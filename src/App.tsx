@@ -27,6 +27,7 @@ type Concert = {
   date: string
   seat: string
   notes: string
+  spotifyUrl?: string
   media: ConcertMedia[]
   createdAt: string
 }
@@ -37,6 +38,16 @@ type ConcertForm = {
   date: string
   seat: string
   notes: string
+  spotifyUrl: string
+}
+
+type SpotifyItem = {
+  type: 'artist' | 'album' | 'track'
+  id: string
+  name: string
+  sub: string
+  img?: string
+  url: string
 }
 
 const VENUES: Venue[] = [
@@ -63,7 +74,19 @@ const EMPTY_FORM: ConcertForm = {
   date: '',
   seat: '',
   notes: '',
+  spotifyUrl: '',
 }
+
+const SPOTIFY_CLIENT_ID = 'cf537ab8a23b4365876e09a0071554df'
+const SPOTIFY_CLIENT_SECRET = '5a30e4bec5994805b5d82573a105e814'
+const SPOTIFY_TYPE_LABELS: Record<SpotifyItem['type'], string> = {
+  artist: '歌手',
+  album: '專輯',
+  track: '歌曲',
+}
+
+let spotifyToken: string | null = null
+let spotifyTokenExpiry = 0
 
 function loadConcerts() {
   try {
@@ -82,6 +105,14 @@ function App() {
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
   const [form, setForm] = useState<ConcertForm>(EMPTY_FORM)
   const [pendingMedia, setPendingMedia] = useState<ConcertMedia[]>([])
+  const [spotifyQuery, setSpotifyQuery] = useState('')
+  const [spotifyResults, setSpotifyResults] = useState<SpotifyItem[]>([])
+  const [spotifyTab, setSpotifyTab] = useState<SpotifyItem['type']>('artist')
+  const [spotifyStatus, setSpotifyStatus] = useState('')
+  const [selectedSpotify, setSelectedSpotify] = useState<SpotifyItem | null>(null)
+  const [isSpotifySearching, setIsSpotifySearching] = useState(false)
+  const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
+  const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
 
   const selectedVenue = useMemo(
     () => VENUES.find((venue) => venue.id === selectedVenueId) ?? null,
@@ -103,6 +134,7 @@ function App() {
   const lightboxMedia = lightbox && lightboxConcert ? lightboxConcert.media[lightbox.mediaIndex] : null
   const visitedVenueCount = new Set(concerts.map((concert) => concert.venueId)).size
   const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
+  const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
 
   useEffect(() => {
     try {
@@ -112,10 +144,23 @@ function App() {
     }
   }, [concerts])
 
+  useEffect(() => {
+    document.body.classList.toggle('player-open', isMusicBarVisible)
+
+    return () => {
+      document.body.classList.remove('player-open')
+    }
+  }, [isMusicBarVisible])
+
   const openAddModal = () => {
     if (!selectedVenue) return
     setForm(EMPTY_FORM)
     setPendingMedia([])
+    setSpotifyQuery('')
+    setSpotifyResults([])
+    setSpotifyStatus('')
+    setSelectedSpotify(null)
+    setSpotifyTab('artist')
     setIsAddModalOpen(true)
   }
 
@@ -162,6 +207,7 @@ function App() {
       date: form.date,
       seat: form.seat.trim(),
       notes: form.notes.trim(),
+      spotifyUrl: form.spotifyUrl.trim(),
       media: pendingMedia,
       createdAt: new Date().toISOString(),
     }
@@ -178,6 +224,57 @@ function App() {
 
   const removePendingMedia = (index: number) => {
     setPendingMedia((current) => current.filter((_, currentIndex) => currentIndex !== index))
+  }
+
+  const searchSpotify = async (queryOverride?: string) => {
+    const query = (queryOverride ?? spotifyQuery).trim()
+    if (!query) return
+
+    setIsSpotifySearching(true)
+    setSpotifyStatus(`搜尋中 ${query}...`)
+
+    try {
+      const token = await getSpotifyToken()
+      const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
+        query,
+      )}&type=artist,album,track&limit=5&market=TW`
+      const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      if (!response.ok) throw new Error('Spotify search failed')
+      const data = await response.json()
+      const results = normalizeSpotifyResults(data)
+
+      setSpotifyResults(results)
+      setSpotifyStatus(results.length === 0 ? `找不到「${query}」的結果` : '')
+    } catch {
+      setSpotifyResults([])
+      setSpotifyStatus('搜尋失敗，請稍後再試')
+    } finally {
+      setIsSpotifySearching(false)
+    }
+  }
+
+  const selectSpotifyItem = (item: SpotifyItem) => {
+    setSelectedSpotify(item)
+    setForm((current) => ({ ...current, spotifyUrl: item.url }))
+    setSpotifyResults([])
+  }
+
+  const clearSpotifySelection = () => {
+    setSelectedSpotify(null)
+    setForm((current) => ({ ...current, spotifyUrl: '' }))
+    setSpotifyQuery('')
+    setSpotifyResults([])
+    setSpotifyStatus('')
+  }
+
+  const openConcertDetail = (concertId: string) => {
+    const concert = concerts.find((item) => item.id === concertId)
+    setDetailConcertId(concertId)
+
+    if (concert?.spotifyUrl && parseSpotifyEmbedUrl(concert.spotifyUrl)) {
+      setMusicBarUrl(concert.spotifyUrl)
+      setIsMusicBarVisible(true)
+    }
   }
 
   return (
@@ -227,7 +324,7 @@ function App() {
             <ConcertList
               concerts={selectedVenueConcerts}
               hasSelectedVenue={Boolean(selectedVenue)}
-              onOpenDetail={setDetailConcertId}
+              onOpenDetail={openConcertDetail}
               onDelete={deleteConcert}
             />
           </div>
@@ -290,6 +387,72 @@ function App() {
             />
           </div>
           <div className="form-group">
+            <label htmlFor="input-spotify-query">Spotify 音樂連結</label>
+            <div className="spotify-search-box">
+              <div className="spotify-search-row">
+                <input
+                  id="input-spotify-query"
+                  type="text"
+                  value={spotifyQuery}
+                  placeholder="搜尋歌手、專輯或歌曲..."
+                  onChange={(event) => setSpotifyQuery(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') {
+                      event.preventDefault()
+                      searchSpotify()
+                    }
+                  }}
+                />
+                <button
+                  className="sp-search-btn"
+                  type="button"
+                  disabled={isSpotifySearching}
+                  onClick={() => searchSpotify()}
+                >
+                  搜尋
+                </button>
+              </div>
+              <input
+                id="input-spotify"
+                type="hidden"
+                value={form.spotifyUrl}
+                onChange={(event) => updateForm('spotifyUrl', event.target.value)}
+              />
+              <div className="spotify-hint">
+                搜尋後選擇一個 Spotify 項目，之後點擊演唱會卡片即可載入播放器。
+              </div>
+              {selectedSpotify && (
+                <div className="spotify-selected-preview">
+                  {selectedSpotify.img && (
+                    <img
+                      className={`sp-selected-img${selectedSpotify.type === 'artist' ? ' round' : ''}`}
+                      src={selectedSpotify.img}
+                      alt=""
+                    />
+                  )}
+                  <div className="sp-selected-info">
+                    <div className="sp-selected-name">{selectedSpotify.name}</div>
+                    <div className="sp-selected-sub">
+                      已選擇 · {SPOTIFY_TYPE_LABELS[selectedSpotify.type]}
+                    </div>
+                  </div>
+                  <button className="sp-selected-clear" type="button" onClick={clearSpotifySelection}>
+                    ✕
+                  </button>
+                </div>
+              )}
+              {(spotifyStatus || spotifyResults.length > 0) && (
+                <SpotifyResults
+                  results={spotifyResults}
+                  status={spotifyStatus}
+                  activeTab={spotifyTab}
+                  onChangeTab={setSpotifyTab}
+                  onSelect={selectSpotifyItem}
+                />
+              )}
+            </div>
+          </div>
+          <div className="form-group">
             <label htmlFor="input-media">照片 / 影片</label>
             <div className="media-upload-area">
               <div className="upload-icon">📷</div>
@@ -333,7 +496,7 @@ function App() {
                 key={concert.id}
                 concert={concert}
                 showVenue
-                onOpenDetail={setDetailConcertId}
+                onOpenDetail={openConcertDetail}
               />
             ))
           )}
@@ -352,6 +515,37 @@ function App() {
           )}
         </div>
       )}
+
+      <button
+        className="music-bar-toggle"
+        type="button"
+        onClick={() => setIsMusicBarVisible((visible) => !visible)}
+      >
+        <div className="spotify-icon" />
+        <span>{isMusicBarVisible ? '收起播放器' : '音樂播放器'}</span>
+      </button>
+
+      <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
+        <div className="music-bar-content">
+          {musicBarEmbedUrl ? (
+            <iframe
+              src={musicBarEmbedUrl}
+              height="90"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Spotify player"
+            />
+          ) : (
+            <div className="music-bar-placeholder">
+              <span className="sp-logo">🎵</span>
+              <span>在演唱會記錄中加入 Spotify 連結，點擊卡片即可在此播放</span>
+            </div>
+          )}
+        </div>
+        <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
+          ✕
+        </button>
+      </div>
     </>
   )
 }
@@ -643,6 +837,7 @@ function ConcertDetail({
         </div>
         {concert.concertName && <div className="detail-concert-name">{concert.concertName}</div>}
       </div>
+      {concert.spotifyUrl && <SpotifyEmbed url={concert.spotifyUrl} />}
       {concert.notes && <div className="detail-notes">{concert.notes}</div>}
       {concert.media.length > 0 && (
         <>
@@ -672,6 +867,103 @@ function ConcertDetail({
   )
 }
 
+function SpotifyResults({
+  results,
+  status,
+  activeTab,
+  onChangeTab,
+  onSelect,
+}: {
+  results: SpotifyItem[]
+  status: string
+  activeTab: SpotifyItem['type']
+  onChangeTab: (tab: SpotifyItem['type']) => void
+  onSelect: (item: SpotifyItem) => void
+}) {
+  const counts = {
+    artist: results.filter((item) => item.type === 'artist').length,
+    album: results.filter((item) => item.type === 'album').length,
+    track: results.filter((item) => item.type === 'track').length,
+  }
+  const visibleResults = results.filter((item) => item.type === activeTab)
+
+  return (
+    <div className="spotify-results">
+      {results.length > 0 && (
+        <div className="sp-tabs">
+          {(['artist', 'album', 'track'] as const).map((type) => (
+            <button
+              key={type}
+              className={`sp-tab${activeTab === type ? ' active' : ''}`}
+              type="button"
+              onClick={() => onChangeTab(type)}
+            >
+              {SPOTIFY_TYPE_LABELS[type]} ({counts[type]})
+            </button>
+          ))}
+        </div>
+      )}
+
+      {status && <div className="sp-search-status">{status}</div>}
+
+      {results.length > 0 &&
+        (visibleResults.length > 0 ? (
+          visibleResults.map((item) => (
+            <button
+              className="sp-result-item"
+              type="button"
+              key={`${item.type}-${item.id}`}
+              onClick={() => onSelect(item)}
+            >
+              {item.img ? (
+                <img
+                  className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`}
+                  src={item.img}
+                  alt=""
+                />
+              ) : (
+                <div className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`} />
+              )}
+              <div className="sp-result-info">
+                <div className="sp-result-name">{item.name}</div>
+                <div className="sp-result-sub">{item.sub}</div>
+              </div>
+              <span className={`sp-result-type sp-type-${item.type}`}>
+                {SPOTIFY_TYPE_LABELS[item.type]}
+              </span>
+            </button>
+          ))
+        ) : (
+          <div className="sp-search-status">此分類無結果</div>
+        ))}
+    </div>
+  )
+}
+
+function SpotifyEmbed({ url }: { url: string }) {
+  const embedUrl = parseSpotifyEmbedUrl(url)
+  if (!embedUrl) return null
+
+  const height = url.includes('/track/') || url.includes('/episode/') ? 152 : 352
+
+  return (
+    <>
+      <div className="detail-spotify">
+        <iframe
+          src={embedUrl}
+          height={height}
+          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+          loading="lazy"
+          title="Spotify detail player"
+        />
+      </div>
+      <a className="spotify-open-btn" href={url} target="_blank" rel="noopener noreferrer">
+        <span>在 Spotify 開啟</span> ↗
+      </a>
+    </>
+  )
+}
+
 function Modal({
   children,
   className = '',
@@ -691,6 +983,74 @@ function Modal({
       </div>
     </div>
   )
+}
+
+async function getSpotifyToken() {
+  if (spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken
+
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Authorization: `Basic ${btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)}`,
+    },
+    body: 'grant_type=client_credentials',
+  })
+  if (!response.ok) throw new Error('Unable to get Spotify token')
+
+  const data = await response.json()
+  spotifyToken = data.access_token
+  spotifyTokenExpiry = Date.now() + (data.expires_in - 60) * 1000
+  return spotifyToken
+}
+
+function normalizeSpotifyResults(data: any): SpotifyItem[] {
+  const artists = data.artists?.items ?? []
+  const albums = data.albums?.items ?? []
+  const tracks = data.tracks?.items ?? []
+
+  return [
+    ...artists.map((artist: any) => ({
+      type: 'artist' as const,
+      id: artist.id,
+      name: artist.name,
+      sub: artist.genres?.slice(0, 2).join('、') || '音樂人',
+      img: artist.images?.[1]?.url || artist.images?.[0]?.url,
+      url: artist.external_urls?.spotify,
+    })),
+    ...albums.map((album: any) => ({
+      type: 'album' as const,
+      id: album.id,
+      name: album.name,
+      sub: `${album.artists?.map((artist: any) => artist.name).join('、') || '未知藝人'} · ${(
+        album.release_date || ''
+      ).slice(0, 4)}`,
+      img: album.images?.[1]?.url || album.images?.[0]?.url,
+      url: album.external_urls?.spotify,
+    })),
+    ...tracks.map((track: any) => ({
+      type: 'track' as const,
+      id: track.id,
+      name: track.name,
+      sub: `${track.artists?.map((artist: any) => artist.name).join('、') || '未知藝人'} · ${
+        track.album?.name || ''
+      }`,
+      img: track.album?.images?.[2]?.url || track.album?.images?.[0]?.url,
+      url: track.external_urls?.spotify,
+    })),
+  ].filter((item) => item.url)
+}
+
+function parseSpotifyEmbedUrl(url: string | null | undefined) {
+  if (!url) return null
+
+  try {
+    const parsedUrl = new URL(url)
+    if (!parsedUrl.hostname.includes('spotify.com')) return null
+    return `https://open.spotify.com/embed${parsedUrl.pathname}?utm_source=generator&theme=0`
+  } catch {
+    return null
+  }
 }
 
 export default App
