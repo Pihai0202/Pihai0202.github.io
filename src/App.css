@@ -1489,11 +1489,16 @@ body.player-open .music-bar-toggle {
   }
 
   .logo-text h1 {
-    font-size: 1rem;
+    font-size: 0.9rem;
   }
 
   .logo-text span {
-    font-size: 0.58rem;
+    font-size: 0.55rem;
+    letter-spacing: 0.15em;
+  }
+
+  .venue-name {
+    font-size: 1.1rem;
   }
 
   .stats-bar {
