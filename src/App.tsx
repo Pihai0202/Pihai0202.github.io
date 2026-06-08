@@ -579,6 +579,7 @@ function App() {
 
         <aside className="sidebar">
           <VenueInfo
+            key={selectedVenue?.id ?? 'empty'}
             venue={selectedVenue}
             concertCount={selectedVenueConcerts.length}
             onAddConcert={openAddModal}
@@ -1015,6 +1016,8 @@ function VenueInfo({
   onAddConcert: () => void
   onClearVenue: () => void
 }) {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+
   if (!venue) {
     return (
       <div className="venue-info empty">
@@ -1031,57 +1034,75 @@ function VenueInfo({
   }
 
   return (
-    <div className="venue-info">
+    <div className={`venue-info${isCollapsed ? ' collapsed' : ''}`}>
       <div className="venue-top">
         <div className="venue-city">{venue.city}</div>
-        <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
-          ✕ 清除選取
-        </button>
+        <div className="venue-top-actions">
+          <button
+            className="toggle-collapse-btn"
+            type="button"
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          >
+            {isCollapsed ? '▼ 展開' : '▲ 收起'}
+          </button>
+          <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
+            ✕ 清除選取
+          </button>
+        </div>
       </div>
-      <div className="venue-header">
+      <div
+        className="venue-header"
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        style={{ cursor: 'pointer', userSelect: 'none' }}
+      >
         <div className="venue-name">{venue.name}</div>
         <div className={`venue-count${concertCount > 0 ? ' has-visits' : ''}`}>
           {concertCount > 0 ? `✓ ${concertCount} 場` : '未造訪'}
         </div>
       </div>
-      <div className="venue-capacity">容量：{venue.capacity} 人</div>
 
-      {venue.address && (
-        <div className="venue-address">
-          <span className="icon">📍</span>
-          <span className="text">{venue.address}</span>
-        </div>
-      )}
-      {venue.transit && (
-        <div className="venue-transit">
-          <span className="icon">🚇</span>
-          <span className="text">{venue.transit}</span>
-        </div>
-      )}
+      {!isCollapsed && (
+        <>
+          <div className="venue-capacity">容量：{venue.capacity} 人</div>
 
-      {venue.address && (
-        <div className="venue-map-embed">
-          <iframe
-            src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-            title={`${venue.name} map`}
-            loading="lazy"
-          />
-        </div>
-      )}
+          {venue.address && (
+            <div className="venue-address">
+              <span className="icon">📍</span>
+              <span className="text">{venue.address}</span>
+            </div>
+          )}
+          {venue.transit && (
+            <div className="venue-transit">
+              <span className="icon">🚇</span>
+              <span className="text">{venue.transit}</span>
+            </div>
+          )}
 
-      <div className="venue-actions">
-        <button className="add-concert-btn" type="button" onClick={onAddConcert}>
-          ＋ 新增演唱會記錄
-        </button>
-        <a
-          className="nav-map-btn"
-          href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          🧭 Google 地圖導航 ↗
-        </a>
-      </div>
+          {venue.address && (
+            <div className="venue-map-embed">
+              <iframe
+                src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                title={`${venue.name} map`}
+                loading="lazy"
+              />
+            </div>
+          )}
+
+          <div className="venue-actions">
+            <button className="add-concert-btn" type="button" onClick={onAddConcert}>
+              ＋ 新增演唱會記錄
+            </button>
+            <a
+              className="nav-map-btn"
+              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              🧭 Google 地圖導航 ↗
+            </a>
+          </div>
+        </>
+      )}
     </div>
   )
 }

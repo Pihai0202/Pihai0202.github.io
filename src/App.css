@@ -353,6 +353,38 @@ svg#taiwan-map {
   background: rgba(230, 57, 70, 0.08);
 }
 
+.venue-top-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.toggle-collapse-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s;
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.toggle-collapse-btn:hover {
+  color: var(--gold);
+  background: rgba(255, 209, 102, 0.08);
+}
+
+.venue-info.collapsed {
+  min-height: auto;
+  padding-bottom: 1.2rem;
+}
+
 .venue-capacity {
   font-size: 0.8rem;
   color: var(--muted);

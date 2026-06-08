@@ -422,127 +422,69 @@ def is_concert_like(text):
 # ── 拓元售票 Tixcraft ───────────────────────────────────────────────────────
 
 def scrape_tixcraft():
-    """Scrape Tixcraft (拓元) music/concert events."""
+    """Scrape Tixcraft (拓元) music/concert events from public /activity catalog."""
     events = []
     seen = set()
 
-    # 拓元提供公開活動列表頁，依分類瀏覽
-    pages = [
-        "https://tixcraft.com/activity/game/tag/concert",
-        "https://tixcraft.com/activity/game/tag/pop",
-        "https://tixcraft.com/activity/game/tag/kpop",
-    ]
-
-    for page_url in pages:
-        print(f"  Fetching {page_url}", file=sys.stderr)
-        html = fetch(page_url)
-        if not html:
-            continue
-
-        # 先嘗試 LD+JSON
-        ld_matches = re.findall(
-            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
-            html, re.DOTALL
-        )
-        for ld_raw in ld_matches:
-            try:
-                ld = json.loads(ld_raw)
-                items = ld if isinstance(ld, list) else [ld]
-                for item in items:
-                    if item.get("@type") not in ("Event", "MusicEvent", "EntertainmentBusiness"):
-                        continue
-                    uid = item.get("url", "") or item.get("name", "")
-                    if uid in seen:
-                        continue
-                    seen.add(uid)
-                    _parse_ld_event(item, "tixcraft", events)
-            except Exception:
-                pass
-
-        # HTML 卡片解析（拓元活動卡）
-        # 格式：<a class="... " href="/activity/game/XXXX">
-        card_links = re.findall(
-            r'href=["\'](/activity/game/([A-Za-z0-9_-]+))["\']',
-            html
-        )
-        names_raw  = re.findall(r'class="[^"]*title[^"]*"[^>]*>([^<]+)<', html)
-
-        for (path, gid) in card_links:
-            ev_url = "https://tixcraft.com" + path
-            if ev_url in seen:
-                continue
-            seen.add(ev_url)
-
-            # 抓活動詳細頁取得日期場館
-            detail = _tixcraft_detail(ev_url)
-            if not detail:
-                continue
-            if detail["date"] and detail["date"] < today_str():
-                continue
-
-            events.append({
-                "id":         f"tixcraft-{gid}",
-                "source":     "拓元售票",
-                "name":       detail["name"],
-                "venue_raw":  detail["venue_raw"],
-                "venue_id":   detail["venue_id"],
-                "venue_name": detail["venue_name"],
-                "city":       VENUE_CITY.get(detail["venue_id"], ""),
-                "date":       detail["date"],
-                "image":      detail["image"],
-                "url":        ev_url,
-                "price":      detail["price"],
-                "ticket_links": [
-                    {"platform": "tixcraft", "name": "拓元售票", "url": ev_url}
-                ],
-            })
-            time.sleep(0.4)
-
-        time.sleep(0.8)
-
-    return events
-
-
-def _tixcraft_detail(url):
-    """Fetch Tixcraft event detail page and extract basic info."""
+    url = "https://tixcraft.com/activity"
+    print(f"  Fetching {url}", file=sys.stderr)
     html = fetch(url)
     if not html:
-        return None
+        return events
 
-    name = ""
-    m = re.search(r'<h1[^>]*class="[^"]*title[^"]*"[^>]*>([^<]+)', html)
-    if not m:
-        m = re.search(r'<title>([^<|]+)', html)
-    if m:
-        name = m.group(1).strip()
+    blocks = re.findall(r'<div class="eventbl[^>]*>([\s\S]*?)</div>\s*</div>\s*</div>', html)
+    print(f"  Found {len(blocks)} blocks in Tixcraft", file=sys.stderr)
 
-    date_str = ""
-    m = re.search(r'(\d{4})[/-](\d{2})[/-](\d{2})', html)
-    if m:
-        date_str = f"{m.group(1)}-{m.group(2)}-{m.group(3)}"
-
-    venue_raw = ""
-    m = re.search(r'(?:場地|地點|venue)[：:]\s*([^\n<]{2,50})', html)
-    if m:
-        venue_raw = m.group(1).strip()
-
-    image = ""
-    m = re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', html)
-    if m:
-        image = m.group(1)
-
-    price = ""
-    m = re.search(r'(?:票價|price)[：:]\s*([^\n<]{2,40})', html)
-    if m:
-        price = m.group(1).strip()
-
-    venue_id, venue_name = match_venue(name + " " + venue_raw)
-
-    return {
-        "name": name, "date": date_str,
-        "venue_raw": venue_raw, "venue_id": venue_id, "venue_name": venue_name,
-        "image": image, "price": price,
-    }
+    for b in blocks:
+        # Image
+        img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', b)
+        image = img_match.group(1) if img_match else ""
+        
+        # Detail URL and Title
+        title_match = re.search(r'<div class="text-bold[^>]*>\s*<a href=["\']([^"\']+)["\'][^>]*>([\s\S]*?)</a>', b)
+        if not title_match:
+            continue
+            
+        detail_path = title_match.group(1)
+        name = unescape(re.sub(r'<[^>]*>', '', title_match.group(2)).strip())
+        
+        # Date
+        date_match = re.search(r'class=["\']text-small date["\'][^>]*>([\s\S]*?)</div>', b)
+        date_raw = unescape(re.sub(r'<[^>]*>', '', date_match.group(1)).strip()) if date_match else ""
+        date_str = parse_first_date(date_raw)
+        
+        # Venue
+        venue_match = re.search(r'class=["\']text-small text-med-light["\'][^>]*>([\s\S]*?)</div>', b)
+        venue_raw = unescape(re.sub(r'<[^>]*>', '', venue_match.group(1)).strip()) if venue_match else ""
+        
+        if date_str and date_str < today_str():
+            continue
+            
+        ev_url = "https://tixcraft.com" + detail_path
+        if ev_url in seen:
+            continue
+        seen.add(ev_url)
+        
+        venue_id, venue_name = match_venue(name + " " + venue_raw)
+        
+        events.append({
+            "id":         f"tixcraft-{detail_path.split('/')[-1]}",
+            "source":     "拓元售票",
+            "name":       name,
+            "venue_raw":  venue_raw,
+            "venue_id":   venue_id,
+            "venue_name": venue_name,
+            "city":       VENUE_CITY.get(venue_id, ""),
+            "date":       date_str,
+            "image":      image,
+            "url":        ev_url,
+            "price":      "",
+            "ticket_links": [
+                {"platform": "tixcraft", "name": "拓元售票", "url": ev_url}
+            ],
+        })
+        
+    return events
 
 
 def _parse_ld_event(item, platform, events_list):
@@ -922,11 +864,19 @@ def merge_ticket_links(events):
             # merge ticket links
             existing = result[index[key]]
             for lk in ev.get("ticket_links", []):
-                if not any(l["platform"] == lk["platform"] for l in existing["ticket_links"]):
+                matched = next((l for l in existing["ticket_links"] if l["platform"] == lk["platform"]), None)
+                if matched:
+                    # If existing url is generic homepage, but incoming is specific, overwrite it
+                    if matched["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and lk["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
+                        matched["url"] = lk["url"]
+                else:
                     existing["ticket_links"].append(lk)
             # prefer image if missing
             if not existing["image"] and ev["image"]:
                 existing["image"] = ev["image"]
+            # prefer specific URL over generic homepage URL at top-level
+            if existing["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and ev["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
+                existing["url"] = ev["url"]
         else:
             index[key] = len(result)
             result.append(ev)
