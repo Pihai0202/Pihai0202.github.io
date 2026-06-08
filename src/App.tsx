@@ -73,7 +73,7 @@ function App() {
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(0.75)
+  const [zoom, setZoom] = useState(0.9)
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'login'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
@@ -493,7 +493,7 @@ function App() {
                 title="地圖縮放"
               />
               <span className="zoom-value">{Math.round(zoom * 100)}%</span>
-              <button className="zoom-reset-btn" type="button" onClick={() => setZoom(0.75)} title="重設縮放">
+              <button className="zoom-reset-btn" type="button" onClick={() => setZoom(0.9)} title="重設縮放">
                 ⟲
               </button>
             </div>

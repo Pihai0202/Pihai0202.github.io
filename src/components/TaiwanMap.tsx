@@ -59,7 +59,7 @@ export function TaiwanMap({
   }, [selectedVenueId, selectedVenue])
 
   useEffect(() => {
-    if (!selectedVenueId && zoom === 0.75) {
+    if (!selectedVenueId && zoom === 0.9) {
       setCenter({ x: 235, y: 285 })
     }
   }, [zoom, selectedVenueId])
