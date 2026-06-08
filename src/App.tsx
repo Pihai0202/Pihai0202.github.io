@@ -359,6 +359,8 @@ function App() {
   }
 
   const handleHeaderClick = () => {
+    setSelectedVenueId(null) // Return to home (deselect venue)
+
     // Scroll window/document
     try {
       window.scrollTo({ top: 0, behavior: 'smooth' })
