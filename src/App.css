@@ -3379,14 +3379,96 @@ body.player-open .music-bar-toggle {
 }
 
 /* Mobile optimizations for Weather & AQI widget */
+/* ==========================================================================
+   Mobile Tab-Navigation Redesign (max-width: 768px)
+   ========================================================================== */
+
+/* Show details button by default */
+.weather-view-details-btn {
+  width: 100%;
+  margin-top: 0.8rem;
+  padding: 0.65rem;
+  background: var(--gold);
+  color: #0a0a0f;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.weather-view-details-btn:hover {
+  background: #ffc43d;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(255, 209, 102, 0.3);
+}
+
 @media (max-width: 768px) {
+  /* Clean up Header */
+  header {
+    padding: 0.8rem 1rem !important;
+    height: 62px !important;
+    overflow: hidden;
+  }
+  
+  .stats-bar {
+    display: none !important; /* Hide stats bar on mobile to keep header clean */
+  }
+
+  .nav-toggle-btn {
+    display: none !important; /* Hide community toggle button in header */
+  }
+
+  .login-trigger-btn,
+  .logout-btn {
+    display: flex !important; /* Keep login/logout buttons visible */
+    font-size: 0.72rem !important;
+    padding: 0.35rem 0.75rem !important;
+    border-radius: 15px !important;
+  }
+
+  /* Full Screen Tab Layout */
+  .main-layout {
+    display: block !important;
+    height: calc(100vh - 62px - 60px) !important; /* Viewport minus header (62px) and bottom nav (60px) */
+    min-height: 0 !important;
+    overflow: hidden !important;
+    position: relative !important;
+  }
+
+  /* Map Tab View */
+  .main-layout.mobile-tab-map .map-container {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+  }
+  .main-layout.mobile-tab-map .sidebar {
+    display: none !important;
+  }
+
+  /* List Tab View */
+  .main-layout.mobile-tab-list .map-container {
+    display: none !important;
+  }
+  .main-layout.mobile-tab-list .sidebar {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+  }
+
+  /* Float weather widget overlay nicely on full-height mobile map */
   .map-weather-overlay {
     top: 4.5rem;
     right: 1rem;
     left: 1rem;
     width: auto;
-    max-height: calc(60vh - 6rem);
+    max-height: calc(100% - 6.5rem); /* Prevents overlapping bottom navigation */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+    z-index: 99;
   }
 
   .weather-widget {
@@ -3426,5 +3508,96 @@ body.player-open .music-bar-toggle {
     width: 30px;
     height: 30px;
     font-size: 1.05rem;
+  }
+
+  /* Mobile Bottom Navigation Bar */
+  .mobile-bottom-nav {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(18, 18, 26, 0.95);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: 1px solid var(--border);
+    z-index: 999;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.4);
+  }
+
+  .mobile-bottom-nav .nav-item {
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    gap: 0.2rem;
+    transition: all 0.2s ease;
+    position: relative;
+    padding: 0.4rem 0;
+    cursor: pointer;
+  }
+
+  .mobile-bottom-nav .nav-item:active {
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .mobile-bottom-nav .nav-item .icon {
+    font-size: 1.15rem;
+    transition: transform 0.2s ease;
+  }
+
+  .mobile-bottom-nav .nav-item .label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+  }
+
+  .mobile-bottom-nav .nav-item.active {
+    color: var(--gold);
+  }
+
+  .mobile-bottom-nav .nav-item.active .icon {
+    transform: scale(1.15);
+  }
+
+  .mobile-bottom-nav .nav-item .badge {
+    position: absolute;
+    top: 5px;
+    right: 25%;
+    background: var(--accent);
+    color: white;
+    font-size: 0.58rem;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    padding: 0.05rem 0.35rem;
+    border-radius: 10px;
+    border: 1px solid var(--surface);
+    line-height: 1;
+  }
+
+  /* Music Player Button Spacing */
+  .music-bar-toggle {
+    bottom: 75px !important; /* Float above bottom nav */
+    right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  /* Ensure correct padding with player open */
+  body.player-open .main-layout {
+    height: calc(100vh - 62px - 60px - 90px) !important; /* Minus player height */
+  }
+
+  body.player-open .mobile-bottom-nav {
+    bottom: 90px; /* Shift bottom nav up above player */
+  }
+
+  /* Hide details button on list tab since we're already there */
+  .main-layout.mobile-tab-list .weather-view-details-btn {
+    display: none !important;
   }
 }

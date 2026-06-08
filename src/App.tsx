@@ -78,6 +78,15 @@ function App() {
   const [view, setView] = useState<'map' | 'board' | 'login'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
+  const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'board'>('map')
+
+  useEffect(() => {
+    if (view === 'board') {
+      setMobileTab('board')
+    } else if (view === 'map') {
+      setMobileTab((current) => (current === 'board' ? 'map' : current))
+    }
+  }, [view])
   const [nickname, setNickname] = useState(() => localStorage.getItem('tw-nickname') || '')
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('tw-logged-in') === 'true')
   const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string } | null>(() => {
@@ -427,7 +436,7 @@ function App() {
       </header>
 
       {view === 'map' ? (
-        <main className="main-layout">
+        <main className={`main-layout mobile-tab-${mobileTab}`}>
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
@@ -467,6 +476,7 @@ function App() {
                   longitude={selectedVenue.longitude}
                   cityName={selectedVenue.city}
                   onClose={() => setSelectedVenueId(null)}
+                  onViewDetails={() => setMobileTab('list')}
                 />
               </div>
             )}
@@ -833,6 +843,46 @@ function App() {
           ✕
         </button>
       </div>
+
+      {view !== 'login' && (
+        <div className="mobile-bottom-nav">
+          <button
+            className={`nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
+            type="button"
+            onClick={() => {
+              setView('map')
+              setMobileTab('map')
+            }}
+          >
+            <span className="icon">🗺️</span>
+            <span className="label">場館地圖</span>
+          </button>
+          <button
+            className={`nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
+            type="button"
+            onClick={() => {
+              setView('map')
+              setMobileTab('list')
+            }}
+          >
+            <span className="icon">📋</span>
+            <span className="label">場館資訊</span>
+            {selectedVenueConcerts.length > 0 && (
+              <span className="badge">{selectedVenueConcerts.length}</span>
+            )}
+          </button>
+          <button
+            className={`nav-item${view === 'board' ? ' active' : ''}`}
+            type="button"
+            onClick={() => {
+              setView('board')
+            }}
+          >
+            <span className="icon">💬</span>
+            <span className="label">社群牆</span>
+          </button>
+        </div>
+      )}
     </>
   )
 }

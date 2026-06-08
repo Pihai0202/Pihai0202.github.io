@@ -5,6 +5,7 @@ interface VenueWeatherProps {
   longitude?: number
   cityName: string
   onClose?: () => void
+  onViewDetails?: () => void
 }
 
 interface WeatherData {
@@ -140,7 +141,7 @@ function getWeatherWarnings(weather: WeatherData): string[] {
   return warnings
 }
 
-export function VenueWeather({ latitude, longitude, cityName, onClose }: VenueWeatherProps) {
+export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDetails }: VenueWeatherProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [aqi, setAqi] = useState<AqiData | null>(null)
   const [loading, setLoading] = useState(false)
@@ -365,6 +366,16 @@ export function VenueWeather({ latitude, longitude, cityName, onClose }: VenueWe
             )}
           </div>
         </div>
+
+        {onViewDetails && (
+          <button
+            className="weather-view-details-btn"
+            type="button"
+            onClick={onViewDetails}
+          >
+            📋 查看場館詳情與記錄 ➔
+          </button>
+        )}
       </div>
     </div>
   )
