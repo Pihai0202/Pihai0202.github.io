@@ -1533,3 +1533,68 @@ body.player-open .music-bar-toggle {
     padding: 0 1rem;
   }
 }
+
+/* 場館詳細地址與交通指南 */
+.venue-address,
+.venue-transit {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  margin-top: 0.8rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.95;
+}
+
+.venue-address .icon,
+.venue-transit .icon {
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.venue-address .text,
+.venue-transit .text {
+  flex: 1;
+}
+
+.venue-transit {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding-top: 0.6rem;
+}
+
+.venue-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1.2rem;
+}
+
+.venue-actions .add-concert-btn {
+  margin-top: 0;
+}
+
+.nav-map-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  padding: 0.65rem;
+  background: var(--surface2);
+  border: 1px solid rgba(255, 209, 102, 0.22);
+  color: var(--gold);
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.nav-map-btn:hover {
+  background: rgba(255, 209, 102, 0.08);
+  border-color: var(--gold);
+  transform: translateY(-1px);
+}
