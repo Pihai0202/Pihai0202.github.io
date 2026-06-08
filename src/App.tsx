@@ -1493,30 +1493,76 @@ function TransitStatusBoard() {
     const activeService = TRANSIT_SERVICES.find((s) => s.id === serviceId) || TRANSIT_SERVICES[0]
     setStatus((prev) => ({ ...prev, loading: true, text: '正在讀取即時狀態...' }))
 
-    try {
-      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(activeService.url)}`
-      const response = await fetch(proxyUrl)
-      if (!response.ok) throw new Error('CORS proxy failed')
-      const data = await response.json()
-      const html = data.contents || ''
+    let html = ''
+    let fetchSuccess = false
 
+    // Proxy 1: corsproxy.io (Direct raw HTML)
+    try {
+      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(activeService.url)}`)
+      if (response.ok) {
+        html = await response.text()
+        fetchSuccess = true
+      }
+    } catch (e) {
+      console.warn('corsproxy.io failed, trying next proxy...', e)
+    }
+
+    // Proxy 2: api.codetabs.com (Direct raw HTML)
+    if (!fetchSuccess) {
+      try {
+        const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(activeService.url)}`)
+        if (response.ok) {
+          html = await response.text()
+          fetchSuccess = true
+        }
+      } catch (e) {
+        console.warn('codetabs proxy failed, trying next proxy...', e)
+      }
+    }
+
+    // Proxy 3: api.allorigins.win (JSON wrapped)
+    if (!fetchSuccess) {
+      try {
+        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(activeService.url)}`)
+        if (response.ok) {
+          const data = await response.json()
+          html = data.contents || ''
+          fetchSuccess = true
+        }
+      } catch (e) {
+        console.warn('allorigins proxy failed', e)
+      }
+    }
+
+    if (fetchSuccess && html) {
+      // Analyze HTML for normal/abnormal patterns
       const isNormal = activeService.searchPatterns.some((pattern) => html.includes(pattern))
+      
+      // Attempt to extract specific marquee text (mostly for Taipei Metro)
+      let customDetail = ''
+      if (activeService.id === 'trtc') {
+        const marqueeMatch = html.match(/<marquee[^>]*>([\s\S]*?)<\/marquee>/i)
+        if (marqueeMatch && marqueeMatch[1]) {
+          customDetail = marqueeMatch[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
+        }
+      }
 
       setStatus({
         loading: false,
         text: isNormal ? '🟢 營運正常' : '🟡 營運調整中',
         isNormal: isNormal,
-        detail: isNormal 
+        detail: customDetail || (isNormal 
           ? `今日${activeService.name}系統運作良好，目前全線正常營運。` 
-          : `偵測到可能有班次異動或系統調整，請以官網即時狀態為準。`,
+          : `偵測到可能有班次異動或系統調整，請以官網即時狀態為準。`),
         updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       })
-    } catch {
+    } else {
+      // Fallback
       setStatus({
         loading: false,
         text: '🟢 營運正常 (預估)',
         isNormal: true,
-        detail: '無法取得即時資料，請點擊下方按鈕前往官網查看即時動態。',
+        detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
         updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
       })
     }
