@@ -190,7 +190,16 @@ svg#taiwan-map.dragging {
 
 .venue-dot circle.core {
   fill: var(--accent);
+  r: calc(6px / var(--map-zoom, 1));
   transition: all 0.3s ease;
+}
+
+.venue-dot circle.bg {
+  r: calc(16px / var(--map-zoom, 1));
+}
+
+.venue-dot circle.click-target {
+  r: calc(25px / var(--map-zoom, 1));
 }
 
 .venue-dot.visited circle.core,
@@ -200,28 +209,28 @@ svg#taiwan-map.dragging {
 
 .venue-dot:hover circle.bg {
   opacity: 0.5;
-  r: 22;
+  r: calc(22px / var(--map-zoom, 1));
 }
 
 .venue-dot:hover circle.core {
-  r: 9;
+  r: calc(9px / var(--map-zoom, 1));
 }
 
 .venue-dot.active circle.core {
   fill: var(--gold);
-  r: 10;
+  r: calc(10px / var(--map-zoom, 1));
 }
 
 .venue-dot.active circle.bg {
   fill: var(--gold);
   opacity: 0.3;
-  r: 24;
+  r: calc(24px / var(--map-zoom, 1));
 }
 
 .pulse-ring {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1.5;
+  stroke-width: calc(1.5px / var(--map-zoom, 1));
   opacity: 0;
   animation: pulse-ring 2.5s ease-out infinite;
 }
@@ -232,12 +241,12 @@ svg#taiwan-map.dragging {
 
 @keyframes pulse-ring {
   0% {
-    r: 8;
+    r: calc(8px / var(--map-zoom, 1));
     opacity: 0.8;
   }
 
   100% {
-    r: 28;
+    r: calc(28px / var(--map-zoom, 1));
     opacity: 0;
   }
 }

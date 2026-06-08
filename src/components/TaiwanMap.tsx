@@ -216,6 +216,7 @@ export function TaiwanMap({
       onTouchStart={handleTouchStart}
       onTouchMove={handleTouchMove}
       onTouchEnd={handleDragEnd}
+      style={{ '--map-zoom': zoom } as React.CSSProperties}
     >
       <defs>
         <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
