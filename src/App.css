@@ -54,6 +54,7 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 1.5rem;
   background: linear-gradient(180deg, #0f0f1a 0%, transparent 100%);
   position: sticky;
   top: 0;
@@ -107,11 +108,14 @@ header {
 
 .stats-bar {
   display: flex;
-  gap: 2rem;
+  gap: clamp(0.8rem, 2vw, 2rem);
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 .stat {
   text-align: center;
+  min-width: 58px;
 }
 
 .stat-num {
@@ -130,7 +134,8 @@ header {
 .main-layout {
   display: grid;
   grid-template-columns: 1fr 420px;
-  height: calc(100vh - 80px);
+  height: calc(100vh - 91px);
+  min-height: 560px;
 }
 
 .map-container {
@@ -358,6 +363,7 @@ svg#taiwan-map {
   flex: 1;
   overflow-y: auto;
   padding: 1rem;
+  min-height: 0;
 }
 
 .concert-list-area::-webkit-scrollbar,
@@ -425,6 +431,8 @@ svg#taiwan-map {
   font-weight: 700;
   font-size: 1rem;
   color: var(--text);
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .concert-date {
@@ -438,6 +446,7 @@ svg#taiwan-map {
   font-size: 0.75rem;
   color: var(--muted);
   margin-top: 0.2rem;
+  overflow-wrap: anywhere;
 }
 
 .seat-tag {
@@ -876,6 +885,117 @@ svg#taiwan-map {
   font-size: 0.85rem;
 }
 
+.empty-state.compact {
+  padding: 1rem;
+}
+
+.upcoming-section {
+  margin-bottom: 1.4rem;
+}
+
+.remote-updated {
+  margin: -0.4rem 0 0.7rem;
+  padding: 0 0.5rem;
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.66rem;
+}
+
+.remote-card {
+  display: grid;
+  grid-template-columns: 86px 1fr;
+  gap: 0.75rem;
+  min-height: 94px;
+  background: rgba(255, 209, 102, 0.06);
+  border: 1px solid rgba(255, 209, 102, 0.18);
+  border-radius: 8px;
+  padding: 0.65rem;
+  color: var(--text);
+  text-decoration: none;
+  margin-bottom: 0.7rem;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+}
+
+.remote-card:hover {
+  border-color: var(--gold);
+  background: rgba(255, 209, 102, 0.1);
+  transform: translateX(3px);
+}
+
+.remote-card img,
+.remote-card-fallback {
+  width: 86px;
+  height: 82px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.remote-card img {
+  object-fit: cover;
+  background: var(--surface);
+}
+
+.remote-card-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+}
+
+.remote-card-body {
+  min-width: 0;
+}
+
+.remote-card-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.7rem;
+  color: var(--gold);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.66rem;
+  margin-bottom: 0.25rem;
+}
+
+.remote-card-name {
+  color: var(--text);
+  font-weight: 700;
+  font-size: 0.9rem;
+  line-height: 1.35;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.remote-card-meta {
+  color: var(--muted);
+  font-size: 0.72rem;
+  margin-top: 0.25rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ticket-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.45rem;
+}
+
+.ticket-links span {
+  border: 1px solid rgba(6, 214, 160, 0.25);
+  border-radius: 4px;
+  color: var(--teal);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.62rem;
+  padding: 0.15rem 0.35rem;
+}
+
 .music-bar {
   position: fixed;
   bottom: 0;
@@ -976,7 +1096,7 @@ svg#taiwan-map {
 }
 
 body.player-open .main-layout {
-  height: calc(100vh - 80px - 90px);
+  height: calc(100vh - 91px - 90px);
 }
 
 body.player-open .music-bar-toggle {
@@ -1229,7 +1349,12 @@ body.player-open .music-bar-toggle {
   header {
     padding: 1rem;
     gap: 1rem;
-    align-items: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .logo {
+    min-width: 220px;
   }
 
   .logo-text h1 {
@@ -1242,6 +1367,8 @@ body.player-open .music-bar-toggle {
 
   .stats-bar {
     gap: 0.8rem;
+    width: 100%;
+    justify-content: space-between;
   }
 
   .stat-num {
@@ -1256,7 +1383,7 @@ body.player-open .music-bar-toggle {
     grid-template-columns: 1fr;
     grid-template-rows: 60vh 1fr;
     height: auto;
-    min-height: calc(100vh - 76px);
+    min-height: calc(100vh - 128px);
   }
 
   .map-container {
@@ -1280,5 +1407,43 @@ body.player-open .music-bar-toggle {
 
   .sidebar {
     min-height: 45vh;
+  }
+
+  body.player-open .main-layout {
+    height: auto;
+    padding-bottom: 90px;
+  }
+
+  .remote-card {
+    grid-template-columns: 76px 1fr;
+  }
+
+  .remote-card img,
+  .remote-card-fallback {
+    width: 76px;
+    height: 78px;
+  }
+
+  .modal {
+    padding: 1.4rem;
+  }
+
+  .spotify-search-row {
+    flex-direction: column;
+  }
+
+  .sp-tabs {
+    flex-wrap: wrap;
+  }
+
+  .music-bar-toggle {
+    right: 1rem;
+    max-width: calc(100vw - 2rem);
+  }
+
+  .music-bar-placeholder {
+    justify-content: flex-start;
+    font-size: 0.78rem;
+    padding: 0 1rem;
   }
 }

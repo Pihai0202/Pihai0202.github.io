@@ -32,6 +32,34 @@ type Concert = {
   createdAt: string
 }
 
+type TicketLink = {
+  platform: string
+  name: string
+  url: string
+}
+
+type RemoteConcert = {
+  id: string
+  source: string
+  name: string
+  venue_raw: string
+  venue_id: string | null
+  venue_name: string | null
+  city: string
+  date: string
+  image: string
+  url: string
+  price: string
+  ticket_links: TicketLink[]
+}
+
+type RemoteConcertPayload = {
+  updated_at?: string
+  count?: number
+  sources?: string[]
+  events?: RemoteConcert[]
+}
+
 type ConcertForm = {
   artist: string
   concertName: string
@@ -98,6 +126,9 @@ function loadConcerts() {
 
 function App() {
   const [concerts, setConcerts] = useState<Concert[]>(loadConcerts)
+  const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
+  const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
+  const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
@@ -125,6 +156,13 @@ function App() {
         .sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts, selectedVenueId],
   )
+  const selectedVenueRemoteConcerts = useMemo(
+    () =>
+      remoteConcerts
+        .filter((concert) => concert.venue_id === selectedVenueId)
+        .sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
+    [remoteConcerts, selectedVenueId],
+  )
   const sortedConcerts = useMemo(
     () => [...concerts].sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts],
@@ -135,6 +173,7 @@ function App() {
   const visitedVenueCount = new Set(concerts.map((concert) => concert.venueId)).size
   const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
+  const visibleRemoteConcerts = remoteConcerts.filter((concert) => concert.venue_id)
 
   useEffect(() => {
     try {
@@ -143,6 +182,33 @@ function App() {
       alert('儲存空間不足，請清理一些照片再試。')
     }
   }, [concerts])
+
+  useEffect(() => {
+    let isMounted = true
+
+    fetch(`${import.meta.env.BASE_URL}concerts.json`, { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error('concerts.json not found')
+        return response.json() as Promise<RemoteConcertPayload>
+      })
+      .then((data) => {
+        if (!isMounted) return
+        const events = Array.isArray(data.events) ? data.events : []
+        setRemoteConcerts(events)
+        setRemoteUpdatedAt(data.updated_at ?? null)
+        setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
+      })
+      .catch(() => {
+        if (!isMounted) return
+        setRemoteConcerts([])
+        setRemoteUpdatedAt(null)
+        setRemoteStatus('近期售票活動暫時讀取失敗')
+      })
+
+    return () => {
+      isMounted = false
+    }
+  }, [])
 
   useEffect(() => {
     document.body.classList.toggle('player-open', isMusicBarVisible)
@@ -290,6 +356,7 @@ function App() {
         <div className="stats-bar">
           <Stat number={concerts.length} label="演唱會" />
           <Stat number={visitedVenueCount} label="場館" />
+          <Stat number={visibleRemoteConcerts.length} label="售票" />
           <Stat number={totalMedia} label="照片/影片" />
         </div>
       </header>
@@ -321,6 +388,12 @@ function App() {
             onAddConcert={openAddModal}
           />
           <div className="concert-list-area">
+            <UpcomingConcerts
+              concerts={selectedVenueRemoteConcerts}
+              hasSelectedVenue={Boolean(selectedVenue)}
+              status={remoteStatus}
+              updatedAt={remoteUpdatedAt}
+            />
             <ConcertList
               concerts={selectedVenueConcerts}
               hasSelectedVenue={Boolean(selectedVenue)}
@@ -547,6 +620,60 @@ function App() {
         </button>
       </div>
     </>
+  )
+}
+
+function UpcomingConcerts({
+  concerts,
+  hasSelectedVenue,
+  status,
+  updatedAt,
+}: {
+  concerts: RemoteConcert[]
+  hasSelectedVenue: boolean
+  status: string
+  updatedAt: string | null
+}) {
+  if (!hasSelectedVenue) return null
+
+  return (
+    <section className="upcoming-section" aria-label="近期售票活動">
+      <div className="section-title">— 近期售票活動 —</div>
+      {updatedAt && <div className="remote-updated">更新：{formatRemoteDate(updatedAt)}</div>}
+      {status && <div className="empty-state compact">{status}</div>}
+      {!status && concerts.length === 0 && (
+        <div className="empty-state compact">這個場館目前沒有近期售票資料</div>
+      )}
+      {concerts.slice(0, 4).map((concert) => (
+        <a
+          className="remote-card"
+          href={concert.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          key={concert.id}
+        >
+          {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
+          <div className="remote-card-body">
+            <div className="remote-card-top">
+              <span>{concert.source || '售票資訊'}</span>
+              <span>{concert.date || '日期未定'}</span>
+            </div>
+            <div className="remote-card-name">{concert.name}</div>
+            <div className="remote-card-meta">
+              {concert.venue_raw || concert.venue_name || '場館待確認'}
+              {concert.price ? ` · ${concert.price}` : ''}
+            </div>
+            {concert.ticket_links?.length > 0 && (
+              <div className="ticket-links">
+                {concert.ticket_links.slice(0, 3).map((link) => (
+                  <span key={`${concert.id}-${link.platform}`}>{link.name}</span>
+                ))}
+              </div>
+            )}
+          </div>
+        </a>
+      ))}
+    </section>
   )
 }
 
@@ -1051,6 +1178,18 @@ function parseSpotifyEmbedUrl(url: string | null | undefined) {
   } catch {
     return null
   }
+}
+
+function formatRemoteDate(value: string) {
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return value.slice(0, 10)
+
+  return new Intl.DateTimeFormat('zh-TW', {
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(date)
 }
 
 export default App
