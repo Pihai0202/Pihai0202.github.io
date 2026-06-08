@@ -1,227 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode } from 'react'
+import { marked } from 'marked'
 import './App.css'
 
-type Venue = {
-  id: string
-  name: string
-  city: string
-  capacity: string
-  x: number
-  y: number
-  address?: string
-  transit?: string
-}
+import type {
+  Concert,
+  ConcertMedia,
+  RemoteConcert,
+  RemoteConcertPayload,
+  ConcertForm,
+  SpotifyItem
+} from './types'
 
-type ConcertMedia = {
-  name: string
-  dataUrl: string
-  type: string
-}
-
-type Concert = {
-  id: string
-  venueId: string
-  venueName: string
-  venueCity: string
-  artist: string
-  concertName: string
-  date: string
-  seat: string
-  notes: string
-  spotifyUrl?: string
-  media: ConcertMedia[]
-  createdAt: string
-}
-
-type TicketLink = {
-  platform: string
-  name: string
-  url: string
-}
-
-type RemoteConcert = {
-  id: string
-  source: string
-  name: string
-  venue_raw: string
-  venue_id: string | null
-  venue_name: string | null
-  city: string
-  date: string
-  image: string
-  url: string
-  price: string
-  ticket_links: TicketLink[]
-}
-
-type RemoteConcertPayload = {
-  updated_at?: string
-  count?: number
-  sources?: string[]
-  events?: RemoteConcert[]
-}
-
-type ConcertForm = {
-  artist: string
-  concertName: string
-  date: string
-  seat: string
-  notes: string
-  spotifyUrl: string
-}
-
-type SpotifyItem = {
-  type: 'artist' | 'album' | 'track'
-  id: string
-  name: string
-  sub: string
-  img?: string
-  url: string
-}
-
-const VENUES: Venue[] = [
-  {
-    id: 'taipei-dome',
-    name: '台北大巨蛋',
-    city: '台北',
-    capacity: '40,000',
-    x: 248,
-    y: 178,
-    address: '台北市信義區忠孝東路四段515號',
-    transit: '捷運板南線「國父紀念館站」5 號出口直達',
-  },
-  {
-    id: 'taipei-arena',
-    name: '台北小巨蛋',
-    city: '台北',
-    capacity: '10,000',
-    x: 262,
-    y: 168,
-    address: '台北市松山區南京東路四段2號',
-    transit: '捷運松山新店線「台北小巨蛋站」2 號出口直達',
-  },
-  {
-    id: 'nangang',
-    name: '南港展覽館',
-    city: '台北',
-    capacity: '30,000',
-    x: 272,
-    y: 185,
-    address: '台北市南港區經貿二路1號',
-    transit: '捷運板南線/文湖線「南港展覽館站」1 號/2 號出口即達',
-  },
-  {
-    id: 'taoyuan-arena',
-    name: '桃園國際棒球場',
-    city: '桃園',
-    capacity: '25,000',
-    x: 218,
-    y: 215,
-    address: '桃園市中壢區領航北路一段1號',
-    transit: '桃園捷運機場線「體育園區站(A19)」下車步行約 3 分鐘',
-  },
-  {
-    id: 'hsinchu',
-    name: '新竹棒球場',
-    city: '新竹',
-    capacity: '12,000',
-    x: 210,
-    y: 245,
-    address: '新竹市北區西大路559號',
-    transit: '搭乘台鐵至「新竹火車站」，轉乘新竹客運 50 路公車或搭乘計程車約 10 分鐘',
-  },
-  {
-    id: 'taichung-dome',
-    name: '台中洲際棒球場',
-    city: '台中',
-    capacity: '25,000',
-    x: 205,
-    y: 305,
-    address: '台中市北屯區崇德路三段835號',
-    transit: '自台中火車站或高鐵台中站，轉乘公車 12、58、71、127 路至「洲際棒球場站」下車',
-  },
-  {
-    id: 'taichung-venue',
-    name: '台中國家歌劇院',
-    city: '台中',
-    capacity: '2,000',
-    x: 218,
-    y: 315,
-    address: '台中市西屯區惠來路二段101號',
-    transit: '捷運綠線「市政府站」1 號出口步行約 10-15 分鐘，或搭公車至「國家歌劇院站」',
-  },
-  {
-    id: 'changhua',
-    name: '彰化縣立體育場',
-    city: '彰化',
-    capacity: '20,000',
-    x: 198,
-    y: 335,
-    address: '彰化市健興路1號',
-    transit: '自彰化火車站搭乘彰化客運「市區 1 路」至體育場站下車，或搭乘計程車約 10 分鐘',
-  },
-  {
-    id: 'tainan',
-    name: '台南市立棒球場',
-    city: '台南',
-    capacity: '12,000',
-    x: 195,
-    y: 400,
-    address: '台南市南區健康路一段257號',
-    transit: '自台南火車站搭乘市區公車 0 左、0 右、2、5 路至「體育公園站」下車即可到達',
-  },
-  {
-    id: 'kaohsiung-dome',
-    name: '高雄巨蛋',
-    city: '高雄',
-    capacity: '15,000',
-    x: 192,
-    y: 438,
-    address: '高雄市左營區博愛二路757號',
-    transit: '高雄捷運紅線「巨蛋站」5 號出口步行約 3 分鐘',
-  },
-  {
-    id: 'kaohsiung-natl',
-    name: '高雄國家體育場（世運主場館）',
-    city: '高雄',
-    capacity: '55,000',
-    x: 205,
-    y: 450,
-    address: '高雄市左營區世運大道100號',
-    transit: '高雄捷運紅線「世運站」1 號出口沿世運大道步行約 8-10 分鐘',
-  },
-  {
-    id: 'kaohsiung-music-center',
-    name: '高雄流行音樂中心',
-    city: '高雄',
-    capacity: '6,000',
-    x: 185,
-    y: 455,
-    address: '高雄市鹽埕區真愛路1號',
-    transit: '高雄輕軌「真愛碼頭站(C11)」或「光榮碼頭站(C10)」即達，或捷運「鹽埕埔站」步行 10 分鐘',
-  },
-  {
-    id: 'hualien',
-    name: '花蓮縣立體育場',
-    city: '花蓮',
-    capacity: '8,000',
-    x: 310,
-    y: 295,
-    address: '花蓮市達固湖灣大路23號',
-    transit: '自花蓮火車站搭乘計程車約 10 分鐘，或搭公車至「德興體育場站」',
-  },
-  {
-    id: 'taitung',
-    name: '台東棒球場',
-    city: '台東',
-    capacity: '8,000',
-    x: 298,
-    y: 398,
-    address: '台東市更生路1369號',
-    transit: '自台東火車站搭乘計程車約 10 分鐘，或搭乘公車至「棒球場站」',
-  },
-]
+import { VENUES } from './constants/venues'
+import { TaiwanMap, Stat, LegendItem } from './components/TaiwanMap'
+import { VenueInfo } from './components/VenueInfo'
+import { ConcertDetail } from './components/ConcertDetail'
+import { ShareBoard } from './components/ShareBoard'
+import { COMMUNITY_MOCK_NOTES } from './constants/communityMock'
+import { LoginPage } from './components/LoginPage'
 
 const STORAGE_KEY = 'tw-concerts'
 const REMOTE_CONCERT_REFRESH_MS = 60_000
@@ -274,6 +71,17 @@ function App() {
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
+  const [zoom, setZoom] = useState(0.75)
+  const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
+  const [view, setView] = useState<'map' | 'board' | 'login'>('map')
+  const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
+  const [nickname, setNickname] = useState(() => localStorage.getItem('tw-nickname') || '')
+  const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('tw-logged-in') === 'true')
+  const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string } | null>(() => {
+    const stored = localStorage.getItem('tw-user-info')
+    return stored ? JSON.parse(stored) : null
+  })
 
   const selectedVenue = useMemo(
     () => VENUES.find((venue) => venue.id === selectedVenueId) ?? null,
@@ -302,6 +110,14 @@ function App() {
       return false
     })
   }, [sortedRemoteConcerts, selectedVenueId, selectedVenue])
+  const notesPreviewHtml = useMemo(() => {
+    if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
+    try {
+      return marked.parse(form.notes) as string
+    } catch {
+      return form.notes
+    }
+  }, [form.notes])
   const sortedConcerts = useMemo(
     () => [...concerts].sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts],
@@ -370,10 +186,14 @@ function App() {
     setSpotifyStatus('')
     setSelectedSpotify(null)
     setSpotifyTab('artist')
+    setNotesActiveTab('edit')
     setIsAddModalOpen(true)
   }
 
-  const closeAddModal = () => setIsAddModalOpen(false)
+  const closeAddModal = () => {
+    setNotesActiveTab('edit')
+    setIsAddModalOpen(false)
+  }
   const closeDetailModal = () => setDetailConcertId(null)
   const closeAllModal = () => setIsAllModalOpen(false)
 
@@ -429,6 +249,57 @@ function App() {
     event.stopPropagation()
     if (!confirm('確定要刪除這筆記錄嗎？')) return
     setConcerts((current) => current.filter((concert) => concert.id !== id))
+  }
+
+  const handlePublishToBoard = (authorName: string) => {
+    if (!publishingConcert) return
+    const author = authorName.trim() || '匿名樂迷'
+    localStorage.setItem('tw-nickname', author)
+    setNickname(author)
+
+    const NOTES_STORAGE_KEY = 'tw-community-notes'
+    let notesList = []
+    const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY)
+    if (storedNotes) {
+      try {
+        notesList = JSON.parse(storedNotes)
+      } catch {
+        notesList = [...COMMUNITY_MOCK_NOTES]
+      }
+    } else {
+      notesList = [...COMMUNITY_MOCK_NOTES]
+    }
+
+    const newNote = {
+      id: Date.now().toString(),
+      artist: publishingConcert.artist,
+      concertName: publishingConcert.concertName,
+      venueName: publishingConcert.venueName,
+      venueCity: publishingConcert.venueCity,
+      date: publishingConcert.date,
+      author: author,
+      notes: publishingConcert.notes,
+      likes: 0,
+      createdAt: new Date().toISOString(),
+    }
+
+    notesList.unshift(newNote)
+    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesList))
+
+    setIsPublishModalOpen(false)
+    setPublishingConcert(null)
+    alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
+    setView('board')
+    setDetailConcertId(null)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('tw-logged-in')
+    localStorage.removeItem('tw-user-info')
+    setIsLoggedIn(false)
+    setCurrentUser(null)
+    setView('map')
+    alert('👋 您已成功登出！')
   }
 
   const removePendingMedia = (index: number) => {
@@ -487,6 +358,7 @@ function App() {
   }
 
   const handleHeaderClick = () => {
+    setView('map')
     setSelectedVenueId(null) // Return to home (deselect venue)
 
     // Scroll window/document
@@ -527,82 +399,146 @@ function App() {
             <span>TAIWAN CONCERT LOG</span>
           </div>
         </div>
-        <div className="stats-bar">
-          <Stat number={concerts.length} label="演唱會" />
-          <Stat number={visitedVenueCount} label="場館" />
-          <Stat number={remoteConcerts.length} label="售票" />
-          <Stat number={totalMedia} label="照片/影片" />
+        <div className="header-right">
+          <div className="stats-bar">
+            <Stat number={concerts.length} label="演唱會" />
+            <Stat number={visitedVenueCount} label="場館" />
+            <Stat number={remoteConcerts.length} label="售票" />
+            <Stat number={totalMedia} label="照片/影片" />
+          </div>
+          <button
+            className="nav-toggle-btn"
+            type="button"
+            onClick={() => setView(view === 'map' ? 'board' : 'map')}
+          >
+            {view === 'map' ? '💬 社群分享牆' : '🗺️ 返回場館地圖'}
+          </button>
+          {isLoggedIn && currentUser ? (
+            <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <span className="user-name" style={{ fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 700 }}>
+                👤 {currentUser.nickname}
+              </span>
+              <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout} style={{ border: '1px solid rgba(230, 57, 70, 0.4)', color: 'var(--accent)' }}>
+                登出
+              </button>
+            </div>
+          ) : (
+            <button
+              className="nav-toggle-btn login-trigger-btn"
+              type="button"
+              onClick={() => setView('login')}
+            >
+              🔑 登入
+            </button>
+          )}
         </div>
       </header>
 
-      <main className="main-layout">
-        <section className="map-container" aria-label="台灣場館地圖">
-          <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
+      {view === 'map' ? (
+        <main className="main-layout">
+          <section className="map-container" aria-label="台灣場館地圖">
+            <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
-          <div className="venue-chips-container">
-            <div className="venue-chips">
-              {VENUES.map((v) => {
-                const isActive = selectedVenueId === v.id
-                const hasVisits = concerts.some((c) => c.venueId === v.id)
-                return (
-                  <button
-                    key={v.id}
-                    type="button"
-                    className={`venue-chip${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
-                    onClick={() => setSelectedVenueId(v.id)}
-                  >
-                    <span className="dot" />
-                    {v.name}
-                  </button>
-                )
-              })}
+            <div className="venue-chips-container">
+              <div className="venue-chips">
+                {VENUES.map((v) => {
+                  const isActive = selectedVenueId === v.id
+                  const hasVisits = concerts.some((c) => c.venueId === v.id)
+                  return (
+                    <button
+                      key={v.id}
+                      type="button"
+                      className={`venue-chip${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
+                      onClick={() => setSelectedVenueId(v.id)}
+                    >
+                      <span className="dot" />
+                      {v.name}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
 
-          <TaiwanMap
-            concerts={concerts}
-            selectedVenueId={selectedVenueId}
-            onSelectVenue={setSelectedVenueId}
-            onClearVenue={() => setSelectedVenueId(null)}
-          />
-
-          <div className="map-legend">
-            <LegendItem color="var(--accent)" label="尚未造訪" />
-            <LegendItem color="var(--teal)" label="已去過" />
-            <LegendItem color="var(--gold)" label="選取中" />
-          </div>
-
-          <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
-            📋 全部記錄
-          </button>
-        </section>
-
-        <aside className="sidebar">
-          <VenueInfo
-            key={selectedVenue?.id ?? 'empty'}
-            venue={selectedVenue}
-            concertCount={selectedVenueConcerts.length}
-            onAddConcert={openAddModal}
-            onClearVenue={() => setSelectedVenueId(null)}
-          />
-          <div className="concert-list-area">
-            <TransitStatusBoard />
-            <UpcomingConcerts
-              concerts={filteredRemoteConcerts}
-              status={remoteStatus}
-              updatedAt={remoteUpdatedAt}
-              isRefreshing={isRemoteRefreshing}
-              onRefresh={loadRemoteConcerts}
+            <TaiwanMap
+              concerts={concerts}
+              selectedVenueId={selectedVenueId}
+              onSelectVenue={setSelectedVenueId}
+              onClearVenue={() => setSelectedVenueId(null)}
+              zoom={zoom}
+              onZoomChange={setZoom}
             />
-            <ConcertList
-              concerts={selectedVenueConcerts}
-              hasSelectedVenue={Boolean(selectedVenue)}
-              onOpenDetail={openConcertDetail}
-              onDelete={deleteConcert}
+
+            <div className="map-zoom-control">
+              <span className="zoom-icon">🔍</span>
+              <input
+                type="range"
+                min="0.7"
+                max="2.5"
+                step="0.1"
+                value={zoom}
+                onChange={(e) => setZoom(parseFloat(e.target.value))}
+                title="地圖縮放"
+              />
+              <span className="zoom-value">{Math.round(zoom * 100)}%</span>
+              <button className="zoom-reset-btn" type="button" onClick={() => setZoom(0.75)} title="重設縮放">
+                ⟲
+              </button>
+            </div>
+
+            <div className="map-legend">
+              <LegendItem color="var(--accent)" label="尚未造訪" />
+              <LegendItem color="var(--teal)" label="已去過" />
+              <LegendItem color="var(--gold)" label="選取中" />
+            </div>
+
+            <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
+              📋 全部記錄
+            </button>
+          </section>
+
+          <aside className="sidebar">
+            <VenueInfo
+              key={selectedVenue?.id ?? 'empty'}
+              venue={selectedVenue}
+              concertCount={selectedVenueConcerts.length}
+              onAddConcert={openAddModal}
+              onClearVenue={() => setSelectedVenueId(null)}
             />
-          </div>
-        </aside>
-      </main>
+            <div className="concert-list-area">
+              <TransitStatusBoard />
+              <UpcomingConcerts
+                concerts={filteredRemoteConcerts}
+                status={remoteStatus}
+                updatedAt={remoteUpdatedAt}
+                isRefreshing={isRemoteRefreshing}
+                onRefresh={loadRemoteConcerts}
+              />
+              <ConcertList
+                concerts={selectedVenueConcerts}
+                hasSelectedVenue={Boolean(selectedVenue)}
+                onOpenDetail={openConcertDetail}
+                onDelete={deleteConcert}
+              />
+            </div>
+          </aside>
+        </main>
+      ) : view === 'board' ? (
+        <ShareBoard />
+      ) : (
+        <LoginPage
+          onLoginSuccess={(user) => {
+            setIsLoggedIn(true)
+            setCurrentUser(user)
+            localStorage.setItem('tw-logged-in', 'true')
+            localStorage.setItem('tw-user-info', JSON.stringify(user))
+            localStorage.setItem('tw-nickname', user.nickname)
+            setNickname(user.nickname)
+            setView('map')
+            alert(`🎉 歡迎回來，${user.nickname}！`)
+          }}
+          onCancel={() => setView('map')}
+        />
+      )}
 
       {isAddModalOpen && selectedVenue && (
         <Modal onClose={closeAddModal}>
@@ -651,13 +587,38 @@ function App() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="input-notes">心得筆記</label>
-            <textarea
-              id="input-notes"
-              value={form.notes}
-              placeholder="記下難忘的時刻..."
-              onChange={(event) => updateForm('notes', event.target.value)}
-            />
+            <div className="notes-label-row">
+              <label htmlFor="input-notes">心得筆記 (支援 Markdown)</label>
+              <div className="notes-tabs">
+                <button
+                  type="button"
+                  className={`notes-tab-btn${notesActiveTab === 'edit' ? ' active' : ''}`}
+                  onClick={() => setNotesActiveTab('edit')}
+                >
+                  編輯
+                </button>
+                <button
+                  type="button"
+                  className={`notes-tab-btn${notesActiveTab === 'preview' ? ' active' : ''}`}
+                  onClick={() => setNotesActiveTab('preview')}
+                >
+                  預覽
+                </button>
+              </div>
+            </div>
+            {notesActiveTab === 'edit' ? (
+              <textarea
+                id="input-notes"
+                value={form.notes}
+                placeholder="記下難忘的時刻... (支援 Markdown 語法如 # 標題, **粗體**, - 清單)"
+                onChange={(event) => updateForm('notes', event.target.value)}
+              />
+            ) : (
+              <div
+                className="notes-preview-box markdown-body"
+                dangerouslySetInnerHTML={{ __html: notesPreviewHtml }}
+              />
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="input-spotify-query">Spotify 音樂連結</label>
@@ -753,6 +714,10 @@ function App() {
           <ConcertDetail
             concert={detailConcert}
             onOpenLightbox={(mediaIndex) => setLightbox({ concertId: detailConcert.id, mediaIndex })}
+            onPublishToBoard={() => {
+              setPublishingConcert(detailConcert)
+              setIsPublishModalOpen(true)
+            }}
           />
         </Modal>
       )}
@@ -787,6 +752,49 @@ function App() {
             <video src={lightboxMedia.dataUrl} controls autoPlay />
           )}
         </div>
+      )}
+
+      {isPublishModalOpen && publishingConcert && (
+        <Modal className="publish-modal" onClose={() => {
+          setIsPublishModalOpen(false)
+          setPublishingConcert(null)
+        }}>
+          <h2>📢 分享觀後感至社群牆</h2>
+          <p className="publish-prompt">
+            您即將把關於 <strong>{publishingConcert.artist} - {publishingConcert.concertName || '未命名演唱會'}</strong> 的觀後心得發佈至公開分享牆！
+          </p>
+          <div className="form-group">
+            <label htmlFor="input-nickname">請輸入您的暱稱 (將公開顯示)</label>
+            <input
+              id="input-nickname"
+              type="text"
+              value={nickname}
+              onChange={(e) => setNickname(e.target.value)}
+              placeholder="e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)"
+              maxLength={20}
+              autoFocus
+            />
+          </div>
+          <div className="publish-actions">
+            <button
+              className="publish-submit-btn"
+              type="button"
+              onClick={() => handlePublishToBoard(nickname)}
+            >
+              確認發佈 🚀
+            </button>
+            <button
+              className="publish-cancel-btn"
+              type="button"
+              onClick={() => {
+                setIsPublishModalOpen(false)
+                setPublishingConcert(null)
+              }}
+            >
+              取消
+            </button>
+          </div>
+        </Modal>
       )}
 
       <button
@@ -896,216 +904,7 @@ function UpcomingConcerts({
   )
 }
 
-function Stat({ number, label }: { number: number; label: string }) {
-  return (
-    <div className="stat">
-      <div className="stat-num">{number}</div>
-      <div className="stat-label">{label}</div>
-    </div>
-  )
-}
 
-function TaiwanMap({
-  concerts,
-  selectedVenueId,
-  onSelectVenue,
-  onClearVenue,
-}: {
-  concerts: Concert[]
-  selectedVenueId: string | null
-  onSelectVenue: (venueId: string) => void
-  onClearVenue: () => void
-}) {
-  return (
-    <svg id="taiwan-map" viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg" onClick={onClearVenue}>
-      <defs>
-        <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stopColor="#1a1a3e" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#0a0a0f" stopOpacity="0" />
-        </radialGradient>
-      </defs>
-
-      <ellipse cx="250" cy="350" rx="200" ry="280" fill="url(#mapGlow)" />
-      <path
-        d="M 225,95 L 232,88 L 248,82 L 262,78 L 278,76 L 292,78 L 305,84 L 315,92 L 322,104 L 325,118 L 323,134 L 318,150 L 310,165 L 320,178 L 330,195 L 335,215 L 334,235 L 328,255 L 318,272 L 310,290 L 305,310 L 302,332 L 298,355 L 292,378 L 282,400 L 270,420 L 256,438 L 240,452 L 225,462 L 212,468 L 198,472 L 185,472 L 172,468 L 162,460 L 155,448 L 152,434 L 154,420 L 160,405 L 168,390 L 172,374 L 170,358 L 164,344 L 156,330 L 150,316 L 148,302 L 150,288 L 156,274 L 162,260 L 165,244 L 162,228 L 156,212 L 152,196 L 154,178 L 162,160 L 172,143 L 182,128 L 194,114 L 206,103 L 216,97 L 225,95 Z"
-        fill="#1e2040"
-        stroke="#2a2a60"
-        strokeWidth="1.5"
-        opacity="0.9"
-      />
-      <path
-        d="M 220,200 Q 240,190 260,205 Q 275,220 265,240 Q 250,255 235,248 Q 218,238 215,220 Q 212,207 220,200 Z"
-        fill="none"
-        stroke="#2a2a55"
-        strokeWidth="0.8"
-        opacity="0.5"
-      />
-      <path
-        d="M 218,195 Q 245,182 268,200 Q 285,218 272,244 Q 256,262 236,254 Q 212,243 208,222 Q 205,204 218,195 Z"
-        fill="none"
-        stroke="#2a2a55"
-        strokeWidth="0.6"
-        opacity="0.3"
-      />
-      <path
-        d="M 230,150 L 250,110 L 268,145 L 280,125 L 295,160 L 285,185 L 265,200 L 245,205 L 228,190 Z"
-        fill="#1a1a35"
-        stroke="#252545"
-        strokeWidth="1"
-        opacity="0.6"
-      />
-      <circle cx="120" cy="330" r="12" fill="#1e2040" stroke="#2a2a60" strokeWidth="1" />
-      <circle cx="108" cy="320" r="7" fill="#1e2040" stroke="#2a2a60" strokeWidth="1" />
-      <circle cx="128" cy="315" r="5" fill="#1e2040" stroke="#2a2a60" strokeWidth="1" />
-      <text x="110" y="348" fill="#4a4a70" fontSize="9" textAnchor="middle">
-        澎湖
-      </text>
-      <circle cx="355" cy="450" r="8" fill="#1e2040" stroke="#2a2a60" strokeWidth="1" />
-      <rect x="58" y="280" width="25" height="15" rx="4" fill="#1e2040" stroke="#2a2a60" strokeWidth="1" />
-      <text x="70" y="306" fill="#4a4a70" fontSize="9" textAnchor="middle">
-        金門
-      </text>
-
-      <g>
-        {VENUES.map((venue) => {
-          const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
-          const isActive = selectedVenueId === venue.id
-
-          return (
-            <g
-              key={venue.id}
-              className={`venue-dot${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-              transform={`translate(${venue.x},${venue.y})`}
-              onClick={(e) => {
-                e.stopPropagation()
-                onSelectVenue(venue.id)
-              }}
-            >
-              <circle className="click-target" r="25" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
-              <circle className="pulse-ring" r="8" cx="0" cy="0" />
-              <circle className="bg" r="16" cx="0" cy="0" />
-              <circle className="core" r="6" cx="0" cy="0" />
-              <text className="venue-label" x="12" y="4">
-                {venue.name}
-              </text>
-            </g>
-          )
-        })}
-      </g>
-    </svg>
-  )
-}
-
-function LegendItem({ color, label }: { color: string; label: string }) {
-  return (
-    <div className="legend-item">
-      <div className="legend-dot" style={{ background: color }} />
-      <span>{label}</span>
-    </div>
-  )
-}
-
-function VenueInfo({
-  venue,
-  concertCount,
-  onAddConcert,
-  onClearVenue,
-}: {
-  venue: Venue | null
-  concertCount: number
-  onAddConcert: () => void
-  onClearVenue: () => void
-}) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-
-  if (!venue) {
-    return (
-      <div className="venue-info empty">
-        <div className="empty-hint">
-          <div className="icon">🗺️</div>
-          <p>
-            點擊地圖上的場館
-            <br />
-            查看詳情並記錄演唱會
-          </p>
-        </div>
-      </div>
-    )
-  }
-
-  return (
-    <div className={`venue-info${isCollapsed ? ' collapsed' : ''}`}>
-      <div className="venue-top">
-        <div className="venue-city">{venue.city}</div>
-        <div className="venue-top-actions">
-          <button
-            className="toggle-collapse-btn"
-            type="button"
-            onClick={() => setIsCollapsed(!isCollapsed)}
-          >
-            {isCollapsed ? '▼ 展開' : '▲ 收起'}
-          </button>
-          <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
-            ✕ 清除選取
-          </button>
-        </div>
-      </div>
-      <div
-        className="venue-header"
-        onClick={() => setIsCollapsed(!isCollapsed)}
-        style={{ cursor: 'pointer', userSelect: 'none' }}
-      >
-        <div className="venue-name">{venue.name}</div>
-        <div className={`venue-count${concertCount > 0 ? ' has-visits' : ''}`}>
-          {concertCount > 0 ? `✓ ${concertCount} 場` : '未造訪'}
-        </div>
-      </div>
-
-      {!isCollapsed && (
-        <>
-          <div className="venue-capacity">容量：{venue.capacity} 人</div>
-
-          {venue.address && (
-            <div className="venue-address">
-              <span className="icon">📍</span>
-              <span className="text">{venue.address}</span>
-            </div>
-          )}
-          {venue.transit && (
-            <div className="venue-transit">
-              <span className="icon">🚇</span>
-              <span className="text">{venue.transit}</span>
-            </div>
-          )}
-
-          {venue.address && (
-            <div className="venue-map-embed">
-              <iframe
-                src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
-                title={`${venue.name} map`}
-                loading="lazy"
-              />
-            </div>
-          )}
-
-          <div className="venue-actions">
-            <button className="add-concert-btn" type="button" onClick={onAddConcert}>
-              ＋ 新增演唱會記錄
-            </button>
-            <a
-              className="nav-map-btn"
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🧭 Google 地圖導航 ↗
-            </a>
-          </div>
-        </>
-      )}
-    </div>
-  )
-}
 
 function ConcertList({
   concerts,
@@ -1232,53 +1031,7 @@ function MediaPreviewGrid({
   )
 }
 
-function ConcertDetail({
-  concert,
-  onOpenLightbox,
-}: {
-  concert: Concert
-  onOpenLightbox: (mediaIndex: number) => void
-}) {
-  return (
-    <>
-      <div className="concert-detail-header">
-        <div className="detail-artist">{concert.artist}</div>
-        <div className="detail-meta">
-          {concert.date && <span className="detail-tag tag-date">📅 {concert.date}</span>}
-          <span className="detail-tag tag-venue">📍 {concert.venueName}</span>
-          {concert.seat && <span className="detail-tag tag-seat">🎫 {concert.seat}</span>}
-        </div>
-        {concert.concertName && <div className="detail-concert-name">{concert.concertName}</div>}
-      </div>
-      {concert.spotifyUrl && <SpotifyEmbed url={concert.spotifyUrl} />}
-      {concert.notes && <div className="detail-notes">{concert.notes}</div>}
-      {concert.media.length > 0 && (
-        <>
-          <div className="section-title">— 照片 / 影片 —</div>
-          <div className="media-gallery">
-            {concert.media.map((item, index) => (
-              <button
-                className="gallery-item"
-                type="button"
-                key={`${item.name}-${index}`}
-                onClick={() => onOpenLightbox(index)}
-              >
-                {item.type.startsWith('image') ? (
-                  <img src={item.dataUrl} alt={item.name} />
-                ) : (
-                  <>
-                    <video src={item.dataUrl} />
-                    <div className="video-overlay">▶</div>
-                  </>
-                )}
-              </button>
-            ))}
-          </div>
-        </>
-      )}
-    </>
-  )
-}
+
 
 function SpotifyResults({
   results,
@@ -1353,29 +1106,7 @@ function SpotifyResults({
   )
 }
 
-function SpotifyEmbed({ url }: { url: string }) {
-  const embedUrl = parseSpotifyEmbedUrl(url)
-  if (!embedUrl) return null
 
-  const height = url.includes('/track/') || url.includes('/episode/') ? 152 : 352
-
-  return (
-    <>
-      <div className="detail-spotify">
-        <iframe
-          src={embedUrl}
-          height={height}
-          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-          loading="lazy"
-          title="Spotify detail player"
-        />
-      </div>
-      <a className="spotify-open-btn" href={url} target="_blank" rel="noopener noreferrer">
-        <span>在 Spotify 開啟</span> ↗
-      </a>
-    </>
-  )
-}
 
 function Modal({
   children,
@@ -1454,7 +1185,7 @@ function normalizeSpotifyResults(data: any): SpotifyItem[] {
   ].filter((item) => item.url)
 }
 
-function parseSpotifyEmbedUrl(url: string | null | undefined) {
+export function parseSpotifyEmbedUrl(url: string | null | undefined) {
   if (!url) return null
 
   try {
