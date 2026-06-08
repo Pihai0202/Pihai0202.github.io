@@ -274,9 +274,11 @@ function App() {
 
       setIsPublishModalOpen(false)
       setPublishingConcert(null)
-      alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
-      setView('board')
-      setDetailConcertId(null)
+      setTimeout(() => {
+        alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
+        setView('board')
+        setDetailConcertId(null)
+      }, 100)
     } catch (error) {
       console.error('Firebase write error:', error)
       alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')

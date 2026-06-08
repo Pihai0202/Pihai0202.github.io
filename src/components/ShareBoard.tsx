@@ -172,7 +172,9 @@ export function ShareBoard() {
         notes: '',
       })
       setIsModalOpen(false)
-      alert('🎉 發佈成功！您的心得已更新至分享牆。')
+      setTimeout(() => {
+        alert('🎉 發佈成功！您的心得已更新至分享牆。')
+      }, 100)
     } catch (err) {
       console.error('Firebase write error:', err)
       alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')
