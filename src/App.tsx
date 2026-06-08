@@ -79,6 +79,7 @@ function App() {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'board'>('map')
+  const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
     if (view === 'board') {
@@ -110,17 +111,36 @@ function App() {
     [remoteConcerts],
   )
   const filteredRemoteConcerts = useMemo(() => {
-    if (!selectedVenueId) return sortedRemoteConcerts
-    return sortedRemoteConcerts.filter((concert) => {
-      if (concert.venue_id === selectedVenueId) return true
-      if (selectedVenue) {
-        const nameMatch = concert.venue_name && concert.venue_name.toLowerCase().includes(selectedVenue.name.toLowerCase())
-        const rawMatch = concert.venue_raw && concert.venue_raw.toLowerCase().includes(selectedVenue.name.toLowerCase())
-        return nameMatch || rawMatch
-      }
-      return false
-    })
-  }, [sortedRemoteConcerts, selectedVenueId, selectedVenue])
+    let list = sortedRemoteConcerts
+
+    if (selectedVenueId) {
+      list = list.filter((concert) => {
+        if (concert.venue_id === selectedVenueId) return true
+        if (selectedVenue) {
+          const nameMatch = concert.venue_name && concert.venue_name.toLowerCase().includes(selectedVenue.name.toLowerCase())
+          const rawMatch = concert.venue_raw && concert.venue_raw.toLowerCase().includes(selectedVenue.name.toLowerCase())
+          return nameMatch || rawMatch
+        }
+        return false
+      })
+    }
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase().trim()
+      list = list.filter((concert) => {
+        const nameMatch = concert.name && concert.name.toLowerCase().includes(q)
+        const venueMatch = (concert.venue_name && concert.venue_name.toLowerCase().includes(q)) ||
+                           (concert.venue_raw && concert.venue_raw.toLowerCase().includes(q))
+        const cityMatch = concert.city && concert.city.toLowerCase().includes(q)
+        const platformMatch = concert.ticket_links && concert.ticket_links.some(
+          (link) => link.name.toLowerCase().includes(q) || link.platform.toLowerCase().includes(q)
+        )
+        return nameMatch || venueMatch || cityMatch || platformMatch
+      })
+    }
+
+    return list
+  }, [sortedRemoteConcerts, selectedVenueId, selectedVenue, searchQuery])
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
     try {
@@ -400,6 +420,31 @@ function App() {
             <span>TAIWAN CONCERT LOG</span>
           </div>
         </div>
+
+        <div className="header-search">
+          <span className="search-icon">🔍</span>
+          <input
+            type="text"
+            placeholder="搜尋歌手、售票或場館..."
+            value={searchQuery}
+            onChange={(e) => {
+              setSearchQuery(e.target.value)
+              if (window.innerWidth <= 768 && e.target.value) {
+                setMobileTab('list')
+              }
+            }}
+          />
+          {searchQuery && (
+            <button
+              className="search-clear-btn"
+              type="button"
+              onClick={() => setSearchQuery('')}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+
         <div className="header-right">
           <div className="stats-bar">
             <Stat number={concerts.length} label="演唱會" />
@@ -525,6 +570,9 @@ function App() {
                 updatedAt={remoteUpdatedAt}
                 isRefreshing={isRemoteRefreshing}
                 onRefresh={loadRemoteConcerts}
+                searchQuery={searchQuery}
+                hasSelectedVenue={!!selectedVenueId}
+                onClearVenue={() => setSelectedVenueId(null)}
               />
               <ConcertList
                 concerts={selectedVenueConcerts}
@@ -893,12 +941,18 @@ function UpcomingConcerts({
   updatedAt,
   isRefreshing,
   onRefresh,
+  searchQuery,
+  hasSelectedVenue,
+  onClearVenue,
 }: {
   concerts: RemoteConcert[]
   status: string
   updatedAt: string | null
   isRefreshing: boolean
   onRefresh: () => void
+  searchQuery?: string
+  hasSelectedVenue?: boolean
+  onClearVenue?: () => void
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
@@ -914,9 +968,37 @@ function UpcomingConcerts({
           {isRefreshing ? '更新中' : '更新'}
         </button>
       </div>
+
+      {searchQuery && searchQuery.trim() && (
+        <div className="search-info-tip">
+          🔍 搜尋「{searchQuery}」：共 {concerts.length} 筆
+          {hasSelectedVenue && onClearVenue && (
+            <button
+              type="button"
+              className="clear-filter-inline-btn"
+              onClick={onClearVenue}
+              style={{
+                marginLeft: '0.4rem',
+                border: 'none',
+                background: 'transparent',
+                color: 'var(--teal)',
+                textDecoration: 'underline',
+                fontSize: '0.72rem',
+                cursor: 'pointer',
+                padding: 0
+              }}
+            >
+              (清除場館看全台)
+            </button>
+          )}
+        </div>
+      )}
+
       {status && <div className="empty-state compact">{status}</div>}
       {!status && concerts.length === 0 && (
-        <div className="empty-state compact">目前沒有近期售票資料</div>
+        <div className="empty-state compact">
+          {searchQuery ? `找不到符合「${searchQuery}」的售票資料` : '目前沒有近期售票資料'}
+        </div>
       )}
       {displayedConcerts.map((concert) => (
         <a
