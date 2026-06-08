@@ -15,6 +15,7 @@ export function VenueInfo({
   onClearVenue,
 }: VenueInfoProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
+  const [showMap, setShowMap] = useState(false)
 
   if (!venue) {
     return (
@@ -67,6 +68,13 @@ export function VenueInfo({
             <div className="venue-address">
               <span className="icon">📍</span>
               <span className="text">{venue.address}</span>
+              <button
+                className={`address-nav-btn${showMap ? ' active' : ''}`}
+                type="button"
+                onClick={() => setShowMap(!showMap)}
+              >
+                🧭 導航
+              </button>
             </div>
           )}
           {venue.transit && (
@@ -76,7 +84,7 @@ export function VenueInfo({
             </div>
           )}
 
-          {venue.address && (
+          {venue.address && showMap && (
             <div className="venue-map-embed">
               <iframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
