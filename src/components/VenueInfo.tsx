@@ -77,7 +77,7 @@ export function VenueInfo({
               </button>
             </div>
           )}
-          {venue.transit && (
+          {venue.transit && showMap && (
             <div className="venue-transit">
               <span className="icon">🚇</span>
               <span className="text">{venue.transit}</span>
