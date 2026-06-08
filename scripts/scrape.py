@@ -17,6 +17,10 @@ from urllib.error import URLError
 from urllib.parse import urlencode, urljoin, quote
 from html.parser import HTMLParser
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stderr.reconfigure(encoding="utf-8")
+
 HEADERS = {
     "User-Agent": (
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -116,6 +120,28 @@ PLATFORM_URLS = {
     "TICKET PLUS": "https://ticketplus.com.tw/",
     "添翼售票": "https://www.indievox.com/",
 }
+
+KKTIX_ORGANIZER_URLS = [
+    "https://globalmusic.kktix.cc/",
+    "https://wve.kktix.cc/",
+    "https://mediaspheretw.kktix.cc/",
+    "https://jslive.kktix.cc/",
+]
+
+CONCERT_KEYWORDS = (
+    "演唱會",
+    "音樂會",
+    "巡迴",
+    "演出",
+    "公演",
+    "concert",
+    "fan concert",
+    "fan meeting",
+    "live",
+    "showcase",
+    "tour",
+    "world tour",
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANUAL_EVENTS_PATH = PROJECT_ROOT / "public" / "manual-events.json"
@@ -290,6 +316,107 @@ def scrape_kktix_html_fallback():
         time.sleep(0.8)
 
     return events
+
+
+def scrape_kktix_organizers():
+    """Scrape public KKTIX organizer pages when the global event API is blocked."""
+    events = []
+    seen = set()
+
+    for org_url in KKTIX_ORGANIZER_URLS:
+        print(f"  Fetching KKTIX organizer {org_url}", file=sys.stderr)
+        html = fetch(org_url)
+        if not html:
+            continue
+
+        for item in _parse_kktix_organizer_events(html, org_url):
+            url = item["url"]
+            if url in seen:
+                continue
+            seen.add(url)
+
+            name = item["name"]
+            description = item["description"]
+            if not is_concert_like(name + " " + description):
+                continue
+
+            date_str = parse_first_date(item["date"])
+            if date_str and date_str < today_str():
+                continue
+
+            venue_id, venue_name = match_venue(name + " " + description)
+            slug = re.sub(r"[^A-Za-z0-9_-]+", "-", url.rstrip("/").split("/")[-1]) or str(len(events))
+
+            events.append({
+                "id":         f"kktix-org-{slug}",
+                "source":     "KKTIX",
+                "name":       name,
+                "venue_raw":  description[:120],
+                "venue_id":   venue_id,
+                "venue_name": venue_name,
+                "city":       VENUE_CITY.get(venue_id, ""),
+                "date":       date_str,
+                "image":      item["image"],
+                "url":        url,
+                "price":      "",
+                "ticket_links": [
+                    {"platform": "kktix", "name": "KKTIX", "url": url}
+                ],
+            })
+
+        time.sleep(0.5)
+
+    return events
+
+
+def _parse_kktix_organizer_events(html, base_url):
+    """Return current event items from a KKTIX organizer listing page."""
+    items_by_url = {}
+
+    for block in re.findall(r'<li class="clearfix">(.*?)</li>', html, re.DOTALL):
+        title_match = re.search(r'<h2>\s*<a href="([^"]+)">(.*?)</a>\s*</h2>', block, re.DOTALL)
+        if not title_match:
+            continue
+
+        url = urljoin(base_url, title_match.group(1))
+        name = clean_text(title_match.group(2))
+        date_match = re.search(r'<span class="timezoneSuffix">(.*?)</span>', block, re.DOTALL)
+        image_match = re.search(r'<img src="([^"]+)"', block, re.DOTALL)
+        description_match = re.search(r'<div class="description">(.*?)</div>', block, re.DOTALL)
+
+        items_by_url[url] = {
+            "name": name,
+            "url": url,
+            "date": clean_text(date_match.group(1) if date_match else ""),
+            "image": image_match.group(1) if image_match else "",
+            "description": clean_text(description_match.group(1) if description_match else ""),
+        }
+
+    match = re.search(r"gon\.recent_events=(\[.*?\]);gon\.locale", html, re.DOTALL)
+    if match:
+        try:
+            for event in json.loads(match.group(1)):
+                url = urljoin(base_url, event.get("url", ""))
+                if not url:
+                    continue
+
+                existing = items_by_url.get(url, {})
+                items_by_url[url] = {
+                    "name": clean_text(event.get("title") or existing.get("name", "")),
+                    "url": url,
+                    "date": str(event.get("start") or existing.get("date", "")),
+                    "image": existing.get("image", ""),
+                    "description": existing.get("description", ""),
+                }
+        except Exception as e:
+            print(f"  KKTIX organizer JSON parse error: {e}", file=sys.stderr)
+
+    return list(items_by_url.values())
+
+
+def is_concert_like(text):
+    haystack = (text or "").lower()
+    return any(keyword.lower() in haystack for keyword in CONCERT_KEYWORDS)
 
 
 # ── 拓元售票 Tixcraft ───────────────────────────────────────────────────────
@@ -822,6 +949,10 @@ def main():
         print("→ 改用 HTML fallback (LD+JSON)...", file=sys.stderr)
         events = scrape_kktix_html_fallback()
         print(f"  HTML fallback 得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        print("→ 改用 KKTIX 主辦單位公開頁 fallback...", file=sys.stderr)
+        events = scrape_kktix_organizers()
+        print(f"  KKTIX 主辦單位頁得到 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
     # 2. 拓元售票

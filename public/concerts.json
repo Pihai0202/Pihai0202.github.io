@@ -1,11 +1,754 @@
 {
-  "updated_at": "2026-06-08T02:31:44.623429+00:00",
-  "count": 0,
+  "updated_at": "2026-06-08T03:02:52.568133+00:00",
+  "count": 31,
   "sources": [
     "KKTIX",
     "拓元售票",
     "ibon售票",
-    "年代售票"
+    "年代售票",
+    "webbboxx 行事曆",
+    "手動補充"
   ],
-  "events": []
+  "events": [
+    {
+      "id": "kktix-org-14d7a5b4",
+      "source": "KKTIX",
+      "name": "日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-17",
+      "image": "https://assets.kktix.io/upload_images/409907/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/14d7a5b4",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/14d7a5b4"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-e0j68kc74",
+      "source": "KKTIX",
+      "name": "【06/19 14:30 一般票】日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-19",
+      "image": "https://assets.kktix.io/upload_images/325492/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-e0j68kc742",
+      "source": "KKTIX",
+      "name": "【06/19 14:30 包廂票，限KKTIX購買】日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-19",
+      "image": "https://assets.kktix.io/upload_images/325499/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc742",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc742"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-601656",
+      "source": "webbboxx 行事曆",
+      "name": "ITZY 3RD WORLD TOUR 高雄站",
+      "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/06/27-28（兩場） 3/26 拓元已開賣 Jun 27",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-06-27",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-16624666",
+      "source": "webbboxx 行事曆",
+      "name": "KYUHYUN 20th Anniversary Fanmeeting 台北站",
+      "venue_raw": "天母體育館 拓元售票 演出日期： 2026/06/27-28（兩場） 現正售票中",
+      "venue_id": "tianmu-arena",
+      "venue_name": "天母體育館",
+      "city": "台北",
+      "date": "2026-06-27",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-4323325",
+      "source": "webbboxx 行事曆",
+      "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
+      "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 現正售票中 Jul 03",
+      "venue_id": "taipei-dome",
+      "venue_name": "台北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-03",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-2636684",
+      "source": "webbboxx 行事曆",
+      "name": "The Kid LAROI - A Perfect World Tour 台北站",
+      "venue_raw": "Zepp New Taipei 拓元售票 演出日期： 2026/07/03-08 現正售票中 Jul 04",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-07-03",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-376230",
+      "source": "webbboxx 行事曆",
+      "name": "JAEHYUN FAN-CON TOUR ＜Mono＞ 台北站",
+      "venue_raw": "熱門 臺北流行音樂中心表演廳 拓元售票 演出日期： 2026/07/04-05（兩場） 現正售票中 Jul 11",
+      "venue_id": "taipei-music-center",
+      "venue_name": "臺北流行音樂中心",
+      "city": "台北",
+      "date": "2026-07-04",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-2026parkjihoonfancon",
+      "source": "KKTIX",
+      "name": "2026 PARK JI HOON FAN CONCERT [RE:FLECT] IN TAIPEI",
+      "venue_raw": "主辦單位 公告： 目前售票系統整理後續未完成結帳及退票之票劵，預計今日（05/31）12：30於KKTIX售票系統再次開放販售。 公告日期：2026年05月31日 若有購/退票相關問題，請洽KKTIX客服信箱：support@kktix.c",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-07-05",
+      "image": "https://assets.kktix.io/upload_images/500462/PARKJIHOON_1200x630_medium.jpg",
+      "url": "https://wve.kktix.cc/events/2026parkjihoonfancon",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://wve.kktix.cc/events/2026parkjihoonfancon"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-3951605",
+      "source": "webbboxx 行事曆",
+      "name": "NMIXX 1ST WORLD TOUR 高雄站",
+      "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/11-12（兩場） 現正售票中 Jul 18",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-07-11",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-ikon2026",
+      "source": "KKTIX",
+      "name": "iKON FOUREVER WORLD TOUR IN TAIPEI",
+      "venue_raw": "iKON FOUREVER WORLD TOUR IN TAIPEIiKON is Coming！四個大男孩要帶著他們滿載的能量進攻北流啦iKONIC準備好接招了嗎🔥∷ ∷ ∷ ∷ ∷ ∷ 節目資訊 🧡活動日期｜2026 年 07 月 18",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-07-18",
+      "image": "https://assets.kktix.io/upload_images/507669/iKON_1200x630__1__medium.jpg",
+      "url": "https://wve.kktix.cc/events/ikon2026",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://wve.kktix.cc/events/ikon2026"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-6196626",
+      "source": "webbboxx 行事曆",
+      "name": "滅火器 Fire EX. 首次攻蛋",
+      "venue_raw": "台北小巨蛋 拓元售票 演出日期： 2026/07/18（六） 備註： 成軍 26 年首次小巨蛋演出 售票中 Jul 03",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-07-18",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-9712281",
+      "source": "webbboxx 行事曆",
+      "name": "EXO PLANET #6 - EXhOrizon 高雄站",
+      "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/18-19（兩場） 現正售票中 Jul 24",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-07-18",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-15911640",
+      "source": "webbboxx 行事曆",
+      "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
+      "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-07-24",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-13563790",
+      "source": "webbboxx 行事曆",
+      "name": "2026 ASH ISLAND ASIA TOUR 台北站",
+      "venue_raw": "Zepp New Taipei 拓元售票 演出日期： 2026/08/02 現正售票中 Aug 24",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-08-02",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-844351",
+      "source": "webbboxx 行事曆",
+      "name": "aespa LIVE TOUR 台北大巨蛋",
+      "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/08/11（二） 預售： 5/16 Weverse 會員 拓元公售：5/17 11:00 開賣 Aug 22",
+      "venue_id": "taipei-dome",
+      "venue_name": "台北大巨蛋",
+      "city": "台北",
+      "date": "2026-08-11",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-6255678",
+      "source": "webbboxx 行事曆",
+      "name": "BABYMONSTER 台北小巨蛋",
+      "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-08-22",
+      "image": "",
+      "url": "https://ticketplus.com.tw/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "ticket-plus",
+          "name": "TICKET PLUS",
+          "url": "https://ticketplus.com.tw/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-16673529",
+      "source": "webbboxx 行事曆",
+      "name": "Kodaline - Farewell Tour 台北站",
+      "venue_raw": "台北國際會議中心 TICC 拓元售票 演出日期： 2026/08/24 現正售票中",
+      "venue_id": "ticc",
+      "venue_name": "TICC",
+      "city": "台北",
+      "date": "2026-08-24",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-13291112",
+      "source": "webbboxx 行事曆",
+      "name": "IVE WORLD TOUR 台北小巨蛋",
+      "venue_raw": "熱門 台北小巨蛋 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 11",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-11",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-750148",
+      "source": "webbboxx 行事曆",
+      "name": "潘越雲「坐看雲起時」演唱會",
+      "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
+      "venue_id": "taipei-music-center",
+      "venue_name": "臺北流行音樂中心",
+      "city": "台北",
+      "date": "2026-09-11",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-16000822",
+      "source": "webbboxx 行事曆",
+      "name": "Post Malone The BIG ASS Stadium World Tour 高雄站",
+      "venue_raw": "熱門 高雄國家體育場 拓元售票 演出日期： 2026/09/19 現正售票中 Sep 19",
+      "venue_id": "kaohsiung-natl",
+      "venue_name": "高雄國家體育場",
+      "city": "高雄",
+      "date": "2026-09-19",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-146857",
+      "source": "webbboxx 行事曆",
+      "name": "2026 LEE YOUNGJI WORLD TOUR ＜2.0＞ 台北站",
+      "venue_raw": "臺北流行音樂中心表演廳 拓元售票 演出日期： 2026/09/19-20（兩場） 現正售票中 Sep 26",
+      "venue_id": "taipei-music-center",
+      "venue_name": "臺北流行音樂中心",
+      "city": "台北",
+      "date": "2026-09-19",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-5dee326c",
+      "source": "KKTIX",
+      "name": "英格伯漢普汀克 不柘傳奇2026世界巡迴演唱會－台北站",
+      "venue_raw": "「浪漫之王」英格伯漢普汀克 重磅回歸台北，打造一夜難忘的經典之夜 睽違已久！響譽國際樂壇巨星，傳奇“浪漫情歌之王”英格伯漢普汀克（Engelbert Humperdinck）王者歸來，全新《英格伯漢普汀克：不朽傳奇 2026 世界巡迴演唱會",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-23",
+      "image": "https://assets.kktix.io/upload_images/323100/Engelbert_1200w_x_630h_medium.jpg",
+      "url": "https://globalmusic.kktix.cc/events/5dee326c",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://globalmusic.kktix.cc/events/5dee326c"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-13834327",
+      "source": "webbboxx 行事曆",
+      "name": "LANY：soft world tour 台北站",
+      "venue_raw": "熱門 台北小巨蛋 拓元售票 演出日期： 2026/09/26 現正售票中 Sep 27",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-26",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-12842508",
+      "source": "webbboxx 行事曆",
+      "name": "BE：FIRST WORLD SHOWCASE 2026 台北站",
+      "venue_raw": "Legacy TERA 拓元售票 演出日期： 2026/09/27 現正售票中",
+      "venue_id": "legacy-tera",
+      "venue_name": "Legacy TERA",
+      "city": "新北",
+      "date": "2026-09-27",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-1490534",
+      "source": "webbboxx 行事曆",
+      "name": "Charlie Puth - Whatever's Clever! World Tour 桃園站",
+      "venue_raw": "熱門 桃園陽光劇場 拓元售票 演出日期： 2026/10/18 現正售票中",
+      "venue_id": "taoyuan-sunlight-arena",
+      "venue_name": "桃園陽光劇場",
+      "city": "桃園",
+      "date": "2026-10-18",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-olwgtsrtt",
+      "source": "KKTIX",
+      "name": "空中補給屬於時間的答案巡迴演唱會-高雄站",
+      "venue_raw": "傳奇雙人組合（空中補給）Air Supply 即將來到高雄，展開備受矚目的《A Matter of Time》巡演，繼2025年台北場演出完售後，今年他們再度回到台灣與當地歌迷見面，並將首度登上高雄流行音樂中心舞台開唱。這組殿堂級音樂組合將",
+      "venue_id": "kaohsiung-music-center",
+      "venue_name": "高雄流行音樂中心",
+      "city": "高雄",
+      "date": "2026-10-24",
+      "image": "https://assets.kktix.io/upload_images/511953/FB_1200x630_medium.jpg",
+      "url": "https://globalmusic.kktix.cc/events/olwgtsrtt",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://globalmusic.kktix.cc/events/olwgtsrtt"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-11753457",
+      "source": "webbboxx 行事曆",
+      "name": "BINI：SIGNALS WORLD TOUR 2026 台北站",
+      "venue_raw": "新北市工商展覽中心 拓元售票 演出日期： 2026/11/15 現正售票中 Nov 19",
+      "venue_id": "new-taipei-exhibition-hall",
+      "venue_name": "新北市工商展覽中心",
+      "city": "新北",
+      "date": "2026-11-15",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-12736004",
+      "source": "webbboxx 行事曆",
+      "name": "BTS 防彈少年團 高雄演唱會",
+      "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-19",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-4182029",
+      "source": "webbboxx 行事曆",
+      "name": "wave to earth - the pieces tour 台北站",
+      "venue_raw": "台北國際會議中心 TICC 拓元售票 演出日期： 2026/11/24 現正售票中 Nov 27",
+      "venue_id": "ticc",
+      "venue_name": "TICC",
+      "city": "台北",
+      "date": "2026-11-24",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-9488363",
+      "source": "webbboxx 行事曆",
+      "name": "JOJI SOLARIS 高雄站",
+      "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/11/27 現正售票中",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-11-27",
+      "image": "",
+      "url": "https://tixcraft.com/",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "webbboxx",
+          "name": "行事曆來源",
+          "url": "https://webbboxx.com/calendar"
+        },
+        {
+          "platform": "拓元售票",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/"
+        }
+      ]
+    }
+  ]
 }
