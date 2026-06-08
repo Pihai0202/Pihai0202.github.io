@@ -3372,3 +3372,54 @@ body.player-open .music-bar-toggle {
   color: var(--accent);
   background: rgba(230, 57, 70, 0.1);
 }
+
+/* Mobile optimizations for Weather & AQI widget */
+@media (max-width: 768px) {
+  .map-weather-overlay {
+    top: 4.5rem;
+    right: 1rem;
+    left: 1rem;
+    width: auto;
+    max-height: calc(60vh - 6rem);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+  }
+
+  .weather-widget {
+    padding: 0.8rem 1rem;
+  }
+
+  .weather-main {
+    grid-template-columns: 1fr;
+    gap: 0.6rem;
+  }
+
+  .weather-details {
+    border-left: none;
+    border-top: 1px dashed var(--border);
+    padding-left: 0;
+    padding-top: 0.5rem;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.5rem 1rem;
+  }
+
+  .detail-item {
+    flex: 1 1 40%;
+  }
+
+  .weather-aqi-section {
+    padding: 0.5rem 0.7rem;
+  }
+
+  .weather-alerts {
+    max-height: 90px;
+    overflow-y: auto;
+  }
+
+  .weather-refresh-btn,
+  .weather-close-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 1.05rem;
+  }
+}
