@@ -98,14 +98,16 @@ export function VenueInfo({
             <button className="add-concert-btn" type="button" onClick={onAddConcert}>
               ＋ 新增演唱會記錄
             </button>
-            <a
-              className="nav-map-btn"
-              href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              🧭 Google 地圖導航 ↗
-            </a>
+            {showMap && (
+              <a
+                className="nav-map-btn"
+                href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                🧭 Google 地圖導航 ↗
+              </a>
+            )}
           </div>
         </>
       )}
