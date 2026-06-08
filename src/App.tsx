@@ -17,8 +17,9 @@ import { TaiwanMap, Stat, LegendItem } from './components/TaiwanMap'
 import { VenueInfo } from './components/VenueInfo'
 import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
-import { COMMUNITY_MOCK_NOTES } from './constants/communityMock'
 import { LoginPage } from './components/LoginPage'
+import { collection, addDoc } from 'firebase/firestore'
+import { db } from './firebase'
 
 const STORAGE_KEY = 'tw-concerts'
 const REMOTE_CONCERT_REFRESH_MS = 60_000
@@ -251,46 +252,34 @@ function App() {
     setConcerts((current) => current.filter((concert) => concert.id !== id))
   }
 
-  const handlePublishToBoard = (authorName: string) => {
+  const handlePublishToBoard = async (authorName: string) => {
     if (!publishingConcert) return
     const author = authorName.trim() || '匿名樂迷'
     localStorage.setItem('tw-nickname', author)
     setNickname(author)
 
-    const NOTES_STORAGE_KEY = 'tw-community-notes'
-    let notesList = []
-    const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY)
-    if (storedNotes) {
-      try {
-        notesList = JSON.parse(storedNotes)
-      } catch {
-        notesList = [...COMMUNITY_MOCK_NOTES]
-      }
-    } else {
-      notesList = [...COMMUNITY_MOCK_NOTES]
+    try {
+      await addDoc(collection(db, 'reviews'), {
+        artist: publishingConcert.artist,
+        concertName: publishingConcert.concertName || '未命名演唱會',
+        venueName: publishingConcert.venueName || '未指定場館',
+        venueCity: publishingConcert.venueCity || '其他',
+        date: publishingConcert.date || '',
+        author: author,
+        notes: publishingConcert.notes,
+        likes: 0,
+        createdAt: new Date().toISOString(),
+      })
+
+      setIsPublishModalOpen(false)
+      setPublishingConcert(null)
+      alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
+      setView('board')
+      setDetailConcertId(null)
+    } catch (error) {
+      console.error('Firebase write error:', error)
+      alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')
     }
-
-    const newNote = {
-      id: Date.now().toString(),
-      artist: publishingConcert.artist,
-      concertName: publishingConcert.concertName,
-      venueName: publishingConcert.venueName,
-      venueCity: publishingConcert.venueCity,
-      date: publishingConcert.date,
-      author: author,
-      notes: publishingConcert.notes,
-      likes: 0,
-      createdAt: new Date().toISOString(),
-    }
-
-    notesList.unshift(newNote)
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(notesList))
-
-    setIsPublishModalOpen(false)
-    setPublishingConcert(null)
-    alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
-    setView('board')
-    setDetailConcertId(null)
   }
 
   const handleLogout = () => {

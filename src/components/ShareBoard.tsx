@@ -2,8 +2,9 @@ import { useState, useMemo, useEffect } from 'react'
 import { marked } from 'marked'
 import type { SharedNote } from '../types'
 import { COMMUNITY_MOCK_NOTES } from '../constants/communityMock'
+import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, increment, addDoc } from 'firebase/firestore'
+import { db } from '../firebase'
 
-const NOTES_STORAGE_KEY = 'tw-community-notes'
 const LIKED_STORAGE_KEY = 'tw-liked-notes'
 
 export function ShareBoard() {
@@ -34,19 +35,48 @@ export function ShareBoard() {
 
   // Load notes and liked status
   useEffect(() => {
-    // Load community notes
-    const storedNotes = localStorage.getItem(NOTES_STORAGE_KEY)
-    if (storedNotes) {
-      try {
-        setNotes(JSON.parse(storedNotes))
-      } catch {
-        setNotes(COMMUNITY_MOCK_NOTES)
-        localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(COMMUNITY_MOCK_NOTES))
+    // Query Firestore sorted by createdAt descending
+    const q = query(collection(db, 'reviews'), orderBy('createdAt', 'desc'))
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const reviewsList: SharedNote[] = []
+      querySnapshot.forEach((doc) => {
+        const data = doc.data()
+        reviewsList.push({
+          id: doc.id,
+          artist: data.artist,
+          concertName: data.concertName,
+          venueName: data.venueName,
+          venueCity: data.venueCity,
+          date: data.date,
+          author: data.author,
+          notes: data.notes,
+          likes: data.likes || 0,
+          createdAt: data.createdAt
+        })
+      })
+
+      // If Firestore is empty, initialize it with mock reviews so it doesn't look empty!
+      if (reviewsList.length === 0) {
+        COMMUNITY_MOCK_NOTES.forEach(async (mock) => {
+          await addDoc(collection(db, 'reviews'), {
+            artist: mock.artist,
+            concertName: mock.concertName,
+            venueName: mock.venueName,
+            venueCity: mock.venueCity,
+            date: mock.date,
+            author: mock.author,
+            notes: mock.notes,
+            likes: mock.likes,
+            createdAt: mock.createdAt
+          })
+        })
+      } else {
+        setNotes(reviewsList)
       }
-    } else {
-      setNotes(COMMUNITY_MOCK_NOTES)
-      localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(COMMUNITY_MOCK_NOTES))
-    }
+    }, (error) => {
+      console.error("Firestore read error:", error)
+    })
 
     // Load liked note IDs
     const storedLikes = localStorage.getItem(LIKED_STORAGE_KEY)
@@ -57,6 +87,8 @@ export function ShareBoard() {
         setLikedIds({})
       }
     }
+
+    return () => unsubscribe()
   }, [])
 
   // Filter notes by search query
@@ -79,29 +111,24 @@ export function ShareBoard() {
   }, [notes, searchQuery])
 
   // Handle Like/Unlike toggle
-  const handleLikeToggle = (noteId: string) => {
+  const handleLikeToggle = async (noteId: string) => {
     const isAlreadyLiked = likedIds[noteId]
     const updatedLikedIds = { ...likedIds, [noteId]: !isAlreadyLiked }
 
     setLikedIds(updatedLikedIds)
     localStorage.setItem(LIKED_STORAGE_KEY, JSON.stringify(updatedLikedIds))
 
-    // Update likes count in notes list
-    const updatedNotes = notes.map((note) => {
-      if (note.id === noteId) {
-        return {
-          ...note,
-          likes: isAlreadyLiked ? Math.max(0, note.likes - 1) : note.likes + 1,
-        }
-      }
-      return note
-    })
-
-    setNotes(updatedNotes)
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updatedNotes))
+    try {
+      const noteRef = doc(db, 'reviews', noteId)
+      await updateDoc(noteRef, {
+        likes: isAlreadyLiked ? increment(-1) : increment(1)
+      })
+    } catch (err) {
+      console.error("Firestore likes update error:", err)
+    }
   };
 
-  const handlePublish = (e: React.FormEvent) => {
+  const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault()
     const artist = form.artist.trim()
     const concertName = form.concertName.trim()
@@ -121,42 +148,45 @@ export function ShareBoard() {
 
     localStorage.setItem('tw-nickname', author)
 
-    const newNote: SharedNote = {
-      id: Date.now().toString(),
-      artist,
-      concertName: concertName || '未命名演唱會',
-      venueName: venueName || '未指定場館',
-      venueCity: venueCity || '其他',
-      date: form.date,
-      author,
-      notes: notesContent,
-      likes: 0,
-      createdAt: new Date().toISOString(),
+    try {
+      await addDoc(collection(db, 'reviews'), {
+        artist,
+        concertName: concertName || '未命名演唱會',
+        venueName: venueName || '未指定場館',
+        venueCity: venueCity || '其他',
+        date: form.date,
+        author,
+        notes: notesContent,
+        likes: 0,
+        createdAt: new Date().toISOString(),
+      })
+
+      // Reset form
+      setForm({
+        artist: '',
+        concertName: '',
+        venueName: '',
+        venueCity: '台北',
+        date: '',
+        author: author,
+        notes: '',
+      })
+      setIsModalOpen(false)
+      alert('🎉 發佈成功！您的心得已更新至分享牆。')
+    } catch (err) {
+      console.error('Firebase write error:', err)
+      alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')
     }
-
-    const updatedNotes = [newNote, ...notes]
-    setNotes(updatedNotes)
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updatedNotes))
-
-    // Reset form
-    setForm({
-      artist: '',
-      concertName: '',
-      venueName: '',
-      venueCity: '台北',
-      date: '',
-      author: author,
-      notes: '',
-    })
-    setIsModalOpen(false)
-    alert('🎉 發佈成功！您的心得已更新至分享牆。')
   }
 
-  const handleNoteDelete = (noteId: string) => {
+  const handleNoteDelete = async (noteId: string) => {
     if (!confirm('確定要刪除這筆分享記錄嗎？')) return
-    const updatedNotes = notes.filter((note) => note.id !== noteId)
-    setNotes(updatedNotes)
-    localStorage.setItem(NOTES_STORAGE_KEY, JSON.stringify(updatedNotes))
+    try {
+      await deleteDoc(doc(db, 'reviews', noteId))
+    } catch (err) {
+      console.error("Firestore delete error:", err)
+      alert('❌ 刪除失敗，請檢查網路連線！')
+    }
   }
 
   const toggleExpand = (noteId: string) => {
