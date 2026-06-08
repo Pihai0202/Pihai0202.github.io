@@ -3587,6 +3587,10 @@ body.player-open .music-bar-toggle {
     max-width: calc(100vw - 2rem);
   }
 
+  body.player-open .music-bar-toggle {
+    display: none !important;
+  }
+
   /* Ensure correct padding with player open */
   body.player-open .main-layout {
     height: calc(100vh - 62px - 60px - 90px) !important; /* Minus player height */
