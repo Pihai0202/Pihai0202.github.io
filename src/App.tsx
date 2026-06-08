@@ -1037,6 +1037,16 @@ function VenueInfo({
         </div>
       )}
 
+      {venue.address && (
+        <div className="venue-map-embed">
+          <iframe
+            src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+            title={`${venue.name} map`}
+            loading="lazy"
+          />
+        </div>
+      )}
+
       <div className="venue-actions">
         <button className="add-concert-btn" type="button" onClick={onAddConcert}>
           ＋ 新增演唱會記錄
