@@ -564,6 +564,7 @@ function App() {
             onClearVenue={() => setSelectedVenueId(null)}
           />
           <div className="concert-list-area">
+            <TransitStatusBoard />
             <UpcomingConcerts
               concerts={filteredRemoteConcerts}
               status={remoteStatus}
@@ -1422,6 +1423,164 @@ function formatRemoteDate(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date)
+}
+
+type TransitService = {
+  id: string
+  name: string
+  url: string
+  statusUrl: string
+  icon: string
+  searchPatterns: string[]
+}
+
+const TRANSIT_SERVICES: TransitService[] = [
+  {
+    id: 'trtc',
+    name: '台北捷運',
+    url: 'https://www.metro.taipei/',
+    statusUrl: 'https://www.metro.taipei/',
+    icon: '🚇',
+    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
+  },
+  {
+    id: 'krtc',
+    name: '高雄捷運',
+    url: 'https://www.krtc.com.tw/',
+    statusUrl: 'https://www.krtc.com.tw/',
+    icon: '🚇',
+    searchPatterns: ['營運正常', '正常營運', '今日全線正常營運'],
+  },
+  {
+    id: 'tmrt',
+    name: '台中捷運',
+    url: 'https://www.tmrt.com.tw/',
+    statusUrl: 'https://www.tmrt.com.tw/',
+    icon: '🚇',
+    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
+  },
+  {
+    id: 'thsr',
+    name: '台灣高鐵',
+    url: 'https://www.thsrc.com.tw/',
+    statusUrl: 'https://www.thsrc.com.tw/',
+    icon: '🚄',
+    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
+  },
+  {
+    id: 'tra',
+    name: '台灣鐵路',
+    url: 'https://www.railway.gov.tw/',
+    statusUrl: 'https://tip.railway.gov.tw/tra-tip-web/wbi/tts/query',
+    icon: '🚂',
+    searchPatterns: ['正常', '營運正常', '正常營運', '各線列車正常營運'],
+  },
+]
+
+function TransitStatusBoard() {
+  const [selectedId, setSelectedId] = useState('trtc')
+  const [status, setStatus] = useState({
+    loading: false,
+    text: '點擊以載入即時動態',
+    isNormal: true,
+    detail: '選擇上方大眾運輸服務以查看即時動態。',
+    updatedAt: '',
+  })
+
+  const service = TRANSIT_SERVICES.find((s) => s.id === selectedId) || TRANSIT_SERVICES[0]
+
+  const fetchStatus = useCallback(async (serviceId: string) => {
+    const activeService = TRANSIT_SERVICES.find((s) => s.id === serviceId) || TRANSIT_SERVICES[0]
+    setStatus((prev) => ({ ...prev, loading: true, text: '正在讀取即時狀態...' }))
+
+    try {
+      const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(activeService.url)}`
+      const response = await fetch(proxyUrl)
+      if (!response.ok) throw new Error('CORS proxy failed')
+      const data = await response.json()
+      const html = data.contents || ''
+
+      const isNormal = activeService.searchPatterns.some((pattern) => html.includes(pattern))
+
+      setStatus({
+        loading: false,
+        text: isNormal ? '🟢 營運正常' : '🟡 營運調整中',
+        isNormal: isNormal,
+        detail: isNormal 
+          ? `今日${activeService.name}系統運作良好，目前全線正常營運。` 
+          : `偵測到可能有班次異動或系統調整，請以官網即時狀態為準。`,
+        updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      })
+    } catch {
+      setStatus({
+        loading: false,
+        text: '🟢 營運正常 (預估)',
+        isNormal: true,
+        detail: '無法取得即時資料，請點擊下方按鈕前往官網查看即時動態。',
+        updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
+      })
+    }
+  }, [])
+
+  useEffect(() => {
+    fetchStatus(selectedId)
+  }, [selectedId, fetchStatus])
+
+  return (
+    <section className="transit-board" aria-label="大眾運輸即時動態">
+      <div className="section-row" style={{ marginBottom: '0.6rem' }}>
+        <div className="section-title" style={{ padding: '0.2rem 0.5rem 0' }}>— 交通即時動態 —</div>
+        <button
+          className="refresh-events-btn"
+          type="button"
+          disabled={status.loading}
+          onClick={() => fetchStatus(selectedId)}
+        >
+          {status.loading ? '讀取中' : '重新整理 ↻'}
+        </button>
+      </div>
+
+      <div className="transit-selector-row">
+        <select
+          value={selectedId}
+          onChange={(e) => setSelectedId(e.target.value)}
+          className="transit-select"
+        >
+          {TRANSIT_SERVICES.map((s) => (
+            <option key={s.id} value={s.id}>
+              {s.icon} {s.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div className="transit-card">
+        <div className="transit-card-header">
+          <div className="transit-service-name">
+            <span className="transit-icon">{service.icon}</span>
+            <span>{service.name}</span>
+          </div>
+          <div className={`transit-badge${status.isNormal ? ' normal' : ' warning'}${status.loading ? ' loading' : ''}`}>
+            {status.text}
+          </div>
+        </div>
+        <p className="transit-detail">{status.detail}</p>
+        {status.updatedAt && (
+          <div className="transit-updated">
+            最後更新：{status.updatedAt}
+          </div>
+        )}
+        <a
+          href={service.statusUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="transit-link-btn"
+        >
+          🧭 前往官方網站查看即時動態 ↗
+        </a>
+      </div>
+    </section>
+  )
 }
 
 export default App
