@@ -62,7 +62,7 @@ VENUE_MAP = {
     "林口體育館": "linkou-arena",
     "天母體育館": "tianmu-arena",
     "Legacy Taipei": "legacy-taipei",
-    "Legacy TERA": "legacy-tera",
+    "Legacy TERA": "taipei-music-center",  # Map to Taipei Music Center since it's located there
     "TICC": "ticc",
     "台北國際會議中心": "ticc",
     "臺北國際會議中心": "ticc",
@@ -72,6 +72,14 @@ VENUE_MAP = {
     "花蓮縣立體育場": "hualien",
     "花蓮體育場": "hualien",
     "台東棒球場": "taitung",
+    "The Wall Live House": "the-wall",
+    "The Wall": "the-wall",
+    "Legacy Taichung": "legacy-taichung",
+    "後台 Backstage Live": "backstage-live",
+    "後台": "backstage-live",
+    "LIVE WAREHOUSE": "kaohsiung-music-center",  # Map to Kaohsiung Music Center
+    "Live Warehouse": "kaohsiung-music-center",
+    "SUB": "taipei-music-center",  # Map to Taipei Music Center (South Base)
 }
 
 VENUE_CITY = {
@@ -99,6 +107,9 @@ VENUE_CITY = {
     "new-taipei-exhibition-hall": "新北",
     "hualien": "花蓮",
     "taitung": "台東",
+    "the-wall": "台北",
+    "legacy-taichung": "台中",
+    "backstage-live": "高雄",
 }
 
 # 售票網資訊
@@ -109,6 +120,7 @@ TICKET_PLATFORMS = {
     "ticket":   {"name": "年代售票",  "color": "#9b5de5"},
     "ticketplus": {"name": "TICKET PLUS", "color": "#00a6fb"},
     "webbboxx": {"name": "webbboxx 行事曆", "color": "#ffd166"},
+    "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
     "manual": {"name": "手動補充", "color": "#06d6a0"},
 }
 
@@ -118,6 +130,7 @@ PLATFORM_URLS = {
     "ibon售票": "https://tickets.ibon.com.tw/",
     "年代售票": "https://www.ticket.com.tw/",
     "TICKET PLUS": "https://ticketplus.com.tw/",
+    "iNDIEVOX": "https://www.indievox.com/",
     "添翼售票": "https://www.indievox.com/",
 }
 
@@ -796,6 +809,98 @@ def scrape_webbboxx_calendar():
     return events
 
 
+def scrape_indievox():
+    """Scrape iNDIEVOX concert events."""
+    events = []
+    seen_urls = set()
+
+    list_url = "https://www.indievox.com/activity/list"
+    print("  Fetching iNDIEVOX activity list...", file=sys.stderr)
+    html_content = fetch(list_url)
+    if not html_content:
+        return events
+
+    # Get all event detail links or event IDs
+    detail_links = re.findall(r'href=["\']([^"\']*/activity/detail/[26_ivA-Za-z0-9_-]+)["\']', html_content)
+    unique_links = []
+    for link in detail_links:
+        full_url = urljoin(list_url, link)
+        if full_url not in seen_urls:
+            seen_urls.add(full_url)
+            unique_links.append(full_url)
+
+    print(f"  Found {len(unique_links)} iNDIEVOX activities. Fetching session details...", file=sys.stderr)
+    
+    for activity_url in unique_links:
+        # Extract ID
+        parts = activity_url.rstrip("/").split("/")
+        if not parts:
+            continue
+        activity_id = parts[-1]
+        
+        game_url = f"https://www.indievox.com/activity/game/{activity_id}"
+        game_html = fetch(game_url)
+        if not game_html:
+            continue
+            
+        # Extract name from title
+        name_match = re.search(r'<h2 class="title activity-title">([\s\S]*?)</h2>', game_html)
+        if not name_match:
+            continue
+        name = clean_text(name_match.group(1))
+        
+        # Extract image
+        img_match = re.search(r'<div class="title-img">[\s\S]*?<img[^>]+src=["\']([^"\']+)["\']', game_html)
+        image = img_match.group(1) if img_match else ""
+        if not image:
+            # Fallback image search
+            img_match_fb = re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', game_html)
+            image = img_match_fb.group(1) if img_match_fb else ""
+
+        # Extract sessions from the table
+        rows = re.findall(r'<tr[^>]*>([\s\S]*?)</tr>', game_html)
+        
+        for row in rows:
+            tds = re.findall(r'<td[^>]*>([\s\S]*?)</td>', row)
+            if len(tds) < 3:
+                continue
+            
+            # First TD: Date & Time
+            date_raw = clean_text(tds[0])
+            # Third TD: Venue name
+            venue_raw = clean_text(tds[2])
+            
+            # Format Date
+            date_str = parse_first_date(date_raw)
+            if not date_str:
+                continue
+            if date_str < today_str():
+                continue
+            
+            venue_id, venue_name = match_venue(name + " " + venue_raw)
+            
+            events.append({
+                "id": f"indievox-{activity_id}-{date_str}",
+                "source": "iNDIEVOX",
+                "name": name,
+                "venue_raw": venue_raw,
+                "venue_id": venue_id,
+                "venue_name": venue_name,
+                "city": VENUE_CITY.get(venue_id, ""),
+                "date": date_str,
+                "image": image,
+                "url": activity_url,
+                "price": "",
+                "ticket_links": [
+                    {"platform": "indievox", "name": "iNDIEVOX", "url": activity_url}
+                ]
+            })
+            
+        time.sleep(0.3)
+        
+    return events
+
+
 def load_manual_events():
     """Load manually curated events that can carry exact ticket URLs."""
     if not MANUAL_EVENTS_PATH.exists():
@@ -923,13 +1028,19 @@ def main():
     print(f"  年代得到 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
-    # 5. Public calendar fallback
+    # 5. iNDIEVOX 售票
+    print("→ 爬取 iNDIEVOX 售票...", file=sys.stderr)
+    events = scrape_indievox()
+    print(f"  iNDIEVOX 得到 {len(events)} 筆", file=sys.stderr)
+    all_events.extend(events)
+
+    # 6. Public calendar fallback
     print("→ 讀取公開演唱會行事曆 fallback...", file=sys.stderr)
     events = scrape_webbboxx_calendar()
     print(f"  行事曆得到 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
-    # 6. Manual exact links
+    # 7. Manual exact links
     print("→ 合併手動補充活動...", file=sys.stderr)
     events = load_manual_events()
     print(f"  手動補充 {len(events)} 筆", file=sys.stderr)
@@ -944,9 +1055,15 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "webbboxx 行事曆", "手動補充"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充"],
         "events": all_events,
     }
+
+    # Write directly to public/concerts.json in UTF-8 to prevent shell encoding issues
+    concerts_path = PROJECT_ROOT / "public" / "concerts.json"
+    concerts_path.parent.mkdir(parents=True, exist_ok=True)
+    with open(concerts_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
 
     print(json.dumps(output, ensure_ascii=False, indent=2))
     print(f"\n✅ 共 {len(all_events)} 筆活動", file=sys.stderr)
