@@ -1471,106 +1471,74 @@ const TRANSIT_SERVICES: TransitService[] = [
     id: 'tra',
     name: '台灣鐵路',
     url: 'https://www.railway.gov.tw/',
-    statusUrl: 'https://tip.railway.gov.tw/tra-tip-web/wbi/tts/query',
+    statusUrl: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList',
     icon: '🚂',
     searchPatterns: ['正常', '營運正常', '正常營運', '各線列車正常營運'],
   },
 ]
 
+type TransitStatusData = {
+  name: string
+  status: string
+  isNormal: boolean
+  detail: string
+  updatedAt: string
+}
+
+type TransitPayload = {
+  updated_at: string
+  statuses: Record<string, TransitStatusData>
+}
+
 function TransitStatusBoard() {
   const [selectedId, setSelectedId] = useState('trtc')
-  const [status, setStatus] = useState({
-    loading: false,
-    text: '點擊以載入即時動態',
-    isNormal: true,
-    detail: '選擇上方大眾運輸服務以查看即時動態。',
-    updatedAt: '',
-  })
+  const [statuses, setStatuses] = useState<Record<string, TransitStatusData>>({})
+  const [loading, setLoading] = useState(false)
 
-  const service = TRANSIT_SERVICES.find((s) => s.id === selectedId) || TRANSIT_SERVICES[0]
-
-  const fetchStatus = useCallback(async (serviceId: string) => {
-    const activeService = TRANSIT_SERVICES.find((s) => s.id === serviceId) || TRANSIT_SERVICES[0]
-    setStatus((prev) => ({ ...prev, loading: true, text: '正在讀取即時狀態...' }))
-
-    let html = ''
-    let fetchSuccess = false
-
-    // Proxy 1: corsproxy.io (Direct raw HTML)
+  const fetchStatus = useCallback(async () => {
+    setLoading(true)
     try {
-      const response = await fetch(`https://corsproxy.io/?${encodeURIComponent(activeService.url)}`)
-      if (response.ok) {
-        html = await response.text()
-        fetchSuccess = true
+      const response = await fetch(`${import.meta.env.BASE_URL}transit-status.json?t=${Date.now()}`, {
+        cache: 'no-store',
+      })
+      if (!response.ok) throw new Error('transit-status.json not found')
+      const data = (await response.json()) as TransitPayload
+      if (data && data.statuses) {
+        setStatuses(data.statuses)
       }
     } catch (e) {
-      console.warn('corsproxy.io failed, trying next proxy...', e)
-    }
-
-    // Proxy 2: api.codetabs.com (Direct raw HTML)
-    if (!fetchSuccess) {
-      try {
-        const response = await fetch(`https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(activeService.url)}`)
-        if (response.ok) {
-          html = await response.text()
-          fetchSuccess = true
-        }
-      } catch (e) {
-        console.warn('codetabs proxy failed, trying next proxy...', e)
-      }
-    }
-
-    // Proxy 3: api.allorigins.win (JSON wrapped)
-    if (!fetchSuccess) {
-      try {
-        const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(activeService.url)}`)
-        if (response.ok) {
-          const data = await response.json()
-          html = data.contents || ''
-          fetchSuccess = true
-        }
-      } catch (e) {
-        console.warn('allorigins proxy failed', e)
-      }
-    }
-
-    if (fetchSuccess && html) {
-      // Analyze HTML for normal/abnormal patterns
-      const isNormal = activeService.searchPatterns.some((pattern) => html.includes(pattern))
-      
-      // Attempt to extract specific marquee text (mostly for Taipei Metro)
-      let customDetail = ''
-      if (activeService.id === 'trtc') {
-        const marqueeMatch = html.match(/<marquee[^>]*>([\s\S]*?)<\/marquee>/i)
-        if (marqueeMatch && marqueeMatch[1]) {
-          customDetail = marqueeMatch[1].replace(/<[^>]*>/g, '').replace(/&nbsp;/g, ' ').trim()
-        }
-      }
-
-      setStatus({
-        loading: false,
-        text: isNormal ? '🟢 營運正常' : '🟡 營運調整中',
-        isNormal: isNormal,
-        detail: customDetail || (isNormal 
-          ? `今日${activeService.name}系統運作良好，目前全線正常營運。` 
-          : `偵測到可能有班次異動或系統調整，請以官網即時狀態為準。`),
-        updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      })
-    } else {
-      // Fallback
-      setStatus({
-        loading: false,
-        text: '🟢 營運正常 (預估)',
-        isNormal: true,
-        detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
-        updatedAt: new Date().toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' }),
-      })
+      console.error('Failed to fetch transit status:', e)
+    } finally {
+      setLoading(false)
     }
   }, [])
 
   useEffect(() => {
-    fetchStatus(selectedId)
-  }, [selectedId, fetchStatus])
+    fetchStatus()
+    // Auto-refresh every 5 minutes
+    const interval = setInterval(fetchStatus, 300_000)
+    return () => clearInterval(interval)
+  }, [fetchStatus])
+
+  const service = TRANSIT_SERVICES.find((s) => s.id === selectedId) || TRANSIT_SERVICES[0]
+  const current = statuses[selectedId] || {
+    name: service.name,
+    status: '🟢 營運正常 (預估)',
+    isNormal: true,
+    detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
+    updatedAt: '',
+  }
+
+  const formatStatusTime = (isoString?: string) => {
+    if (!isoString) return ''
+    try {
+      const date = new Date(isoString)
+      if (isNaN(date.getTime())) return ''
+      return date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+    } catch {
+      return ''
+    }
+  }
 
   return (
     <section className="transit-board" aria-label="大眾運輸即時動態">
@@ -1579,10 +1547,10 @@ function TransitStatusBoard() {
         <button
           className="refresh-events-btn"
           type="button"
-          disabled={status.loading}
-          onClick={() => fetchStatus(selectedId)}
+          disabled={loading}
+          onClick={fetchStatus}
         >
-          {status.loading ? '讀取中' : '重新整理 ↻'}
+          {loading ? '讀取中' : '重新整理 ↻'}
         </button>
       </div>
 
@@ -1606,14 +1574,14 @@ function TransitStatusBoard() {
             <span className="transit-icon">{service.icon}</span>
             <span>{service.name}</span>
           </div>
-          <div className={`transit-badge${status.isNormal ? ' normal' : ' warning'}${status.loading ? ' loading' : ''}`}>
-            {status.text}
+          <div className={`transit-badge${current.isNormal ? ' normal' : ' warning'}${loading ? ' loading' : ''}`}>
+            {current.status}
           </div>
         </div>
-        <p className="transit-detail">{status.detail}</p>
-        {status.updatedAt && (
+        <p className="transit-detail">{current.detail}</p>
+        {current.updatedAt && (
           <div className="transit-updated">
-            最後更新：{status.updatedAt}
+            最後更新：{formatStatusTime(current.updatedAt)}
           </div>
         )}
         <a

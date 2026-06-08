@@ -32,17 +32,23 @@ jobs:
           echo "--- concerts.json preview ---"
           head -30 public/concerts.json
 
+      - name: 🚗 執行大眾運輸狀態爬蟲
+        run: |
+          python scripts/scrape_transit.py
+
       - name: 📊 確認結果
         run: |
           COUNT=$(python3 -c "import json; d=json.load(open('public/concerts.json')); print(d['count'])")
           SOURCES=$(python3 -c "import json; d=json.load(open('public/concerts.json')); print(', '.join(d.get('sources',[])))")
           echo "✅ 共抓到 $COUNT 筆活動（來源：$SOURCES）"
+          echo "--- transit-status.json preview ---"
+          cat public/transit-status.json
 
       - name: 💾 Commit & Push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/concerts.json
+          git add public/concerts.json public/transit-status.json
           # 若沒有變更就不 commit（避免空 commit）
-          git diff --staged --quiet || git commit -m "🎵 自動更新演唱會資料 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "🎵 自動更新演唱會及交通資料 $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
