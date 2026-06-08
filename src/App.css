@@ -3405,6 +3405,10 @@ body.player-open .music-bar-toggle {
   box-shadow: 0 4px 15px rgba(255, 209, 102, 0.3);
 }
 
+.mobile-bottom-nav {
+  display: none;
+}
+
 @media (max-width: 768px) {
   /* Clean up Header */
   header {
