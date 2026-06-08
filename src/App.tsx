@@ -15,6 +15,7 @@ import type {
 import { VENUES } from './constants/venues'
 import { TaiwanMap, Stat, LegendItem } from './components/TaiwanMap'
 import { VenueInfo } from './components/VenueInfo'
+import { VenueWeather } from './components/VenueWeather'
 import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
 import { LoginPage } from './components/LoginPage'
@@ -456,6 +457,17 @@ function App() {
               zoom={zoom}
               onZoomChange={setZoom}
             />
+
+            {selectedVenue && (
+              <div className="map-weather-overlay">
+                <VenueWeather
+                  latitude={selectedVenue.latitude}
+                  longitude={selectedVenue.longitude}
+                  cityName={selectedVenue.city}
+                  onClose={() => setSelectedVenueId(null)}
+                />
+              </div>
+            )}
 
             <div className="map-zoom-control">
               <span className="zoom-icon">🔍</span>

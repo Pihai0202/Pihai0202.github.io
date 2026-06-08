@@ -7,6 +7,8 @@ export type Venue = {
   y: number
   address?: string
   transit?: string
+  latitude?: number
+  longitude?: number
 }
 
 export type ConcertMedia = {

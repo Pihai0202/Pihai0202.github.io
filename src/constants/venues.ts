@@ -10,6 +10,8 @@ export const VENUES: Venue[] = [
     y: 172,
     address: '台北市信義區忠孝東路四段515號',
     transit: '捷運板南線「國父紀念館站」5 號出口直達',
+    latitude: 25.0440,
+    longitude: 121.5606,
   },
   {
     id: 'taipei-arena',
@@ -20,6 +22,8 @@ export const VENUES: Venue[] = [
     y: 150,
     address: '台北市松山區南京東路四段2號',
     transit: '捷運松山新店線「台北小巨蛋站」2 號出口直達',
+    latitude: 25.0510,
+    longitude: 121.5502,
   },
   {
     id: 'nangang',
@@ -30,6 +34,8 @@ export const VENUES: Venue[] = [
     y: 175,
     address: '台北市南港區經貿二路1號',
     transit: '捷運板南線/文湖線「南港展覽館站」1 號/2 號出口即達',
+    latitude: 25.0569,
+    longitude: 121.6189,
   },
   {
     id: 'taipei-music-center',
@@ -40,6 +46,8 @@ export const VENUES: Venue[] = [
     y: 180,
     address: '台北市南港區市民大道八段99號',
     transit: '捷運板南線「昆陽站」4 號出口步行約 8 分鐘，或「南港站」1A 出口步行約 8 分鐘',
+    latitude: 25.0483,
+    longitude: 121.5977,
   },
   {
     id: 'taoyuan-arena',
@@ -50,6 +58,8 @@ export const VENUES: Venue[] = [
     y: 215,
     address: '桃園市中壢區領航北路一段1號',
     transit: '桃園捷運機場線「體育園區站(A19)」下車步行約 3 分鐘',
+    latitude: 25.0003,
+    longitude: 121.2003,
   },
   {
     id: 'hsinchu',
@@ -60,6 +70,8 @@ export const VENUES: Venue[] = [
     y: 245,
     address: '新竹市北區西大路559號',
     transit: '搭乘台鐵至「新竹火車站」，轉乘新竹客運 50 路公車或搭乘計程車約 10 分鐘',
+    latitude: 24.8066,
+    longitude: 120.9601,
   },
   {
     id: 'taichung-dome',
@@ -70,6 +82,8 @@ export const VENUES: Venue[] = [
     y: 298,
     address: '台中市北屯區崇德路三段835號',
     transit: '自台中火車站或高鐵台中站，轉乘公車 12、58、71、127 路至「洲際棒球場站」下車',
+    latitude: 24.2003,
+    longitude: 120.6853,
   },
   {
     id: 'taichung-venue',
@@ -80,6 +94,8 @@ export const VENUES: Venue[] = [
     y: 318,
     address: '台中市西屯區惠來路二段101號',
     transit: '捷運綠線「市政府站」1 號出口步行約 10-15 分鐘，或搭公車至「國家歌劇院站」',
+    latitude: 24.1627,
+    longitude: 120.6405,
   },
   {
     id: 'changhua',
@@ -90,6 +106,8 @@ export const VENUES: Venue[] = [
     y: 335,
     address: '彰化市健興路1號',
     transit: '自彰化火車站搭乘彰化客運「市區 1 路」至體育場站下車，或搭乘計程車約 10 分鐘',
+    latitude: 24.0652,
+    longitude: 120.5583,
   },
   {
     id: 'tainan',
@@ -100,6 +118,8 @@ export const VENUES: Venue[] = [
     y: 400,
     address: '台南市南區健康路一段257號',
     transit: '自台南火車站搭乘市區公車 0 左、0 右、2、5 路至「體育公園站」下車即可到達',
+    latitude: 22.9831,
+    longitude: 120.2045,
   },
   {
     id: 'kaohsiung-dome',
@@ -110,6 +130,8 @@ export const VENUES: Venue[] = [
     y: 445,
     address: '高雄市左營區博愛二路757號',
     transit: '高雄捷運紅線「巨蛋站」5 號出口步行約 3 分鐘',
+    latitude: 22.6698,
+    longitude: 120.3022,
   },
   {
     id: 'kaohsiung-natl',
@@ -120,6 +142,8 @@ export const VENUES: Venue[] = [
     y: 430,
     address: '高雄市左營區世運大道100號',
     transit: '高雄捷運紅線「世運站」1 號出口沿世運大道步行約 8-10 分鐘',
+    latitude: 22.7018,
+    longitude: 120.2946,
   },
   {
     id: 'kaohsiung-music-center',
@@ -130,6 +154,8 @@ export const VENUES: Venue[] = [
     y: 460,
     address: '高雄市鹽埕區真愛路1號',
     transit: '高雄輕軌「真愛碼頭站(C11)」或「光榮碼頭站(C10)」即達，或捷運「鹽埕埔站」步行 10 分鐘',
+    latitude: 22.6212,
+    longitude: 120.2917,
   },
   {
     id: 'hualien',
@@ -140,6 +166,8 @@ export const VENUES: Venue[] = [
     y: 295,
     address: '花蓮市達固湖灣大路23號',
     transit: '自花蓮火車站搭乘計程車約 10 分鐘，或搭公車至「德興體育場站」',
+    latitude: 23.9984,
+    longitude: 121.5878,
   },
   {
     id: 'taitung',
@@ -150,5 +178,7 @@ export const VENUES: Venue[] = [
     y: 398,
     address: '台東市更生路1369號',
     transit: '自台東火車站搭乘計程車約 10 分鐘，或搭乘公車至「棒球場站」',
+    latitude: 22.7744,
+    longitude: 121.1189,
   },
 ]

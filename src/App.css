@@ -3033,3 +3033,342 @@ body.player-open .music-bar-toggle {
   background: rgba(230, 57, 70, 0.2) !important;
   box-shadow: 0 0 10px rgba(230, 57, 70, 0.2) !important;
 }
+
+/* ==========================================================================
+   Weather & AQI Widgets
+   ========================================================================== */
+
+.weather-widget {
+  margin-top: 1.2rem;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.2rem;
+  font-family: 'Noto Serif TC', serif;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.weather-widget:hover {
+  border-color: rgba(255, 209, 102, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.weather-widget.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  padding: 2rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
+.weather-widget.error {
+  color: var(--accent);
+  background: rgba(230, 57, 70, 0.05);
+  border-color: rgba(230, 57, 70, 0.2);
+  padding: 1rem;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.weather-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+  border-bottom: 1px dashed var(--border);
+}
+
+.weather-title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: 0.05em;
+}
+
+.fallback-badge {
+  font-size: 0.65rem;
+  background: rgba(255, 209, 102, 0.1);
+  border: 1px solid rgba(255, 209, 102, 0.3);
+  color: var(--gold);
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  cursor: help;
+}
+
+.weather-refresh-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1rem;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.weather-refresh-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.weather-refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.weather-body {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.weather-main {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.weather-temp-section {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.weather-emoji {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.weather-temp-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.temp-val {
+  font-family: 'Space Mono', monospace;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.1;
+}
+
+.weather-desc {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.72rem;
+  border-left: 1px solid var(--border);
+  padding-left: 0.8rem;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  color: var(--muted);
+}
+
+.detail-item .value {
+  color: var(--text);
+  font-weight: 600;
+  font-family: 'Space Mono', monospace;
+}
+
+/* AQI Section */
+.weather-aqi-section {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.75rem 0.9rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.aqi-badge-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.aqi-badge-container .label {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.aqi-badge {
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 0.2rem 0.6rem;
+  border-radius: 4px;
+  white-space: nowrap;
+}
+
+.aqi-good {
+  background: rgba(6, 214, 160, 0.15);
+  border: 1px solid rgba(6, 214, 160, 0.4);
+  color: var(--teal);
+}
+
+.aqi-moderate {
+  background: rgba(255, 209, 102, 0.15);
+  border: 1px solid rgba(255, 209, 102, 0.4);
+  color: var(--gold);
+}
+
+.aqi-sensitive {
+  background: rgba(230, 115, 0, 0.15);
+  border: 1px solid rgba(230, 115, 0, 0.4);
+  color: #ff9f1c;
+}
+
+.aqi-unhealthy {
+  background: rgba(230, 57, 70, 0.15);
+  border: 1px solid rgba(230, 57, 70, 0.4);
+  color: var(--accent);
+}
+
+.aqi-particles {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.aqi-particles strong {
+  color: var(--text);
+  font-family: 'Space Mono', monospace;
+}
+
+/* Warnings and Suggestions section */
+.weather-alerts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.alerts-title {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--gold);
+}
+
+.alerts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.alert-item {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  padding: 0.5rem 0.7rem;
+  border-radius: 6px;
+  border-left: 3px solid transparent;
+}
+
+.alert-item.aqi-advice {
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  border-left-color: var(--muted);
+}
+
+.alert-item.weather-warning {
+  background: rgba(230, 57, 70, 0.06);
+  color: #ffb3b8;
+  border-left-color: var(--accent);
+}
+
+.alert-item.weather-sunny {
+  background: rgba(255, 209, 102, 0.05);
+  color: #ffe6a7;
+  border-left-color: var(--gold);
+}
+
+/* Spinner for loading state */
+.spinner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--border);
+  border-top-color: var(--muted);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Floating weather panel over map */
+.map-weather-overlay {
+  position: absolute;
+  top: 5rem;
+  right: 1.5rem;
+  width: 330px;
+  max-height: calc(100% - 6.5rem);
+  overflow-y: auto;
+  z-index: 10;
+  pointer-events: auto;
+  animation: slide-in-fade 0.3s ease-out;
+}
+
+@keyframes slide-in-fade {
+  from {
+    transform: translateX(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.map-weather-overlay .weather-widget {
+  margin-top: 0;
+  background: rgba(18, 18, 26, 0.88) !important;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.weather-close-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.9rem;
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.weather-close-btn:hover {
+  color: var(--accent);
+  background: rgba(230, 57, 70, 0.1);
+}
