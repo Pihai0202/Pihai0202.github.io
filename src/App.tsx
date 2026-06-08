@@ -162,6 +162,18 @@ function App() {
     () => [...remoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
     [remoteConcerts],
   )
+  const filteredRemoteConcerts = useMemo(() => {
+    if (!selectedVenueId) return sortedRemoteConcerts
+    return sortedRemoteConcerts.filter((concert) => {
+      if (concert.venue_id === selectedVenueId) return true
+      if (selectedVenue) {
+        const nameMatch = concert.venue_name && concert.venue_name.toLowerCase().includes(selectedVenue.name.toLowerCase())
+        const rawMatch = concert.venue_raw && concert.venue_raw.toLowerCase().includes(selectedVenue.name.toLowerCase())
+        return nameMatch || rawMatch
+      }
+      return false
+    })
+  }, [sortedRemoteConcerts, selectedVenueId, selectedVenue])
   const sortedConcerts = useMemo(
     () => [...concerts].sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts],
@@ -346,10 +358,39 @@ function App() {
     }
   }
 
+  const handleHeaderClick = () => {
+    // Scroll window/document
+    try {
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      window.scrollTo(0, 0)
+    }
+    try {
+      document.documentElement.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      document.documentElement.scrollTop = 0
+    }
+    try {
+      document.body.scrollTo({ top: 0, behavior: 'smooth' })
+    } catch {
+      document.body.scrollTop = 0
+    }
+
+    // Scroll sidebar
+    const sidebarScroll = document.querySelector('.concert-list-area')
+    if (sidebarScroll) {
+      try {
+        sidebarScroll.scrollTo({ top: 0, behavior: 'smooth' })
+      } catch {
+        sidebarScroll.scrollTop = 0
+      }
+    }
+  }
+
   return (
     <>
       <header>
-        <div className="logo">
+        <div className="logo" onClick={handleHeaderClick}>
           <div className="logo-icon">🎵</div>
           <div className="logo-text">
             <h1>台灣演唱會地圖</h1>
@@ -366,11 +407,12 @@ function App() {
 
       <main className="main-layout">
         <section className="map-container" aria-label="台灣場館地圖">
-          <div className="map-bg" />
+          <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
           <TaiwanMap
             concerts={concerts}
             selectedVenueId={selectedVenueId}
             onSelectVenue={setSelectedVenueId}
+            onClearVenue={() => setSelectedVenueId(null)}
           />
 
           <div className="map-legend">
@@ -389,10 +431,11 @@ function App() {
             venue={selectedVenue}
             concertCount={selectedVenueConcerts.length}
             onAddConcert={openAddModal}
+            onClearVenue={() => setSelectedVenueId(null)}
           />
           <div className="concert-list-area">
             <UpcomingConcerts
-              concerts={sortedRemoteConcerts}
+              concerts={filteredRemoteConcerts}
               status={remoteStatus}
               updatedAt={remoteUpdatedAt}
               isRefreshing={isRemoteRefreshing}
@@ -640,6 +683,9 @@ function UpcomingConcerts({
   isRefreshing: boolean
   onRefresh: () => void
 }) {
+  const [isExpanded, setIsExpanded] = useState(false)
+  const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
+
   return (
     <section className="upcoming-section" aria-label="售票資訊">
       <div className="section-row">
@@ -655,7 +701,7 @@ function UpcomingConcerts({
       {!status && concerts.length === 0 && (
         <div className="empty-state compact">目前沒有近期售票資料</div>
       )}
-      {concerts.slice(0, 8).map((concert) => (
+      {displayedConcerts.map((concert) => (
         <a
           className="remote-card"
           href={concert.url}
@@ -684,6 +730,15 @@ function UpcomingConcerts({
           </div>
         </a>
       ))}
+      {concerts.length > 8 && (
+        <button
+          className="show-more-btn"
+          type="button"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          {isExpanded ? '收起售票資訊 ▴' : `顯示所有售票資訊 (還有 ${concerts.length - 8} 筆) ▾`}
+        </button>
+      )}
     </section>
   )
 }
@@ -701,13 +756,15 @@ function TaiwanMap({
   concerts,
   selectedVenueId,
   onSelectVenue,
+  onClearVenue,
 }: {
   concerts: Concert[]
   selectedVenueId: string | null
   onSelectVenue: (venueId: string) => void
+  onClearVenue: () => void
 }) {
   return (
-    <svg id="taiwan-map" viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg">
+    <svg id="taiwan-map" viewBox="0 0 500 700" xmlns="http://www.w3.org/2000/svg" onClick={onClearVenue}>
       <defs>
         <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
           <stop offset="0%" stopColor="#1a1a3e" stopOpacity="0.8" />
@@ -766,7 +823,10 @@ function TaiwanMap({
               key={venue.id}
               className={`venue-dot${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
               transform={`translate(${venue.x},${venue.y})`}
-              onClick={() => onSelectVenue(venue.id)}
+              onClick={(e) => {
+                e.stopPropagation()
+                onSelectVenue(venue.id)
+              }}
             >
               <circle className="pulse-ring" r="8" cx="0" cy="0" />
               <circle className="bg" r="16" cx="0" cy="0" />
@@ -795,10 +855,12 @@ function VenueInfo({
   venue,
   concertCount,
   onAddConcert,
+  onClearVenue,
 }: {
   venue: Venue | null
   concertCount: number
   onAddConcert: () => void
+  onClearVenue: () => void
 }) {
   if (!venue) {
     return (
@@ -817,7 +879,12 @@ function VenueInfo({
 
   return (
     <div className="venue-info">
-      <div className="venue-city">{venue.city}</div>
+      <div className="venue-top">
+        <div className="venue-city">{venue.city}</div>
+        <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
+          ✕ 清除選取
+        </button>
+      </div>
       <div className="venue-header">
         <div className="venue-name">{venue.name}</div>
         <div className={`venue-count${concertCount > 0 ? ' has-visits' : ''}`}>
