@@ -38,7 +38,7 @@ export function TaiwanMap({
   zoom,
   onZoomChange,
 }: TaiwanMapProps) {
-  const [center, setCenter] = useState({ x: 235, y: 285 })
+  const [center, setCenter] = useState({ x: 235, y: 295 })
   const [isDragging, setIsDragging] = useState(false)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
@@ -54,13 +54,13 @@ export function TaiwanMap({
     if (selectedVenue) {
       setCenter({ x: selectedVenue.x, y: selectedVenue.y })
     } else {
-      setCenter({ x: 235, y: 285 })
+      setCenter({ x: 235, y: 295 })
     }
   }, [selectedVenueId, selectedVenue])
 
   useEffect(() => {
-    if (!selectedVenueId && zoom === 0.9) {
-      setCenter({ x: 235, y: 285 })
+    if (!selectedVenueId && zoom === 1.1) {
+      setCenter({ x: 235, y: 295 })
     }
   }, [zoom, selectedVenueId])
 
