@@ -284,7 +284,12 @@ export function TaiwanMap({
               <circle className="pulse-ring" r="8" cx="0" cy="0" />
               <circle className="bg" r="16" cx="0" cy="0" />
               <circle className="core" r="6" cx="0" cy="0" />
-              <text className="venue-label" x="12" y="4">
+              <text
+                className="venue-label"
+                x={12 / zoom}
+                y={4 / zoom}
+                style={{ fontSize: `${11 / zoom}px` }}
+              >
                 {venue.name}
               </text>
             </g>
