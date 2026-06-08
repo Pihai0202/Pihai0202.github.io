@@ -538,6 +538,27 @@ function App() {
       <main className="main-layout">
         <section className="map-container" aria-label="台灣場館地圖">
           <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
+
+          <div className="venue-chips-container">
+            <div className="venue-chips">
+              {VENUES.map((v) => {
+                const isActive = selectedVenueId === v.id
+                const hasVisits = concerts.some((c) => c.venueId === v.id)
+                return (
+                  <button
+                    key={v.id}
+                    type="button"
+                    className={`venue-chip${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
+                    onClick={() => setSelectedVenueId(v.id)}
+                  >
+                    <span className="dot" />
+                    {v.name}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <TaiwanMap
             concerts={concerts}
             selectedVenueId={selectedVenueId}
@@ -959,6 +980,7 @@ function TaiwanMap({
                 onSelectVenue(venue.id)
               }}
             >
+              <circle className="click-target" r="25" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
               <circle className="pulse-ring" r="8" cx="0" cy="0" />
               <circle className="bg" r="16" cx="0" cy="0" />
               <circle className="core" r="6" cx="0" cy="0" />

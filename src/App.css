@@ -234,7 +234,8 @@ svg#taiwan-map {
   font-family: 'Noto Serif TC', serif;
   font-size: 11px;
   fill: var(--text);
-  pointer-events: none;
+  pointer-events: auto;
+  cursor: pointer;
   opacity: 0.85;
 }
 
@@ -1763,4 +1764,95 @@ body.player-open .music-bar-toggle {
   height: 100%;
   border: none;
   filter: grayscale(0.1) invert(0.9) hue-rotate(180deg);
+}
+
+/* 頂部場館快速選取按鈕 (Chips) */
+.venue-chips-container {
+  position: absolute;
+  top: 1rem;
+  left: 1.5rem;
+  right: 1.5rem;
+  z-index: 10;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.venue-chips {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding: 0.4rem 0.2rem;
+  pointer-events: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+
+.venue-chips::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+.venue-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(18, 18, 26, 0.88);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  padding: 0.45rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-family: 'Noto Serif TC', serif;
+  white-space: nowrap;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.venue-chip:hover {
+  border-color: var(--teal);
+  color: var(--text);
+  transform: translateY(-1px);
+}
+
+.venue-chip.active {
+  background: rgba(255, 209, 102, 0.12);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 600;
+  box-shadow: 0 0 10px rgba(255, 209, 102, 0.15);
+}
+
+.venue-chip.visited {
+  border-color: rgba(6, 214, 160, 0.4);
+}
+
+.venue-chip .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--border);
+  transition: background 0.2s;
+}
+
+.venue-chip.visited .dot {
+  background: var(--teal);
+  box-shadow: 0 0 4px var(--teal);
+}
+
+.venue-chip.active .dot {
+  background: var(--gold);
+  box-shadow: 0 0 6px var(--gold);
+}
+
+@media (max-width: 768px) {
+  .venue-chips-container {
+    top: 0.6rem;
+    left: 0.8rem;
+    right: 0.8rem;
+  }
+  .venue-chip {
+    padding: 0.38rem 0.75rem;
+    font-size: 0.74rem;
+  }
 }
