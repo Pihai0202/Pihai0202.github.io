@@ -718,6 +718,7 @@ function App() {
             onPublishToBoard={() => {
               setPublishingConcert(detailConcert)
               setIsPublishModalOpen(true)
+              setDetailConcertId(null) // Close detail modal immediately
             }}
           />
         </Modal>
@@ -758,6 +759,7 @@ function App() {
       {isPublishModalOpen && publishingConcert && (
         <Modal className="publish-modal" onClose={() => {
           setIsPublishModalOpen(false)
+          setDetailConcertId(publishingConcert.id) // Restore detail modal
           setPublishingConcert(null)
         }}>
           <h2>📢 分享觀後感至社群牆</h2>
@@ -789,6 +791,7 @@ function App() {
               type="button"
               onClick={() => {
                 setIsPublishModalOpen(false)
+                setDetailConcertId(publishingConcert.id) // Restore detail modal
                 setPublishingConcert(null)
               }}
             >
