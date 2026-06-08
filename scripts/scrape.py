@@ -10,6 +10,8 @@ import re
 import sys
 import time
 from datetime import datetime, timezone
+from html import unescape
+from pathlib import Path
 from urllib.request import urlopen, Request
 from urllib.error import URLError
 from urllib.parse import urlencode, urljoin, quote
@@ -28,9 +30,11 @@ HEADERS = {
 # ── 場館對應表 ──────────────────────────────────────────────────────────────
 VENUE_MAP = {
     "台北大巨蛋": "taipei-dome",
+    "臺北大巨蛋": "taipei-dome",
     "大巨蛋": "taipei-dome",
     "小巨蛋": "taipei-arena",
     "台北小巨蛋": "taipei-arena",
+    "臺北小巨蛋": "taipei-arena",
     "南港展覽館": "nangang",
     "南港展覽": "nangang",
     "桃園國際棒球場": "taoyuan-arena",
@@ -46,6 +50,21 @@ VENUE_MAP = {
     "台南棒球場": "tainan",
     "高雄巨蛋": "kaohsiung-dome",
     "國立體育場": "kaohsiung-natl",
+    "高雄國家體育場": "kaohsiung-natl",
+    "高雄流行音樂中心": "kaohsiung-music-center",
+    "臺北流行音樂中心": "taipei-music-center",
+    "台北流行音樂中心": "taipei-music-center",
+    "Zepp New Taipei": "zepp-new-taipei",
+    "林口體育館": "linkou-arena",
+    "天母體育館": "tianmu-arena",
+    "Legacy Taipei": "legacy-taipei",
+    "Legacy TERA": "legacy-tera",
+    "TICC": "ticc",
+    "台北國際會議中心": "ticc",
+    "臺北國際會議中心": "ticc",
+    "MESSE TAOYUAN": "messe-taoyuan",
+    "桃園陽光劇場": "taoyuan-sunlight-arena",
+    "新北市工商展覽中心": "new-taipei-exhibition-hall",
     "花蓮縣立體育場": "hualien",
     "花蓮體育場": "hualien",
     "台東棒球場": "taitung",
@@ -63,6 +82,17 @@ VENUE_CITY = {
     "tainan": "台南",
     "kaohsiung-dome": "高雄",
     "kaohsiung-natl": "高雄",
+    "kaohsiung-music-center": "高雄",
+    "taipei-music-center": "台北",
+    "zepp-new-taipei": "新北",
+    "linkou-arena": "新北",
+    "tianmu-arena": "台北",
+    "legacy-taipei": "台北",
+    "legacy-tera": "新北",
+    "ticc": "台北",
+    "messe-taoyuan": "桃園",
+    "taoyuan-sunlight-arena": "桃園",
+    "new-taipei-exhibition-hall": "新北",
     "hualien": "花蓮",
     "taitung": "台東",
 }
@@ -73,7 +103,22 @@ TICKET_PLATFORMS = {
     "tixcraft": {"name": "拓元售票",  "color": "#f4a261"},
     "ibon":     {"name": "ibon售票", "color": "#2ec4b6"},
     "ticket":   {"name": "年代售票",  "color": "#9b5de5"},
+    "ticketplus": {"name": "TICKET PLUS", "color": "#00a6fb"},
+    "webbboxx": {"name": "webbboxx 行事曆", "color": "#ffd166"},
+    "manual": {"name": "手動補充", "color": "#06d6a0"},
 }
+
+PLATFORM_URLS = {
+    "KKTIX": "https://kktix.com/",
+    "拓元售票": "https://tixcraft.com/",
+    "ibon售票": "https://tickets.ibon.com.tw/",
+    "年代售票": "https://www.ticket.com.tw/",
+    "TICKET PLUS": "https://ticketplus.com.tw/",
+    "添翼售票": "https://www.indievox.com/",
+}
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+MANUAL_EVENTS_PATH = PROJECT_ROOT / "public" / "manual-events.json"
 
 
 def fetch(url, as_json=False):
@@ -602,6 +647,135 @@ def _generic_detail(url, platform):
     }
 
 
+# ── 公開行事曆 fallback ─────────────────────────────────────────────────────
+
+def clean_text(value):
+    value = re.sub(r"<[^>]+>", " ", value or "")
+    value = unescape(value)
+    return re.sub(r"\s+", " ", value).strip()
+
+
+def parse_first_date(text):
+    """Extract the first YYYY/MM/DD-ish date and normalize to YYYY-MM-DD."""
+    if not text:
+        return ""
+
+    m = re.search(r"(20\d{2})[/-](\d{1,2})(?:[/-](\d{1,2}))?", text)
+    if m:
+        year, month, day = m.group(1), int(m.group(2)), int(m.group(3) or 1)
+        return f"{year}-{month:02d}-{day:02d}"
+
+    m = re.search(r"(\d{1,2})/(\d{1,2})", text)
+    if m:
+        month, day = int(m.group(1)), int(m.group(2))
+        return f"{datetime.now(timezone.utc).year}-{month:02d}-{day:02d}"
+
+    return ""
+
+
+def detect_platform(text):
+    for name in PLATFORM_URLS:
+        if name in text:
+            return name
+    return "售票資訊"
+
+
+def scrape_webbboxx_calendar():
+    """Fallback source for a readable Taiwan concert calendar."""
+    url = "https://webbboxx.com/calendar"
+    html = fetch(url)
+    if not html:
+        return []
+
+    blocks = re.split(r"<h3[^>]*>", html, flags=re.I)
+    events = []
+
+    for index, block in enumerate(blocks[1:], start=1):
+        title_raw, _, rest = block.partition("</h3>")
+        title = clean_text(title_raw)
+        if not title:
+            continue
+
+        chunk = rest.split("<h3", 1)[0].split("<h2", 1)[0]
+        text = clean_text(chunk)
+        date_str = parse_first_date(text)
+        if date_str and date_str < today_str():
+            continue
+
+        venue_id, venue_name = match_venue(title + " " + text)
+        platform = detect_platform(text)
+        platform_url = PLATFORM_URLS.get(platform, url)
+
+        events.append({
+            "id": f"webbboxx-{abs(hash(title + date_str)) & 0xFFFFFF}",
+            "source": "webbboxx 行事曆",
+            "name": title,
+            "venue_raw": text[:80],
+            "venue_id": venue_id,
+            "venue_name": venue_name,
+            "city": VENUE_CITY.get(venue_id, ""),
+            "date": date_str,
+            "image": "",
+            "url": platform_url,
+            "price": "",
+            "ticket_links": [
+                {"platform": "webbboxx", "name": "行事曆來源", "url": url},
+                {"platform": platform.lower().replace(" ", "-"), "name": platform, "url": platform_url},
+            ],
+        })
+
+    return events
+
+
+def load_manual_events():
+    """Load manually curated events that can carry exact ticket URLs."""
+    if not MANUAL_EVENTS_PATH.exists():
+        return []
+
+    try:
+        data = json.loads(MANUAL_EVENTS_PATH.read_text(encoding="utf-8"))
+    except Exception as e:
+        print(f"  ⚠ manual-events.json parse error: {e}", file=sys.stderr)
+        return []
+
+    items = data.get("events", data if isinstance(data, list) else [])
+    events = []
+
+    for index, item in enumerate(items):
+        name = str(item.get("name") or item.get("title") or "").strip()
+        if not name:
+            continue
+
+        venue_raw = str(item.get("venue_raw") or item.get("venue_name") or item.get("venue") or "")
+        venue_id = item.get("venue_id")
+        venue_name = item.get("venue_name")
+        if not venue_id:
+            venue_id, venue_name = match_venue(name + " " + venue_raw)
+
+        url = str(item.get("url") or "").strip()
+        platform = str(item.get("source") or item.get("platform") or "手動補充")
+        ticket_links = item.get("ticket_links") or []
+        if url and not ticket_links:
+            ticket_links = [{"platform": "manual", "name": platform, "url": url}]
+
+        events.append({
+            "id": str(item.get("id") or f"manual-{index}-{abs(hash(name)) & 0xFFFFFF}"),
+            "source": platform,
+            "name": name,
+            "venue_raw": venue_raw,
+            "venue_id": venue_id,
+            "venue_name": venue_name,
+            "city": item.get("city") or VENUE_CITY.get(venue_id, ""),
+            "date": str(item.get("date") or ""),
+            "image": str(item.get("image") or ""),
+            "url": url or PLATFORM_URLS.get(platform, ""),
+            "price": str(item.get("price") or ""),
+            "ticket_links": ticket_links,
+        })
+
+    return events
+
+
 # ── 跨平台合併：同名活動加上多平台售票連結 ────────────────────────────────────
 
 def merge_ticket_links(events):
@@ -668,6 +842,18 @@ def main():
     print(f"  年代得到 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
+    # 5. Public calendar fallback
+    print("→ 讀取公開演唱會行事曆 fallback...", file=sys.stderr)
+    events = scrape_webbboxx_calendar()
+    print(f"  行事曆得到 {len(events)} 筆", file=sys.stderr)
+    all_events.extend(events)
+
+    # 6. Manual exact links
+    print("→ 合併手動補充活動...", file=sys.stderr)
+    events = load_manual_events()
+    print(f"  手動補充 {len(events)} 筆", file=sys.stderr)
+    all_events.extend(events)
+
     # 合併同一活動的多平台售票連結
     all_events = merge_ticket_links(all_events)
 
@@ -677,7 +863,7 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "webbboxx 行事曆", "手動補充"],
         "events": all_events,
     }
 

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode } from 'react'
 import './App.css'
 
@@ -96,6 +96,7 @@ const VENUES: Venue[] = [
 ]
 
 const STORAGE_KEY = 'tw-concerts'
+const REMOTE_CONCERT_REFRESH_MS = 60_000
 const EMPTY_FORM: ConcertForm = {
   artist: '',
   concertName: '',
@@ -129,6 +130,7 @@ function App() {
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
   const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
+  const [isRemoteRefreshing, setIsRemoteRefreshing] = useState(false)
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
@@ -156,12 +158,9 @@ function App() {
         .sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts, selectedVenueId],
   )
-  const selectedVenueRemoteConcerts = useMemo(
-    () =>
-      remoteConcerts
-        .filter((concert) => concert.venue_id === selectedVenueId)
-        .sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
-    [remoteConcerts, selectedVenueId],
+  const sortedRemoteConcerts = useMemo(
+    () => [...remoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
+    [remoteConcerts],
   )
   const sortedConcerts = useMemo(
     () => [...concerts].sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
@@ -173,7 +172,29 @@ function App() {
   const visitedVenueCount = new Set(concerts.map((concert) => concert.venueId)).size
   const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
-  const visibleRemoteConcerts = remoteConcerts.filter((concert) => concert.venue_id)
+
+  const loadRemoteConcerts = useCallback(async () => {
+    setIsRemoteRefreshing(true)
+
+    try {
+      const response = await fetch(`${import.meta.env.BASE_URL}concerts.json?t=${Date.now()}`, {
+        cache: 'no-store',
+      })
+      if (!response.ok) throw new Error('concerts.json not found')
+
+      const data = (await response.json()) as RemoteConcertPayload
+      const events = Array.isArray(data.events) ? data.events : []
+      setRemoteConcerts(events)
+      setRemoteUpdatedAt(data.updated_at ?? null)
+      setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
+    } catch {
+      setRemoteConcerts([])
+      setRemoteUpdatedAt(null)
+      setRemoteStatus('近期售票活動暫時讀取失敗')
+    } finally {
+      setIsRemoteRefreshing(false)
+    }
+  }, [])
 
   useEffect(() => {
     try {
@@ -184,31 +205,13 @@ function App() {
   }, [concerts])
 
   useEffect(() => {
-    let isMounted = true
-
-    fetch(`${import.meta.env.BASE_URL}concerts.json`, { cache: 'no-store' })
-      .then((response) => {
-        if (!response.ok) throw new Error('concerts.json not found')
-        return response.json() as Promise<RemoteConcertPayload>
-      })
-      .then((data) => {
-        if (!isMounted) return
-        const events = Array.isArray(data.events) ? data.events : []
-        setRemoteConcerts(events)
-        setRemoteUpdatedAt(data.updated_at ?? null)
-        setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
-      })
-      .catch(() => {
-        if (!isMounted) return
-        setRemoteConcerts([])
-        setRemoteUpdatedAt(null)
-        setRemoteStatus('近期售票活動暫時讀取失敗')
-      })
+    loadRemoteConcerts()
+    const timer = window.setInterval(loadRemoteConcerts, REMOTE_CONCERT_REFRESH_MS)
 
     return () => {
-      isMounted = false
+      window.clearInterval(timer)
     }
-  }, [])
+  }, [loadRemoteConcerts])
 
   useEffect(() => {
     document.body.classList.toggle('player-open', isMusicBarVisible)
@@ -356,7 +359,7 @@ function App() {
         <div className="stats-bar">
           <Stat number={concerts.length} label="演唱會" />
           <Stat number={visitedVenueCount} label="場館" />
-          <Stat number={visibleRemoteConcerts.length} label="售票" />
+          <Stat number={remoteConcerts.length} label="售票" />
           <Stat number={totalMedia} label="照片/影片" />
         </div>
       </header>
@@ -389,10 +392,11 @@ function App() {
           />
           <div className="concert-list-area">
             <UpcomingConcerts
-              concerts={selectedVenueRemoteConcerts}
-              hasSelectedVenue={Boolean(selectedVenue)}
+              concerts={sortedRemoteConcerts}
               status={remoteStatus}
               updatedAt={remoteUpdatedAt}
+              isRefreshing={isRemoteRefreshing}
+              onRefresh={loadRemoteConcerts}
             />
             <ConcertList
               concerts={selectedVenueConcerts}
@@ -625,26 +629,33 @@ function App() {
 
 function UpcomingConcerts({
   concerts,
-  hasSelectedVenue,
   status,
   updatedAt,
+  isRefreshing,
+  onRefresh,
 }: {
   concerts: RemoteConcert[]
-  hasSelectedVenue: boolean
   status: string
   updatedAt: string | null
+  isRefreshing: boolean
+  onRefresh: () => void
 }) {
-  if (!hasSelectedVenue) return null
-
   return (
-    <section className="upcoming-section" aria-label="近期售票活動">
-      <div className="section-title">— 近期售票活動 —</div>
-      {updatedAt && <div className="remote-updated">更新：{formatRemoteDate(updatedAt)}</div>}
+    <section className="upcoming-section" aria-label="售票資訊">
+      <div className="section-row">
+        <div>
+          <div className="section-title">— 售票資訊 —</div>
+          {updatedAt && <div className="remote-updated">更新：{formatRemoteDate(updatedAt)}</div>}
+        </div>
+        <button className="refresh-events-btn" type="button" onClick={onRefresh} disabled={isRefreshing}>
+          {isRefreshing ? '更新中' : '更新'}
+        </button>
+      </div>
       {status && <div className="empty-state compact">{status}</div>}
       {!status && concerts.length === 0 && (
-        <div className="empty-state compact">這個場館目前沒有近期售票資料</div>
+        <div className="empty-state compact">目前沒有近期售票資料</div>
       )}
-      {concerts.slice(0, 4).map((concert) => (
+      {concerts.slice(0, 8).map((concert) => (
         <a
           className="remote-card"
           href={concert.url}
@@ -660,7 +671,7 @@ function UpcomingConcerts({
             </div>
             <div className="remote-card-name">{concert.name}</div>
             <div className="remote-card-meta">
-              {concert.venue_raw || concert.venue_name || '場館待確認'}
+              {concert.venue_raw || concert.venue_name || concert.city || '地點待確認'}
               {concert.price ? ` · ${concert.price}` : ''}
             </div>
             {concert.ticket_links?.length > 0 && (

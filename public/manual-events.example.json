@@ -1,0 +1,23 @@
+{
+  "events": [
+    {
+      "id": "my-ticket-link-001",
+      "name": "範例演唱會",
+      "date": "2026-07-18",
+      "venue_id": "taipei-arena",
+      "venue_name": "台北小巨蛋",
+      "city": "台北",
+      "source": "官方購票頁",
+      "url": "https://example.com/ticket",
+      "price": "",
+      "image": "",
+      "ticket_links": [
+        {
+          "platform": "official",
+          "name": "官方購票頁",
+          "url": "https://example.com/ticket"
+        }
+      ]
+    }
+  ]
+}
