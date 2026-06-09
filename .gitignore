@@ -11,7 +11,7 @@ node_modules
 dist
 dist-ssr
 # Local env files
-.env
+# .env (committed for GitHub Actions build)
 .env.local
 .env.*.local
 *.local
