@@ -19,7 +19,7 @@ import { VenueWeather } from './components/VenueWeather'
 import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
 import { LoginPage } from './components/LoginPage'
-import { collection, addDoc } from 'firebase/firestore'
+import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { db, logCustomEvent } from './firebase'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -52,8 +52,29 @@ function loadConcerts() {
   }
 }
 
+function loadInitialConcerts() {
+  try {
+    const loggedIn = localStorage.getItem('tw-logged-in') === 'true'
+    const storedUser = localStorage.getItem('tw-user-info')
+    if (loggedIn && storedUser) {
+      const user = JSON.parse(storedUser)
+      const email = user.email
+      if (email) {
+        const cached = localStorage.getItem(`tw-concerts-${email}`)
+        if (cached) {
+          return JSON.parse(cached) as Concert[]
+        }
+        return []
+      }
+    }
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as Concert[]
+  } catch {
+    return []
+  }
+}
+
 function App() {
-  const [concerts, setConcerts] = useState<Concert[]>(loadConcerts)
+  const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
   const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
@@ -211,13 +232,78 @@ function App() {
     }
   }, [])
 
+  // Sync and load user-specific concerts from Firestore when login state changes
   useEffect(() => {
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(concerts))
-    } catch {
-      alert('儲存空間不足，請清理一些照片再試。')
+    async function syncConcerts() {
+      if (isLoggedIn && currentUser?.email) {
+        const email = currentUser.email
+        try {
+          const docRef = doc(db, 'users_concerts', email)
+          const docSnap = await getDoc(docRef)
+          if (docSnap.exists()) {
+            const remoteConcerts = docSnap.data().concerts as Concert[]
+            setConcerts(remoteConcerts)
+            localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(remoteConcerts))
+          } else {
+            // Check if there is a local cache for this email
+            const cached = localStorage.getItem(`tw-concerts-${email}`)
+            if (cached) {
+              const localParsed = JSON.parse(cached) as Concert[]
+              setConcerts(localParsed)
+              // save to Firestore to initialize cloud storage
+              await setDoc(docRef, {
+                email,
+                concerts: localParsed,
+                updatedAt: new Date().toISOString()
+              })
+            } else {
+              setConcerts([])
+            }
+          }
+        } catch (error) {
+          console.error('Failed to sync concerts from Firestore:', error)
+          // Fallback to local cache if offline/error
+          const cached = localStorage.getItem(`tw-concerts-${email}`)
+          if (cached) {
+            setConcerts(JSON.parse(cached) as Concert[])
+          }
+        }
+      } else {
+        // Fallback to guest list
+        setConcerts(loadConcerts())
+      }
     }
-  }, [concerts])
+    syncConcerts()
+  }, [isLoggedIn, currentUser])
+
+  // Persist concerts when state changes
+  useEffect(() => {
+    async function persistConcerts() {
+      if (isLoggedIn && currentUser?.email) {
+        const email = currentUser.email
+        try {
+          // 1. Save locally to account cache
+          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(concerts))
+          // 2. Sync to Firestore
+          const docRef = doc(db, 'users_concerts', email)
+          await setDoc(docRef, {
+            email,
+            concerts,
+            updatedAt: new Date().toISOString()
+          })
+        } catch (error) {
+          console.error('Failed to persist concerts:', error)
+        }
+      } else {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(concerts))
+        } catch {
+          alert('儲存空間不足，請清理一些照片再試。')
+        }
+      }
+    }
+    persistConcerts()
+  }, [concerts, isLoggedIn, currentUser])
 
   useEffect(() => {
     loadRemoteConcerts()
