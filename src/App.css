@@ -3571,6 +3571,12 @@ body.player-open .music-bar-toggle {
     display: none !important; /* Hide stats bar on mobile to keep header clean */
   }
 
+  .header-right {
+    flex-direction: row !important;
+    width: auto !important;
+    gap: 0.5rem !important;
+  }
+
   .nav-toggle-btn {
     display: none !important; /* Hide community toggle button in header */
   }
