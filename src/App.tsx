@@ -322,7 +322,7 @@ function App() {
     setNickname(author)
 
     try {
-      await addDoc(collection(db, 'reviews'), {
+      const docRef = await addDoc(collection(db, 'reviews'), {
         artist: publishingConcert.artist,
         concertName: publishingConcert.concertName || '未命名演唱會',
         venueName: publishingConcert.venueName || '未指定場館',
@@ -333,6 +333,11 @@ function App() {
         likes: 0,
         createdAt: new Date().toISOString(),
       })
+
+      // Save created note ID to local storage
+      const myCreatedNotes = JSON.parse(localStorage.getItem('tw-my-created-notes') || '[]')
+      myCreatedNotes.push(docRef.id)
+      localStorage.setItem('tw-my-created-notes', JSON.stringify(myCreatedNotes))
 
       logCustomEvent('publish_community_note', {
         artist: publishingConcert.artist,

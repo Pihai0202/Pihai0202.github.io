@@ -11,6 +11,7 @@ export function ShareBoard() {
   const [notes, setNotes] = useState<SharedNote[]>([])
   const [likedIds, setLikedIds] = useState<Record<string, boolean>>({})
   const [searchQuery, setSearchQuery] = useState('')
+  const [myCreatedIds, setMyCreatedIds] = useState<string[]>([])
   const [expandedIds, setExpandedIds] = useState<Record<string, boolean>>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
@@ -88,6 +89,16 @@ export function ShareBoard() {
       }
     }
 
+    // Load created note IDs
+    const storedMyNotes = localStorage.getItem('tw-my-created-notes')
+    if (storedMyNotes) {
+      try {
+        setMyCreatedIds(JSON.parse(storedMyNotes))
+      } catch {
+        setMyCreatedIds([])
+      }
+    }
+
     return () => unsubscribe()
   }, [])
 
@@ -152,7 +163,7 @@ export function ShareBoard() {
     localStorage.setItem('tw-nickname', author)
 
     try {
-      await addDoc(collection(db, 'reviews'), {
+      const docRef = await addDoc(collection(db, 'reviews'), {
         artist,
         concertName: concertName || '未命名演唱會',
         venueName: venueName || '未指定場館',
@@ -163,6 +174,12 @@ export function ShareBoard() {
         likes: 0,
         createdAt: new Date().toISOString(),
       })
+
+      // Save created note ID to local storage and state
+      const myCreatedNotes = JSON.parse(localStorage.getItem('tw-my-created-notes') || '[]')
+      myCreatedNotes.push(docRef.id)
+      localStorage.setItem('tw-my-created-notes', JSON.stringify(myCreatedNotes))
+      setMyCreatedIds(myCreatedNotes)
 
       logCustomEvent('publish_community_note', {
         artist,
@@ -296,14 +313,16 @@ export function ShareBoard() {
                 <div className="shared-card-header">
                   <div className="card-artist-tag">{note.artist}</div>
                   <div className="card-header-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                    <button
-                      className="card-delete-btn"
-                      type="button"
-                      onClick={() => handleNoteDelete(note.id)}
-                      title="刪除此分享"
-                    >
-                      🗑️
-                    </button>
+                    {myCreatedIds.includes(note.id) && (
+                      <button
+                        className="card-delete-btn"
+                        type="button"
+                        onClick={() => handleNoteDelete(note.id)}
+                        title="刪除此分享"
+                      >
+                        🗑️
+                      </button>
+                    )}
                     <button
                       className={`card-like-btn${isLiked ? ' liked' : ''}`}
                       type="button"
