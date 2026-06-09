@@ -3,7 +3,7 @@ import { marked } from 'marked'
 import type { SharedNote } from '../types'
 import { COMMUNITY_MOCK_NOTES } from '../constants/communityMock'
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, increment, addDoc } from 'firebase/firestore'
-import { db } from '../firebase'
+import { db, logCustomEvent } from '../firebase'
 
 const LIKED_STORAGE_KEY = 'tw-liked-notes'
 
@@ -123,6 +123,9 @@ export function ShareBoard() {
       await updateDoc(noteRef, {
         likes: isAlreadyLiked ? increment(-1) : increment(1)
       })
+      logCustomEvent(isAlreadyLiked ? 'unlike_community_note' : 'like_community_note', {
+        note_id: noteId
+      })
     } catch (err) {
       console.error("Firestore likes update error:", err)
     }
@@ -161,6 +164,13 @@ export function ShareBoard() {
         createdAt: new Date().toISOString(),
       })
 
+      logCustomEvent('publish_community_note', {
+        artist,
+        venue_name: venueName,
+        concert_name: concertName,
+        source: 'share_board'
+      })
+
       // Reset form
       setForm({
         artist: '',
@@ -185,6 +195,9 @@ export function ShareBoard() {
     if (!confirm('確定要刪除這筆分享記錄嗎？')) return
     try {
       await deleteDoc(doc(db, 'reviews', noteId))
+      logCustomEvent('delete_community_note', {
+        note_id: noteId
+      })
     } catch (err) {
       console.error("Firestore delete error:", err)
       alert('❌ 刪除失敗，請檢查網路連線！')

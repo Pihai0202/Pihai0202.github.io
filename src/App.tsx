@@ -20,7 +20,7 @@ import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
 import { LoginPage } from './components/LoginPage'
 import { collection, addDoc } from 'firebase/firestore'
-import { db } from './firebase'
+import { db, logCustomEvent } from './firebase'
 
 const STORAGE_KEY = 'tw-concerts'
 const REMOTE_CONCERT_REFRESH_MS = 60_000
@@ -87,7 +87,34 @@ function App() {
     } else if (view === 'map') {
       setMobileTab((current) => (current === 'board' ? 'map' : current))
     }
+    // Log view change
+    logCustomEvent('view_page', { page: view })
   }, [view])
+
+  // Log venue selection
+  useEffect(() => {
+    if (selectedVenueId) {
+      const venue = VENUES.find(v => v.id === selectedVenueId)
+      if (venue) {
+        logCustomEvent('select_venue', {
+          venue_id: selectedVenueId,
+          venue_name: venue.name,
+          venue_city: venue.city
+        })
+      }
+    }
+  }, [selectedVenueId])
+
+  // Log search queries (debounced)
+  useEffect(() => {
+    if (!searchQuery.trim()) return
+    const timer = setTimeout(() => {
+      logCustomEvent('search_concert', {
+        search_term: searchQuery.trim()
+      })
+    }, 1500)
+    return () => clearTimeout(timer)
+  }, [searchQuery])
   const [nickname, setNickname] = useState(() => localStorage.getItem('tw-nickname') || '')
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('tw-logged-in') === 'true')
   const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string } | null>(() => {
@@ -274,6 +301,12 @@ function App() {
 
     setConcerts((current) => [...current, concert])
     setIsAddModalOpen(false)
+    logCustomEvent('add_concert_record', {
+      venue_id: concert.venueId,
+      venue_name: concert.venueName,
+      artist: concert.artist,
+      concert_name: concert.concertName
+    })
   }
 
   const deleteConcert = (id: string, event: MouseEvent<HTMLButtonElement>) => {
@@ -299,6 +332,13 @@ function App() {
         notes: publishingConcert.notes,
         likes: 0,
         createdAt: new Date().toISOString(),
+      })
+
+      logCustomEvent('publish_community_note', {
+        artist: publishingConcert.artist,
+        venue_name: publishingConcert.venueName,
+        concert_name: publishingConcert.concertName,
+        source: 'my_record'
       })
 
       setIsPublishModalOpen(false)
@@ -1007,6 +1047,14 @@ function UpcomingConcerts({
           target="_blank"
           rel="noopener noreferrer"
           key={concert.id}
+          onClick={() => {
+            logCustomEvent('click_ticket_card', {
+              concert_id: concert.id,
+              concert_name: concert.name,
+              venue_name: concert.venue_name || concert.venue_raw,
+              source: concert.source
+            })
+          }}
         >
           {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
           <div className="remote-card-body">

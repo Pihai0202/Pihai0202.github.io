@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import type { Venue } from '../types'
+import { logCustomEvent } from '../firebase'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -71,7 +72,16 @@ export function VenueInfo({
               <button
                 className={`address-nav-btn${showMap ? ' active' : ''}`}
                 type="button"
-                onClick={() => setShowMap(!showMap)}
+                onClick={() => {
+                  const nextShowMap = !showMap
+                  setShowMap(nextShowMap)
+                  if (nextShowMap) {
+                    logCustomEvent('click_navigation_toggle', {
+                      venue_id: venue.id,
+                      venue_name: venue.name
+                    })
+                  }
+                }}
               >
                 🧭 導航
               </button>
@@ -104,6 +114,12 @@ export function VenueInfo({
                 href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${venue.city} ${venue.name}`)}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={() => {
+                  logCustomEvent('click_google_maps_external', {
+                    venue_id: venue.id,
+                    venue_name: venue.name
+                  })
+                }}
               >
                 🧭 Google 地圖導航 ↗
               </a>
