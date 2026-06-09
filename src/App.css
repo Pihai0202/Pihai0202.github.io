@@ -3562,34 +3562,23 @@ body.player-open .music-bar-toggle {
 @media (max-width: 768px) {
   /* Clean up Header */
   header {
-    padding: 0.8rem 1rem 0.5rem !important;
-    height: 108px !important;
-    display: flex !important;
-    flex-wrap: wrap !important;
-    align-content: space-between !important;
+    padding: 0.8rem 1rem !important;
+    height: 62px !important;
+    overflow: hidden;
   }
   
   .stats-bar {
     display: none !important; /* Hide stats bar on mobile to keep header clean */
   }
 
-  .logo {
-    order: 1 !important;
-  }
-
   .header-right {
-    order: 2 !important;
     flex-direction: row !important;
     width: auto !important;
     gap: 0.5rem !important;
   }
 
   .header-search {
-    order: 3 !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    margin: 0.4rem 0 0 !important;
-    padding: 0.4rem 0.8rem !important;
+    display: none !important; /* Hide header search bar completely on mobile */
   }
 
   .nav-toggle-btn {
@@ -3607,7 +3596,7 @@ body.player-open .music-bar-toggle {
   /* Full Screen Tab Layout */
   .main-layout {
     display: block !important;
-    height: calc(100vh - 108px - 60px) !important; /* Viewport minus header (108px) and bottom nav (60px) */
+    height: calc(100vh - 62px - 60px) !important; /* Viewport minus header (62px) and bottom nav (60px) */
     min-height: 0 !important;
     overflow: hidden !important;
     position: relative !important;
@@ -3635,13 +3624,64 @@ body.player-open .music-bar-toggle {
     overflow-y: auto !important;
   }
 
+  /* Search Tab View */
+  .main-layout.mobile-tab-search .map-container {
+    display: none !important;
+  }
+  .main-layout.mobile-tab-search .sidebar {
+    display: flex !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    overflow-y: auto !important;
+  }
+
+  /* Mobile Search Bar in Sidebar */
+  .mobile-search-bar {
+    display: flex;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.55rem 0.8rem;
+    margin-bottom: 1.2rem;
+    gap: 0.5rem;
+  }
+
+  .mobile-search-bar .search-icon {
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .mobile-search-bar input {
+    background: transparent;
+    border: none;
+    color: var(--text);
+    font-size: 0.85rem;
+    width: 100%;
+    outline: none;
+    font-family: inherit;
+  }
+
+  .mobile-search-bar .search-clear-btn {
+    background: none;
+    border: none;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 0.8rem;
+    padding: 0.1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
   /* Float weather widget overlay nicely on full-height mobile map */
   .map-weather-overlay {
-    top: 7.2rem;
+    top: 4.5rem;
     right: 1rem;
     left: 1rem;
     width: auto;
-    max-height: calc(100% - 9rem); /* Prevents overlapping bottom navigation */
+    max-height: calc(100% - 6.5rem); /* Prevents overlapping bottom navigation */
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
     z-index: 99;
   }
@@ -3688,7 +3728,7 @@ body.player-open .music-bar-toggle {
   /* Mobile Bottom Navigation Bar */
   .mobile-bottom-nav {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr) !important;
     position: fixed;
     bottom: 0;
     left: 0;
@@ -3768,7 +3808,7 @@ body.player-open .music-bar-toggle {
 
   /* Ensure correct padding with player open */
   body.player-open .main-layout {
-    height: calc(100vh - 108px - 60px - 90px) !important; /* Minus player height */
+    height: calc(100vh - 62px - 60px - 90px) !important; /* Minus player height */
   }
 
   body.player-open .mobile-bottom-nav {

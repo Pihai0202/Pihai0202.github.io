@@ -78,7 +78,7 @@ function App() {
   const [view, setView] = useState<'map' | 'board' | 'login'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
-  const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'board'>('map')
+  const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -598,17 +598,38 @@ function App() {
               📋 全部記錄
             </button>
           </section>
-
           <aside className="sidebar">
-            <VenueInfo
-              key={selectedVenue?.id ?? 'empty'}
-              venue={selectedVenue}
-              concertCount={selectedVenueConcerts.length}
-              onAddConcert={openAddModal}
-              onClearVenue={() => setSelectedVenueId(null)}
-            />
+            {mobileTab !== 'search' && (
+              <VenueInfo
+                key={selectedVenue?.id ?? 'empty'}
+                venue={selectedVenue}
+                concertCount={selectedVenueConcerts.length}
+                onAddConcert={openAddModal}
+                onClearVenue={() => setSelectedVenueId(null)}
+              />
+            )}
             <div className="concert-list-area">
-              <TransitStatusBoard />
+              {mobileTab === 'search' && (
+                <div className="mobile-search-bar">
+                  <span className="search-icon">🔍</span>
+                  <input
+                    type="text"
+                    placeholder="搜尋歌手、售票或場館..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                  {searchQuery && (
+                    <button
+                      className="search-clear-btn"
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                    >
+                      ✕
+                    </button>
+                  )}
+                </div>
+              )}
+              {mobileTab !== 'search' && <TransitStatusBoard />}
               <UpcomingConcerts
                 concerts={filteredRemoteConcerts}
                 status={remoteStatus}
@@ -963,6 +984,18 @@ function App() {
             {selectedVenueConcerts.length > 0 && (
               <span className="badge">{selectedVenueConcerts.length}</span>
             )}
+          </button>
+          <button
+            className={`nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
+            type="button"
+            onClick={() => {
+              setView('map')
+              setMobileTab('search')
+              setSelectedVenueId(null)
+            }}
+          >
+            <span className="icon">🔍</span>
+            <span className="label">活動搜尋</span>
           </button>
           <button
             className={`nav-item${view === 'board' ? ' active' : ''}`}
