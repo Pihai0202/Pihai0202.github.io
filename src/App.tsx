@@ -79,6 +79,7 @@ function App() {
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
 
   useEffect(() => {
@@ -458,6 +459,16 @@ function App() {
   return (
     <>
       <header>
+        {view !== 'login' && (
+          <button
+            className="mobile-menu-toggle-btn"
+            type="button"
+            onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
+            aria-label="選單"
+          >
+            ☰
+          </button>
+        )}
         <div className="logo" onClick={handleHeaderClick}>
           <div className="logo-icon">🎵</div>
           <div className="logo-text">
@@ -505,11 +516,11 @@ function App() {
             {view === 'map' ? '💬 社群分享牆' : '🗺️ 返回場館地圖'}
           </button>
           {isLoggedIn && currentUser ? (
-            <div className="user-profile-menu" style={{ display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <span className="user-name" style={{ fontSize: '0.8rem', color: 'var(--gold)', fontWeight: 700 }}>
+            <div className="user-profile-menu">
+              <span className="user-name">
                 👤 {currentUser.nickname}
               </span>
-              <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout} style={{ border: '1px solid rgba(230, 57, 70, 0.4)', color: 'var(--accent)' }}>
+              <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
                 登出
               </button>
             </div>
@@ -959,55 +970,78 @@ function App() {
       </div>
 
       {view !== 'login' && (
-        <div className="mobile-bottom-nav">
-          <button
-            className={`nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
-            type="button"
-            onClick={() => {
-              setView('map')
-              setMobileTab('map')
-            }}
-          >
-            <span className="icon">🗺️</span>
-            <span className="label">場館地圖</span>
-          </button>
-          <button
-            className={`nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
-            type="button"
-            onClick={() => {
-              setView('map')
-              setMobileTab('list')
-            }}
-          >
-            <span className="icon">📋</span>
-            <span className="label">場館資訊</span>
-            {selectedVenueConcerts.length > 0 && (
-              <span className="badge">{selectedVenueConcerts.length}</span>
-            )}
-          </button>
-          <button
-            className={`nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
-            type="button"
-            onClick={() => {
-              setView('map')
-              setMobileTab('search')
-              setSelectedVenueId(null)
-            }}
-          >
-            <span className="icon">🔍</span>
-            <span className="label">活動搜尋</span>
-          </button>
-          <button
-            className={`nav-item${view === 'board' ? ' active' : ''}`}
-            type="button"
-            onClick={() => {
-              setView('board')
-            }}
-          >
-            <span className="icon">💬</span>
-            <span className="label">社群牆</span>
-          </button>
-        </div>
+        <>
+          <div
+            className={`mobile-sidebar-overlay${isMobileSidebarOpen ? ' active' : ''}`}
+            onClick={() => setIsMobileSidebarOpen(false)}
+          />
+          <div className={`mobile-sidebar-nav${isMobileSidebarOpen ? ' open' : ''}`}>
+            <div className="sidebar-nav-header">
+              <span className="sidebar-nav-title">選單 MENU</span>
+              <button
+                className="sidebar-nav-close"
+                type="button"
+                onClick={() => setIsMobileSidebarOpen(false)}
+                aria-label="關閉選單"
+              >
+                ✕
+              </button>
+            </div>
+            <div className="sidebar-nav-items">
+              <button
+                className={`sidebar-nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('map')
+                  setMobileTab('map')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">🗺️</span>
+                <span className="label">場館地圖</span>
+              </button>
+              <button
+                className={`sidebar-nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('map')
+                  setMobileTab('list')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">📋</span>
+                <span className="label">場館資訊</span>
+                {selectedVenueConcerts.length > 0 && (
+                  <span className="badge">{selectedVenueConcerts.length}</span>
+                )}
+              </button>
+              <button
+                className={`sidebar-nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('map')
+                  setMobileTab('search')
+                  setSelectedVenueId(null)
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">🔍</span>
+                <span className="label">活動搜尋</span>
+              </button>
+              <button
+                className={`sidebar-nav-item${view === 'board' ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('board')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">💬</span>
+                <span className="label">社群牆</span>
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </>
   )
