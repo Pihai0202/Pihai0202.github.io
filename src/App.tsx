@@ -240,24 +240,64 @@ function App() {
         try {
           const docRef = doc(db, 'users_concerts', email)
           const docSnap = await getDoc(docRef)
+
+          // Load current local guest concerts to merge
+          const guestCached = localStorage.getItem(STORAGE_KEY)
+          const guestConcerts = guestCached ? (JSON.parse(guestCached) as Concert[]) : []
+
           if (docSnap.exists()) {
             const remoteConcerts = docSnap.data().concerts as Concert[]
-            setConcerts(remoteConcerts)
-            localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(remoteConcerts))
+            
+            // Merge guest concerts into remote concerts (deduplicated by id)
+            let mergedConcerts = [...remoteConcerts]
+            let hasNewMerge = false
+            guestConcerts.forEach((gc) => {
+              if (!mergedConcerts.some((rc) => rc.id === gc.id)) {
+                mergedConcerts.push(gc)
+                hasNewMerge = true
+              }
+            })
+
+            setConcerts(mergedConcerts)
+            localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
+
+            if (hasNewMerge) {
+              await setDoc(docRef, {
+                email,
+                concerts: mergedConcerts,
+                updatedAt: new Date().toISOString()
+              })
+            }
           } else {
             // Check if there is a local cache for this email
             const cached = localStorage.getItem(`tw-concerts-${email}`)
             if (cached) {
               const localParsed = JSON.parse(cached) as Concert[]
-              setConcerts(localParsed)
-              // save to Firestore to initialize cloud storage
+              
+              // Merge guest concerts into local user cache
+              let mergedConcerts = [...localParsed]
+              guestConcerts.forEach((gc) => {
+                if (!mergedConcerts.some((lc) => lc.id === gc.id)) {
+                  mergedConcerts.push(gc)
+                }
+              })
+
+              setConcerts(mergedConcerts)
+              localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
               await setDoc(docRef, {
                 email,
-                concerts: localParsed,
+                concerts: mergedConcerts,
                 updatedAt: new Date().toISOString()
               })
             } else {
-              setConcerts([])
+              // No remote data and no account cache: initialize with guest concerts
+              setConcerts(guestConcerts)
+              localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(guestConcerts))
+              await setDoc(docRef, {
+                email,
+                concerts: guestConcerts,
+                updatedAt: new Date().toISOString()
+              })
             }
           }
         } catch (error) {
