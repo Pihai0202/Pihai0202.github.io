@@ -75,6 +75,11 @@ export function TicketDetailModal({
   })
   const [spotifyLoading, setSpotifyLoading] = useState(false)
 
+  // Create a guaranteed list of links to render
+  const linksToRender = ticket.ticket_links && ticket.ticket_links.length > 0
+    ? ticket.ticket_links
+    : [{ platform: 'official', name: ticket.source || '官方售票', url: ticket.url }]
+
   // 1. Fetch comments in real-time from Firestore
   useEffect(() => {
     setCommentsLoading(true)
@@ -241,9 +246,9 @@ export function TicketDetailModal({
           )}
         </div>
         
-        {ticket.ticket_links && ticket.ticket_links.length > 0 && (
+        {linksToRender.length > 0 && (
           <div className="ticket-link-buttons">
-            {ticket.ticket_links.map((link, idx) => (
+            {linksToRender.map((link, idx) => (
               <a
                 key={`${link.platform}-${idx}`}
                 href={link.url}
@@ -360,6 +365,26 @@ export function TicketDetailModal({
           </div>
         )}
       </div>
+
+      {/* 購票連結快捷區 */}
+      {linksToRender.length > 0 && (
+        <div className="ticket-purchase-banner">
+          <span className="banner-title">🎟️ 購票/活動連結資訊：</span>
+          <div className="banner-buttons-row">
+            {linksToRender.map((link, idx) => (
+              <a
+                key={`${link.platform}-banner-${idx}`}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="ticket-buy-btn-large"
+              >
+                立即前往 {link.name} 購票/活動網頁 ➔
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* 售票資訊留言牆 */}
       <div className="ticket-comments-section">

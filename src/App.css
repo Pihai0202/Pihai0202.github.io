@@ -4104,13 +4104,81 @@ body.player-open .music-bar-toggle {
 /* ==========================================================================
    Ticket Detail Modal Styles
    ========================================================================== */
+/* 售票詳情彈窗寬度與防溢出優化 */
+.ticket-detail-modal {
+  width: 800px !important;
+  max-width: 95vw !important;
+  overflow-x: hidden !important;
+}
+
 .ticket-detail-container {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
   max-height: 80vh;
   overflow-y: auto;
+  overflow-x: hidden;
   padding-right: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* 購票連結快捷區樣式 */
+.ticket-purchase-banner {
+  background: linear-gradient(135deg, rgba(255, 209, 102, 0.08) 0%, rgba(6, 214, 160, 0.04) 100%);
+  border: 1px solid rgba(255, 209, 102, 0.25);
+  border-radius: 12px;
+  padding: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ticket-purchase-banner .banner-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+  letter-spacing: 0.05em;
+}
+
+.banner-buttons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  width: 100%;
+}
+
+.ticket-buy-btn-large {
+  flex: 1;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--teal);
+  border: 1px solid var(--teal);
+  color: #000 !important;
+  font-weight: 700;
+  font-size: 0.88rem;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(6, 214, 160, 0.15);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.ticket-buy-btn-large:hover {
+  background: #05c290;
+  border-color: #05c290;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(6, 214, 160, 0.25);
+}
+
+.ticket-buy-btn-large:active {
+  transform: translateY(0);
 }
 
 .ticket-info-header {
