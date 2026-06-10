@@ -13,6 +13,22 @@ interface TransitPayload {
   statuses: Record<string, TransitStatusData>
 }
 
+interface TrainQueryResult {
+  trainType: string
+  trainNo: string
+  depTime: string
+  arrTime: string
+  duration: string
+  isExpress: boolean
+  status: string
+}
+
+interface BusStopInfo {
+  name: string
+  status: string
+  className: string
+}
+
 // Timetables and schedules data
 const METRO_LINE_DATA = {
   taipei: [
@@ -36,30 +52,6 @@ const METRO_LINE_DATA = {
 const THSR_STATIONS = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營']
 const TRA_STATIONS = ['基隆', '七堵', '南港', '松山', '台北', '板橋', '樹林', '桃園', '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義', '新營', '台南', '岡山', '新左營', '高雄', '屏東', '宜蘭', '羅東', '花蓮', '玉里', '台東']
 
-// Simulated popular bus routes for county bus search
-const POPULAR_BUSES: Record<string, { route: string; stops: string[] }> = {
-  '307': {
-    route: '307 (板橋前站 - 撫遠街)',
-    stops: ['板橋公車站', '新北市政府', '致理科技大學', '積穗', '中和中山路', '連城路', '華中橋', '萬大路', '西門町', '台北車站', '南京復興', '南京三民', '撫遠街']
-  },
-  '299': {
-    route: '299 (輔大 - 永春高中)',
-    stops: ['輔仁大學', '新莊地政事務所', '新莊田徑場', '中華路', '三重自強路', '台北車站', '忠孝新生', '忠孝復興', '忠孝敦化', '市政府', '永春高中']
-  },
-  '301': {
-    route: '301 (台中車站 - 靜宜大學)',
-    stops: ['台中車站', '中友百貨', '科博館', '秋紅谷', '新光三越', '東海大學', '榮總', '弘光科大', '靜宜大學']
-  },
-  '100': {
-    route: '100 (瑞豐沙崙 - 高雄車站)',
-    stops: ['瑞豐站', '五甲路', '前鎮高中', '三多商圈', '中央公園', '美麗島', '高雄車站']
-  },
-  '綠1': {
-    route: '綠1 (新店 - 市政府)',
-    stops: ['新店捷運站', '七張', '大坪林', '木柵', '信義安和', '台北101/世貿', '市政府']
-  }
-}
-
 const COUNTIES = [
   { id: 'tpe', name: '台北市' },
   { id: 'ntpc', name: '新北市' },
@@ -68,60 +60,163 @@ const COUNTIES = [
   { id: 'tnn', name: '台南市' }
 ]
 
-// Helper to generate dynamic, realistic stops list for any queried bus number
-function generateDynamicStops(busNum: string, county: string): { route: string; stops: string[] } {
-  const popularKey = Object.keys(POPULAR_BUSES).find(
-    (k) => k.toLowerCase() === busNum.toLowerCase().trim()
-  )
-  if (popularKey) {
-    return POPULAR_BUSES[popularKey]
+const HSR_OFFSETS: Record<string, number> = {
+  '南港': 0, '台北': 10, '板橋': 18, '桃園': 32, '新竹': 43,
+  '苗栗': 54, '台中': 70, '彰化': 82, '雲林': 92, '嘉義': 102,
+  '台南': 118, '左營': 133
+};
+
+const TRA_WESTERN: Record<string, number> = {
+  '基隆': -45, '七堵': -30, '南港': -15, '松山': -8, '台北': 0,
+  '板橋': 10, '樹林': 18, '桃園': 35, '中壢': 45, '新竹': 75,
+  '竹南': 95, '苗栗': 110, '豐原': 145, '台中': 160, '彰化': 175,
+  '員林': 190, '斗六': 220, '嘉義': 245, '新營': 270, '台南': 300,
+  '岡山': 325, '新左營': 340, '高雄': 350, '屏東': 380
+};
+
+const TRA_EASTERN: Record<string, number> = {
+  '宜蘭': 70, '羅東': 80, '花蓮': 130, '玉里': 190, '台東': 240
+};
+
+function getHash(str: string): number {
+  let hash = 0
+  for (let i = 0; i < str.length; i++) {
+    hash = str.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return Math.abs(hash)
+}
+
+function generateDynamicStops(busNum: string, county: string): { routeName: string; startTerminal: string; endTerminal: string; stops: string[] } {
+  const queryStr = busNum.trim()
+  
+  const popularDataset: Record<string, Record<string, { start: string; end: string; stops: string[] }>> = {
+    'tpe': {
+      '307': {
+        start: '板橋前站',
+        end: '撫遠街',
+        stops: ['板橋前站', '新北市政府', '捷運板橋站', '致理科技大學', '積穗', '中和中山路', '連城路', '華中橋', '萬大路', '捷運西門站', '台北車站(忠孝)', '捷運南京復興站', '南京三民', '撫遠街']
+      },
+      '299': {
+        start: '輔大',
+        end: '永春高中',
+        stops: ['輔仁大學', '新莊地政事務所', '新莊田徑場', '中華路', '三重自強路', '台北車站(忠孝)', '捷運忠孝新生站', '捷運忠孝復興站', '捷運忠孝敦化站', '市府轉運站', '永春高中']
+      }
+    },
+    'ntpc': {
+      '307': {
+        start: '板橋前站',
+        end: '撫遠街',
+        stops: ['板橋前站', '新北市政府', '捷運板橋站', '致理科技大學', '積穗', '中和中山路', '連城路', '華中橋', '萬大路', '捷運西門站', '台北車站(忠孝)', '捷運南京復興站', '南京三民', '撫遠街']
+      },
+      '299': {
+        start: '輔大',
+        end: '永春高中',
+        stops: ['輔仁大學', '新莊地政事務所', '新莊田徑場', '中華路', '三重自強路', '台北車站(忠孝)', '捷運忠孝新生站', '捷運忠孝復興站', '捷運忠孝敦化站', '市府轉運站', '永春高中']
+      }
+    },
+    'txg': {
+      '300': {
+        start: '靜宜大學',
+        end: '台中車站',
+        stops: ['靜宜大學', '弘光科技大學', '正英路', '坪頂', '東海別墅', '榮總/東海大學', '澄清醫院', '秋紅谷', '市政府', '科博館', '原子街口', '台中車站']
+      },
+      '151': {
+        start: '朝陽科大',
+        end: '台中高鐵站',
+        stops: ['朝陽科大', '霧峰農會', '亞大醫院', '霧峰公車站', '林森路口', '省議會', '台中高鐵站']
+      }
+    },
+    'khh': {
+      '100': {
+        start: '瑞豐站',
+        end: '高雄車站',
+        stops: ['瑞豐站', '瑞隆路口', '崗山仔', '輕軌籬仔內站', '一心路口', '三多商圈', '中央公園', '美麗島', '高雄車站']
+      },
+      '50': {
+        start: '五甲社區',
+        end: '鼓山輪渡站',
+        stops: ['五甲社區', '前鎮高中', '輕軌凱旋瑞田站', '夢時代', '捷運獅甲站', '三多商圈', '中央公園', '捷運鹽埕埔站', '駁二藝術特區', '哈瑪星', '鼓山輪渡站']
+      }
+    },
+    'tnn': {
+      '5': {
+        start: '鹽田里',
+        end: '市立醫院',
+        stops: ['鹽田里', '台南科大', '六甲頂', '奇美醫院', '大橋車站', '台南車站(北站)', '赤崁樓', '西門路', '台南市政府', '體育公園', '文化中心', '市立醫院']
+      },
+      '2': {
+        start: '崑山科大',
+        end: '安平',
+        stops: ['崑山科大', '平實公園', '台南車站(北站)', '赤崁樓', '郭綜合醫院', '民生路', '安平古堡', '安平國中', '三信家商']
+      }
+    }
   }
 
-  let pool = [
-    '捷運台北車站', '捷運西門站', '捷運中山站', '捷運忠孝復興站', '捷運市政府站',
-    '捷運公館站', '捷運古亭站', '捷運頂溪站', '捷運板橋站', '捷運府中站',
-    '台北流行音樂中心', '台北小巨蛋', '大安森林公園', '國父紀念館', '南港展覽館'
+  const countyData = popularDataset[county]
+  if (countyData && countyData[queryStr]) {
+    const route = countyData[queryStr]
+    return {
+      routeName: queryStr,
+      startTerminal: route.start,
+      endTerminal: route.end,
+      stops: route.stops
+    }
+  }
+
+  let landmarks = [
+    '台北車站', '西門町', '市政府', '南港展覽館', '小巨蛋',
+    '板橋公車站', '府中商圈', '淡水老街', '碧潭風景區', '陽明山'
   ]
-  let startStop: string
-  let endStop: string
+  let startStop = ''
+  let endStop = ''
 
   if (county === 'txg') {
-    pool = ['台中車站', '一中商圈', '科博館', '秋紅谷', '逢甲夜市', '東海大學', '台中市政府', '捷運文心森林公園站', '台中歌劇院', '捷運市政府站', '大甲鎮瀾宮', '高美濕地']
-    startStop = '台中車站'
-    endStop = '靜宜大學'
+    landmarks = ['台中車站', '一中街', '逢甲夜市', '東海大學', '秋紅谷', '科博館', '台中市政府', '勤美誠品', '國家歌劇院', '高美濕地']
+    startStop = '台中榮總'
+    endStop = '台中火車站'
   } else if (county === 'khh') {
-    pool = ['高雄車站', '美麗島站', '中央公園站', '三多商圈站', '巨蛋站', '衛武營國家藝術文化中心', '駁二藝術特區', '西子灣', '瑞豐夜市', '高雄展覽館', '高雄流行音樂中心', '左營高鐵站']
-    startStop = '高雄車站'
-    endStop = '駁二藝術特區'
+    landmarks = ['高雄車站', '西子灣', '駁二特區', '三多商圈', '美麗島', '中央公園', '巨蛋商圈', '衛武營', '瑞豐夜市', '高雄展覽館']
+    startStop = '左營高鐵站'
+    endStop = '夢時代'
   } else if (county === 'tnn') {
-    pool = ['台南車站', '赤崁樓', '安平古堡', '孔廟', '台南市美術館', '奇美博物館', '花園夜市', '成大成功校區', '安平樹屋', '億載金城', '台南小巨蛋', '台南市政府']
-    startStop = '台南車站'
-    endStop = '安平工業區'
-  } else {
-    startStop = `${busNum} 起程站`
-    endStop = `${busNum} 終點站`
+    landmarks = ['台南車站', '赤崁樓', '孔廟', '花園夜市', '安平古堡', '億載金城', '奇美博物館', '神農街', '台南美術館', '安平樹屋']
+    startStop = '台南科大'
+    endStop = '台南市立醫院'
+  } else if (county === 'ntpc') {
+    landmarks = ['板橋公車站', '新北市政府', '致理科大', '積穗', '中和中山路', '連城路', '華中橋', '樹林車站', '三峽老街', '淡水捷運站']
+    startStop = '新莊輔大'
+    endStop = '板橋前站'
   }
 
-  let hash = 0
-  for (let i = 0; i < busNum.length; i++) {
-    hash = busNum.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  hash = Math.abs(hash)
+  const hashVal = getHash(queryStr)
 
-  const numStops = 10 + (hash % 3) // 10 to 12 stops
+  if (!startStop || !endStop) {
+    const startIdx = hashVal % landmarks.length
+    startStop = landmarks[startIdx]
+    let endIdx = (hashVal + 3) % landmarks.length
+    if (endIdx === startIdx) {
+      endIdx = (endIdx + 1) % landmarks.length
+    }
+    endStop = landmarks[endIdx]
+  }
+
+  const numStops = 8 + (hashVal % 5)
   const stops: string[] = []
-  const selectedPool = [...pool]
-  
   stops.push(startStop)
+
+  const pool = landmarks.filter((item) => item !== startStop && item !== endStop)
   for (let i = 0; i < numStops - 2; i++) {
-    const idx = (hash + i * 7) % selectedPool.length
-    stops.push(selectedPool[idx])
-    selectedPool.splice(idx, 1)
+    if (pool.length === 0) break
+    const idx = (hashVal + i * 7) % pool.length
+    stops.push(pool[idx])
+    pool.splice(idx, 1)
   }
   stops.push(endStop)
 
   return {
-    route: `${busNum} (${startStop} - ${endStop})`,
+    routeName: queryStr,
+    startTerminal: startStop,
+    endTerminal: endStop,
     stops
   }
 }
@@ -138,13 +233,20 @@ export function TransitInfoBoard() {
   const [trainType, setTrainType] = useState<'thsr' | 'tra'>('thsr')
   const [originStation, setOriginStation] = useState('台北')
   const [destinationStation, setDestinationStation] = useState('左營')
-  const [queryResults, setQueryResults] = useState<any[]>([])
+  const [queryResults, setQueryResults] = useState<TrainQueryResult[]>([])
 
   // Bus search state
   const [selectedCounty, setSelectedCounty] = useState('tpe')
   const [busSearch, setBusSearch] = useState('307')
-  const [busStops, setBusStops] = useState<any[]>([])
+  const [busStops, setBusStops] = useState<BusStopInfo[]>([])
   const [isBusSearching, setIsBusSearching] = useState(false)
+  const [busDirection, setBusDirection] = useState<0 | 1>(0)
+  const [busRouteDetails, setBusRouteDetails] = useState<{
+    routeName: string;
+    startTerminal: string;
+    endTerminal: string;
+    stops: string[];
+  } | null>(null)
 
   // 1. Fetch system status from transit-status.json
   const fetchStatus = useCallback(async () => {
@@ -190,8 +292,8 @@ export function TransitInfoBoard() {
     const current = statuses[selectedService] || {
       name: info.name,
       status: '🟢 營運正常',
-      isNormal: true,
       detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
+      isNormal: true,
       updatedAt: ''
     }
 
@@ -207,91 +309,228 @@ export function TransitInfoBoard() {
     const currentMin = now.getMinutes()
 
     const results = []
-    const baseInterval = trainType === 'thsr' ? 25 : 20 // minutes between trains
+    
+    if (trainType === 'thsr') {
+      const oOffset = HSR_OFFSETS[originStation] ?? 0;
+      const dOffset = HSR_OFFSETS[destinationStation] ?? 0;
+      const isNorthbound = oOffset > dOffset;
+      const baseDistance = Math.abs(oOffset - dOffset);
 
-    // Generate 6 trains leaving starting from the current hour/minute
-    let departureMinAccum = currentMin + 5 // start in 5 minutes
-    const hourOffset = 0
+      // Generate 6 trains departing starting from the current time
+      let departureMinAccum = currentMin + 5;
+      let hourOffset = 0;
 
-    for (let i = 0; i < 6; i++) {
-      let depHour = currentHour + hourOffset
-      let depMin = departureMinAccum
+      for (let i = 0; i < 6; i++) {
+        let depMin = departureMinAccum;
 
-      if (depMin >= 60) {
-        depHour += Math.floor(depMin / 60)
-        depMin = depMin % 60
+        if (depMin >= 60) {
+          hourOffset += Math.floor(depMin / 60);
+          depMin = depMin % 60;
+        }
+        const depHour = (currentHour + hourOffset) % 24;
+
+        // HSR Train Type: i % 3 === 0 ? "直達" : "站站停"
+        const isExpress = i % 3 === 0 && 
+          ['台北', '板橋', '台中', '左營'].includes(originStation) && 
+          ['台北', '板橋', '台中', '左營'].includes(destinationStation);
+        
+        const speedFactor = isExpress ? 0.75 : 1.0;
+        const durationMin = Math.max(10, Math.round(baseDistance * speedFactor));
+        
+        let arrHour = depHour + Math.floor((depMin + durationMin) / 60);
+        const arrMin = (depMin + durationMin) % 60;
+        arrHour = arrHour % 24;
+
+        const formatTime = (h: number, m: number) => 
+          `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+        // Train number
+        const trainNo = isExpress
+          ? (isNorthbound ? `${100 + i * 2 + 1}` : `${100 + i * 2}`)
+          : (isNorthbound ? `${600 + i * 4 + 1}` : `${600 + i * 4}`);
+
+        // Delay status: 90% on time
+        const delayRnd = (getHash(trainNo) + i) % 100;
+        let delayStatus = '🟢 準點';
+        if (delayRnd >= 95) {
+          delayStatus = `🟡 晚 ${delayRnd - 94} 分`;
+        }
+
+        results.push({
+          trainType: isExpress ? '直達' : '站站停',
+          trainNo,
+          depTime: formatTime(depHour, depMin),
+          arrTime: formatTime(arrHour, arrMin),
+          duration: `${Math.floor(durationMin / 60) > 0 ? `${Math.floor(durationMin / 60)}小時` : ''}${durationMin % 60}分`,
+          isExpress,
+          status: delayStatus
+        });
+
+        departureMinAccum += 20 + (delayRnd % 15);
       }
-      depHour = depHour % 24
-
-      // Mock travel duration
-      const isExpress = trainType === 'thsr' && i % 2 === 0
-      const durationMin = trainType === 'thsr' ? (isExpress ? 96 : 124) : 180 + (i * 15) % 60
+    } else {
+      // TRA
+      const isWestO = TRA_WESTERN[originStation] !== undefined;
+      const isWestD = TRA_WESTERN[destinationStation] !== undefined;
       
-      let arrHour = depHour + Math.floor((depMin + durationMin) / 60)
-      const arrMin = (depMin + durationMin) % 60
-      arrHour = arrHour % 24
+      let baseDistance: number;
 
-      const formatTime = (h: number, m: number) => 
-        `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`
+      if (isWestO && isWestD) {
+        baseDistance = Math.abs(TRA_WESTERN[originStation] - TRA_WESTERN[destinationStation]);
+      } else if (!isWestO && !isWestD) {
+        baseDistance = Math.abs((TRA_EASTERN[originStation] ?? 0) - (TRA_EASTERN[destinationStation] ?? 0));
+      } else {
+        // West to East or East to West (through Taipei)
+        const westVal = isWestO ? TRA_WESTERN[originStation] : TRA_WESTERN[destinationStation];
+        const eastVal = !isWestO ? TRA_EASTERN[originStation] : TRA_EASTERN[destinationStation];
+        baseDistance = Math.abs(westVal) + Math.abs(eastVal);
+      }
 
-      results.push({
-        trainNo: trainType === 'thsr' ? `${100 + i * 13}` : `${500 + i * 22}`,
-        depTime: formatTime(depHour, depMin),
-        arrTime: formatTime(arrHour, arrMin),
-        duration: `${Math.floor(durationMin / 60)}小時${durationMin % 60}分`,
-        isExpress,
-        status: i === 0 ? '🕒 接近發車' : '🟢 尚有空位'
-      })
+      const isNorthbound = (isWestO && isWestD && TRA_WESTERN[originStation] > TRA_WESTERN[destinationStation]) ||
+                            (!isWestO && !isWestD && TRA_EASTERN[originStation] > TRA_EASTERN[destinationStation]) ||
+                            (isWestO && !isWestD);
 
-      departureMinAccum += baseInterval
+      let departureMinAccum = currentMin + 3;
+      let hourOffset = 0;
+
+      for (let i = 0; i < 6; i++) {
+        let depMin = departureMinAccum;
+
+        if (depMin >= 60) {
+          hourOffset += Math.floor(depMin / 60);
+          depMin = depMin % 60;
+        }
+        const depHour = (currentHour + hourOffset) % 24;
+
+        let traType: string;
+        let speedFactor: number;
+        let isExpress = false;
+        
+        const typeSelect = (i + (isNorthbound ? 1 : 0)) % 4;
+        if (typeSelect === 0) {
+          traType = '自強';
+          speedFactor = 0.7;
+          isExpress = true;
+        } else if (typeSelect === 1) {
+          traType = '區間';
+          speedFactor = 1.15;
+        } else if (typeSelect === 2) {
+          traType = '莒光';
+          speedFactor = 0.9;
+        } else {
+          const isEasternRelated = !isWestO || !isWestD;
+          traType = isEasternRelated ? '普悠瑪' : '區間快';
+          speedFactor = isEasternRelated ? 0.65 : 0.85;
+          isExpress = true;
+        }
+
+        const durationMin = Math.max(8, Math.round(baseDistance * speedFactor));
+
+        let arrHour = depHour + Math.floor((depMin + durationMin) / 60);
+        const arrMin = (depMin + durationMin) % 60;
+        arrHour = arrHour % 24;
+
+        const formatTime = (h: number, m: number) => 
+          `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+
+        let trainNo: string;
+        if (traType === '自強') {
+          trainNo = String(100 + i * 14 + (isNorthbound ? 1 : 2));
+        } else if (traType === '普悠瑪' || traType === '太魯閣') {
+          trainNo = String(200 + i * 8 + (isNorthbound ? 1 : 2));
+        } else if (traType === '莒光') {
+          trainNo = String(500 + i * 12 + (isNorthbound ? 1 : 2));
+        } else {
+          trainNo = String(2100 + i * 22 + (isNorthbound ? 1 : 2));
+        }
+
+        const delayRnd = (getHash(trainNo) + i) % 100;
+        let delayStatus = '🟢 準點';
+        if (delayRnd >= 75) {
+          const delayMinutes = (delayRnd % 12) + 1;
+          delayStatus = `🟡 晚 ${delayMinutes} 分`;
+        }
+
+        results.push({
+          trainType: traType,
+          trainNo,
+          depTime: formatTime(depHour, depMin),
+          arrTime: formatTime(arrHour, arrMin),
+          duration: `${Math.floor(durationMin / 60) > 0 ? `${Math.floor(durationMin / 60)}小時` : ''}${durationMin % 60}分`,
+          isExpress,
+          status: delayStatus
+        });
+
+        departureMinAccum += 15 + (delayRnd % 15);
+      }
     }
 
     setQueryResults(results)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [trainType, originStation, destinationStation])
 
   // 3. County Bus dynamic simulator
-  const handleBusSearch = useCallback(() => {
+  const handleBusSearch = useCallback((directionOverride?: number) => {
     const queryStr = busSearch.trim()
     if (!queryStr) return
     setIsBusSearching(true)
+    
+    const targetDirection = directionOverride !== undefined ? directionOverride : busDirection
+
     setTimeout(() => {
       const routeInfo = generateDynamicStops(queryStr, selectedCounty)
+      setBusRouteDetails(routeInfo)
       
-      // Simulate real-time arrival times for stops
-      const stops = routeInfo.stops.map((stop, index) => {
-        // Deterministic arrival simulation based on stop index and current time
-        const hash = (queryStr.length + index + new Date().getMinutes()) % 30
-        
-        let status: string
-        let className: string
-        if (hash === 0) {
-          status = '接近中 🚌'
-          className = 'status-approaching'
-        } else if (hash === 1) {
-          status = '將到站'
-          className = 'status-approaching'
-        } else if (hash <= 3) {
-          status = `${hash + 1} 分鐘`
-          className = 'status-soon'
-        } else if (hash <= 5) {
-          status = `${hash + 2} 分鐘`
-          className = 'status-soon'
-        } else if (hash > 22) {
-          status = '未發車'
-          className = 'status-offline'
+      const stopsToRender = targetDirection === 0 
+        ? [...routeInfo.stops] 
+        : [...routeInfo.stops].reverse();
+
+      const headway = 15;
+      const hash = getHash(queryStr);
+      
+      const now = new Date();
+      const currentMinutes = now.getHours() * 60 + now.getMinutes();
+
+      const stops = stopsToRender.map((stop, index) => {
+        const stopJitter = (hash + index * 17) % 3 - 1;
+        const cumTime = index * 2.5 + stopJitter;
+
+        const diff = currentMinutes - cumTime;
+        const timeRemaining = diff <= 0
+          ? Math.round(-diff)
+          : (diff % headway === 0 ? 0 : Math.round(headway - (diff % headway)));
+
+        let statusText: string;
+        let className: string;
+
+        const isOffline = (hash + index * 9) % 15 === 0 && index > stopsToRender.length - 3;
+
+        if (isOffline) {
+          statusText = '未發車';
+          className = 'status-offline';
+        } else if (timeRemaining <= 1) {
+          statusText = timeRemaining === 0 ? '接近中 🚌' : '將到站';
+          className = 'status-approaching';
+        } else if (timeRemaining <= 4) {
+          statusText = `${timeRemaining} 分鐘`;
+          className = 'status-soon';
         } else {
-          status = `${hash} 分鐘`
-          className = 'status-ok'
+          statusText = `${timeRemaining} 分鐘`;
+          className = 'status-ok';
         }
-        
-        return { name: stop, status, className }
+
+        return { name: stop, status: statusText, className }
       })
 
       setBusStops(stops)
       setIsBusSearching(false)
-    }, 600)
-  }, [busSearch, selectedCounty])
+    }, 500)
+  }, [busSearch, selectedCounty, busDirection])
+
+  const handleToggleBusDirection = () => {
+    const nextDirection = busDirection === 0 ? 1 : 0
+    setBusDirection(nextDirection)
+    handleBusSearch(nextDirection)
+  }
 
   // Auto-trigger queries on mount/toggle
   useEffect(() => {
@@ -509,20 +748,24 @@ export function TransitInfoBoard() {
           {/* Train results grid */}
           <div className="train-results-board">
             <div className="train-board-header">
+              <span>車種</span>
               <span>車次</span>
               <span>出發</span>
               <span>抵達</span>
-              <span>行車時間</span>
+              <span>行車時間 / 狀態</span>
             </div>
             <div className="train-board-rows">
               {queryResults.map((tr, idx) => (
                 <div className={`train-board-row${tr.isExpress ? ' express' : ''}`} key={idx}>
+                  <span className={`train-type-badge type-${tr.trainType}`}>{tr.trainType}</span>
                   <span className="train-no">{tr.trainNo}</span>
                   <span className="train-time-dep">{tr.depTime}</span>
                   <span className="train-time-arr">{tr.arrTime}</span>
                   <div className="train-dur-info">
                     <span className="train-dur">{tr.duration}</span>
-                    <span className="train-status-badge">{tr.status}</span>
+                    <span className={`train-status-badge ${tr.status.includes('準點') ? 'status-ontime' : 'status-delayed'}`}>
+                      {tr.status}
+                    </span>
                   </div>
                 </div>
               ))}
@@ -556,13 +799,37 @@ export function TransitInfoBoard() {
               <button
                 type="button"
                 className="bus-search-btn"
-                onClick={handleBusSearch}
+                onClick={() => {
+                  setBusDirection(0);
+                  handleBusSearch(0);
+                }}
                 disabled={isBusSearching}
               >
                 查詢
               </button>
             </div>
           </div>
+
+          {/* Bus Route Direction Header */}
+          {busRouteDetails && busStops.length > 0 && !isBusSearching && (
+            <div className="bus-route-header-info">
+              <div className="bus-route-title">
+                🚌 路線 {busRouteDetails.routeName} ({busRouteDetails.startTerminal} ⇄ {busRouteDetails.endTerminal})
+              </div>
+              <div className="bus-direction-row">
+                <span className="bus-direction-label">
+                  往 <strong>{busDirection === 0 ? busRouteDetails.endTerminal : busRouteDetails.startTerminal}</strong>
+                </span>
+                <button
+                  type="button"
+                  className="bus-direction-toggle-btn"
+                  onClick={handleToggleBusDirection}
+                >
+                  🔄 切換方向
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Bus stops countdown display */}
           <div className="bus-stops-board">
@@ -586,3 +853,4 @@ export function TransitInfoBoard() {
     </section>
   )
 }
+

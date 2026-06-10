@@ -5430,7 +5430,7 @@ body.player-open .music-bar-toggle {
 
 .train-board-header {
   display: grid;
-  grid-template-columns: 50px 60px 60px 1fr;
+  grid-template-columns: 75px 55px 55px 55px 1fr;
   padding: 0.6rem 0.8rem;
   background: var(--surface2);
   color: var(--muted);
@@ -5446,7 +5446,7 @@ body.player-open .music-bar-toggle {
 
 .train-board-row {
   display: grid;
-  grid-template-columns: 50px 60px 60px 1fr;
+  grid-template-columns: 75px 55px 55px 55px 1fr;
   padding: 0.6rem 0.8rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.02);
   align-items: center;
@@ -5501,10 +5501,72 @@ body.player-open .music-bar-toggle {
   border: 1px solid var(--border);
 }
 
-.train-board-row.express .train-status-badge {
+.train-status-badge.status-ontime {
+  border-color: rgba(6, 214, 160, 0.25);
+  color: var(--teal);
+  background: rgba(6, 214, 160, 0.05);
+}
+
+.train-status-badge.status-delayed {
   border-color: rgba(255, 90, 95, 0.25);
   color: #ff5a5f;
   background: rgba(255, 90, 95, 0.05);
+}
+
+/* Train type badge styles */
+.train-type-badge {
+  font-size: 0.65rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 700;
+  text-align: center;
+  display: inline-block;
+  width: fit-content;
+  max-width: 65px;
+  white-space: nowrap;
+}
+
+.train-type-badge.type-直達 {
+  background: rgba(255, 209, 102, 0.15);
+  color: var(--gold);
+  border: 1px solid rgba(255, 209, 102, 0.3);
+}
+
+.train-type-badge.type-站站停 {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.train-type-badge.type-自強 {
+  background: rgba(255, 90, 95, 0.15);
+  color: #ff5a5f;
+  border: 1px solid rgba(255, 90, 95, 0.3);
+}
+
+.train-type-badge.type-普悠瑪,
+.train-type-badge.type-太魯閣 {
+  background: rgba(239, 71, 111, 0.15);
+  color: #ef476f;
+  border: 1px solid rgba(239, 71, 111, 0.3);
+}
+
+.train-type-badge.type-莒光 {
+  background: rgba(244, 162, 97, 0.15);
+  color: #f4a261;
+  border: 1px solid rgba(244, 162, 97, 0.3);
+}
+
+.train-type-badge.type-區間 {
+  background: rgba(6, 214, 160, 0.15);
+  color: var(--teal);
+  border: 1px solid rgba(6, 214, 160, 0.3);
+}
+
+.train-type-badge.type-區間快 {
+  background: rgba(17, 138, 178, 0.15);
+  color: #118ab2;
+  border: 1px solid rgba(17, 138, 178, 0.3);
 }
 
 /* Bus dynamic search */
@@ -5572,6 +5634,54 @@ body.player-open .music-bar-toggle {
   padding: 0 1rem;
   border-radius: 6px;
   cursor: pointer;
+}
+
+/* Bus route header and direction styles */
+.bus-route-header-info {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  margin-bottom: 0.6rem;
+}
+
+.bus-route-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.bus-direction-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.4rem;
+}
+
+.bus-direction-label {
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.bus-direction-label strong {
+  color: var(--teal);
+}
+
+.bus-direction-toggle-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.25rem 0.6rem;
+  border-radius: 4px;
+  font-size: 0.72rem;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.bus-direction-toggle-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--teal);
+  color: var(--teal);
 }
 
 /* Bus stops list */
