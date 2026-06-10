@@ -171,50 +171,6 @@ function getBusStopStatus(eta?: TdxBusEta) {
 
 async function getTdxToken() {
   if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
-    throw new Error('尚未設定 TDX API 金鑰');
-  }
-  if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken;
-  const body = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: TDX_CLIENT_ID,
-    client_secret: TDX_CLIENT_SECRET,
-  });
-  const response = await fetch(TDX_TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  });
-  if (!response.ok) throw new Error('TDX token 取得失敗');
-  const data = (await response.json()) as { access_token?: string; expires_in?: number };
-  if (!data.access_token) throw new Error('TDX token 回傳格式錯誤');
-  tdxToken = data.access_token;
-  tdxTokenExpiry = Date.now() + Math.max(60, (data.expires_in || 3600) - 120) * 1000;
-  return tdxToken;
-}
-  if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
-    throw new Error('尚未設定 TDX API 金鑰');
-  }
-  if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken;
-  const body = new URLSearchParams({
-    grant_type: 'client_credentials',
-    client_id: TDX_CLIENT_ID,
-    client_secret: TDX_CLIENT_SECRET,
-  });
-  const response = await fetch(TDX_TOKEN_URL, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body,
-  });
-  if (!response.ok) throw new Error('TDX token 取得失敗');
-  const data = (await response.json()) as { access_token?: string; expires_in?: number };
-  if (!data.access_token) throw new Error('TDX token 回傳格式錯誤');
-  tdxToken = data.access_token;
-  tdxTokenExpiry = Date.now() + Math.max(60, (data.expires_in || 3600) - 120) * 1000;
-  // Mark TDX as active for UI badge
-  setTdxActive(true);
-  return tdxToken;
-}
-  if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
     throw new Error('尚未設定 TDX API 金鑰')
   }
   if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken
@@ -239,29 +195,11 @@ async function getTdxToken() {
 }
 
 async function fetchTdx<T>(path: string) {
-  const token = await getTdxToken();
-  const proxy = import.meta.env.VITE_CORS_PROXY || 'https://corsproxy.io/?url=';
-  const separator = path.includes('?') ? '&' : '?';
-  const fullUrl = `${proxy}${encodeURIComponent(`${TDX_API_BASE}${path}${separator}$format=JSON`)}`;
-  const response = await fetch(fullUrl, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`);
-  return (await response.json()) as T;
-}
-  const token = await getTdxToken();
-  const proxy = import.meta.env.VITE_CORS_PROXY || 'https://corsproxy.io/?url=';
-  const separator = path.includes('?') ? '&' : '?';
-  const url = `${proxy}${encodeURIComponent(`${TDX_API_BASE}${path}${separator}$format=JSON`)};`
-  const response = await fetch(url, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`);
-  return (await response.json()) as T;
-}
   const token = await getTdxToken()
+  const proxy = import.meta.env.VITE_CORS_PROXY || 'https://corsproxy.io/?url='
   const separator = path.includes('?') ? '&' : '?'
-  const response = await fetch(`${TDX_API_BASE}${path}${separator}$format=JSON`, {
+  const fullUrl = `${proxy}${encodeURIComponent(`${TDX_API_BASE}${path}${separator}$format=JSON`)}`
+  const response = await fetch(fullUrl, {
     headers: { Authorization: `Bearer ${token}` },
   })
   if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`)
@@ -559,16 +497,13 @@ export function TransitInfoBoard() {
           <div className="transit-card">
             <div className="transit-card-header">
               <div className="transit-service-name">
-            <span className="transit-icon">{info.icon}</span>
-            <span>{info.name}</span>
-            {tdxActive ? (
-              <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>📡 TDX 即時資料</span>
-            ) : (
-              <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>🔮 模擬資料</span>
-            )}
-          </div>
                 <span className="transit-icon">{info.icon}</span>
                 <span>{info.name}</span>
+                {tdxActive ? (
+                  <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>📡 TDX 即時資料</span>
+                ) : (
+                  <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>🔮 模擬資料</span>
+                )}
               </div>
               <div className={`transit-badge${current.isNormal ? ' normal' : ' warning'}${loading ? ' loading' : ''}`}>
                 {current.status}
