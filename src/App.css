@@ -27,6 +27,7 @@
   --search-hover-bg: rgba(255, 255, 255, 0.08);
   --search-focus-bg: rgba(255, 255, 255, 0.1);
   --legend-bg: rgba(18, 18, 26, 0.9);
+  --mobile-nav-bg: rgba(18, 18, 26, 0.95);
 }
 
 [data-theme="light"] {
@@ -56,6 +57,7 @@
   --search-hover-bg: rgba(0, 0, 0, 0.05);
   --search-focus-bg: rgba(0, 0, 0, 0.07);
   --legend-bg: rgba(255, 255, 255, 0.9);
+  --mobile-nav-bg: rgba(255, 255, 255, 0.95);
 }
 
 *,
@@ -1093,7 +1095,7 @@ svg#taiwan-map.dragging {
   position: absolute;
   bottom: 5rem;
   right: 1.5rem;
-  background: rgba(18, 18, 26, 0.9);
+  background: var(--legend-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.6rem 1rem;
@@ -2107,7 +2109,7 @@ body.player-open .music-bar-toggle {
   position: absolute;
   bottom: 5rem;
   right: 1.5rem;
-  background: rgba(18, 18, 26, 0.9);
+  background: var(--legend-bg);
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 0.6rem 1rem;
@@ -3589,11 +3591,11 @@ body.player-open .music-bar-toggle {
 
 .map-weather-overlay .weather-widget {
   margin-top: 0;
-  background: rgba(18, 18, 26, 0.88) !important;
+  background: var(--legend-bg) !important;
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 .weather-close-btn {
@@ -3893,7 +3895,7 @@ body.player-open .music-bar-toggle {
     bottom: 0;
     width: 280px;
     max-width: 80vw;
-    background: rgba(18, 18, 26, 0.95);
+    background: var(--mobile-nav-bg);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
     border-right: 1px solid var(--border);
