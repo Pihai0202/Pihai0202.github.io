@@ -97,7 +97,11 @@ function resolveTixcraftUrls(list: RemoteConcert[]): RemoteConcert[] {
   })
 
   return list.map((c) => {
-    const isGenericUrl = (u?: string) => u === 'https://tixcraft.com/' || u === 'https://tixcraft.com'
+    const isGenericUrl = (u?: string) => {
+      if (!u) return false
+      const lower = u.toLowerCase()
+      return lower.includes('tixcraft.com') && !lower.includes('/activity/')
+    }
     
     let updatedUrl = c.url
     let updatedLinks = c.ticket_links ? [...c.ticket_links] : []
@@ -125,6 +129,26 @@ function resolveTixcraftUrls(list: RemoteConcert[]): RemoteConcert[] {
         updatedLinks = updatedLinks.map((lk) => {
           if (lk.platform === 'tixcraft' && isGenericUrl(lk.url)) {
             return { ...lk, url: matchedUrl! }
+          }
+          return lk
+        })
+      } else {
+        // Fallback: Clean event name for site search
+        let cleanName = c.name.replace(/【[^】]+】/g, '')
+        cleanName = cleanName.replace(/\[[^\]]+\]/g, '')
+        cleanName = cleanName.replace(/\([^)]+\)/g, '')
+        cleanName = cleanName.replace(/（[^）]+）/g, '')
+        cleanName = cleanName.replace(/202\d/g, '')
+        cleanName = cleanName.trim()
+
+        const fallbackUrl = `https://www.google.com/search?q=site:tixcraft.com/activity/detail+${encodeURIComponent(cleanName)}`
+
+        if (isGenericUrl(c.url)) {
+          updatedUrl = fallbackUrl
+        }
+        updatedLinks = updatedLinks.map((lk) => {
+          if (lk.platform === 'tixcraft' && isGenericUrl(lk.url)) {
+            return { ...lk, url: fallbackUrl }
           }
           return lk
         })
@@ -786,21 +810,32 @@ function App() {
               </div>
             )}
 
-            <div className="map-zoom-control">
-              <span className="zoom-icon">🔍</span>
-              <input
-                type="range"
-                min="0.7"
-                max="2.5"
-                step="0.1"
-                value={zoom}
-                onChange={(e) => setZoom(parseFloat(e.target.value))}
-                title="地圖縮放"
-              />
-              <span className="zoom-value">{Math.round(zoom * 100)}%</span>
-              <button className="zoom-reset-btn" type="button" onClick={() => setZoom(1.1)} title="重設縮放">
+            <div className="map-zoom-control vertical">
+              <button
+                className="zoom-btn"
+                type="button"
+                onClick={() => setZoom((z) => Math.min(2.5, z + 0.1))}
+                title="放大地圖"
+              >
+                +
+              </button>
+              <button
+                className="zoom-btn"
+                type="button"
+                onClick={() => setZoom((z) => Math.max(0.7, z - 0.1))}
+                title="縮小地圖"
+              >
+                -
+              </button>
+              <button
+                className="zoom-btn reset"
+                type="button"
+                onClick={() => setZoom(1.1)}
+                title="重設縮放"
+              >
                 ⟲
               </button>
+              <span className="zoom-value">{Math.round(zoom * 100)}%</span>
             </div>
 
             <div className="map-legend">

@@ -68,6 +68,64 @@ const COUNTIES = [
   { id: 'tnn', name: '台南市' }
 ]
 
+// Helper to generate dynamic, realistic stops list for any queried bus number
+function generateDynamicStops(busNum: string, county: string): { route: string; stops: string[] } {
+  const popularKey = Object.keys(POPULAR_BUSES).find(
+    (k) => k.toLowerCase() === busNum.toLowerCase().trim()
+  )
+  if (popularKey) {
+    return POPULAR_BUSES[popularKey]
+  }
+
+  let pool = [
+    '捷運台北車站', '捷運西門站', '捷運中山站', '捷運忠孝復興站', '捷運市政府站',
+    '捷運公館站', '捷運古亭站', '捷運頂溪站', '捷運板橋站', '捷運府中站',
+    '台北流行音樂中心', '台北小巨蛋', '大安森林公園', '國父紀念館', '南港展覽館'
+  ]
+  let startStop: string
+  let endStop: string
+
+  if (county === 'txg') {
+    pool = ['台中車站', '一中商圈', '科博館', '秋紅谷', '逢甲夜市', '東海大學', '台中市政府', '捷運文心森林公園站', '台中歌劇院', '捷運市政府站', '大甲鎮瀾宮', '高美濕地']
+    startStop = '台中車站'
+    endStop = '靜宜大學'
+  } else if (county === 'khh') {
+    pool = ['高雄車站', '美麗島站', '中央公園站', '三多商圈站', '巨蛋站', '衛武營國家藝術文化中心', '駁二藝術特區', '西子灣', '瑞豐夜市', '高雄展覽館', '高雄流行音樂中心', '左營高鐵站']
+    startStop = '高雄車站'
+    endStop = '駁二藝術特區'
+  } else if (county === 'tnn') {
+    pool = ['台南車站', '赤崁樓', '安平古堡', '孔廟', '台南市美術館', '奇美博物館', '花園夜市', '成大成功校區', '安平樹屋', '億載金城', '台南小巨蛋', '台南市政府']
+    startStop = '台南車站'
+    endStop = '安平工業區'
+  } else {
+    startStop = `${busNum} 起程站`
+    endStop = `${busNum} 終點站`
+  }
+
+  let hash = 0
+  for (let i = 0; i < busNum.length; i++) {
+    hash = busNum.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  hash = Math.abs(hash)
+
+  const numStops = 10 + (hash % 3) // 10 to 12 stops
+  const stops: string[] = []
+  const selectedPool = [...pool]
+  
+  stops.push(startStop)
+  for (let i = 0; i < numStops - 2; i++) {
+    const idx = (hash + i * 7) % selectedPool.length
+    stops.push(selectedPool[idx])
+    selectedPool.splice(idx, 1)
+  }
+  stops.push(endStop)
+
+  return {
+    route: `${busNum} (${startStop} - ${endStop})`,
+    stops
+  }
+}
+
 export function TransitInfoBoard() {
   const [selectedService, setSelectedService] = useState('trtc')
   const [statuses, setStatuses] = useState<Record<string, TransitStatusData>>({})
@@ -108,9 +166,14 @@ export function TransitInfoBoard() {
   }, [])
 
   useEffect(() => {
-    fetchStatus()
+    const timer = setTimeout(() => {
+      fetchStatus()
+    }, 0)
     const interval = setInterval(fetchStatus, 300_000)
-    return () => clearInterval(interval)
+    return () => {
+      clearTimeout(timer)
+      clearInterval(interval)
+    }
   }, [fetchStatus])
 
   // Get current active status details
@@ -138,7 +201,7 @@ export function TransitInfoBoard() {
   const { info, current } = getStatusDetails()
 
   // 2. Train Timetable generator
-  const handleTrainSearch = () => {
+  const handleTrainSearch = useCallback(() => {
     const now = new Date()
     const currentHour = now.getHours()
     const currentMin = now.getMinutes()
@@ -148,7 +211,7 @@ export function TransitInfoBoard() {
 
     // Generate 6 trains leaving starting from the current hour/minute
     let departureMinAccum = currentMin + 5 // start in 5 minutes
-    let hourOffset = 0
+    const hourOffset = 0
 
     for (let i = 0; i < 6; i++) {
       let depHour = currentHour + hourOffset
@@ -165,7 +228,7 @@ export function TransitInfoBoard() {
       const durationMin = trainType === 'thsr' ? (isExpress ? 96 : 124) : 180 + (i * 15) % 60
       
       let arrHour = depHour + Math.floor((depMin + durationMin) / 60)
-      let arrMin = (depMin + durationMin) % 60
+      const arrMin = (depMin + durationMin) % 60
       arrHour = arrHour % 24
 
       const formatTime = (h: number, m: number) => 
@@ -184,40 +247,41 @@ export function TransitInfoBoard() {
     }
 
     setQueryResults(results)
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [trainType, originStation, destinationStation])
 
   // 3. County Bus dynamic simulator
-  const handleBusSearch = () => {
+  const handleBusSearch = useCallback(() => {
+    const queryStr = busSearch.trim()
+    if (!queryStr) return
     setIsBusSearching(true)
     setTimeout(() => {
-      // Find route details
-      const busKey = Object.keys(POPULAR_BUSES).find(
-        (key) => key.toLowerCase().includes(busSearch.toLowerCase())
-      ) || '307'
-      
-      const routeInfo = POPULAR_BUSES[busKey]
+      const routeInfo = generateDynamicStops(queryStr, selectedCounty)
       
       // Simulate real-time arrival times for stops
       const stops = routeInfo.stops.map((stop, index) => {
-        // First few stops are close, later are farther
-        const timeVal = Math.round((index * 3 + new Date().getMinutes() % 15))
+        // Deterministic arrival simulation based on stop index and current time
+        const hash = (queryStr.length + index + new Date().getMinutes()) % 30
         
-        let status = ''
-        let className = ''
-        if (timeVal <= 1) {
+        let status: string
+        let className: string
+        if (hash === 0) {
           status = '接近中 🚌'
           className = 'status-approaching'
-        } else if (timeVal <= 3) {
-          status = '2 分鐘'
+        } else if (hash === 1) {
+          status = '將到站'
+          className = 'status-approaching'
+        } else if (hash <= 3) {
+          status = `${hash + 1} 分鐘`
           className = 'status-soon'
-        } else if (timeVal <= 5) {
-          status = '5 分鐘'
+        } else if (hash <= 5) {
+          status = `${hash + 2} 分鐘`
           className = 'status-soon'
-        } else if (timeVal > 25) {
+        } else if (hash > 22) {
           status = '未發車'
           className = 'status-offline'
         } else {
-          status = `${timeVal} 分鐘`
+          status = `${hash} 分鐘`
           className = 'status-ok'
         }
         
@@ -227,16 +291,19 @@ export function TransitInfoBoard() {
       setBusStops(stops)
       setIsBusSearching(false)
     }, 600)
-  }
+  }, [busSearch, selectedCounty])
 
   // Auto-trigger queries on mount/toggle
   useEffect(() => {
-    if (activeTab === 'train') {
-      handleTrainSearch()
-    } else if (activeTab === 'bus') {
-      handleBusSearch()
-    }
-  }, [activeTab, trainType, originStation, destinationStation])
+    const timer = setTimeout(() => {
+      if (activeTab === 'train') {
+        handleTrainSearch()
+      } else if (activeTab === 'bus') {
+        handleBusSearch()
+      }
+    }, 0)
+    return () => clearTimeout(timer)
+  }, [activeTab, handleTrainSearch, handleBusSearch])
 
   return (
     <section className="transit-board" aria-label="大眾運輸即時動態">
@@ -353,6 +420,20 @@ export function TransitInfoBoard() {
             <div className="metro-sub-title" style={{ marginTop: '1.2rem' }}>🚇 高雄捷運 班距時程</div>
             <div className="metro-freq-table">
               {METRO_LINE_DATA.kaohsiung.map((m) => (
+                <div className="metro-freq-row" key={m.line}>
+                  <div className="metro-line-name">{m.line}</div>
+                  <div className="metro-freq-details">
+                    <span>尖峰: <strong>{m.peak}</strong></span>
+                    <span>離峰: <strong>{m.offpeak}</strong></span>
+                    <span>首尾班: <strong>{m.first}~{m.last}</strong></span>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="metro-sub-title" style={{ marginTop: '1.2rem' }}>🚇 台中捷運 班距時程</div>
+            <div className="metro-freq-table">
+              {METRO_LINE_DATA.taichung.map((m) => (
                 <div className="metro-freq-row" key={m.line}>
                   <div className="metro-line-name">{m.line}</div>
                   <div className="metro-freq-details">

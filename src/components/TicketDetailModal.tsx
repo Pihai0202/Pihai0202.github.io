@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react'
 import type { RemoteConcert, SpotifyItem } from '../types'
 import { db } from '../firebase'
 import { collection, query, where, orderBy, onSnapshot, addDoc } from 'firebase/firestore'
-import { parseSpotifyEmbedUrl } from '../App'
 
 interface TicketDetailModalProps {
   ticket: RemoteConcert
@@ -218,7 +217,6 @@ export function TicketDetailModal({
     }
   }
 
-  const embedUrl = selectedTrack ? parseSpotifyEmbedUrl(selectedTrack.url) : null
 
   return (
     <div className="ticket-detail-container">
@@ -313,18 +311,37 @@ export function TicketDetailModal({
               </div>
             </div>
 
-            {/* Embedded Player */}
-            {autoPlay && embedUrl && (
-              <div className="embedded-spotify-player">
-                <iframe
-                  src={embedUrl}
-                  width="100%"
-                  height="152"
-                  frameBorder="0"
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                  title="Spotify Modal Player"
-                />
+            {/* Custom Visualizer to prevent double audio playback */}
+            {autoPlay && selectedTrack && (
+              <div className="modal-player-visualizer">
+                <div className="now-playing-header">
+                  <div className="equalizer-waves">
+                    <span className="wave-bar bar1" />
+                    <span className="wave-bar bar2" />
+                    <span className="wave-bar bar3" />
+                    <span className="wave-bar bar4" />
+                  </div>
+                  <span className="playing-label">正在播放 (頁面下方)</span>
+                </div>
+                <div className="playing-track-card">
+                  {selectedTrack.img && <img src={selectedTrack.img} alt="" className="playing-track-thumb" />}
+                  <div className="playing-track-detail">
+                    <div className="playing-track-name">{selectedTrack.name}</div>
+                    <div className="playing-track-sub">{selectedTrack.sub}</div>
+                  </div>
+                  <a
+                    href={selectedTrack.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="track-spotify-link-btn"
+                    title="在 Spotify 開啟"
+                  >
+                    ↗
+                  </a>
+                </div>
+                <div className="player-instructions">
+                  💡 音樂已在下方主播放器啟動，關閉此彈窗可繼續聆聽。
+                </div>
               </div>
             )}
             

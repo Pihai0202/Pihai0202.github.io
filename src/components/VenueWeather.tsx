@@ -235,7 +235,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
       const dailyData = weatherJson.daily
       const newDaily: DailyForecast[] = []
       if (dailyData && dailyData.time) {
-        for (let i = 1; i <= 3 && i < dailyData.time.length; i++) {
+        for (let i = 0; i < 7 && i < dailyData.time.length; i++) {
           newDaily.push({
             date: dailyData.time[i],
             tempMax: Math.round(dailyData.temperature_2m_max[i]),
@@ -259,18 +259,10 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
       console.warn('Unable to load real-time weather from Open-Meteo, using offline simulated data.', err)
       // Generates elegant fallback simulated data based on season (June) and location
       const month = new Date().getMonth() + 1
-      let baseTemp = 22
-      let baseHumidity = 75
-      let isSummer = month >= 6 && month <= 9
-      let isWinter = month === 12 || month <= 2
-
-      if (isSummer) {
-        baseTemp = 30
-      } else if (isWinter) {
-        baseTemp = 16
-      } else {
-        baseTemp = 24
-      }
+      const isSummer = month >= 6 && month <= 9
+      const isWinter = month === 12 || month <= 2
+      const baseTemp = isSummer ? 30 : isWinter ? 16 : 24
+      const baseHumidity = 75
 
       // Add a small deterministic deviation based on city name length
       const offset = (cityName.length % 5) - 2
@@ -293,7 +285,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
 
       const fallbackDaily: DailyForecast[] = []
       const today = new Date()
-      for (let i = 1; i <= 3; i++) {
+      for (let i = 0; i < 7; i++) {
         const nextDay = new Date()
         nextDay.setDate(today.getDate() + i)
         const dateStr = nextDay.toISOString().split('T')[0]
@@ -316,7 +308,10 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
   }, [latitude, longitude, cityName])
 
   useEffect(() => {
-    fetchWeather()
+    const timer = setTimeout(() => {
+      fetchWeather()
+    }, 0)
+    return () => clearTimeout(timer)
   }, [fetchWeather])
 
   if (error) {
@@ -412,10 +407,10 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
           </div>
         </div>
 
-        {/* 3-day Weather Forecast */}
+        {/* 7-day Weather Forecast */}
         {dailyForecast && dailyForecast.length > 0 && (
           <div className="weather-forecast-section">
-            <div className="forecast-title">📅 三日天氣預報</div>
+            <div className="forecast-title">📅 七日天氣預報</div>
             <div className="forecast-grid">
               {dailyForecast.map((day) => {
                 const info = parseWeatherCode(day.weatherCode)
