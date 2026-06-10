@@ -164,6 +164,19 @@ function resolveTixcraftUrls(list: RemoteConcert[]): RemoteConcert[] {
 }
 
 function App() {
+  const [theme, setTheme] = useState<'dark' | 'light'>(() => {
+    const storedTheme = localStorage.getItem('theme')
+    if (storedTheme === 'light' || storedTheme === 'dark') {
+      return storedTheme
+    }
+    return 'dark'
+  })
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme)
+    localStorage.setItem('theme', theme)
+  }, [theme])
+
   const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
@@ -734,6 +747,15 @@ function App() {
             onClick={() => setView(view === 'map' ? 'board' : 'map')}
           >
             {view === 'map' ? '💬 社群分享牆' : '🗺️ 返回場館地圖'}
+          </button>
+          <button
+            className="theme-toggle-btn"
+            type="button"
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
+            aria-label="切換主題"
+          >
+            {theme === 'dark' ? '☀️' : '🌙'}
           </button>
           {isLoggedIn && currentUser ? (
             <div className="user-profile-menu">
