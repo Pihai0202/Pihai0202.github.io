@@ -461,7 +461,7 @@ export function TicketDetailModal({
       </div>
 
       {/* 底部關閉按鈕 */}
-      <div className="ticket-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem' }}>
+      <div className="ticket-modal-footer" style={{ display: 'flex', justifyContent: 'flex-end', marginTop: '0.5rem', flexShrink: 0 }}>
         <button
           type="button"
           className="ticket-close-action-btn"

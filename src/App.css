@@ -1271,13 +1271,29 @@ svg#taiwan-map.dragging {
   margin-top: 0.45rem;
 }
 
-.ticket-links span {
+.ticket-links span,
+.ticket-links .ticket-link-btn {
   border: 1px solid rgba(6, 214, 160, 0.25);
   border-radius: 4px;
   color: var(--teal);
   font-family: 'Space Mono', monospace;
   font-size: 0.62rem;
   padding: 0.15rem 0.35rem;
+  text-decoration: none;
+  background: rgba(6, 214, 160, 0.03);
+  transition: all 0.2s ease;
+  display: inline-block;
+}
+
+.ticket-links .ticket-link-btn {
+  cursor: pointer;
+}
+
+.ticket-links .ticket-link-btn:hover {
+  background: rgba(6, 214, 160, 0.15);
+  border-color: var(--teal);
+  color: #fff;
+  transform: translateY(-0.5px);
 }
 
 .music-bar {
@@ -4134,6 +4150,7 @@ body.player-open .music-bar-toggle {
   gap: 0.8rem;
   box-sizing: border-box;
   width: 100%;
+  flex-shrink: 0;
 }
 
 .ticket-purchase-banner .banner-title {
@@ -4188,6 +4205,7 @@ body.player-open .music-bar-toggle {
   padding: 1.2rem;
   position: relative;
   overflow: hidden;
+  flex-shrink: 0;
 }
 
 .ticket-source-badge {
@@ -4274,6 +4292,7 @@ body.player-open .music-bar-toggle {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.2rem;
+  flex-shrink: 0;
 }
 
 .section-title-row {
@@ -4620,6 +4639,7 @@ body.player-open .music-bar-toggle {
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.2rem;
+  flex-shrink: 0;
 }
 
 .ticket-comments-section h3 {

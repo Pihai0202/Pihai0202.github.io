@@ -1459,7 +1459,18 @@ function UpcomingConcerts({
             {concert.ticket_links?.length > 0 && (
               <div className="ticket-links">
                 {concert.ticket_links.slice(0, 3).map((link) => (
-                  <span key={`${concert.id}-${link.platform}`}>{link.name}</span>
+                  <a
+                    key={`${concert.id}-${link.platform}`}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="ticket-link-btn"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                    }}
+                  >
+                    {link.name}
+                  </a>
                 ))}
               </div>
             )}
