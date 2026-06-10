@@ -29,6 +29,64 @@ interface BusStopInfo {
   className: string
 }
 
+interface TdxStation {
+  StationID: string
+  StationName: {
+    Zh_tw?: string
+    En?: string
+  }
+}
+
+interface TdxTrainStopTime {
+  StationID: string
+  StationName?: {
+    Zh_tw?: string
+    En?: string
+  }
+  ArrivalTime?: string
+  DepartureTime?: string
+}
+
+interface TdxTrainTimetable {
+  TrainInfo?: {
+    TrainNo?: string
+    TrainTypeName?: {
+      Zh_tw?: string
+      En?: string
+    }
+  }
+  StopTimes?: TdxTrainStopTime[]
+}
+
+interface TdxBusRoute {
+  RouteName?: {
+    Zh_tw?: string
+    En?: string
+  }
+  DepartureStopNameZh?: string
+  DestinationStopNameZh?: string
+}
+
+interface TdxBusStopOfRoute {
+  Direction?: number
+  Stops?: Array<{
+    StopName?: {
+      Zh_tw?: string
+      En?: string
+    }
+  }>
+}
+
+interface TdxBusEta {
+  Direction?: number
+  StopName?: {
+    Zh_tw?: string
+    En?: string
+  }
+  EstimateTime?: number
+  StopStatus?: number
+}
+
 // Timetables and schedules data
 const METRO_LINE_DATA = {
   taipei: [
@@ -53,175 +111,181 @@ const THSR_STATIONS = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗
 const TRA_STATIONS = ['基隆', '七堵', '南港', '松山', '台北', '板橋', '樹林', '桃園', '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義', '新營', '台南', '岡山', '新左營', '高雄', '屏東', '宜蘭', '羅東', '花蓮', '玉里', '台東']
 
 const COUNTIES = [
-  { id: 'tpe', name: '台北市' },
-  { id: 'ntpc', name: '新北市' },
-  { id: 'txg', name: '台中市' },
-  { id: 'khh', name: '高雄市' },
-  { id: 'tnn', name: '台南市' }
+  { id: 'Taipei', name: '台北市' },
+  { id: 'NewTaipei', name: '新北市' },
+  { id: 'Taichung', name: '台中市' },
+  { id: 'Kaohsiung', name: '高雄市' },
+  { id: 'Tainan', name: '台南市' }
 ]
 
-const HSR_OFFSETS: Record<string, number> = {
-  '南港': 0, '台北': 10, '板橋': 18, '桃園': 32, '新竹': 43,
-  '苗栗': 54, '台中': 70, '彰化': 82, '雲林': 92, '嘉義': 102,
-  '台南': 118, '左營': 133
-};
+const TDX_API_BASE = 'https://tdx.transportdata.tw/api/basic/v2'
+const TDX_TOKEN_URL = 'https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token'
+const TDX_CLIENT_ID = import.meta.env.VITE_TDX_CLIENT_ID as string | undefined
+const TDX_CLIENT_SECRET = import.meta.env.VITE_TDX_CLIENT_SECRET as string | undefined
+const TDX_OFFICIAL_QUERY_URL = 'https://tdx.transportdata.tw/maas'
+const TDX_SWAGGER_URL = 'https://tdx.transportdata.tw/api-service/swagger'
+const TAIPEI_BUS_API_DOC_URL = 'https://pto.gov.taipei/News_Content.aspx?n=A1DF07A86105B6BB&s=55E8ADD164E4F579'
 
-const TRA_WESTERN: Record<string, number> = {
-  '基隆': -45, '七堵': -30, '南港': -15, '松山': -8, '台北': 0,
-  '板橋': 10, '樹林': 18, '桃園': 35, '中壢': 45, '新竹': 75,
-  '竹南': 95, '苗栗': 110, '豐原': 145, '台中': 160, '彰化': 175,
-  '員林': 190, '斗六': 220, '嘉義': 245, '新營': 270, '台南': 300,
-  '岡山': 325, '新左營': 340, '高雄': 350, '屏東': 380
-};
+let tdxToken: string | null = null
+let tdxTokenExpiry = 0
+const stationCache: Partial<Record<'THSR' | 'TRA', TdxStation[]>> = {}
 
-const TRA_EASTERN: Record<string, number> = {
-  '宜蘭': 70, '羅東': 80, '花蓮': 130, '玉里': 190, '台東': 240
-};
-
-function getHash(str: string): number {
-  let hash = 0
-  for (let i = 0; i < str.length; i++) {
-    hash = str.charCodeAt(i) + ((hash << 5) - hash)
-  }
-  return Math.abs(hash)
+function normalizeStationName(name: string) {
+  return name.replace(/^臺/, '台').replace(/\s/g, '')
 }
 
-function generateDynamicStops(busNum: string, county: string): { routeName: string; startTerminal: string; endTerminal: string; stops: string[] } {
-  const queryStr = busNum.trim()
-  
-  const popularDataset: Record<string, Record<string, { start: string; end: string; stops: string[] }>> = {
-    'tpe': {
-      '307': {
-        start: '板橋前站',
-        end: '撫遠街',
-        stops: ['板橋前站', '新北市政府', '捷運板橋站', '致理科技大學', '積穗', '中和中山路', '連城路', '華中橋', '萬大路', '捷運西門站', '台北車站(忠孝)', '捷運南京復興站', '南京三民', '撫遠街']
-      },
-      '299': {
-        start: '輔大',
-        end: '永春高中',
-        stops: ['輔仁大學', '新莊地政事務所', '新莊田徑場', '中華路', '三重自強路', '台北車站(忠孝)', '捷運忠孝新生站', '捷運忠孝復興站', '捷運忠孝敦化站', '市府轉運站', '永春高中']
-      }
-    },
-    'ntpc': {
-      '307': {
-        start: '板橋前站',
-        end: '撫遠街',
-        stops: ['板橋前站', '新北市政府', '捷運板橋站', '致理科技大學', '積穗', '中和中山路', '連城路', '華中橋', '萬大路', '捷運西門站', '台北車站(忠孝)', '捷運南京復興站', '南京三民', '撫遠街']
-      },
-      '299': {
-        start: '輔大',
-        end: '永春高中',
-        stops: ['輔仁大學', '新莊地政事務所', '新莊田徑場', '中華路', '三重自強路', '台北車站(忠孝)', '捷運忠孝新生站', '捷運忠孝復興站', '捷運忠孝敦化站', '市府轉運站', '永春高中']
-      }
-    },
-    'txg': {
-      '300': {
-        start: '靜宜大學',
-        end: '台中車站',
-        stops: ['靜宜大學', '弘光科技大學', '正英路', '坪頂', '東海別墅', '榮總/東海大學', '澄清醫院', '秋紅谷', '市政府', '科博館', '原子街口', '台中車站']
-      },
-      '151': {
-        start: '朝陽科大',
-        end: '台中高鐵站',
-        stops: ['朝陽科大', '霧峰農會', '亞大醫院', '霧峰公車站', '林森路口', '省議會', '台中高鐵站']
-      }
-    },
-    'khh': {
-      '100': {
-        start: '瑞豐站',
-        end: '高雄車站',
-        stops: ['瑞豐站', '瑞隆路口', '崗山仔', '輕軌籬仔內站', '一心路口', '三多商圈', '中央公園', '美麗島', '高雄車站']
-      },
-      '50': {
-        start: '五甲社區',
-        end: '鼓山輪渡站',
-        stops: ['五甲社區', '前鎮高中', '輕軌凱旋瑞田站', '夢時代', '捷運獅甲站', '三多商圈', '中央公園', '捷運鹽埕埔站', '駁二藝術特區', '哈瑪星', '鼓山輪渡站']
-      }
-    },
-    'tnn': {
-      '5': {
-        start: '鹽田里',
-        end: '市立醫院',
-        stops: ['鹽田里', '台南科大', '六甲頂', '奇美醫院', '大橋車站', '台南車站(北站)', '赤崁樓', '西門路', '台南市政府', '體育公園', '文化中心', '市立醫院']
-      },
-      '2': {
-        start: '崑山科大',
-        end: '安平',
-        stops: ['崑山科大', '平實公園', '台南車站(北站)', '赤崁樓', '郭綜合醫院', '民生路', '安平古堡', '安平國中', '三信家商']
-      }
+function getTodayTaipei() {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'Asia/Taipei',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date())
+}
+
+function formatDuration(depTime: string, arrTime: string) {
+  const [depHour, depMinute] = depTime.split(':').map(Number)
+  const [arrHour, arrMinute] = arrTime.split(':').map(Number)
+  let minutes = arrHour * 60 + arrMinute - (depHour * 60 + depMinute)
+  if (minutes < 0) minutes += 24 * 60
+  return `${Math.floor(minutes / 60) > 0 ? `${Math.floor(minutes / 60)}小時` : ''}${minutes % 60}分`
+}
+
+function getBusStopStatus(eta?: TdxBusEta) {
+  if (!eta) return { status: '暫無資料', className: 'status-offline' }
+  if (eta.StopStatus !== undefined && eta.StopStatus !== 0) {
+    const statusMap: Record<number, string> = {
+      1: '尚未發車',
+      2: '交管不停靠',
+      3: '末班已過',
+      4: '今日未營運',
     }
+    return { status: statusMap[eta.StopStatus] || '暫無資料', className: 'status-offline' }
   }
+  if (eta.EstimateTime === undefined) return { status: '暫無資料', className: 'status-offline' }
+  const minutes = Math.ceil(eta.EstimateTime / 60)
+  if (minutes <= 1) return { status: '即將到站', className: 'status-approaching' }
+  if (minutes <= 4) return { status: `${minutes} 分鐘`, className: 'status-soon' }
+  return { status: `${minutes} 分鐘`, className: 'status-ok' }
+}
 
-  const countyData = popularDataset[county]
-  if (countyData && countyData[queryStr]) {
-    const route = countyData[queryStr]
-    return {
-      routeName: queryStr,
-      startTerminal: route.start,
-      endTerminal: route.end,
-      stops: route.stops
-    }
+async function getTdxToken() {
+  if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
+    throw new Error('尚未設定 TDX API 金鑰');
   }
-
-  let landmarks = [
-    '台北車站', '西門町', '市政府', '南港展覽館', '小巨蛋',
-    '板橋公車站', '府中商圈', '淡水老街', '碧潭風景區', '陽明山'
-  ]
-  let startStop = ''
-  let endStop = ''
-
-  if (county === 'txg') {
-    landmarks = ['台中車站', '一中街', '逢甲夜市', '東海大學', '秋紅谷', '科博館', '台中市政府', '勤美誠品', '國家歌劇院', '高美濕地']
-    startStop = '台中榮總'
-    endStop = '台中火車站'
-  } else if (county === 'khh') {
-    landmarks = ['高雄車站', '西子灣', '駁二特區', '三多商圈', '美麗島', '中央公園', '巨蛋商圈', '衛武營', '瑞豐夜市', '高雄展覽館']
-    startStop = '左營高鐵站'
-    endStop = '夢時代'
-  } else if (county === 'tnn') {
-    landmarks = ['台南車站', '赤崁樓', '孔廟', '花園夜市', '安平古堡', '億載金城', '奇美博物館', '神農街', '台南美術館', '安平樹屋']
-    startStop = '台南科大'
-    endStop = '台南市立醫院'
-  } else if (county === 'ntpc') {
-    landmarks = ['板橋公車站', '新北市政府', '致理科大', '積穗', '中和中山路', '連城路', '華中橋', '樹林車站', '三峽老街', '淡水捷運站']
-    startStop = '新莊輔大'
-    endStop = '板橋前站'
+  if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken;
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: TDX_CLIENT_ID,
+    client_secret: TDX_CLIENT_SECRET,
+  });
+  const response = await fetch(TDX_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+  if (!response.ok) throw new Error('TDX token 取得失敗');
+  const data = (await response.json()) as { access_token?: string; expires_in?: number };
+  if (!data.access_token) throw new Error('TDX token 回傳格式錯誤');
+  tdxToken = data.access_token;
+  tdxTokenExpiry = Date.now() + Math.max(60, (data.expires_in || 3600) - 120) * 1000;
+  return tdxToken;
+}
+  if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
+    throw new Error('尚未設定 TDX API 金鑰');
   }
-
-  const hashVal = getHash(queryStr)
-
-  if (!startStop || !endStop) {
-    const startIdx = hashVal % landmarks.length
-    startStop = landmarks[startIdx]
-    let endIdx = (hashVal + 3) % landmarks.length
-    if (endIdx === startIdx) {
-      endIdx = (endIdx + 1) % landmarks.length
-    }
-    endStop = landmarks[endIdx]
+  if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken;
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: TDX_CLIENT_ID,
+    client_secret: TDX_CLIENT_SECRET,
+  });
+  const response = await fetch(TDX_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+  if (!response.ok) throw new Error('TDX token 取得失敗');
+  const data = (await response.json()) as { access_token?: string; expires_in?: number };
+  if (!data.access_token) throw new Error('TDX token 回傳格式錯誤');
+  tdxToken = data.access_token;
+  tdxTokenExpiry = Date.now() + Math.max(60, (data.expires_in || 3600) - 120) * 1000;
+  // Mark TDX as active for UI badge
+  setTdxActive(true);
+  return tdxToken;
+}
+  if (!TDX_CLIENT_ID || !TDX_CLIENT_SECRET || TDX_CLIENT_ID.includes('YOUR_')) {
+    throw new Error('尚未設定 TDX API 金鑰')
   }
+  if (tdxToken && Date.now() < tdxTokenExpiry) return tdxToken
 
-  const numStops = 8 + (hashVal % 5)
-  const stops: string[] = []
-  stops.push(startStop)
+  const body = new URLSearchParams({
+    grant_type: 'client_credentials',
+    client_id: TDX_CLIENT_ID,
+    client_secret: TDX_CLIENT_SECRET,
+  })
+  const response = await fetch(TDX_TOKEN_URL, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  })
+  if (!response.ok) throw new Error('TDX token 取得失敗')
 
-  const pool = landmarks.filter((item) => item !== startStop && item !== endStop)
-  for (let i = 0; i < numStops - 2; i++) {
-    if (pool.length === 0) break
-    const idx = (hashVal + i * 7) % pool.length
-    stops.push(pool[idx])
-    pool.splice(idx, 1)
-  }
-  stops.push(endStop)
+  const data = (await response.json()) as { access_token?: string; expires_in?: number }
+  if (!data.access_token) throw new Error('TDX token 回傳格式錯誤')
+  tdxToken = data.access_token
+  tdxTokenExpiry = Date.now() + Math.max(60, (data.expires_in || 3600) - 120) * 1000
+  return tdxToken
+}
 
-  return {
-    routeName: queryStr,
-    startTerminal: startStop,
-    endTerminal: endStop,
-    stops
-  }
+async function fetchTdx<T>(path: string) {
+  const token = await getTdxToken();
+  const proxy = import.meta.env.VITE_CORS_PROXY || 'https://corsproxy.io/?url=';
+  const separator = path.includes('?') ? '&' : '?';
+  const fullUrl = `${proxy}${encodeURIComponent(`${TDX_API_BASE}${path}${separator}$format=JSON`)}`;
+  const response = await fetch(fullUrl, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`);
+  return (await response.json()) as T;
+}
+  const token = await getTdxToken();
+  const proxy = import.meta.env.VITE_CORS_PROXY || 'https://corsproxy.io/?url=';
+  const separator = path.includes('?') ? '&' : '?';
+  const url = `${proxy}${encodeURIComponent(`${TDX_API_BASE}${path}${separator}$format=JSON`)};`
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`);
+  return (await response.json()) as T;
+}
+  const token = await getTdxToken()
+  const separator = path.includes('?') ? '&' : '?'
+  const response = await fetch(`${TDX_API_BASE}${path}${separator}$format=JSON`, {
+    headers: { Authorization: `Bearer ${token}` },
+  })
+  if (!response.ok) throw new Error(`TDX API 查詢失敗 (${response.status})`)
+  return (await response.json()) as T
+}
+
+async function getTdxStations(type: 'THSR' | 'TRA') {
+  if (stationCache[type]) return stationCache[type]!
+  const stations = await fetchTdx<TdxStation[]>(`/Rail/${type}/Station?$select=StationID,StationName`)
+  stationCache[type] = stations
+  return stations
+}
+
+function findStationId(stations: TdxStation[], stationName: string) {
+  const target = normalizeStationName(stationName)
+  return stations.find((station) => normalizeStationName(station.StationName?.Zh_tw || '') === target)?.StationID
+}
+
+function getStopTime(timetable: TdxTrainTimetable, stationId: string) {
+  return timetable.StopTimes?.find((stop) => stop.StationID === stationId)
 }
 
 export function TransitInfoBoard() {
+  const [tdxActive, setTdxActive] = useState(false);
   const [selectedService, setSelectedService] = useState('trtc')
   const [statuses, setStatuses] = useState<Record<string, TransitStatusData>>({})
   const [loading, setLoading] = useState(false)
@@ -234,12 +298,15 @@ export function TransitInfoBoard() {
   const [originStation, setOriginStation] = useState('台北')
   const [destinationStation, setDestinationStation] = useState('左營')
   const [queryResults, setQueryResults] = useState<TrainQueryResult[]>([])
+  const [isTrainSearching, setIsTrainSearching] = useState(false)
+  const [trainError, setTrainError] = useState('')
 
   // Bus search state
-  const [selectedCounty, setSelectedCounty] = useState('tpe')
+  const [selectedCounty, setSelectedCounty] = useState('Taipei')
   const [busSearch, setBusSearch] = useState('307')
   const [busStops, setBusStops] = useState<BusStopInfo[]>([])
   const [isBusSearching, setIsBusSearching] = useState(false)
+  const [busError, setBusError] = useState('')
   const [busDirection, setBusDirection] = useState<0 | 1>(0)
   const [busRouteDetails, setBusRouteDetails] = useState<{
     routeName: string;
@@ -302,218 +369,107 @@ export function TransitInfoBoard() {
 
   const { info, current } = getStatusDetails()
 
-  // 2. Train Timetable generator
-  const handleTrainSearch = useCallback(() => {
-    const now = new Date()
-    const currentHour = now.getHours()
-    const currentMin = now.getMinutes()
+  // 2. Train Timetable from TDX
+  const handleTrainSearch = useCallback(async () => {
+    setIsTrainSearching(true); setTdxActive(false);
+    setTrainError('')
+    try {
+      const railType = trainType === 'thsr' ? 'THSR' : 'TRA'
+      const stations = await getTdxStations(railType)
+      const originId = findStationId(stations, originStation)
+      const destinationId = findStationId(stations, destinationStation)
+      if (!originId || !destinationId) throw new Error('找不到對應車站代碼')
 
-    const results = []
-    
-    if (trainType === 'thsr') {
-      const oOffset = HSR_OFFSETS[originStation] ?? 0;
-      const dOffset = HSR_OFFSETS[destinationStation] ?? 0;
-      const isNorthbound = oOffset > dOffset;
-      const baseDistance = Math.abs(oOffset - dOffset);
+      const today = getTodayTaipei()
+      const path = `/Rail/${railType}/DailyTrainTimetable/OD/${originId}/to/${destinationId}/${today}?$top=12`
+      const data = await fetchTdx<TdxTrainTimetable[]>(path)
+      const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
+      const results = data
+        .map((item) => {
+          const originStop = getStopTime(item, originId)
+          const destinationStop = getStopTime(item, destinationId)
+          const depTime = originStop?.DepartureTime || originStop?.ArrivalTime
+          const arrTime = destinationStop?.ArrivalTime || destinationStop?.DepartureTime
+          if (!depTime || !arrTime) return null
+          const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
+          const trainTypeName = item.TrainInfo?.TrainTypeName?.Zh_tw || (trainType === 'thsr' ? '高鐵' : '列車')
+          return {
+            trainType: trainTypeName,
+            trainNo: item.TrainInfo?.TrainNo || '--',
+            depTime: depTime.slice(0, 5),
+            arrTime: arrTime.slice(0, 5),
+            duration: formatDuration(depTime, arrTime),
+            isExpress: !['區間', '區間車', '站站停'].some((typeName) => trainTypeName.includes(typeName)),
+            status: depMinutes >= nowMinutes ? '🟢 今日班表' : '⚪ 已發車',
+          } satisfies TrainQueryResult
+        })
+        .filter((item): item is TrainQueryResult => item !== null)
+        .filter((item) => {
+          const depMinutes = Number(item.depTime.slice(0, 2)) * 60 + Number(item.depTime.slice(3, 5))
+          return depMinutes >= nowMinutes
+        })
+        .slice(0, 6)
 
-      // Generate 6 trains departing starting from the current time
-      let departureMinAccum = 5;
- 
-      for (let i = 0; i < 6; i++) {
-        const totalMinutes = currentMin + departureMinAccum;
-        const depHour = (currentHour + Math.floor(totalMinutes / 60)) % 24;
-        const depMin = totalMinutes % 60;
- 
-        // HSR Train Type: i % 3 === 0 ? "直達" : "站站停"
-        const isExpress = i % 3 === 0 && 
-          ['台北', '板橋', '台中', '左營'].includes(originStation) && 
-          ['台北', '板橋', '台中', '左營'].includes(destinationStation);
-        
-        const speedFactor = isExpress ? 0.75 : 1.0;
-        const durationMin = Math.max(10, Math.round(baseDistance * speedFactor));
-        
-        const totalArrMinutes = totalMinutes + durationMin;
-        const arrHour = (currentHour + Math.floor(totalArrMinutes / 60)) % 24;
-        const arrMin = totalArrMinutes % 60;
- 
-        const formatTime = (h: number, m: number) => 
-          `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
- 
-        // Train number
-        const trainNo = isExpress
-          ? (isNorthbound ? `${100 + i * 2 + 1}` : `${100 + i * 2}`)
-          : (isNorthbound ? `${600 + i * 4 + 1}` : `${600 + i * 4}`);
- 
-        // Delay status: 90% on time
-        const delayRnd = (getHash(trainNo) + i) % 100;
-        let delayStatus = '🟢 準點';
-        if (delayRnd >= 95) {
-          delayStatus = `🟡 晚 ${delayRnd - 94} 分`;
-        }
- 
-        results.push({
-          trainType: isExpress ? '直達' : '站站停',
-          trainNo,
-          depTime: formatTime(depHour, depMin),
-          arrTime: formatTime(arrHour, arrMin),
-          duration: `${Math.floor(durationMin / 60) > 0 ? `${Math.floor(durationMin / 60)}小時` : ''}${durationMin % 60}分`,
-          isExpress,
-          status: delayStatus
-        });
- 
-        departureMinAccum += 20 + (delayRnd % 15);
+      setQueryResults(results)
+      if (results.length === 0) {
+        setTrainError('TDX 今日班表沒有找到此區間接下來的班次，請改查其他站點或前往官方查詢。')
       }
-    } else {
-      // TRA
-      const isWestO = TRA_WESTERN[originStation] !== undefined;
-      const isWestD = TRA_WESTERN[destinationStation] !== undefined;
-      
-      let baseDistance: number;
-
-      if (isWestO && isWestD) {
-        baseDistance = Math.abs(TRA_WESTERN[originStation] - TRA_WESTERN[destinationStation]);
-      } else if (!isWestO && !isWestD) {
-        baseDistance = Math.abs((TRA_EASTERN[originStation] ?? 0) - (TRA_EASTERN[destinationStation] ?? 0));
-      } else {
-        // West to East or East to West (through Taipei)
-        const westVal = isWestO ? TRA_WESTERN[originStation] : TRA_WESTERN[destinationStation];
-        const eastVal = !isWestO ? TRA_EASTERN[originStation] : TRA_EASTERN[destinationStation];
-        baseDistance = Math.abs(westVal) + Math.abs(eastVal);
-      }
-
-      const isNorthbound = (isWestO && isWestD && TRA_WESTERN[originStation] > TRA_WESTERN[destinationStation]) ||
-                            (!isWestO && !isWestD && TRA_EASTERN[originStation] > TRA_EASTERN[destinationStation]) ||
-                            (isWestO && !isWestD);
-
-      let departureMinAccum = 3;
- 
-      for (let i = 0; i < 6; i++) {
-        const totalMinutes = currentMin + departureMinAccum;
-        const depHour = (currentHour + Math.floor(totalMinutes / 60)) % 24;
-        const depMin = totalMinutes % 60;
- 
-        let traType: string;
-        let speedFactor: number;
-        let isExpress = false;
-        
-        const typeSelect = (i + (isNorthbound ? 1 : 0)) % 4;
-        if (typeSelect === 0) {
-          traType = '自強';
-          speedFactor = 0.7;
-          isExpress = true;
-        } else if (typeSelect === 1) {
-          traType = '區間';
-          speedFactor = 1.15;
-        } else if (typeSelect === 2) {
-          traType = '莒光';
-          speedFactor = 0.9;
-        } else {
-          const isEasternRelated = !isWestO || !isWestD;
-          traType = isEasternRelated ? '普悠瑪' : '區間快';
-          speedFactor = isEasternRelated ? 0.65 : 0.85;
-          isExpress = true;
-        }
-
-        const durationMin = Math.max(8, Math.round(baseDistance * speedFactor));
-
-        let arrHour = depHour + Math.floor((depMin + durationMin) / 60);
-        const arrMin = (depMin + durationMin) % 60;
-        arrHour = arrHour % 24;
-
-        const formatTime = (h: number, m: number) => 
-          `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-
-        let trainNo: string;
-        if (traType === '自強') {
-          trainNo = String(100 + i * 14 + (isNorthbound ? 1 : 2));
-        } else if (traType === '普悠瑪' || traType === '太魯閣') {
-          trainNo = String(200 + i * 8 + (isNorthbound ? 1 : 2));
-        } else if (traType === '莒光') {
-          trainNo = String(500 + i * 12 + (isNorthbound ? 1 : 2));
-        } else {
-          trainNo = String(2100 + i * 22 + (isNorthbound ? 1 : 2));
-        }
-
-        const delayRnd = (getHash(trainNo) + i) % 100;
-        let delayStatus = '🟢 準點';
-        if (delayRnd >= 75) {
-          const delayMinutes = (delayRnd % 12) + 1;
-          delayStatus = `🟡 晚 ${delayMinutes} 分`;
-        }
-
-        results.push({
-          trainType: traType,
-          trainNo,
-          depTime: formatTime(depHour, depMin),
-          arrTime: formatTime(arrHour, arrMin),
-          duration: `${Math.floor(durationMin / 60) > 0 ? `${Math.floor(durationMin / 60)}小時` : ''}${durationMin % 60}分`,
-          isExpress,
-          status: delayStatus
-        });
-
-        departureMinAccum += 15 + (delayRnd % 15);
-      }
+    } catch (e) {
+      console.error('Failed to fetch TDX train timetable:', e)
+      setQueryResults([])
+      setTrainError(e instanceof Error ? e.message : 'TDX 雙鐵時刻查詢失敗')
+    } finally {
+      setIsTrainSearching(false)
     }
-
-    setQueryResults(results)
   }, [trainType, originStation, destinationStation])
 
-  // 3. County Bus dynamic simulator
-  const handleBusSearch = useCallback((directionOverride?: number) => {
+  // 3. County Bus arrivals from TDX
+  const handleBusSearch = useCallback(async (directionOverride?: number) => {
     const queryStr = busSearch.trim()
     if (!queryStr) return
     setIsBusSearching(true)
-    
+    setBusError('')
     const targetDirection = directionOverride !== undefined ? directionOverride : busDirection
 
-    setTimeout(() => {
-      const routeInfo = generateDynamicStops(queryStr, selectedCounty)
+    try {
+      const routeName = encodeURIComponent(queryStr)
+      const [routes, stopRoutes, etas] = await Promise.all([
+        fetchTdx<TdxBusRoute[]>(`/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`),
+        fetchTdx<TdxBusStopOfRoute[]>(`/Bus/DisplayStopOfRoute/City/${selectedCounty}/${routeName}`),
+        fetchTdx<TdxBusEta[]>(`/Bus/EstimatedTimeOfArrival/City/${selectedCounty}/${routeName}`),
+      ])
+      const route = routes[0]
+      const selectedStopRoute = stopRoutes.find((item) => item.Direction === targetDirection) || stopRoutes[0]
+      const stopsToRender = selectedStopRoute?.Stops || []
+      if (!route || stopsToRender.length === 0) {
+        throw new Error('TDX 查無此公車路線或站牌資料')
+      }
+
+      const startTerminal = route.DepartureStopNameZh || stopsToRender[0]?.StopName?.Zh_tw || '起點'
+      const endTerminal = route.DestinationStopNameZh || stopsToRender[stopsToRender.length - 1]?.StopName?.Zh_tw || '終點'
+      const routeInfo = {
+        routeName: route.RouteName?.Zh_tw || queryStr,
+        startTerminal,
+        endTerminal,
+        stops: stopsToRender.map((stop) => stop.StopName?.Zh_tw || stop.StopName?.En || '未命名站牌'),
+      }
       setBusRouteDetails(routeInfo)
-      
-      const stopsToRender = targetDirection === 0 
-        ? [...routeInfo.stops] 
-        : [...routeInfo.stops].reverse();
 
-      const headway = 15;
-      const hash = getHash(queryStr);
-      
-      const now = new Date();
-      const currentMinutes = now.getHours() * 60 + now.getMinutes();
-
-      const stops = stopsToRender.map((stop, index) => {
-        const stopJitter = (hash + index * 17) % 3 - 1;
-        const cumTime = index * 2.5 + stopJitter;
-
-        const diff = currentMinutes - cumTime;
-        const timeRemaining = diff <= 0
-          ? Math.round(-diff)
-          : (diff % headway === 0 ? 0 : Math.round(headway - (diff % headway)));
-
-        let statusText: string;
-        let className: string;
-
-        const isOffline = (hash + index * 9) % 15 === 0 && index > stopsToRender.length - 3;
-
-        if (isOffline) {
-          statusText = '未發車';
-          className = 'status-offline';
-        } else if (timeRemaining <= 1) {
-          statusText = timeRemaining === 0 ? '接近中 🚌' : '將到站';
-          className = 'status-approaching';
-        } else if (timeRemaining <= 4) {
-          statusText = `${timeRemaining} 分鐘`;
-          className = 'status-soon';
-        } else {
-          statusText = `${timeRemaining} 分鐘`;
-          className = 'status-ok';
-        }
-
-        return { name: stop, status: statusText, className }
+      const stops = routeInfo.stops.map((stop) => {
+        const eta = etas.find((item) => item.Direction === targetDirection && item.StopName?.Zh_tw === stop)
+        const { status, className } = getBusStopStatus(eta)
+        return { name: stop, status, className }
       })
 
       setBusStops(stops)
+    } catch (e) {
+      console.error('Failed to fetch TDX bus data:', e)
+      setBusRouteDetails(null)
+      setBusStops([])
+      setBusError(e instanceof Error ? e.message : 'TDX 公車動態查詢失敗')
+    } finally {
       setIsBusSearching(false)
-    }, 500)
+    }
   }, [busSearch, selectedCounty, busDirection])
 
   const handleToggleBusDirection = () => {
@@ -603,6 +559,14 @@ export function TransitInfoBoard() {
           <div className="transit-card">
             <div className="transit-card-header">
               <div className="transit-service-name">
+            <span className="transit-icon">{info.icon}</span>
+            <span>{info.name}</span>
+            {tdxActive ? (
+              <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>📡 TDX 即時資料</span>
+            ) : (
+              <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>🔮 模擬資料</span>
+            )}
+          </div>
                 <span className="transit-icon">{info.icon}</span>
                 <span>{info.name}</span>
               </div>
@@ -733,6 +697,14 @@ export function TransitInfoBoard() {
                 </select>
               </div>
             </div>
+            <button
+              type="button"
+              className="bus-search-btn"
+              onClick={handleTrainSearch}
+              disabled={isTrainSearching}
+            >
+              {isTrainSearching ? '查詢中' : '查詢 TDX 時刻'}
+            </button>
           </div>
 
           {/* Train results grid */}
@@ -745,7 +717,20 @@ export function TransitInfoBoard() {
               <span>行車時間 / 狀態</span>
             </div>
             <div className="train-board-rows">
-              {queryResults.map((tr, idx) => (
+              {isTrainSearching ? (
+                <div className="bus-stops-loading">正在向 TDX 查詢雙鐵時刻...</div>
+              ) : trainError ? (
+                <div className="bus-stops-empty">
+                  {trainError}
+                  <div style={{ marginTop: '0.5rem' }}>
+                    <a href={TDX_OFFICIAL_QUERY_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
+                      前往 TDX MaaS 查詢 ↗
+                    </a>
+                  </div>
+                </div>
+              ) : queryResults.length === 0 ? (
+                <div className="bus-stops-empty">請選擇起訖站後查詢 TDX 今日班表。</div>
+              ) : queryResults.map((tr, idx) => (
                 <div className={`train-board-row${tr.isExpress ? ' express' : ''}`} key={idx}>
                   <span className={`train-type-badge type-${tr.trainType}`}>{tr.trainType}</span>
                   <span className="train-no">{tr.trainNo}</span>
@@ -795,7 +780,7 @@ export function TransitInfoBoard() {
                 }}
                 disabled={isBusSearching}
               >
-                查詢
+                {isBusSearching ? '查詢中' : '查詢'}
               </button>
             </div>
           </div>
@@ -825,6 +810,18 @@ export function TransitInfoBoard() {
           <div className="bus-stops-board">
             {isBusSearching ? (
               <div className="bus-stops-loading">正在搜尋公車即時動態...</div>
+            ) : busError ? (
+              <div className="bus-stops-empty">
+                {busError}
+                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <a href={TDX_SWAGGER_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
+                    TDX API 文件 ↗
+                  </a>
+                  <a href={TAIPEI_BUS_API_DOC_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
+                    台北市公車 API 文件 ↗
+                  </a>
+                </div>
+              </div>
             ) : busStops.length === 0 ? (
               <div className="bus-stops-empty">請輸入公車號碼進行查詢。</div>
             ) : (
