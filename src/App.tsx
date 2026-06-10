@@ -19,6 +19,9 @@ import { VenueWeather } from './components/VenueWeather'
 import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
 import { LoginPage } from './components/LoginPage'
+import { TicketDetailModal } from './components/TicketDetailModal'
+import { ProfilePage } from './components/ProfilePage'
+import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { db, logCustomEvent } from './firebase'
 
@@ -73,6 +76,69 @@ function loadInitialConcerts() {
   }
 }
 
+function resolveTixcraftUrls(list: RemoteConcert[]): RemoteConcert[] {
+  const specificUrls = new Map<string, string>()
+  
+  const normalize = (s: string) => {
+    return s.replace(/[\s\-_【】「」（）()、，,!！]/g, '').toLowerCase()
+  }
+  
+  list.forEach((c) => {
+    if (c.source === '拓元售票' && c.url && c.url.includes('/activity/detail/')) {
+      specificUrls.set(normalize(c.name), c.url)
+    }
+    if (c.ticket_links) {
+      c.ticket_links.forEach((lk) => {
+        if (lk.platform === 'tixcraft' && lk.url && lk.url.includes('/activity/detail/')) {
+          specificUrls.set(normalize(c.name), lk.url)
+        }
+      })
+    }
+  })
+
+  return list.map((c) => {
+    const isGenericUrl = (u?: string) => u === 'https://tixcraft.com/' || u === 'https://tixcraft.com'
+    
+    let updatedUrl = c.url
+    let updatedLinks = c.ticket_links ? [...c.ticket_links] : []
+    let matchedUrl: string | null = null
+
+    const hasGeneric = isGenericUrl(c.url) || updatedLinks.some((lk) => isGenericUrl(lk.url))
+
+    if (hasGeneric) {
+      const normName = normalize(c.name)
+      if (specificUrls.has(normName)) {
+        matchedUrl = specificUrls.get(normName)!
+      } else {
+        for (const [key, url] of specificUrls.entries()) {
+          if (key.includes(normName) || normName.includes(key) || (key.length > 5 && normName.substring(0, 8) === key.substring(0, 8))) {
+            matchedUrl = url
+            break
+          }
+        }
+      }
+
+      if (matchedUrl) {
+        if (isGenericUrl(c.url)) {
+          updatedUrl = matchedUrl
+        }
+        updatedLinks = updatedLinks.map((lk) => {
+          if (lk.platform === 'tixcraft' && isGenericUrl(lk.url)) {
+            return { ...lk, url: matchedUrl! }
+          }
+          return lk
+        })
+      }
+    }
+
+    return {
+      ...c,
+      url: updatedUrl,
+      ticket_links: updatedLinks
+    }
+  })
+}
+
 function App() {
   const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
@@ -84,6 +150,7 @@ function App() {
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
+  const [selectedTicket, setSelectedTicket] = useState<RemoteConcert | null>(null)
   const [form, setForm] = useState<ConcertForm>(EMPTY_FORM)
   const [pendingMedia, setPendingMedia] = useState<ConcertMedia[]>([])
   const [spotifyQuery, setSpotifyQuery] = useState('')
@@ -96,7 +163,7 @@ function App() {
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
   const [zoom, setZoom] = useState(1.1)
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
-  const [view, setView] = useState<'map' | 'board' | 'login'>('map')
+  const [view, setView] = useState<'map' | 'board' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
@@ -155,9 +222,12 @@ function App() {
         .sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts, selectedVenueId],
   )
+  const resolvedRemoteConcerts = useMemo(() => {
+    return resolveTixcraftUrls(remoteConcerts)
+  }, [remoteConcerts])
   const sortedRemoteConcerts = useMemo(
-    () => [...remoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
-    [remoteConcerts],
+    () => [...resolvedRemoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
+    [resolvedRemoteConcerts],
   )
   const filteredRemoteConcerts = useMemo(() => {
     let list = sortedRemoteConcerts
@@ -643,9 +713,17 @@ function App() {
           </button>
           {isLoggedIn && currentUser ? (
             <div className="user-profile-menu">
-              <span className="user-name">
-                👤 {currentUser.nickname}
-              </span>
+              <button
+                className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
+                type="button"
+                onClick={() => setView('profile')}
+                style={{
+                  border: view === 'profile' ? '1px solid var(--gold)' : '1px solid rgba(255, 255, 255, 0.15)',
+                  color: view === 'profile' ? 'var(--gold)' : 'var(--text)'
+                }}
+              >
+                👤 個人資料
+              </button>
               <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
                 登出
               </button>
@@ -766,7 +844,7 @@ function App() {
                   )}
                 </div>
               )}
-              {mobileTab !== 'search' && <TransitStatusBoard />}
+              {mobileTab !== 'search' && <TransitInfoBoard />}
               <UpcomingConcerts
                 concerts={filteredRemoteConcerts}
                 status={remoteStatus}
@@ -776,6 +854,7 @@ function App() {
                 searchQuery={searchQuery}
                 hasSelectedVenue={!!selectedVenueId}
                 onClearVenue={() => setSelectedVenueId(null)}
+                onSelectTicket={setSelectedTicket}
               />
               <ConcertList
                 concerts={selectedVenueConcerts}
@@ -788,6 +867,21 @@ function App() {
         </main>
       ) : view === 'board' ? (
         <ShareBoard />
+      ) : view === 'profile' && isLoggedIn && currentUser ? (
+        <ProfilePage
+          user={currentUser}
+          concerts={concerts}
+          onUpdateNickname={(newName) => {
+            const updated = { ...currentUser, nickname: newName }
+            setCurrentUser(updated)
+            localStorage.setItem('tw-user-info', JSON.stringify(updated))
+            localStorage.setItem('tw-nickname', newName)
+            setNickname(newName)
+          }}
+          onLogout={handleLogout}
+          onBack={() => setView('map')}
+          onOpenConcertDetail={openConcertDetail}
+        />
       ) : (
         <LoginPage
           onLoginSuccess={(user) => {
@@ -987,6 +1081,20 @@ function App() {
         </Modal>
       )}
 
+      {selectedTicket && (
+        <Modal className="ticket-detail-modal" onClose={() => setSelectedTicket(null)}>
+          <TicketDetailModal
+            ticket={selectedTicket}
+            onClose={() => setSelectedTicket(null)}
+            spotifyTokenFetcher={getSpotifyToken}
+            onPlayMusicBar={(url) => {
+              setMusicBarUrl(url)
+              setIsMusicBarVisible(true)
+            }}
+          />
+        </Modal>
+      )}
+
       {isAllModalOpen && (
         <Modal className="all-modal" onClose={closeAllModal}>
           <h2 className="all-modal-title">所有演唱會記錄</h2>
@@ -1165,6 +1273,31 @@ function App() {
                 <span className="icon">💬</span>
                 <span className="label">社群牆</span>
               </button>
+              {isLoggedIn && currentUser ? (
+                <button
+                  className={`sidebar-nav-item${view === 'profile' ? ' active' : ''}`}
+                  type="button"
+                  onClick={() => {
+                    setView('profile')
+                    setIsMobileSidebarOpen(false)
+                  }}
+                >
+                  <span className="icon">👤</span>
+                  <span className="label">個人資料 ({currentUser.nickname})</span>
+                </button>
+              ) : (
+                <button
+                  className="sidebar-nav-item"
+                  type="button"
+                  onClick={() => {
+                    setView('login')
+                    setIsMobileSidebarOpen(false)
+                  }}
+                >
+                  <span className="icon">🔑</span>
+                  <span className="label">帳戶登入</span>
+                </button>
+              )}
             </div>
           </div>
         </>
@@ -1182,6 +1315,7 @@ function UpcomingConcerts({
   searchQuery,
   hasSelectedVenue,
   onClearVenue,
+  onSelectTicket,
 }: {
   concerts: RemoteConcert[]
   status: string
@@ -1191,6 +1325,7 @@ function UpcomingConcerts({
   searchQuery?: string
   hasSelectedVenue?: boolean
   onClearVenue?: () => void
+  onSelectTicket: (ticket: RemoteConcert) => void
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
@@ -1239,11 +1374,9 @@ function UpcomingConcerts({
         </div>
       )}
       {displayedConcerts.map((concert) => (
-        <a
+        <div
           className="remote-card"
-          href={concert.url}
-          target="_blank"
-          rel="noopener noreferrer"
+          style={{ cursor: 'pointer' }}
           key={concert.id}
           onClick={() => {
             logCustomEvent('click_ticket_card', {
@@ -1252,6 +1385,7 @@ function UpcomingConcerts({
               venue_name: concert.venue_name || concert.venue_raw,
               source: concert.source
             })
+            onSelectTicket(concert)
           }}
         >
           {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
@@ -1273,7 +1407,7 @@ function UpcomingConcerts({
               </div>
             )}
           </div>
-        </a>
+        </div>
       ))}
       {concerts.length > 8 && (
         <button
@@ -1591,178 +1725,6 @@ function formatRemoteDate(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(date)
-}
-
-type TransitService = {
-  id: string
-  name: string
-  url: string
-  statusUrl: string
-  icon: string
-  searchPatterns: string[]
-}
-
-const TRANSIT_SERVICES: TransitService[] = [
-  {
-    id: 'trtc',
-    name: '台北捷運',
-    url: 'https://www.metro.taipei/',
-    statusUrl: 'https://www.metro.taipei/',
-    icon: '🚇',
-    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
-  },
-  {
-    id: 'krtc',
-    name: '高雄捷運',
-    url: 'https://www.krtc.com.tw/',
-    statusUrl: 'https://www.krtc.com.tw/',
-    icon: '🚇',
-    searchPatterns: ['營運正常', '正常營運', '今日全線正常營運'],
-  },
-  {
-    id: 'tmrt',
-    name: '台中捷運',
-    url: 'https://www.tmrt.com.tw/',
-    statusUrl: 'https://www.tmrt.com.tw/',
-    icon: '🚇',
-    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
-  },
-  {
-    id: 'thsr',
-    name: '台灣高鐵',
-    url: 'https://www.thsrc.com.tw/',
-    statusUrl: 'https://www.thsrc.com.tw/',
-    icon: '🚄',
-    searchPatterns: ['全線正常營運', '正常營運', '營運正常'],
-  },
-  {
-    id: 'tra',
-    name: '台灣鐵路',
-    url: 'https://www.railway.gov.tw/',
-    statusUrl: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList',
-    icon: '🚂',
-    searchPatterns: ['正常', '營運正常', '正常營運', '各線列車正常營運'],
-  },
-]
-
-type TransitStatusData = {
-  name: string
-  status: string
-  isNormal: boolean
-  detail: string
-  updatedAt: string
-}
-
-type TransitPayload = {
-  updated_at: string
-  statuses: Record<string, TransitStatusData>
-}
-
-function TransitStatusBoard() {
-  const [selectedId, setSelectedId] = useState('trtc')
-  const [statuses, setStatuses] = useState<Record<string, TransitStatusData>>({})
-  const [loading, setLoading] = useState(false)
-
-  const fetchStatus = useCallback(async () => {
-    setLoading(true)
-    try {
-      const response = await fetch(`${import.meta.env.BASE_URL}transit-status.json?t=${Date.now()}`, {
-        cache: 'no-store',
-      })
-      if (!response.ok) throw new Error('transit-status.json not found')
-      const data = (await response.json()) as TransitPayload
-      if (data && data.statuses) {
-        setStatuses(data.statuses)
-      }
-    } catch (e) {
-      console.error('Failed to fetch transit status:', e)
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  useEffect(() => {
-    fetchStatus()
-    // Auto-refresh every 5 minutes
-    const interval = setInterval(fetchStatus, 300_000)
-    return () => clearInterval(interval)
-  }, [fetchStatus])
-
-  const service = TRANSIT_SERVICES.find((s) => s.id === selectedId) || TRANSIT_SERVICES[0]
-  const current = statuses[selectedId] || {
-    name: service.name,
-    status: '🟢 營運正常 (預估)',
-    isNormal: true,
-    detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
-    updatedAt: '',
-  }
-
-  const formatStatusTime = (isoString?: string) => {
-    if (!isoString) return ''
-    try {
-      const date = new Date(isoString)
-      if (isNaN(date.getTime())) return ''
-      return date.toLocaleTimeString('zh-TW', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
-    } catch {
-      return ''
-    }
-  }
-
-  return (
-    <section className="transit-board" aria-label="大眾運輸即時動態">
-      <div className="section-row" style={{ marginBottom: '0.6rem' }}>
-        <div className="section-title" style={{ padding: '0.2rem 0.5rem 0' }}>— 交通即時動態 —</div>
-        <button
-          className="refresh-events-btn"
-          type="button"
-          disabled={loading}
-          onClick={fetchStatus}
-        >
-          {loading ? '讀取中' : '重新整理 ↻'}
-        </button>
-      </div>
-
-      <div className="transit-selector-row">
-        <select
-          value={selectedId}
-          onChange={(e) => setSelectedId(e.target.value)}
-          className="transit-select"
-        >
-          {TRANSIT_SERVICES.map((s) => (
-            <option key={s.id} value={s.id}>
-              {s.icon} {s.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div className="transit-card">
-        <div className="transit-card-header">
-          <div className="transit-service-name">
-            <span className="transit-icon">{service.icon}</span>
-            <span>{service.name}</span>
-          </div>
-          <div className={`transit-badge${current.isNormal ? ' normal' : ' warning'}${loading ? ' loading' : ''}`}>
-            {current.status}
-          </div>
-        </div>
-        <p className="transit-detail">{current.detail}</p>
-        {current.updatedAt && (
-          <div className="transit-updated">
-            最後更新：{formatStatusTime(current.updatedAt)}
-          </div>
-        )}
-        <a
-          href={service.statusUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="transit-link-btn"
-        >
-          🧭 前往官方網站查看即時動態 ↗
-        </a>
-      </div>
-    </section>
-  )
 }
 
 export default App

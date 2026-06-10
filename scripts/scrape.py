@@ -445,7 +445,8 @@ def scrape_tixcraft():
     if not html:
         return events
 
-    blocks = re.findall(r'<div class="eventbl[^>]*>([\s\S]*?)</div>\s*</div>\s*</div>', html)
+    parts = re.split(r'class=["\']eventbl', html)
+    blocks = parts[1:]
     print(f"  Found {len(blocks)} blocks in Tixcraft", file=sys.stderr)
 
     for b in blocks:
@@ -952,6 +953,57 @@ def load_manual_events():
 
 # ── 跨平台合併：同名活動加上多平台售票連結 ────────────────────────────────────
 
+def resolve_generic_tixcraft_urls(events):
+    """
+    Find all events that have a specific Tixcraft URL,
+    and use them to resolve any generic tixcraft.com URLs using fuzzy matching on event names.
+    """
+    specific_urls = {} # normalized name -> specific url
+    
+    def normalize(s):
+        s = re.sub(r'[\s\-_【】「」（）()、，,!！]', '', s or '').lower()
+        s = re.sub(r'(台北站|高雄站|台中站|加場|加開|演唱會|音樂會|巡迴|live|tour)', '', s)
+        return s
+
+    for ev in events:
+        if ev.get("source") == "拓元售票" and ev.get("url") and "/activity/detail/" in ev.get("url"):
+            specific_urls[normalize(ev["name"])] = ev["url"]
+        if ev.get("ticket_links"):
+            for lk in ev["ticket_links"]:
+                if lk.get("platform") == "tixcraft" and lk.get("url") and "/activity/detail/" in lk.get("url"):
+                    specific_urls[normalize(ev["name"])] = lk["url"]
+
+    for ev in events:
+        is_generic = lambda u: u in ["https://tixcraft.com/", "https://tixcraft.com"]
+        
+        has_generic_url = is_generic(ev.get("url"))
+        has_generic_link = False
+        if ev.get("ticket_links"):
+            for lk in ev["ticket_links"]:
+                if lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft":
+                    if is_generic(lk.get("url")):
+                        has_generic_link = True
+                        
+        if has_generic_url or has_generic_link:
+            norm_name = normalize(ev["name"])
+            matched_url = None
+            
+            if norm_name in specific_urls:
+                matched_url = specific_urls[norm_name]
+            else:
+                for key, url in specific_urls.items():
+                    if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
+                        matched_url = url
+                        break
+            
+            if matched_url:
+                if has_generic_url:
+                    ev["url"] = matched_url
+                if ev.get("ticket_links"):
+                    for lk in ev["ticket_links"]:
+                        if (lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft") and is_generic(lk.get("url")):
+                            lk["url"] = matched_url
+
 def merge_ticket_links(events):
     """
     If two events share a very similar name and date,
@@ -986,6 +1038,7 @@ def merge_ticket_links(events):
             index[key] = len(result)
             result.append(ev)
 
+    resolve_generic_tixcraft_urls(result)
     return result
 
 

@@ -22,8 +22,15 @@ interface AqiData {
   pm10: number
 }
 
+interface DailyForecast {
+  date: string
+  tempMax: number
+  tempMin: number
+  weatherCode: number
+}
+
 // Module-level cache to store weather responses for 5 minutes
-const weatherCache = new Map<string, { data: { weather: WeatherData; aqi: AqiData }; timestamp: number }>()
+const weatherCache = new Map<string, { data: { weather: WeatherData; aqi: AqiData; daily: DailyForecast[] }; timestamp: number }>()
 const CACHE_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 
 // Map WMO Weather Codes to Description and Emoji
@@ -144,9 +151,34 @@ function getWeatherWarnings(weather: WeatherData): string[] {
 export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDetails }: VenueWeatherProps) {
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [aqi, setAqi] = useState<AqiData | null>(null)
+  const [dailyForecast, setDailyForecast] = useState<DailyForecast[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isFallback, setIsFallback] = useState(false)
+
+  const getDayLabel = (dateStr: string): string => {
+    try {
+      const date = new Date(dateStr)
+      const today = new Date()
+      const tomorrow = new Date()
+      tomorrow.setDate(today.getDate() + 1)
+      const dayAfter = new Date()
+      dayAfter.setDate(today.getDate() + 2)
+
+      if (date.toDateString() === today.toDateString()) {
+        return '今天'
+      } else if (date.toDateString() === tomorrow.toDateString()) {
+        return '明天'
+      } else if (date.toDateString() === dayAfter.toDateString()) {
+        return '後天'
+      } else {
+        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+        return days[date.getDay()]
+      }
+    } catch {
+      return dateStr
+    }
+  }
 
   const fetchWeather = useCallback(async (forceRefresh = false) => {
     if (!latitude || !longitude) {
@@ -160,6 +192,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
     if (!forceRefresh && cached && Date.now() - cached.timestamp < CACHE_EXPIRY_MS) {
       setWeather(cached.data.weather)
       setAqi(cached.data.aqi)
+      setDailyForecast(cached.data.daily)
       setIsFallback(false)
       setError(null)
       return
@@ -170,7 +203,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
 
     try {
       // Fetch both weather and AQI concurrently
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m`
+      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`
       const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi,pm2_5,pm10`
 
       const [weatherRes, aqiRes] = await Promise.all([
@@ -199,13 +232,27 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
         pm10: Math.round(aqiJson.current.pm10)
       }
 
+      const dailyData = weatherJson.daily
+      const newDaily: DailyForecast[] = []
+      if (dailyData && dailyData.time) {
+        for (let i = 1; i <= 3 && i < dailyData.time.length; i++) {
+          newDaily.push({
+            date: dailyData.time[i],
+            tempMax: Math.round(dailyData.temperature_2m_max[i]),
+            tempMin: Math.round(dailyData.temperature_2m_min[i]),
+            weatherCode: dailyData.weather_code[i]
+          })
+        }
+      }
+
       setWeather(newWeather)
       setAqi(newAqi)
+      setDailyForecast(newDaily)
       setIsFallback(false)
 
       // Store in cache
       weatherCache.set(cacheKey, {
-        data: { weather: newWeather, aqi: newAqi },
+        data: { weather: newWeather, aqi: newAqi, daily: newDaily },
         timestamp: Date.now()
       })
     } catch (err) {
@@ -244,8 +291,24 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
         pm10: 22 + (cityName.length * 4) % 20
       }
 
+      const fallbackDaily: DailyForecast[] = []
+      const today = new Date()
+      for (let i = 1; i <= 3; i++) {
+        const nextDay = new Date()
+        nextDay.setDate(today.getDate() + i)
+        const dateStr = nextDay.toISOString().split('T')[0]
+        
+        fallbackDaily.push({
+          date: dateStr,
+          tempMax: temp + 2 - (i % 2),
+          tempMin: temp - 4 - (i % 3),
+          weatherCode: (2 + i) % 4
+        })
+      }
+
       setWeather(fallbackWeather)
       setAqi(fallbackAqi)
+      setDailyForecast(fallbackDaily)
       setIsFallback(true)
     } finally {
       setLoading(false)
@@ -348,6 +411,27 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
             <span>PM₁₀: <strong>{aqi.pm10} µg/m³</strong></span>
           </div>
         </div>
+
+        {/* 3-day Weather Forecast */}
+        {dailyForecast && dailyForecast.length > 0 && (
+          <div className="weather-forecast-section">
+            <div className="forecast-title">📅 三日天氣預報</div>
+            <div className="forecast-grid">
+              {dailyForecast.map((day) => {
+                const info = parseWeatherCode(day.weatherCode)
+                const dayLabel = getDayLabel(day.date)
+                return (
+                  <div className="forecast-item" key={day.date}>
+                    <span className="forecast-day">{dayLabel}</span>
+                    <span className="forecast-emoji" title={info.desc}>{info.emoji}</span>
+                    <span className="forecast-desc">{info.desc}</span>
+                    <span className="forecast-temp">{day.tempMin}°~{day.tempMax}°C</span>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Warnings & Suggestions alerts */}
         <div className="weather-alerts">
