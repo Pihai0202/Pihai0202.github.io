@@ -317,18 +317,13 @@ export function TransitInfoBoard() {
       const baseDistance = Math.abs(oOffset - dOffset);
 
       // Generate 6 trains departing starting from the current time
-      let departureMinAccum = currentMin + 5;
-      let hourOffset = 0;
-
+      let departureMinAccum = 5;
+ 
       for (let i = 0; i < 6; i++) {
-        let depMin = departureMinAccum;
-
-        if (depMin >= 60) {
-          hourOffset += Math.floor(depMin / 60);
-          depMin = depMin % 60;
-        }
-        const depHour = (currentHour + hourOffset) % 24;
-
+        const totalMinutes = currentMin + departureMinAccum;
+        const depHour = (currentHour + Math.floor(totalMinutes / 60)) % 24;
+        const depMin = totalMinutes % 60;
+ 
         // HSR Train Type: i % 3 === 0 ? "直達" : "站站停"
         const isExpress = i % 3 === 0 && 
           ['台北', '板橋', '台中', '左營'].includes(originStation) && 
@@ -337,25 +332,25 @@ export function TransitInfoBoard() {
         const speedFactor = isExpress ? 0.75 : 1.0;
         const durationMin = Math.max(10, Math.round(baseDistance * speedFactor));
         
-        let arrHour = depHour + Math.floor((depMin + durationMin) / 60);
-        const arrMin = (depMin + durationMin) % 60;
-        arrHour = arrHour % 24;
-
+        const totalArrMinutes = totalMinutes + durationMin;
+        const arrHour = (currentHour + Math.floor(totalArrMinutes / 60)) % 24;
+        const arrMin = totalArrMinutes % 60;
+ 
         const formatTime = (h: number, m: number) => 
           `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
-
+ 
         // Train number
         const trainNo = isExpress
           ? (isNorthbound ? `${100 + i * 2 + 1}` : `${100 + i * 2}`)
           : (isNorthbound ? `${600 + i * 4 + 1}` : `${600 + i * 4}`);
-
+ 
         // Delay status: 90% on time
         const delayRnd = (getHash(trainNo) + i) % 100;
         let delayStatus = '🟢 準點';
         if (delayRnd >= 95) {
           delayStatus = `🟡 晚 ${delayRnd - 94} 分`;
         }
-
+ 
         results.push({
           trainType: isExpress ? '直達' : '站站停',
           trainNo,
@@ -365,7 +360,7 @@ export function TransitInfoBoard() {
           isExpress,
           status: delayStatus
         });
-
+ 
         departureMinAccum += 20 + (delayRnd % 15);
       }
     } else {
@@ -390,18 +385,13 @@ export function TransitInfoBoard() {
                             (!isWestO && !isWestD && TRA_EASTERN[originStation] > TRA_EASTERN[destinationStation]) ||
                             (isWestO && !isWestD);
 
-      let departureMinAccum = currentMin + 3;
-      let hourOffset = 0;
-
+      let departureMinAccum = 3;
+ 
       for (let i = 0; i < 6; i++) {
-        let depMin = departureMinAccum;
-
-        if (depMin >= 60) {
-          hourOffset += Math.floor(depMin / 60);
-          depMin = depMin % 60;
-        }
-        const depHour = (currentHour + hourOffset) % 24;
-
+        const totalMinutes = currentMin + departureMinAccum;
+        const depHour = (currentHour + Math.floor(totalMinutes / 60)) % 24;
+        const depMin = totalMinutes % 60;
+ 
         let traType: string;
         let speedFactor: number;
         let isExpress = false;
