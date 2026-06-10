@@ -10,6 +10,10 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
+
+# Firebase Functions build output
+functions/lib
+functions/node_modules
 # Local env files
 # .env (committed for GitHub Actions build)
 .env.local
