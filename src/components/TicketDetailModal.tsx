@@ -366,25 +366,7 @@ export function TicketDetailModal({
         )}
       </div>
 
-      {/* 購票連結快捷區 */}
-      {linksToRender.length > 0 && (
-        <div className="ticket-purchase-banner">
-          <span className="banner-title">🎟️ 購票/活動連結資訊：</span>
-          <div className="banner-buttons-row">
-            {linksToRender.map((link, idx) => (
-              <a
-                key={`${link.platform}-banner-${idx}`}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="ticket-buy-btn-large"
-              >
-                立即前往 {link.name} 購票/活動網頁 ➔
-              </a>
-            ))}
-          </div>
-        </div>
-      )}
+
 
       {/* 售票資訊留言牆 */}
       <div className="ticket-comments-section">
