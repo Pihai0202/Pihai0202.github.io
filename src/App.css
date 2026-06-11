@@ -5310,6 +5310,16 @@ body.player-open .music-bar-toggle {
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+.transit-tab-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.transit-tab-btn:disabled:hover {
+  color: var(--muted);
+  background: none;
+}
+
 .transit-tab-content {
   animation: fadeInBoard 0.3s ease-out;
 }
