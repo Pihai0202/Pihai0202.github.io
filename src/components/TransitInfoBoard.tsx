@@ -437,15 +437,17 @@ export function TransitInfoBoard() {
           const labels: Record<string, string> = {
             status: '🚨 營運通阻',
             metro:  '🚇 捷運班距',
-            train:  '🚄 雙鐵時刻',
-            bus:    '🚌 公車動態',
+            train:  '🚄 雙鐵動態 (開發中)',
+            bus:    '🚌 公車動態 (開發中)',
           }
+          const isDisabled = tab === 'train' || tab === 'bus'
           return (
             <button
               key={tab}
               type="button"
               className={`transit-tab-btn${activeTab === tab ? ' active' : ''}`}
               onClick={() => setActiveTab(tab)}
+              disabled={isDisabled}
             >
               {labels[tab]}
             </button>
