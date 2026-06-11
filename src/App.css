@@ -4966,6 +4966,7 @@ body.player-open .music-bar-toggle {
 
 .edit-nickname-row input {
   flex: 1;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
@@ -4989,6 +4990,8 @@ body.player-open .music-bar-toggle {
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .cancel-name-btn {
@@ -4999,6 +5002,8 @@ body.player-open .music-bar-toggle {
   border-radius: 6px;
   font-size: 0.76rem;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .profile-email-badge {
