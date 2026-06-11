@@ -1,8 +1,52 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /{document=**} {
-      allow read, write: if true;
+
+    // 1. User Concert Logs: Keyed by user email. Enforces that email field matches document name.
+    match /users_concerts/{email} {
+      allow read: if true;
+      allow create, update: if email == request.resource.data.email
+                            && request.resource.data.concerts is list
+                            && request.resource.data.updatedAt is string;
+      allow delete: if false;
+    }
+
+    // 2. Community Reviews / Shared Notes: Allow anyone to read and create.
+    // Enforce that updates can only modify the 'likes' count, protecting review text/author from tampering.
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.resource.data.artist is string
+                    && request.resource.data.concertName is string
+                    && request.resource.data.venueName is string
+                    && request.resource.data.venueCity is string
+                    && request.resource.data.date is string
+                    && request.resource.data.author is string
+                    && request.resource.data.notes is string
+                    && request.resource.data.likes is int
+                    && request.resource.data.createdAt is string;
+      
+      allow update: if request.resource.data.likes is int
+                    && request.resource.data.artist == resource.data.artist
+                    && request.resource.data.concertName == resource.data.concertName
+                    && request.resource.data.venueName == resource.data.venueName
+                    && request.resource.data.venueCity == resource.data.venueCity
+                    && request.resource.data.date == resource.data.date
+                    && request.resource.data.author == resource.data.author
+                    && request.resource.data.notes == resource.data.notes
+                    && request.resource.data.createdAt == resource.data.createdAt;
+                    
+      allow delete: if true;
+    }
+
+    // 3. Ticket Comments: Allow anyone to read and create. Updates/deletes are blocked.
+    match /ticket_comments/{commentId} {
+      allow read: if true;
+      allow create: if request.resource.data.ticketId is string
+                    && request.resource.data.author is string
+                    && request.resource.data.content is string
+                    && request.resource.data.createdAt is string
+                    && request.resource.data.avatarColor is string;
+      allow update, delete: if false;
     }
   }
 }
