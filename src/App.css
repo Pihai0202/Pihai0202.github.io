@@ -3666,6 +3666,14 @@ body.player-open .music-bar-toggle {
 }
 
 @media (max-width: 768px) {
+  :root {
+    --bottom-offset: 60px;
+  }
+
+  body.player-open {
+    --bottom-offset: 150px;
+  }
+
   /* Clean up Header */
   header {
     padding: 0.8rem 1rem !important;
@@ -3678,19 +3686,7 @@ body.player-open .music-bar-toggle {
   }
 
   .mobile-menu-toggle-btn {
-    display: flex !important;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: var(--text);
-    font-size: 1.2rem;
-    width: 36px;
-    height: 36px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    flex-shrink: 0;
+    display: none !important; /* Hide hamburger menu as we have bottom nav */
   }
 
   .mobile-menu-toggle-btn:hover {
@@ -5811,5 +5807,182 @@ body.player-open .music-bar-toggle {
     width: 76px !important;
     height: 76px !important;
     font-size: 1.8rem !important;
+  }
+
+  /* ==========================================================================
+     Mobile Bottom Navigation Bar & Dynamic Layout Offsets
+     ========================================================================== */
+  
+  /* Dynamic spacing to avoid overlaps with bottom navigation / player */
+  .sidebar {
+    padding-bottom: calc(var(--bottom-offset) + 20px) !important;
+  }
+
+  .profile-board-container {
+    padding-bottom: calc(var(--bottom-offset) + 30px) !important;
+  }
+
+  .share-board-container {
+    padding-bottom: calc(var(--bottom-offset) + 30px) !important;
+  }
+
+  /* Dynamic positioning of map controls, legend and toggle btn */
+  .music-bar {
+    bottom: 60px !important;
+    z-index: 280 !important;
+  }
+
+  .music-bar-toggle {
+    bottom: calc(var(--bottom-offset) + 16px) !important;
+    z-index: 290 !important;
+  }
+
+  .map-legend {
+    bottom: calc(var(--bottom-offset) + 12px) !important;
+  }
+
+  .all-concerts-btn {
+    bottom: calc(var(--bottom-offset) + 55px) !important;
+  }
+
+  .map-zoom-control.vertical {
+    bottom: calc(var(--bottom-offset) + 110px) !important;
+  }
+
+  /* Mobile Bottom Navigation Bar Styles */
+  .mobile-bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: rgba(18, 18, 26, 0.85);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    z-index: 295;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.35);
+  }
+
+  [data-theme='light'] .mobile-bottom-nav {
+    background: rgba(245, 246, 248, 0.85);
+    border-top-color: var(--border);
+  }
+
+  .bottom-nav-item {
+    flex: 1;
+    height: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--muted);
+    padding: 6px 0;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    text-decoration: none;
+    position: relative;
+  }
+
+  .bottom-nav-item:active {
+    transform: scale(0.92);
+  }
+
+  .bottom-nav-item .icon {
+    font-size: 1.25rem;
+    margin-bottom: 2px;
+    transition: transform 0.2s ease;
+    display: inline-block;
+  }
+
+  .bottom-nav-item.active .icon {
+    transform: translateY(-2px);
+  }
+
+  .bottom-nav-item .label {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+  }
+
+  .bottom-nav-item.active {
+    color: var(--gold);
+    text-shadow: 0 0 10px rgba(255, 209, 102, 0.2);
+  }
+
+  .bottom-nav-item .badge {
+    position: absolute;
+    top: 4px;
+    right: 22%;
+    background: var(--accent);
+    color: white;
+    font-size: 0.6rem;
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    padding: 0.15rem 0.35rem;
+    border-radius: 8px;
+    border: 1.5px solid var(--surface);
+    line-height: 1;
+  }
+
+  [data-theme='light'] .bottom-nav-item .badge {
+    border-color: var(--surface);
+  }
+
+  /* Mobile Bottom Sheet Modal Styles */
+  .modal-overlay {
+    align-items: flex-end !important;
+  }
+
+  .modal {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    max-width: 100vw !important;
+    max-height: 85vh !important;
+    margin: 0 !important;
+    border-radius: 20px 20px 0 0 !important;
+    padding: 2.2rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom)) 1.4rem !important;
+    box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
+    animation: slide-up-sheet 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow-y: auto;
+  }
+
+  .modal::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 44px;
+    height: 5px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 3px;
+  }
+
+  [data-theme='light'] .modal::before {
+    background: rgba(0, 0, 0, 0.12);
+  }
+
+  .modal-close {
+    top: 0.8rem !important;
+    right: 1.2rem !important;
+  }
+
+  @keyframes slide-up-sheet {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
   }
 }

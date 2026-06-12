@@ -1357,6 +1357,70 @@ function App() {
               )}
             </div>
           </div>
+          
+          <div className="mobile-bottom-nav">
+            <button
+              className={`bottom-nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                setView('map')
+                setMobileTab('map')
+              }}
+            >
+              <span className="icon">🗺️</span>
+              <span className="label">地圖</span>
+            </button>
+            <button
+              className={`bottom-nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                setView('map')
+                setMobileTab('list')
+              }}
+            >
+              <span className="icon">📋</span>
+              <span className="label">場館</span>
+              {selectedVenueConcerts.length > 0 && (
+                <span className="badge">{selectedVenueConcerts.length}</span>
+              )}
+            </button>
+            <button
+              className={`bottom-nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                setView('map')
+                setMobileTab('search')
+                setSelectedVenueId(null)
+              }}
+            >
+              <span className="icon">🔍</span>
+              <span className="label">搜尋</span>
+            </button>
+            <button
+              className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                setView('board')
+              }}
+            >
+              <span className="icon">💬</span>
+              <span className="label">社群牆</span>
+            </button>
+            <button
+              className={`bottom-nav-item${view === 'profile' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                if (isLoggedIn) {
+                  setView('profile')
+                } else {
+                  setView('login')
+                }
+              }}
+            >
+              <span className="icon">👤</span>
+              <span className="label">{isLoggedIn ? '我的' : '登入'}</span>
+            </button>
+          </div>
         </>
       )}
     </>
