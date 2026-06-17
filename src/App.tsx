@@ -20,6 +20,7 @@ import { ConcertDetail } from './components/ConcertDetail'
 import { ShareBoard } from './components/ShareBoard'
 import { LoginPage } from './components/LoginPage'
 import { TicketDetailModal } from './components/TicketDetailModal'
+import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
@@ -163,6 +164,21 @@ function resolveTixcraftUrls(list: RemoteConcert[]): RemoteConcert[] {
   })
 }
 
+function extractArtistFromTitle(title: string): string {
+  let clean = title.replace(/【[^】]+】/g, '')
+  clean = clean.replace(/\[[^\]]+\]/g, '')
+  clean = clean.replace(/\([^)]+\)/g, '')
+  clean = clean.replace(/（[^）]+）/g, '')
+  
+  const separators = ['《', '<', ' - ', '—', '|', '：', ':', '★']
+  for (const sep of separators) {
+    if (clean.includes(sep)) {
+      clean = clean.split(sep)[0]
+    }
+  }
+  return clean.replace(/202\d/g, '').trim()
+}
+
 function App() {
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const storedTheme = localStorage.getItem('theme')
@@ -189,6 +205,9 @@ function App() {
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
   const [selectedTicket, setSelectedTicket] = useState<RemoteConcert | null>(null)
   const [form, setForm] = useState<ConcertForm>(EMPTY_FORM)
+  const [formVenueId, setFormVenueId] = useState<string>('')
+  const [formVenueName, setFormVenueName] = useState<string>('')
+  const [formVenueCity, setFormVenueCity] = useState<string>('')
   const [pendingMedia, setPendingMedia] = useState<ConcertMedia[]>([])
   const [spotifyQuery, setSpotifyQuery] = useState('')
   const [spotifyResults, setSpotifyResults] = useState<SpotifyItem[]>([])
@@ -200,7 +219,7 @@ function App() {
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
   const [zoom, setZoom] = useState(1.1)
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
-  const [view, setView] = useState<'map' | 'board' | 'login' | 'profile'>('map')
+  const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
@@ -469,9 +488,21 @@ function App() {
     }
   }, [isMusicBarVisible])
 
-  const openAddModal = () => {
-    if (!selectedVenue) return
-    setForm(EMPTY_FORM)
+  const openAddModal = (date?: string, venue?: typeof VENUES[0] | null) => {
+    const activeVenue = venue !== undefined ? venue : selectedVenue
+    setForm({
+      ...EMPTY_FORM,
+      date: date || ''
+    })
+    if (activeVenue) {
+      setFormVenueId(activeVenue.id)
+      setFormVenueName(activeVenue.name)
+      setFormVenueCity(activeVenue.city)
+    } else {
+      setFormVenueId('')
+      setFormVenueName('')
+      setFormVenueCity('台北')
+    }
     setPendingMedia([])
     setSpotifyQuery('')
     setSpotifyResults([])
@@ -510,19 +541,30 @@ function App() {
   }
 
   const saveConcert = () => {
-    if (!selectedVenue) return
     const artist = form.artist.trim()
 
     if (!artist) {
       alert('請輸入演出者名稱')
       return
     }
+    if (!formVenueId) {
+      alert('請選擇或輸入活動場館')
+      return
+    }
+    if (formVenueId === 'custom' && !formVenueName.trim()) {
+      alert('請輸入自訂場館名稱')
+      return
+    }
+
+    const finalVenueId = formVenueId
+    const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
+    const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
 
     const concert: Concert = {
       id: Date.now().toString(),
-      venueId: selectedVenue.id,
-      venueName: selectedVenue.name,
-      venueCity: selectedVenue.city,
+      venueId: finalVenueId,
+      venueName: finalVenueName,
+      venueCity: finalVenueCity,
       artist,
       concertName: form.concertName.trim(),
       date: form.date,
@@ -742,11 +784,25 @@ function App() {
             <Stat number={totalMedia} label="照片/影片" />
           </div>
           <button
-            className="nav-toggle-btn"
+            className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
             type="button"
-            onClick={() => setView(view === 'map' ? 'board' : 'map')}
+            onClick={() => setView('map')}
           >
-            {view === 'map' ? '💬 社群分享牆' : '🗺️ 返回場館地圖'}
+            🗺️ 場館地圖
+          </button>
+          <button
+            className={`nav-toggle-btn${view === 'calendar' ? ' active' : ''}`}
+            type="button"
+            onClick={() => setView('calendar')}
+          >
+            📅 活動行事曆
+          </button>
+          <button
+            className={`nav-toggle-btn${view === 'board' ? ' active' : ''}`}
+            type="button"
+            onClick={() => setView('board')}
+          >
+            💬 社群分享牆
           </button>
           <button
             className="theme-toggle-btn"
@@ -922,6 +978,17 @@ function App() {
             </div>
           </aside>
         </main>
+      ) : view === 'calendar' ? (
+        <main className="calendar-main-layout">
+          <CalendarView
+            concerts={concerts}
+            remoteConcerts={remoteConcerts}
+            onAddEventClick={(date) => openAddModal(date, null)}
+            onOpenConcertDetail={openConcertDetail}
+            onOpenTicketDetail={(ticket) => setSelectedTicket(ticket)}
+            onDeleteConcert={(id, event) => deleteConcert(id, event as any)}
+          />
+        </main>
       ) : view === 'board' ? (
         <ShareBoard />
       ) : view === 'profile' && isLoggedIn && currentUser ? (
@@ -955,12 +1022,69 @@ function App() {
         />
       )}
 
-      {isAddModalOpen && selectedVenue && (
+      {isAddModalOpen && (
         <Modal onClose={closeAddModal}>
-          <h2>新增演唱會記錄</h2>
-          <div className="modal-venue-name">
-            {selectedVenue.name} · {selectedVenue.city}
+          <h2>新增演唱會 / 自訂活動</h2>
+
+          <div className="form-group">
+            <label htmlFor="input-venue-select">活動場館</label>
+            <select
+              id="input-venue-select"
+              value={formVenueId}
+              className="venue-select-input"
+              onChange={(event) => {
+                const val = event.target.value
+                setFormVenueId(val)
+                if (val !== 'custom') {
+                  const matched = VENUES.find((v) => v.id === val)
+                  if (matched) {
+                    setFormVenueName(matched.name)
+                    setFormVenueCity(matched.city)
+                  }
+                } else {
+                  setFormVenueName('')
+                  setFormVenueCity('台北')
+                }
+              }}
+            >
+              <option value="" disabled>-- 請選擇場館 --</option>
+              {VENUES.map((v) => (
+                <option key={v.id} value={v.id}>
+                  {v.name} ({v.city})
+                </option>
+              ))}
+              <option value="custom">✍️ 其他 / 自訂場館</option>
+            </select>
           </div>
+
+          {formVenueId === 'custom' && (
+            <div className="form-row custom-venue-row" style={{ display: 'flex', gap: '0.8rem', marginTop: '0.4rem', marginBottom: '1rem' }}>
+              <div className="form-group" style={{ flex: 2, marginBottom: 0 }}>
+                <label htmlFor="input-custom-venue">自訂場館名稱</label>
+                <input
+                  id="input-custom-venue"
+                  type="text"
+                  value={formVenueName}
+                  placeholder="e.g. 國家音樂廳、Legacy Mini..."
+                  onChange={(event) => setFormVenueName(event.target.value)}
+                />
+              </div>
+              <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
+                <label htmlFor="input-custom-city">縣市</label>
+                <select
+                  id="input-custom-city"
+                  value={formVenueCity}
+                  onChange={(event) => setFormVenueCity(event.target.value)}
+                >
+                  {['台北', '新北', '桃園', '台中', '台南', '高雄', '宜蘭', '花蓮', '台東', '新竹', '苗栗', '彰化', '南投', '雲林', '嘉義', '屏東', '港澳', '國外'].map((c) => (
+                    <option key={c} value={c}>
+                      {c}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+          )}
 
           <div className="form-group">
             <label htmlFor="input-artist">演出者 / 團體</label>
@@ -1148,6 +1272,39 @@ function App() {
               setMusicBarUrl(url)
               setIsMusicBarVisible(true)
             }}
+            onLogAsPersonal={(ticket) => {
+              setSelectedTicket(null)
+              const extractedArtist = extractArtistFromTitle(ticket.name)
+              const matchedVenue = VENUES.find(v => v.id === ticket.venue_id || (ticket.venue_name && v.name.includes(ticket.venue_name))) || null
+              
+              setForm({
+                artist: extractedArtist,
+                concertName: ticket.name,
+                date: ticket.date || '',
+                seat: '',
+                notes: '',
+                spotifyUrl: ''
+              })
+              
+              if (matchedVenue) {
+                setFormVenueId(matchedVenue.id)
+                setFormVenueName(matchedVenue.name)
+                setFormVenueCity(matchedVenue.city)
+              } else {
+                setFormVenueId('custom')
+                setFormVenueName(ticket.venue_name || ticket.venue_raw || '')
+                setFormVenueCity(ticket.city || '台北')
+              }
+              
+              setPendingMedia([])
+              setSpotifyQuery('')
+              setSpotifyResults([])
+              setSpotifyStatus('')
+              setSelectedSpotify(null)
+              setSpotifyTab('artist')
+              setNotesActiveTab('edit')
+              setIsAddModalOpen(true)
+            }}
           />
         </Modal>
       )}
@@ -1320,6 +1477,17 @@ function App() {
                 <span className="label">活動搜尋</span>
               </button>
               <button
+                className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('calendar')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">📅</span>
+                <span className="label">活動行事曆</span>
+              </button>
+              <button
                 className={`sidebar-nav-item${view === 'board' ? ' active' : ''}`}
                 type="button"
                 onClick={() => {
@@ -1395,6 +1563,16 @@ function App() {
             >
               <span className="icon">🔍</span>
               <span className="label">搜尋</span>
+            </button>
+            <button
+              className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
+              type="button"
+              onClick={() => {
+                setView('calendar')
+              }}
+            >
+              <span className="icon">📅</span>
+              <span className="label">行事曆</span>
             </button>
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}

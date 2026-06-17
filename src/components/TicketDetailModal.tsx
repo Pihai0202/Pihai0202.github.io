@@ -8,6 +8,7 @@ interface TicketDetailModalProps {
   onClose: () => void
   spotifyTokenFetcher: () => Promise<string | null>
   onPlayMusicBar?: (url: string) => void
+  onLogAsPersonal?: (ticket: RemoteConcert) => void
 }
 
 interface TicketComment {
@@ -58,7 +59,8 @@ export function TicketDetailModal({
   ticket,
   onClose,
   spotifyTokenFetcher,
-  onPlayMusicBar
+  onPlayMusicBar,
+  onLogAsPersonal
 }: TicketDetailModalProps) {
   const [comments, setComments] = useState<TicketComment[]>([])
   const [newComment, setNewComment] = useState('')
@@ -260,6 +262,16 @@ export function TicketDetailModal({
               </a>
             ))}
           </div>
+        )}
+        
+        {onLogAsPersonal && (
+          <button
+            type="button"
+            className="ticket-log-personal-btn"
+            onClick={() => onLogAsPersonal(ticket)}
+          >
+            ⭐ 登錄為我的演唱會記錄 / 自訂活動
+          </button>
         )}
       </div>
 
