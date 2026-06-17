@@ -1392,6 +1392,18 @@ def scrape_cpbl():
 def main():
     print("🎵 台灣演唱會爬蟲啟動", file=sys.stderr)
 
+    # Read existing concerts.json if it exists
+    existing_events = []
+    concerts_path = PROJECT_ROOT / "public" / "concerts.json"
+    if concerts_path.exists():
+        try:
+            with open(concerts_path, "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                if isinstance(old_data, dict) and isinstance(old_data.get("events"), list):
+                    existing_events = old_data["events"]
+        except Exception as e:
+            print(f"  ⚠ 讀取現有 concerts.json 失敗: {e}", file=sys.stderr)
+
     all_events = []
 
     # 1. KKTIX
@@ -1406,36 +1418,66 @@ def main():
         print("→ 改用 KKTIX 主辦單位公開頁 fallback...", file=sys.stderr)
         events = scrape_kktix_organizers()
         print(f"  KKTIX 主辦單位頁得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_kktix = [ev for ev in existing_events if ev.get("source") == "KKTIX" and ev.get("date", "") >= today_str()]
+        if old_kktix:
+            print(f"  ⚠ KKTIX 爬取為 0 筆，從舊檔案恢復 {len(old_kktix)} 筆未來活動", file=sys.stderr)
+            events = old_kktix
     all_events.extend(events)
 
     # 2. 拓元售票
     print("→ 爬取拓元售票 Tixcraft...", file=sys.stderr)
     events = scrape_tixcraft()
     print(f"  拓元得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_tixcraft = [ev for ev in existing_events if ev.get("source") == "拓元售票" and ev.get("date", "") >= today_str()]
+        if old_tixcraft:
+            print(f"  ⚠ 拓元爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
+            events = old_tixcraft
     all_events.extend(events)
 
     # 3. ibon 售票
     print("→ 爬取 ibon 售票...", file=sys.stderr)
     events = scrape_ibon()
     print(f"  ibon 得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_ibon = [ev for ev in existing_events if ev.get("source") == "ibon售票" and ev.get("date", "") >= today_str()]
+        if old_ibon:
+            print(f"  ⚠ ibon 爬取為 0 筆，從舊檔案恢復 {len(old_ibon)} 筆未來活動", file=sys.stderr)
+            events = old_ibon
     all_events.extend(events)
 
     # 4. 年代售票
     print("→ 爬取年代售票...", file=sys.stderr)
     events = scrape_ticket()
     print(f"  年代得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_ticket = [ev for ev in existing_events if ev.get("source") == "年代售票" and ev.get("date", "") >= today_str()]
+        if old_ticket:
+            print(f"  ⚠ 年代爬取為 0 筆，從舊檔案恢復 {len(old_ticket)} 筆未來活動", file=sys.stderr)
+            events = old_ticket
     all_events.extend(events)
 
     # 5. iNDIEVOX 售票
     print("→ 爬取 iNDIEVOX 售票...", file=sys.stderr)
     events = scrape_indievox()
     print(f"  iNDIEVOX 得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_indievox = [ev for ev in existing_events if ev.get("source") == "iNDIEVOX" and ev.get("date", "") >= today_str()]
+        if old_indievox:
+            print(f"  ⚠ iNDIEVOX 爬取為 0 筆，從舊檔案恢復 {len(old_indievox)} 筆未來活動", file=sys.stderr)
+            events = old_indievox
     all_events.extend(events)
 
     # 6. Public calendar fallback
     print("→ 讀取公開演唱會行事曆 fallback...", file=sys.stderr)
     events = scrape_webbboxx_calendar()
     print(f"  行事曆得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_cal = [ev for ev in existing_events if ev.get("source") == "webbboxx 行事曆" and ev.get("date", "") >= today_str()]
+        if old_cal:
+            print(f"  ⚠ 行事曆爬取為 0 筆，從舊檔案恢復 {len(old_cal)} 筆未來活動", file=sys.stderr)
+            events = old_cal
     all_events.extend(events)
 
     # 7. Manual exact links
@@ -1444,12 +1486,17 @@ def main():
     print(f"  手動補充 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
-    # 8. 中華職棒 CPBL
     try:
         cpbl_events = scrape_cpbl()
-        all_events.extend(cpbl_events)
     except Exception as e:
         print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+        cpbl_events = []
+    if not cpbl_events:
+        old_cpbl = [ev for ev in existing_events if ev.get("source") == "中華職棒" and ev.get("date", "") >= today_str()]
+        if old_cpbl:
+            print(f"  ⚠ 中華職棒爬取為 0 筆，從舊檔案恢復 {len(old_cpbl)} 筆未來活動", file=sys.stderr)
+            cpbl_events = old_cpbl
+    all_events.extend(cpbl_events)
 
     # 優先解析通用售票 URL 為特定活動 URL
     resolve_generic_urls(all_events)
