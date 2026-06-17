@@ -321,6 +321,13 @@ svg#taiwan-map.dragging {
   cursor: grabbing;
 }
 
+.venue-dot.category-inactive {
+  opacity: 0.12;
+  pointer-events: none;
+  filter: grayscale(85%);
+  transition: all 0.3s ease;
+}
+
 .venue-dot {
   cursor: pointer;
   transition: all 0.3s ease;
@@ -1165,6 +1172,43 @@ svg#taiwan-map.dragging {
   color: var(--muted);
   border-color: var(--border);
   cursor: wait;
+}
+
+.category-filter-bar {
+  display: flex;
+  gap: 0.4rem;
+  margin: 0.2rem 0 1rem 0;
+  padding: 0;
+}
+
+.filter-tab-btn {
+  flex: 1;
+  background: var(--card-bg, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 8px;
+  color: var(--muted, #8a8a9e);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.5rem 0.4rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.2rem;
+}
+
+.filter-tab-btn:hover {
+  background: rgba(255, 209, 102, 0.05);
+  border-color: rgba(255, 209, 102, 0.3);
+  color: var(--text, #ffffff);
+}
+
+.filter-tab-btn.active {
+  background: rgba(255, 209, 102, 0.12);
+  border-color: var(--gold, #ffd166);
+  color: var(--gold, #ffd166);
+  box-shadow: 0 0 12px rgba(255, 209, 102, 0.15);
 }
 
 .show-more-btn {
@@ -4966,6 +5010,7 @@ body.player-open .music-bar-toggle {
 
 .edit-nickname-row input {
   flex: 1;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
@@ -4989,6 +5034,8 @@ body.player-open .music-bar-toggle {
   font-size: 0.76rem;
   font-weight: 700;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .cancel-name-btn {
@@ -4999,6 +5046,8 @@ body.player-open .music-bar-toggle {
   border-radius: 6px;
   font-size: 0.76rem;
   cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .profile-email-badge {
@@ -5308,6 +5357,16 @@ body.player-open .music-bar-toggle {
   background: var(--surface);
   color: var(--gold);
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.transit-tab-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.transit-tab-btn:disabled:hover {
+  color: var(--muted);
+  background: none;
 }
 
 .transit-tab-content {

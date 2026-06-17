@@ -527,15 +527,17 @@ export function TransitInfoBoard() {
           type="button"
           className={`transit-tab-btn${activeTab === 'train' ? ' active' : ''}`}
           onClick={() => setActiveTab('train')}
+          disabled
         >
-          🚄 雙鐵時刻
+          🚄 雙鐵動態 (開發中)
         </button>
         <button
           type="button"
           className={`transit-tab-btn${activeTab === 'bus' ? ' active' : ''}`}
           onClick={() => setActiveTab('bus')}
+          disabled
         >
-          🚌 公車動態
+          🚌 公車動態 (開發中)
         </button>
       </div>
 

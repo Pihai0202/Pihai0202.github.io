@@ -9,6 +9,7 @@ import json
 import re
 import sys
 import time
+import ssl
 from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
@@ -80,6 +81,26 @@ VENUE_MAP = {
     "LIVE WAREHOUSE": "kaohsiung-music-center",  # Map to Kaohsiung Music Center
     "Live Warehouse": "kaohsiung-music-center",
     "SUB": "taipei-music-center",  # Map to Taipei Music Center (South Base)
+    "天母棒球場": "tianmu",
+    "新莊棒球場": "xinzhuang",
+    "亞太國際棒球訓練中心成棒主球場": "asia-pacific-main",
+    "亞太國際棒球訓練中心": "asia-pacific-main",
+    "亞太棒球場": "asia-pacific-main",
+    "亞太成棒主球場": "asia-pacific-main",
+    "澄清湖棒球場": "chengcing-lake",
+    "大巨蛋": "taipei-dome",
+    "新莊": "xinzhuang",
+    "天母": "tianmu",
+    "洲際": "taichung-dome",
+    "澄清湖": "chengcing-lake",
+    "亞太主": "asia-pacific-main",
+    "樂天桃園": "taoyuan-arena",
+    "台東": "taitung",
+    "花蓮": "hualien",
+    "斗六棒球場": "douliou",
+    "斗六": "douliou",
+    "嘉義市棒球場": "chiayi",
+    "嘉義市": "chiayi",
 }
 
 VENUE_CITY = {
@@ -110,6 +131,12 @@ VENUE_CITY = {
     "the-wall": "台北",
     "legacy-taichung": "台中",
     "backstage-live": "高雄",
+    "tianmu": "台北",
+    "xinzhuang": "新北",
+    "asia-pacific-main": "台南",
+    "chengcing-lake": "高雄",
+    "douliou": "雲林",
+    "chiayi": "嘉義",
 }
 
 # 售票網資訊
@@ -122,6 +149,7 @@ TICKET_PLATFORMS = {
     "webbboxx": {"name": "webbboxx 行事曆", "color": "#ffd166"},
     "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
     "manual": {"name": "手動補充", "color": "#06d6a0"},
+    "cpbl": {"name": "中華職棒官方", "color": "#005a9c"},
 }
 
 PLATFORM_URLS = {
@@ -160,10 +188,19 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANUAL_EVENTS_PATH = PROJECT_ROOT / "public" / "manual-events.json"
 
 
+# Create a customized SSL context to bypass Cloudflare TLS fingerprinting blocks
+chrome_ssl_context = ssl.create_default_context()
+chrome_ssl_context.set_ciphers(
+    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
+    'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
+    'DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+)
+
 def fetch(url, as_json=False):
     req = Request(url, headers=HEADERS)
     try:
-        with urlopen(req, timeout=15) as r:
+        with urlopen(req, context=chrome_ssl_context, timeout=15) as r:
             raw = r.read().decode("utf-8", errors="replace")
             if as_json:
                 return json.loads(raw)
@@ -953,99 +990,419 @@ def load_manual_events():
 
 # ── 跨平台合併：同名活動加上多平台售票連結 ────────────────────────────────────
 
-def resolve_generic_tixcraft_urls(events):
+def is_specific_url(url):
+    if not url:
+        return False
+    url_lower = url.lower().strip().rstrip("/")
+    generic_urls = [
+        "https://tixcraft.com",
+        "https://tixcraft.com/activity",
+        "https://kktix.com",
+        "https://kktix.com/events",
+        "https://tickets.ibon.com.tw",
+        "https://tickets.ibon.com.tw/activity",
+        "https://www.ticket.com.tw",
+        "https://ticketplus.com.tw",
+        "https://webbboxx.com",
+        "https://webbboxx.com/calendar",
+        "https://www.indievox.com",
+        "https://www.cpbl.com.tw",
+        "https://www.cpbl.com.tw/schedule",
+        "https://tix.ctbcsports.com/brothers/utk0101_",
+        "https://ticket.ibon.com.tw/activityinfo/details/39428",
+        "https://guardians.fami.life/utk0101_",
+        "https://ticket.tsghawks.com",
+        "https://tix.wdragons.com/utk0101_",
+        "https://ticket.ibon.com.tw/activityinfo/details/39455"
+    ]
+    return not any(url_lower == g or url_lower == g + "/" for g in generic_urls)
+
+def resolve_generic_urls(events):
     """
-    Find all events that have a specific Tixcraft URL,
-    and use them to resolve any generic tixcraft.com URLs using fuzzy matching on event names.
+    Find all events that have a specific ticket platform URL (Tixcraft, KKTIX, ibon, ticketplus, indievox),
+    and use them to resolve any generic ticket platform URLs using fuzzy matching on event names.
     """
-    specific_urls = {} # normalized name -> specific url
+    specific_urls = {} # platform -> {normalized name -> specific url}
     
+    platforms = ["tixcraft", "kktix", "ibon", "ticketplus", "indievox", "ticket"]
+    for p in platforms:
+        specific_urls[p] = {}
+
+    def get_platform_key(url):
+        if not url:
+            return None
+        url_lower = url.lower()
+        if "tixcraft.com" in url_lower: return "tixcraft"
+        if "kktix.com" in url_lower or "kktix.cc" in url_lower: return "kktix"
+        if "ibon.com.tw" in url_lower: return "ibon"
+        if "ticketplus.com.tw" in url_lower: return "ticketplus"
+        if "indievox.com" in url_lower: return "indievox"
+        if "ticket.com.tw" in url_lower: return "ticket"
+        return None
+
     def normalize(s):
-        s = re.sub(r'[\s\-_【】「」（）()、，,!！]', '', s or '').lower()
+        s = re.sub(r'[\s\-_【】「”（）()、，,!！]', '', s or '').lower()
         s = re.sub(r'(台北站|高雄站|台中站|加場|加開|演唱會|音樂會|巡迴|live|tour)', '', s)
         return s
 
+    # 1. Collect all specific URLs
     for ev in events:
-        if ev.get("source") == "拓元售票" and ev.get("url") and "/activity/detail/" in ev.get("url"):
-            specific_urls[normalize(ev["name"])] = ev["url"]
-        if ev.get("ticket_links"):
-            for lk in ev["ticket_links"]:
-                if lk.get("platform") == "tixcraft" and lk.get("url") and "/activity/detail/" in lk.get("url"):
-                    specific_urls[normalize(ev["name"])] = lk["url"]
-
-    for ev in events:
-        is_generic = lambda u: u in ["https://tixcraft.com/", "https://tixcraft.com"]
+        if ev.get("source") == "中華職棒":
+            continue
+        url = ev.get("url")
+        if url and is_specific_url(url):
+            pkey = get_platform_key(url)
+            if pkey:
+                specific_urls[pkey][normalize(ev["name"])] = url
         
-        has_generic_url = is_generic(ev.get("url"))
-        has_generic_link = False
         if ev.get("ticket_links"):
             for lk in ev["ticket_links"]:
-                if lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft":
-                    if is_generic(lk.get("url")):
-                        has_generic_link = True
-                        
-        if has_generic_url or has_generic_link:
-            norm_name = normalize(ev["name"])
-            matched_url = None
-            
-            if norm_name in specific_urls:
-                matched_url = specific_urls[norm_name]
-            else:
-                for key, url in specific_urls.items():
-                    if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
-                        matched_url = url
-                        break
-            
-            if matched_url:
-                if has_generic_url:
+                lk_url = lk.get("url")
+                if lk_url and is_specific_url(lk_url):
+                    pkey = get_platform_key(lk_url)
+                    if pkey:
+                        specific_urls[pkey][normalize(ev["name"])] = lk_url
+
+    # 2. Resolve generic URLs
+    for ev in events:
+        if ev.get("source") == "中華職棒":
+            continue
+        main_url = ev.get("url")
+        if main_url and not is_specific_url(main_url):
+            pkey = get_platform_key(main_url)
+            if pkey and specific_urls[pkey]:
+                norm_name = normalize(ev["name"])
+                matched_url = None
+                if norm_name in specific_urls[pkey]:
+                    matched_url = specific_urls[pkey][norm_name]
+                else:
+                    for key, url in specific_urls[pkey].items():
+                        if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
+                            matched_url = url
+                            break
+                if matched_url:
                     ev["url"] = matched_url
-                if ev.get("ticket_links"):
-                    for lk in ev["ticket_links"]:
-                        if (lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft") and is_generic(lk.get("url")):
+
+        if ev.get("ticket_links"):
+            for lk in ev["ticket_links"]:
+                lk_url = lk.get("url")
+                if lk_url and not is_specific_url(lk_url):
+                    pkey = get_platform_key(lk_url)
+                    if pkey and specific_urls[pkey]:
+                        norm_name = normalize(ev["name"])
+                        matched_url = None
+                        if norm_name in specific_urls[pkey]:
+                            matched_url = specific_urls[pkey][norm_name]
+                        else:
+                            for key, url in specific_urls[pkey].items():
+                                if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
+                                    matched_url = url
+                                    break
+                        if matched_url:
                             lk["url"] = matched_url
 
 def merge_ticket_links(events):
     """
-    If two events share a very similar name and date,
-    merge their ticket_links instead of listing duplicates.
+    If two events share a specific ticket URL, or share a very similar name and date,
+    merge their ticket_links instead of listing duplicates, prioritizing official sources.
     """
     result = []
-    index  = {}  # key -> position in result
+    name_date_index = {}  # (normalized_name, date) -> index
+    url_index = {}        # specific_url -> index
 
     def normalize(s):
         return re.sub(r'[\s\-_【】「」（）()【】、，,!！]', '', s or '').lower()
 
+    def get_specific_urls(ev):
+        if ev.get("source") == "中華職棒":
+            return []
+        urls = []
+        if ev.get("url") and is_specific_url(ev["url"]):
+            urls.append(ev["url"].strip().rstrip("/"))
+        for lk in ev.get("ticket_links", []):
+            if lk.get("url") and is_specific_url(lk["url"]):
+                urls.append(lk["url"].strip().rstrip("/"))
+        return list(set(urls))
+
     for ev in events:
-        key = normalize(ev["name"]) + (ev["date"] or "")
-        if key in index:
-            # merge ticket links
-            existing = result[index[key]]
+        matched_idx = None
+        ev_urls = get_specific_urls(ev)
+        
+        # 1. Match by specific URL first
+        for url in ev_urls:
+            if url in url_index:
+                matched_idx = url_index[url]
+                break
+
+        # 2. Match by name + date second
+        name_key = (normalize(ev["name"]), ev["date"] or "")
+        if matched_idx is None:
+            if name_key in name_date_index:
+                matched_idx = name_date_index[name_key]
+
+        if matched_idx is not None:
+            existing = result[matched_idx]
+            
+            # Merge ticket links
             for lk in ev.get("ticket_links", []):
-                matched = next((l for l in existing["ticket_links"] if l["platform"] == lk["platform"]), None)
-                if matched:
-                    # If existing url is generic homepage, but incoming is specific, overwrite it
-                    if matched["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and lk["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
-                        matched["url"] = lk["url"]
+                matched_lk = next((l for l in existing["ticket_links"] if l["platform"] == lk["platform"]), None)
+                if matched_lk:
+                    if not is_specific_url(matched_lk["url"]) and is_specific_url(lk["url"]):
+                        matched_lk["url"] = lk["url"]
                 else:
                     existing["ticket_links"].append(lk)
-            # prefer image if missing
-            if not existing["image"] and ev["image"]:
-                existing["image"] = ev["image"]
-            # prefer specific URL over generic homepage URL at top-level
-            if existing["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and ev["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
-                existing["url"] = ev["url"]
-        else:
-            index[key] = len(result)
-            result.append(ev)
 
-    resolve_generic_tixcraft_urls(result)
+            # Determine prioritization (official sources override webbboxx/manual/fallback sources)
+            is_existing_fallback = existing["source"] in ["webbboxx 行事曆", "手動補充"]
+            is_new_official = ev["source"] in ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "中華職棒"]
+            
+            if is_existing_fallback and is_new_official:
+                # Official source details take priority
+                existing["name"] = ev["name"]
+                existing["source"] = ev["source"]
+                existing["url"] = ev["url"]
+                existing["venue_raw"] = ev["venue_raw"]
+                existing["venue_id"] = ev["venue_id"]
+                existing["venue_name"] = ev["venue_name"]
+                existing["city"] = ev["city"]
+                existing["price"] = ev["price"]
+                if ev["image"]:
+                    existing["image"] = ev["image"]
+            else:
+                # Otherwise, keep existing but prefer image or specific url if missing
+                if not existing["image"] and ev["image"]:
+                    existing["image"] = ev["image"]
+                if not is_specific_url(existing["url"]) and is_specific_url(ev["url"]):
+                    existing["url"] = ev["url"]
+
+            # Re-index specific URLs for the merged item
+            new_urls = get_specific_urls(existing)
+            for url in new_urls:
+                url_index[url] = matched_idx
+        else:
+            idx = len(result)
+            result.append(ev)
+            name_date_index[name_key] = idx
+            for url in ev_urls:
+                url_index[url] = idx
+
+    resolve_generic_urls(result)
     return result
+
+
+
+def scrape_cpbl():
+    """
+    Scrape CPBL games schedule from cpbl.com.tw.
+    """
+    print("→ 爬取中華職棒 CPBL 賽程...", file=sys.stderr)
+    events = []
+    
+    # 1. Fetch main page to get Verification Token and Cookies
+    url = "https://www.cpbl.com.tw/schedule"
+    req = Request(url, headers=HEADERS)
+    try:
+        with urlopen(req, timeout=15) as response:
+            html = response.read().decode('utf-8', errors='replace')
+            cookie = response.info().get('Set-Cookie')
+            
+            # Find the anti-forgery token in the script
+            tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", html)
+            if not tokens:
+                print("  ⚠ 找不到 RequestVerificationToken，無法爬取 CPBL 賽程", file=sys.stderr)
+                return []
+            
+            token = tokens[0]
+    except Exception as e:
+        print(f"  ⚠ 獲取 CPBL 賽程頁面失敗: {e}", file=sys.stderr)
+        return []
+
+    # 2. Make the POST request to getgamedatas
+    current_year = datetime.now().year
+    post_url = "https://www.cpbl.com.tw/schedule/getgamedatas"
+    post_data = urlencode({
+        "calendar": f"{current_year}/01/01",
+        "location": "",
+        "kindCode": "A"
+    }).encode('utf-8')
+    
+    post_headers = {
+        "User-Agent": HEADERS["User-Agent"],
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
+        "RequestVerificationToken": token
+    }
+    if cookie:
+        c_vals = [c.split(';')[0] for c in cookie.split(',')]
+        post_headers["Cookie"] = "; ".join(c_vals)
+        
+    post_req = Request(post_url, data=post_data, headers=post_headers)
+    try:
+        with urlopen(post_req, timeout=15) as post_resp:
+            resp_str = post_resp.read().decode('utf-8', errors='replace')
+            resp_json = json.loads(resp_str)
+            if not resp_json.get("Success"):
+                print("  ⚠ CPBL 賽程 API 回傳 Success=False", file=sys.stderr)
+                return []
+                
+            games = json.loads(resp_json["GameDatas"])
+            
+            # Map FieldAbbe to our venue IDs
+            field_mapping = {
+                "大巨蛋": "taipei-dome",
+                "新莊": "xinzhuang",
+                "天母": "tianmu",
+                "洲際": "taichung-dome",
+                "澄清湖": "chengcing-lake",
+                "亞太主": "asia-pacific-main",
+                "樂天桃園": "taoyuan-arena",
+                "台東": "taitung",
+                "花蓮": "hualien",
+                "斗六": "douliou",
+                "嘉義市": "chiayi"
+            }
+            
+            for g in games:
+                # Get Date and check if past
+                # Format: "2026-03-28T17:06:00"
+                start_dt = g.get("GameDateTimeS")
+                if not start_dt:
+                    continue
+                date_str = start_dt[:10]
+                if date_str < today_str():
+                    continue
+                
+                # Extract Teams
+                visiting = g.get("VisitingTeamName", "").strip()
+                home = g.get("HomeTeamName", "").strip()
+                if not visiting or not home:
+                    continue
+                
+                visiting = visiting.replace("\u200b", "").strip()
+                home = home.replace("\u200b", "").strip()
+                
+                game_no = g.get("GameSno", "")
+                
+                name = f"中華職棒例行賽：{visiting} vs {home}"
+                
+                field_abbe = g.get("FieldAbbe", "").strip()
+                venue_id = field_mapping.get(field_abbe)
+                if not venue_id:
+                    # Fallback to general matching
+                    venue_id, _ = match_venue(field_abbe)
+                
+                if not venue_id:
+                    continue
+                
+                venue_names = {
+                    "taipei-dome": "台北大巨蛋",
+                    "xinzhuang": "新莊棒球場",
+                    "tianmu": "天母棒球場",
+                    "taichung-dome": "台中洲際棒球場",
+                    "chengcing-lake": "澄清湖棒球場",
+                    "asia-pacific-main": "亞太國際棒球訓練中心成棒主球場",
+                    "taoyuan-arena": "桃園國際棒球場",
+                    "taitung": "台東棒球場",
+                    "hualien": "花蓮縣立體育場",
+                    "douliou": "斗六棒球場",
+                    "chiayi": "嘉義市棒球場"
+                }
+                venue_name = venue_names.get(venue_id, field_abbe + "棒球場")
+                
+                # Image
+                logo_path = g.get("HomeClubSmallImgPath", "")
+                if logo_path:
+                    image_url = urljoin("https://www.cpbl.com.tw", logo_path)
+                else:
+                    image_url = ""
+                
+                # Dynamic ticketing URL based on home team
+                team_tickets = {
+                    "中信兄弟": {
+                        "name": "中信兄弟售票網",
+                        "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
+                    },
+                    "樂天桃猿": {
+                        "name": "樂天桃猿售票網",
+                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39428"
+                    },
+                    "富邦悍將": {
+                        "name": "富邦悍將售票網",
+                        "url": "https://guardians.fami.life/UTK0101_"
+                    },
+                    "台鋼雄鷹": {
+                        "name": "台鋼雄鷹售票網",
+                        "url": "https://ticket.tsghawks.com/"
+                    },
+                    "味全龍": {
+                        "name": "味全龍售票網",
+                        "url": "https://tix.wdragons.com/UTK0101_"
+                    },
+                    "統一": {
+                        "name": "統一獅售票網",
+                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+                    }
+                }
+                
+                ticket_links = []
+                # Find ticket URL for home team
+                home_ticket = None
+                for team_keyword, info in team_tickets.items():
+                    if team_keyword in home:
+                        home_ticket = info
+                        break
+                
+                if home_ticket:
+                    ticket_links.append({
+                        "platform": "cpbl",
+                        "name": home_ticket["name"],
+                        "url": home_ticket["url"]
+                    })
+                
+                # Add default CPBL official schedule page as fallback
+                ticket_links.append({
+                    "platform": "manual",
+                    "name": "中華職棒官方賽程",
+                    "url": "https://www.cpbl.com.tw/schedule"
+                })
+                    
+                events.append({
+                    "id": f"cpbl-{current_year}-{game_no}",
+                    "source": "中華職棒",
+                    "name": name,
+                    "venue_raw": field_abbe,
+                    "venue_id": venue_id,
+                    "venue_name": venue_name,
+                    "city": VENUE_CITY.get(venue_id, ""),
+                    "date": date_str,
+                    "image": image_url,
+                    "url": "https://www.cpbl.com.tw/schedule",
+                    "price": "依官網/主隊公告為準",
+                    "ticket_links": ticket_links
+                })
+        print(f"  CPBL 賽程得到 {len(events)} 筆未來賽事", file=sys.stderr)
+        return events
+    except Exception as e:
+        print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+        return []
 
 
 # ── 主程式 ─────────────────────────────────────────────────────────────────
 
 def main():
     print("🎵 台灣演唱會爬蟲啟動", file=sys.stderr)
+
+    # Read existing concerts.json if it exists
+    existing_events = []
+    concerts_path = PROJECT_ROOT / "public" / "concerts.json"
+    if concerts_path.exists():
+        try:
+            with open(concerts_path, "r", encoding="utf-8") as f:
+                old_data = json.load(f)
+                if isinstance(old_data, dict) and isinstance(old_data.get("events"), list):
+                    existing_events = old_data["events"]
+        except Exception as e:
+            print(f"  ⚠ 讀取現有 concerts.json 失敗: {e}", file=sys.stderr)
 
     all_events = []
 
@@ -1061,36 +1418,66 @@ def main():
         print("→ 改用 KKTIX 主辦單位公開頁 fallback...", file=sys.stderr)
         events = scrape_kktix_organizers()
         print(f"  KKTIX 主辦單位頁得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_kktix = [ev for ev in existing_events if ev.get("source") == "KKTIX" and ev.get("date", "") >= today_str()]
+        if old_kktix:
+            print(f"  ⚠ KKTIX 爬取為 0 筆，從舊檔案恢復 {len(old_kktix)} 筆未來活動", file=sys.stderr)
+            events = old_kktix
     all_events.extend(events)
 
     # 2. 拓元售票
     print("→ 爬取拓元售票 Tixcraft...", file=sys.stderr)
     events = scrape_tixcraft()
     print(f"  拓元得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_tixcraft = [ev for ev in existing_events if ev.get("source") == "拓元售票" and ev.get("date", "") >= today_str()]
+        if old_tixcraft:
+            print(f"  ⚠ 拓元爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
+            events = old_tixcraft
     all_events.extend(events)
 
     # 3. ibon 售票
     print("→ 爬取 ibon 售票...", file=sys.stderr)
     events = scrape_ibon()
     print(f"  ibon 得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_ibon = [ev for ev in existing_events if ev.get("source") == "ibon售票" and ev.get("date", "") >= today_str()]
+        if old_ibon:
+            print(f"  ⚠ ibon 爬取為 0 筆，從舊檔案恢復 {len(old_ibon)} 筆未來活動", file=sys.stderr)
+            events = old_ibon
     all_events.extend(events)
 
     # 4. 年代售票
     print("→ 爬取年代售票...", file=sys.stderr)
     events = scrape_ticket()
     print(f"  年代得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_ticket = [ev for ev in existing_events if ev.get("source") == "年代售票" and ev.get("date", "") >= today_str()]
+        if old_ticket:
+            print(f"  ⚠ 年代爬取為 0 筆，從舊檔案恢復 {len(old_ticket)} 筆未來活動", file=sys.stderr)
+            events = old_ticket
     all_events.extend(events)
 
     # 5. iNDIEVOX 售票
     print("→ 爬取 iNDIEVOX 售票...", file=sys.stderr)
     events = scrape_indievox()
     print(f"  iNDIEVOX 得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_indievox = [ev for ev in existing_events if ev.get("source") == "iNDIEVOX" and ev.get("date", "") >= today_str()]
+        if old_indievox:
+            print(f"  ⚠ iNDIEVOX 爬取為 0 筆，從舊檔案恢復 {len(old_indievox)} 筆未來活動", file=sys.stderr)
+            events = old_indievox
     all_events.extend(events)
 
     # 6. Public calendar fallback
     print("→ 讀取公開演唱會行事曆 fallback...", file=sys.stderr)
     events = scrape_webbboxx_calendar()
     print(f"  行事曆得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_cal = [ev for ev in existing_events if ev.get("source") == "webbboxx 行事曆" and ev.get("date", "") >= today_str()]
+        if old_cal:
+            print(f"  ⚠ 行事曆爬取為 0 筆，從舊檔案恢復 {len(old_cal)} 筆未來活動", file=sys.stderr)
+            events = old_cal
     all_events.extend(events)
 
     # 7. Manual exact links
@@ -1098,6 +1485,21 @@ def main():
     events = load_manual_events()
     print(f"  手動補充 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
+
+    try:
+        cpbl_events = scrape_cpbl()
+    except Exception as e:
+        print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+        cpbl_events = []
+    if not cpbl_events:
+        old_cpbl = [ev for ev in existing_events if ev.get("source") == "中華職棒" and ev.get("date", "") >= today_str()]
+        if old_cpbl:
+            print(f"  ⚠ 中華職棒爬取為 0 筆，從舊檔案恢復 {len(old_cpbl)} 筆未來活動", file=sys.stderr)
+            cpbl_events = old_cpbl
+    all_events.extend(cpbl_events)
+
+    # 優先解析通用售票 URL 為特定活動 URL
+    resolve_generic_urls(all_events)
 
     # 合併同一活動的多平台售票連結
     all_events = merge_ticket_links(all_events)
@@ -1108,7 +1510,7 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充", "中華職棒"],
         "events": all_events,
     }
 
