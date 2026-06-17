@@ -159,7 +159,7 @@ PLATFORM_URLS = {
     "年代售票": "https://www.ticket.com.tw/",
     "TICKET PLUS": "https://ticketplus.com.tw/",
     "iNDIEVOX": "https://www.indievox.com/",
-    "添翼售票": "https://www.indievox.com/",
+    "添翼售票": "https://teamear.tixcraft.com/",
 }
 
 KKTIX_ORGANIZER_URLS = [
