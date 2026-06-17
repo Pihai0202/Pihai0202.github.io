@@ -390,29 +390,32 @@ def scrape_kktix_organizers():
             if not is_concert_like(name + " " + description):
                 continue
 
-            date_str = parse_first_date(item["date"])
-            if date_str and date_str < today_str():
+            dates = parse_all_dates(item["date"])
+            if not dates:
                 continue
 
             venue_id, venue_name = match_venue(name + " " + description)
             slug = re.sub(r"[^A-Za-z0-9_-]+", "-", url.rstrip("/").split("/")[-1]) or str(len(events))
 
-            events.append({
-                "id":         f"kktix-org-{slug}",
-                "source":     "KKTIX",
-                "name":       name,
-                "venue_raw":  description[:120],
-                "venue_id":   venue_id,
-                "venue_name": venue_name,
-                "city":       VENUE_CITY.get(venue_id, ""),
-                "date":       date_str,
-                "image":      item["image"],
-                "url":        url,
-                "price":      "",
-                "ticket_links": [
-                    {"platform": "kktix", "name": "KKTIX", "url": url}
-                ],
-            })
+            for d in dates:
+                if d < today_str():
+                    continue
+                events.append({
+                    "id":         f"kktix-org-{slug}-{d}",
+                    "source":     "KKTIX",
+                    "name":       name,
+                    "venue_raw":  description[:120],
+                    "venue_id":   venue_id,
+                    "venue_name": venue_name,
+                    "city":       VENUE_CITY.get(venue_id, ""),
+                    "date":       d,
+                    "image":      item["image"],
+                    "url":        url,
+                    "price":      "",
+                    "ticket_links": [
+                        {"platform": "kktix", "name": "KKTIX", "url": url}
+                    ],
+                })
 
         time.sleep(0.5)
 
@@ -502,38 +505,40 @@ def scrape_tixcraft():
         # Date
         date_match = re.search(r'class=["\']text-small date["\'][^>]*>([\s\S]*?)</div>', b)
         date_raw = unescape(re.sub(r'<[^>]*>', '', date_match.group(1)).strip()) if date_match else ""
-        date_str = parse_first_date(date_raw)
+        dates = parse_all_dates(date_raw)
         
         # Venue
         venue_match = re.search(r'class=["\']text-small text-med-light["\'][^>]*>([\s\S]*?)</div>', b)
         venue_raw = unescape(re.sub(r'<[^>]*>', '', venue_match.group(1)).strip()) if venue_match else ""
         
-        if date_str and date_str < today_str():
-            continue
-            
         ev_url = "https://tixcraft.com" + detail_path
         if ev_url in seen:
             continue
         seen.add(ev_url)
         
         venue_id, venue_name = match_venue(name + " " + venue_raw)
+        slug = detail_path.split('/')[-1]
         
-        events.append({
-            "id":         f"tixcraft-{detail_path.split('/')[-1]}",
-            "source":     "拓元售票",
-            "name":       name,
-            "venue_raw":  venue_raw,
-            "venue_id":   venue_id,
-            "venue_name": venue_name,
-            "city":       VENUE_CITY.get(venue_id, ""),
-            "date":       date_str,
-            "image":      image,
-            "url":        ev_url,
-            "price":      "",
-            "ticket_links": [
-                {"platform": "tixcraft", "name": "拓元售票", "url": ev_url}
-            ],
-        })
+        for d in dates:
+            if d and d < today_str():
+                continue
+                
+            events.append({
+                "id":         f"tixcraft-{slug}-{d}",
+                "source":     "拓元售票",
+                "name":       name,
+                "venue_raw":  venue_raw,
+                "venue_id":   venue_id,
+                "venue_name": venue_name,
+                "city":       VENUE_CITY.get(venue_id, ""),
+                "date":       d,
+                "image":      image,
+                "url":        ev_url,
+                "price":      "",
+                "ticket_links": [
+                    {"platform": "tixcraft", "name": "拓元售票", "url": ev_url}
+                ],
+            })
         
     return events
 
@@ -622,26 +627,29 @@ def scrape_ibon():
             seen.add(ev_url)
 
             detail = _generic_detail(ev_url, "ibon")
-            if not detail or (detail["date"] and detail["date"] < today_str()):
+            if not detail or not detail.get("dates"):
                 continue
 
-            eid = abs(hash(ev_url)) & 0xFFFFFF
-            events.append({
-                "id":         f"ibon-{eid}",
-                "source":     "ibon售票",
-                "name":       detail["name"],
-                "venue_raw":  detail["venue_raw"],
-                "venue_id":   detail["venue_id"],
-                "venue_name": detail["venue_name"],
-                "city":       VENUE_CITY.get(detail["venue_id"], ""),
-                "date":       detail["date"],
-                "image":      detail["image"],
-                "url":        ev_url,
-                "price":      detail["price"],
-                "ticket_links": [
-                    {"platform": "ibon", "name": "ibon售票", "url": ev_url}
-                ],
-            })
+            for d in detail["dates"]:
+                if d < today_str():
+                    continue
+                eid = abs(hash(ev_url + d)) & 0xFFFFFF
+                events.append({
+                    "id":         f"ibon-{eid}",
+                    "source":     "ibon售票",
+                    "name":       detail["name"],
+                    "venue_raw":  detail["venue_raw"],
+                    "venue_id":   detail["venue_id"],
+                    "venue_name": detail["venue_name"],
+                    "city":       VENUE_CITY.get(detail["venue_id"], ""),
+                    "date":       d,
+                    "image":      detail["image"],
+                    "url":        ev_url,
+                    "price":      detail["price"],
+                    "ticket_links": [
+                        {"platform": "ibon", "name": "ibon售票", "url": ev_url}
+                    ],
+                })
             time.sleep(0.4)
 
         time.sleep(0.8)
@@ -696,26 +704,29 @@ def scrape_ticket():
             seen.add(ev_url)
 
             detail = _generic_detail(ev_url, "ticket")
-            if not detail or (detail["date"] and detail["date"] < today_str()):
+            if not detail or not detail.get("dates"):
                 continue
 
-            eid = abs(hash(ev_url)) & 0xFFFFFF
-            events.append({
-                "id":         f"ticket-{eid}",
-                "source":     "年代售票",
-                "name":       detail["name"],
-                "venue_raw":  detail["venue_raw"],
-                "venue_id":   detail["venue_id"],
-                "venue_name": detail["venue_name"],
-                "city":       VENUE_CITY.get(detail["venue_id"], ""),
-                "date":       detail["date"],
-                "image":      detail["image"],
-                "url":        ev_url,
-                "price":      detail["price"],
-                "ticket_links": [
-                    {"platform": "ticket", "name": "年代售票", "url": ev_url}
-                ],
-            })
+            for d in detail["dates"]:
+                if d < today_str():
+                    continue
+                eid = abs(hash(ev_url + d)) & 0xFFFFFF
+                events.append({
+                    "id":         f"ticket-{eid}",
+                    "source":     "年代售票",
+                    "name":       detail["name"],
+                    "venue_raw":  detail["venue_raw"],
+                    "venue_id":   detail["venue_id"],
+                    "venue_name": detail["venue_name"],
+                    "city":       VENUE_CITY.get(detail["venue_id"], ""),
+                    "date":       d,
+                    "image":      detail["image"],
+                    "url":        ev_url,
+                    "price":      detail["price"],
+                    "ticket_links": [
+                        {"platform": "ticket", "name": "年代售票", "url": ev_url}
+                    ],
+                })
             time.sleep(0.4)
 
         time.sleep(0.8)
@@ -743,10 +754,47 @@ def _generic_detail(url, platform):
     if m:
         image = m.group(1)
 
-    date_str = ""
-    m = re.search(r'(\d{4})[/-](\d{1,2})[/-](\d{1,2})', html)
-    if m:
-        date_str = f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"
+    dates = []
+    # Try to find a date range in the HTML: YYYY/MM/DD ~ YYYY/MM/DD or YYYY/MM/DD ~ MM/DD
+    range_match = re.search(
+        r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(?:(\d{4})[./-])?(\d{1,2})[./-](\d{1,2})',
+        html
+    )
+    if range_match:
+        g = range_match.groups()
+        y1, m1, d1 = int(g[0]), int(g[1]), int(g[2])
+        y2 = int(g[3]) if g[3] else y1
+        m2, d2 = int(g[4]), int(g[5])
+        try:
+            start_dt = datetime(y1, m1, d1)
+            end_dt = datetime(y2, m2, d2)
+            from datetime import timedelta
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+        except Exception:
+            pass
+
+    # If no range found, fall back to matching discrete full dates (first 5 YYYY/MM/DD in the HTML)
+    if not dates:
+        full_dates = re.findall(r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})', html)
+        temp_set = set()
+        for y, m_str, d_str in full_dates[:5]:
+            try:
+                dt = datetime(int(y), int(m_str), int(d_str))
+                temp_set.add(dt.strftime("%Y-%m-%d"))
+            except Exception:
+                pass
+        if temp_set:
+            dates = sorted(list(temp_set))
+
+    # Fallback to single date search
+    if not dates:
+        m = re.search(r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})', html)
+        if m:
+            dates = [f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"]
 
     venue_raw = ""
     m = re.search(r'(?:場地|地點|演出地點|venue)[：:\s]+([^\n<]{2,50})', html)
@@ -761,7 +809,7 @@ def _generic_detail(url, platform):
     venue_id, venue_name = match_venue(name + " " + venue_raw)
 
     return {
-        "name": name, "date": date_str,
+        "name": name, "dates": dates,
         "venue_raw": venue_raw, "venue_id": venue_id, "venue_name": venue_name,
         "image": image, "price": price,
     }
@@ -793,6 +841,99 @@ def parse_first_date(text):
     return ""
 
 
+def parse_all_dates(text):
+    """
+    Extract all YYYY-MM-DD format dates from a text string, including date ranges
+    like YYYY/MM/DD ~ YYYY/MM/DD or YYYY/MM/DD - MM/DD, or YYYY年MM月DD日.
+    """
+    if not text:
+        return []
+
+    # Clean the text a bit (remove week labels like (五), (六), （四）)
+    text = re.sub(r'[\(\uff08][^\)\uff09]+[\)\uff09]', ' ', text)
+    text = text.replace('年', '/').replace('月', '/').replace('日', ' ')
+    
+    from datetime import datetime, timedelta
+    
+    # Range pattern 1: YYYY/MM/DD ~ YYYY/MM/DD
+    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{4})[./-](\d{1,2})[./-](\d{1,2})", text)
+    if m:
+        try:
+            start_dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            end_dt = datetime(int(m.group(4)), int(m.group(5)), int(m.group(6)))
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                dates = []
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+                return dates
+        except Exception:
+            pass
+
+    # Range pattern 2: YYYY/MM/DD ~ MM/DD (same year)
+    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})", text)
+    if m:
+        try:
+            year = int(m.group(1))
+            start_dt = datetime(year, int(m.group(2)), int(m.group(3)))
+            end_dt = datetime(year, int(m.group(4)), int(m.group(5)))
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                dates = []
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+                return dates
+        except Exception:
+            pass
+
+    # Range pattern 3: MM/DD ~ MM/DD (implicit current year)
+    m = re.search(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})(?!\d)", text)
+    if m:
+        try:
+            year = datetime.now(timezone.utc).year
+            start_dt = datetime(year, int(m.group(1)), int(m.group(2)))
+            end_dt = datetime(year, int(m.group(3)), int(m.group(4)))
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                dates = []
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+                return dates
+        except Exception:
+            pass
+
+    # 2. Extract discrete dates
+    dates_set = set()
+    # Match YYYY/MM/DD
+    full_dates = re.findall(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})", text)
+    for y, m_str, d_str in full_dates:
+        try:
+            dt = datetime(int(y), int(m_str), int(d_str))
+            dates_set.add(dt.strftime("%Y-%m-%d"))
+        except Exception:
+            pass
+            
+    # Match MM/DD (fallback)
+    if not dates_set:
+        short_dates = re.findall(r"(?<!\d)(\d{1,2})[./-](\d{1,2})(?!\d)", text)
+        year = datetime.now(timezone.utc).year
+        for m_str, d_str in short_dates:
+            try:
+                dt = datetime(year, int(m_str), int(d_str))
+                dates_set.add(dt.strftime("%Y-%m-%d"))
+            except Exception:
+                pass
+
+    if dates_set:
+        return sorted(list(dates_set))
+        
+    first = parse_first_date(text)
+    return [first] if first else []
+
+
 def detect_platform(text):
     for name in PLATFORM_URLS:
         if name in text:
@@ -818,31 +959,34 @@ def scrape_webbboxx_calendar():
 
         chunk = rest.split("<h3", 1)[0].split("<h2", 1)[0]
         text = clean_text(chunk)
-        date_str = parse_first_date(text)
-        if date_str and date_str < today_str():
+        dates = parse_all_dates(text)
+        if not dates:
             continue
 
         venue_id, venue_name = match_venue(title + " " + text)
         platform = detect_platform(text)
         platform_url = PLATFORM_URLS.get(platform, url)
 
-        events.append({
-            "id": f"webbboxx-{abs(hash(title + date_str)) & 0xFFFFFF}",
-            "source": "webbboxx 行事曆",
-            "name": title,
-            "venue_raw": text[:80],
-            "venue_id": venue_id,
-            "venue_name": venue_name,
-            "city": VENUE_CITY.get(venue_id, ""),
-            "date": date_str,
-            "image": "",
-            "url": platform_url,
-            "price": "",
-            "ticket_links": [
-                {"platform": "webbboxx", "name": "行事曆來源", "url": url},
-                {"platform": platform.lower().replace(" ", "-"), "name": platform, "url": platform_url},
-            ],
-        })
+        for d in dates:
+            if d < today_str():
+                continue
+            events.append({
+                "id": f"webbboxx-{abs(hash(title + d)) & 0xFFFFFF}",
+                "source": "webbboxx 行事曆",
+                "name": title,
+                "venue_raw": text[:80],
+                "venue_id": venue_id,
+                "venue_name": venue_name,
+                "city": VENUE_CITY.get(venue_id, ""),
+                "date": d,
+                "image": "",
+                "url": platform_url,
+                "price": "",
+                "ticket_links": [
+                    {"platform": "webbboxx", "name": "行事曆來源", "url": url},
+                    {"platform": platform.lower().replace(" ", "-"), "name": platform, "url": platform_url},
+                ],
+            })
 
     return events
 
