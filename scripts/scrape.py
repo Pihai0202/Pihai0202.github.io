@@ -87,6 +87,19 @@ VENUE_MAP = {
     "亞太棒球場": "asia-pacific-main",
     "亞太成棒主球場": "asia-pacific-main",
     "澄清湖棒球場": "chengcing-lake",
+    "大巨蛋": "taipei-dome",
+    "新莊": "xinzhuang",
+    "天母": "tianmu",
+    "洲際": "taichung-dome",
+    "澄清湖": "chengcing-lake",
+    "亞太主": "asia-pacific-main",
+    "樂天桃園": "taoyuan-arena",
+    "台東": "taitung",
+    "花蓮": "hualien",
+    "斗六棒球場": "douliou",
+    "斗六": "douliou",
+    "嘉義市棒球場": "chiayi",
+    "嘉義市": "chiayi",
 }
 
 VENUE_CITY = {
@@ -121,6 +134,8 @@ VENUE_CITY = {
     "xinzhuang": "新北",
     "asia-pacific-main": "台南",
     "chengcing-lake": "高雄",
+    "douliou": "雲林",
+    "chiayi": "嘉義",
 }
 
 # 售票網資訊
@@ -133,6 +148,7 @@ TICKET_PLATFORMS = {
     "webbboxx": {"name": "webbboxx 行事曆", "color": "#ffd166"},
     "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
     "manual": {"name": "手動補充", "color": "#06d6a0"},
+    "cpbl": {"name": "中華職棒官方", "color": "#005a9c"},
 }
 
 PLATFORM_URLS = {
@@ -1053,6 +1069,154 @@ def merge_ticket_links(events):
     return result
 
 
+def scrape_cpbl():
+    """
+    Scrape CPBL games schedule from cpbl.com.tw.
+    """
+    print("→ 爬取中華職棒 CPBL 賽程...", file=sys.stderr)
+    events = []
+    
+    # 1. Fetch main page to get Verification Token and Cookies
+    url = "https://www.cpbl.com.tw/schedule"
+    req = Request(url, headers=HEADERS)
+    try:
+        with urlopen(req, timeout=15) as response:
+            html = response.read().decode('utf-8', errors='replace')
+            cookie = response.info().get('Set-Cookie')
+            
+            # Find the anti-forgery token in the script
+            tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", html)
+            if not tokens:
+                print("  ⚠ 找不到 RequestVerificationToken，無法爬取 CPBL 賽程", file=sys.stderr)
+                return []
+            
+            token = tokens[0]
+    except Exception as e:
+        print(f"  ⚠ 獲取 CPBL 賽程頁面失敗: {e}", file=sys.stderr)
+        return []
+
+    # 2. Make the POST request to getgamedatas
+    current_year = datetime.now().year
+    post_url = "https://www.cpbl.com.tw/schedule/getgamedatas"
+    post_data = urlencode({
+        "calendar": f"{current_year}/01/01",
+        "location": "",
+        "kindCode": "A"
+    }).encode('utf-8')
+    
+    post_headers = {
+        "User-Agent": HEADERS["User-Agent"],
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+        "X-Requested-With": "XMLHttpRequest",
+        "RequestVerificationToken": token
+    }
+    if cookie:
+        c_vals = [c.split(';')[0] for c in cookie.split(',')]
+        post_headers["Cookie"] = "; ".join(c_vals)
+        
+    post_req = Request(post_url, data=post_data, headers=post_headers)
+    try:
+        with urlopen(post_req, timeout=15) as post_resp:
+            resp_str = post_resp.read().decode('utf-8', errors='replace')
+            resp_json = json.loads(resp_str)
+            if not resp_json.get("Success"):
+                print("  ⚠ CPBL 賽程 API 回傳 Success=False", file=sys.stderr)
+                return []
+                
+            games = json.loads(resp_json["GameDatas"])
+            
+            # Map FieldAbbe to our venue IDs
+            field_mapping = {
+                "大巨蛋": "taipei-dome",
+                "新莊": "xinzhuang",
+                "天母": "tianmu",
+                "洲際": "taichung-dome",
+                "澄清湖": "chengcing-lake",
+                "亞太主": "asia-pacific-main",
+                "樂天桃園": "taoyuan-arena",
+                "台東": "taitung",
+                "花蓮": "hualien",
+                "斗六": "douliou",
+                "嘉義市": "chiayi"
+            }
+            
+            for g in games:
+                # Get Date and check if past
+                # Format: "2026-03-28T17:06:00"
+                start_dt = g.get("GameDateTimeS")
+                if not start_dt:
+                    continue
+                date_str = start_dt[:10]
+                if date_str < today_str():
+                    continue
+                
+                # Extract Teams
+                visiting = g.get("VisitingTeamName", "").strip()
+                home = g.get("HomeTeamName", "").strip()
+                if not visiting or not home:
+                    continue
+                
+                visiting = visiting.replace("\u200b", "").strip()
+                home = home.replace("\u200b", "").strip()
+                
+                game_no = g.get("GameSno", "")
+                
+                name = f"中華職棒例行賽：{visiting} vs {home}"
+                
+                field_abbe = g.get("FieldAbbe", "").strip()
+                venue_id = field_mapping.get(field_abbe)
+                if not venue_id:
+                    # Fallback to general matching
+                    venue_id, _ = match_venue(field_abbe)
+                
+                if not venue_id:
+                    continue
+                
+                venue_names = {
+                    "taipei-dome": "台北大巨蛋",
+                    "xinzhuang": "新莊棒球場",
+                    "tianmu": "天母棒球場",
+                    "taichung-dome": "台中洲際棒球場",
+                    "chengcing-lake": "澄清湖棒球場",
+                    "asia-pacific-main": "亞太國際棒球訓練中心成棒主球場",
+                    "taoyuan-arena": "桃園國際棒球場",
+                    "taitung": "台東棒球場",
+                    "hualien": "花蓮縣立體育場",
+                    "douliou": "斗六棒球場",
+                    "chiayi": "嘉義市棒球場"
+                }
+                venue_name = venue_names.get(venue_id, field_abbe + "棒球場")
+                
+                # Image
+                logo_path = g.get("HomeClubSmallImgPath", "")
+                if logo_path:
+                    image_url = urljoin("https://www.cpbl.com.tw", logo_path)
+                else:
+                    image_url = ""
+                    
+                events.append({
+                    "id": f"cpbl-{current_year}-{game_no}",
+                    "source": "中華職棒",
+                    "name": name,
+                    "venue_raw": field_abbe,
+                    "venue_id": venue_id,
+                    "venue_name": venue_name,
+                    "city": VENUE_CITY.get(venue_id, ""),
+                    "date": date_str,
+                    "image": image_url,
+                    "url": "https://www.cpbl.com.tw/schedule",
+                    "price": "依官網/主隊公告為準",
+                    "ticket_links": [
+                        {"platform": "cpbl", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"}
+                    ]
+                })
+        print(f"  CPBL 賽程得到 {len(events)} 筆未來賽事", file=sys.stderr)
+        return events
+    except Exception as e:
+        print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+        return []
+
+
 # ── 主程式 ─────────────────────────────────────────────────────────────────
 
 def main():
@@ -1110,6 +1274,13 @@ def main():
     print(f"  手動補充 {len(events)} 筆", file=sys.stderr)
     all_events.extend(events)
 
+    # 8. 中華職棒 CPBL
+    try:
+        cpbl_events = scrape_cpbl()
+        all_events.extend(cpbl_events)
+    except Exception as e:
+        print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+
     # 合併同一活動的多平台售票連結
     all_events = merge_ticket_links(all_events)
 
@@ -1119,7 +1290,7 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充", "中華職棒"],
         "events": all_events,
     }
 
