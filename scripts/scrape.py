@@ -990,93 +990,191 @@ def load_manual_events():
 
 # ── 跨平台合併：同名活動加上多平台售票連結 ────────────────────────────────────
 
-def resolve_generic_tixcraft_urls(events):
+def is_specific_url(url):
+    if not url:
+        return False
+    url_lower = url.lower().strip().rstrip("/")
+    generic_urls = [
+        "https://tixcraft.com",
+        "https://tixcraft.com/activity",
+        "https://kktix.com",
+        "https://kktix.com/events",
+        "https://tickets.ibon.com.tw",
+        "https://tickets.ibon.com.tw/activity",
+        "https://www.ticket.com.tw",
+        "https://ticketplus.com.tw",
+        "https://webbboxx.com",
+        "https://webbboxx.com/calendar",
+        "https://www.indievox.com"
+    ]
+    return not any(url_lower == g or url_lower == g + "/" for g in generic_urls)
+
+def resolve_generic_urls(events):
     """
-    Find all events that have a specific Tixcraft URL,
-    and use them to resolve any generic tixcraft.com URLs using fuzzy matching on event names.
+    Find all events that have a specific ticket platform URL (Tixcraft, KKTIX, ibon, ticketplus, indievox),
+    and use them to resolve any generic ticket platform URLs using fuzzy matching on event names.
     """
-    specific_urls = {} # normalized name -> specific url
+    specific_urls = {} # platform -> {normalized name -> specific url}
     
+    platforms = ["tixcraft", "kktix", "ibon", "ticketplus", "indievox", "ticket"]
+    for p in platforms:
+        specific_urls[p] = {}
+
+    def get_platform_key(url):
+        if not url:
+            return None
+        url_lower = url.lower()
+        if "tixcraft.com" in url_lower: return "tixcraft"
+        if "kktix.com" in url_lower or "kktix.cc" in url_lower: return "kktix"
+        if "ibon.com.tw" in url_lower: return "ibon"
+        if "ticketplus.com.tw" in url_lower: return "ticketplus"
+        if "indievox.com" in url_lower: return "indievox"
+        if "ticket.com.tw" in url_lower: return "ticket"
+        return None
+
     def normalize(s):
         s = re.sub(r'[\s\-_【】「」（）()、，,!！]', '', s or '').lower()
         s = re.sub(r'(台北站|高雄站|台中站|加場|加開|演唱會|音樂會|巡迴|live|tour)', '', s)
         return s
 
+    # 1. Collect all specific URLs
     for ev in events:
-        if ev.get("source") == "拓元售票" and ev.get("url") and "/activity/detail/" in ev.get("url"):
-            specific_urls[normalize(ev["name"])] = ev["url"]
-        if ev.get("ticket_links"):
-            for lk in ev["ticket_links"]:
-                if lk.get("platform") == "tixcraft" and lk.get("url") and "/activity/detail/" in lk.get("url"):
-                    specific_urls[normalize(ev["name"])] = lk["url"]
-
-    for ev in events:
-        is_generic = lambda u: u in ["https://tixcraft.com/", "https://tixcraft.com"]
+        url = ev.get("url")
+        if url and is_specific_url(url):
+            pkey = get_platform_key(url)
+            if pkey:
+                specific_urls[pkey][normalize(ev["name"])] = url
         
-        has_generic_url = is_generic(ev.get("url"))
-        has_generic_link = False
         if ev.get("ticket_links"):
             for lk in ev["ticket_links"]:
-                if lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft":
-                    if is_generic(lk.get("url")):
-                        has_generic_link = True
-                        
-        if has_generic_url or has_generic_link:
-            norm_name = normalize(ev["name"])
-            matched_url = None
-            
-            if norm_name in specific_urls:
-                matched_url = specific_urls[norm_name]
-            else:
-                for key, url in specific_urls.items():
-                    if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
-                        matched_url = url
-                        break
-            
-            if matched_url:
-                if has_generic_url:
+                lk_url = lk.get("url")
+                if lk_url and is_specific_url(lk_url):
+                    pkey = get_platform_key(lk_url)
+                    if pkey:
+                        specific_urls[pkey][normalize(ev["name"])] = lk_url
+
+    # 2. Resolve generic URLs
+    for ev in events:
+        main_url = ev.get("url")
+        if main_url and not is_specific_url(main_url):
+            pkey = get_platform_key(main_url)
+            if pkey and specific_urls[pkey]:
+                norm_name = normalize(ev["name"])
+                matched_url = None
+                if norm_name in specific_urls[pkey]:
+                    matched_url = specific_urls[pkey][norm_name]
+                else:
+                    for key, url in specific_urls[pkey].items():
+                        if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
+                            matched_url = url
+                            break
+                if matched_url:
                     ev["url"] = matched_url
-                if ev.get("ticket_links"):
-                    for lk in ev["ticket_links"]:
-                        if (lk.get("platform") == "拓元售票" or lk.get("platform") == "tixcraft") and is_generic(lk.get("url")):
+
+        if ev.get("ticket_links"):
+            for lk in ev["ticket_links"]:
+                lk_url = lk.get("url")
+                if lk_url and not is_specific_url(lk_url):
+                    pkey = get_platform_key(lk_url)
+                    if pkey and specific_urls[pkey]:
+                        norm_name = normalize(ev["name"])
+                        matched_url = None
+                        if norm_name in specific_urls[pkey]:
+                            matched_url = specific_urls[pkey][norm_name]
+                        else:
+                            for key, url in specific_urls[pkey].items():
+                                if key in norm_name or norm_name in key or (len(key) > 4 and norm_name[:5] == key[:5]):
+                                    matched_url = url
+                                    break
+                        if matched_url:
                             lk["url"] = matched_url
 
 def merge_ticket_links(events):
     """
-    If two events share a very similar name and date,
-    merge their ticket_links instead of listing duplicates.
+    If two events share a specific ticket URL, or share a very similar name and date,
+    merge their ticket_links instead of listing duplicates, prioritizing official sources.
     """
     result = []
-    index  = {}  # key -> position in result
+    name_date_index = {}  # (normalized_name, date) -> index
+    url_index = {}        # specific_url -> index
 
     def normalize(s):
         return re.sub(r'[\s\-_【】「」（）()【】、，,!！]', '', s or '').lower()
 
+    def get_specific_urls(ev):
+        urls = []
+        if ev.get("url") and is_specific_url(ev["url"]):
+            urls.append(ev["url"].strip().rstrip("/"))
+        for lk in ev.get("ticket_links", []):
+            if lk.get("url") and is_specific_url(lk["url"]):
+                urls.append(lk["url"].strip().rstrip("/"))
+        return list(set(urls))
+
     for ev in events:
-        key = normalize(ev["name"]) + (ev["date"] or "")
-        if key in index:
-            # merge ticket links
-            existing = result[index[key]]
+        matched_idx = None
+        ev_urls = get_specific_urls(ev)
+        
+        # 1. Match by specific URL first
+        for url in ev_urls:
+            if url in url_index:
+                matched_idx = url_index[url]
+                break
+
+        # 2. Match by name + date second
+        name_key = (normalize(ev["name"]), ev["date"] or "")
+        if matched_idx is None:
+            if name_key in name_date_index:
+                matched_idx = name_date_index[name_key]
+
+        if matched_idx is not None:
+            existing = result[matched_idx]
+            
+            # Merge ticket links
             for lk in ev.get("ticket_links", []):
-                matched = next((l for l in existing["ticket_links"] if l["platform"] == lk["platform"]), None)
-                if matched:
-                    # If existing url is generic homepage, but incoming is specific, overwrite it
-                    if matched["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and lk["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
-                        matched["url"] = lk["url"]
+                matched_lk = next((l for l in existing["ticket_links"] if l["platform"] == lk["platform"]), None)
+                if matched_lk:
+                    if not is_specific_url(matched_lk["url"]) and is_specific_url(lk["url"]):
+                        matched_lk["url"] = lk["url"]
                 else:
                     existing["ticket_links"].append(lk)
-            # prefer image if missing
-            if not existing["image"] and ev["image"]:
-                existing["image"] = ev["image"]
-            # prefer specific URL over generic homepage URL at top-level
-            if existing["url"] in ["https://tixcraft.com/", "https://tixcraft.com"] and ev["url"] not in ["https://tixcraft.com/", "https://tixcraft.com"]:
-                existing["url"] = ev["url"]
-        else:
-            index[key] = len(result)
-            result.append(ev)
 
-    resolve_generic_tixcraft_urls(result)
+            # Determine prioritization (official sources override webbboxx/manual/fallback sources)
+            is_existing_fallback = existing["source"] in ["webbboxx 行事曆", "手動補充"]
+            is_new_official = ev["source"] in ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "中華職棒"]
+            
+            if is_existing_fallback and is_new_official:
+                # Official source details take priority
+                existing["name"] = ev["name"]
+                existing["source"] = ev["source"]
+                existing["url"] = ev["url"]
+                existing["venue_raw"] = ev["venue_raw"]
+                existing["venue_id"] = ev["venue_id"]
+                existing["venue_name"] = ev["venue_name"]
+                existing["city"] = ev["city"]
+                existing["price"] = ev["price"]
+                if ev["image"]:
+                    existing["image"] = ev["image"]
+            else:
+                # Otherwise, keep existing but prefer image or specific url if missing
+                if not existing["image"] and ev["image"]:
+                    existing["image"] = ev["image"]
+                if not is_specific_url(existing["url"]) and is_specific_url(ev["url"]):
+                    existing["url"] = ev["url"]
+
+            # Re-index specific URLs for the merged item
+            new_urls = get_specific_urls(existing)
+            for url in new_urls:
+                url_index[url] = matched_idx
+        else:
+            idx = len(result)
+            result.append(ev)
+            name_date_index[name_key] = idx
+            for url in ev_urls:
+                url_index[url] = idx
+
+    resolve_generic_urls(result)
     return result
+
 
 
 def scrape_cpbl():
@@ -1338,6 +1436,9 @@ def main():
         all_events.extend(cpbl_events)
     except Exception as e:
         print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
+
+    # 優先解析通用售票 URL 為特定活動 URL
+    resolve_generic_urls(all_events)
 
     # 合併同一活動的多平台售票連結
     all_events = merge_ticket_links(all_events)
