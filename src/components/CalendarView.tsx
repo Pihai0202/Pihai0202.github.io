@@ -353,38 +353,7 @@ export function CalendarView({
                     </button>
                   </div>
 
-                  {/* Desktop Event Pills */}
-                  <div className="day-cell-events-container">
-                    {dateEvents.personal.map((event) => (
-                      <button
-                        key={`personal-${event.id}`}
-                        className="calendar-event-pill personal"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onOpenConcertDetail(event.id)
-                        }}
-                        title={`${event.artist} - ${event.concertName || '演唱會'} @ ${event.venueName}`}
-                      >
-                        ⭐ {event.artist}
-                      </button>
-                    ))}
-
-                    {dateEvents.remote.map((event) => (
-                      <button
-                        key={`remote-${event.id}`}
-                        className="calendar-event-pill remote"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          onOpenTicketDetail(event)
-                        }}
-                        title={`${event.name} @ ${event.venue_name || event.venue_raw}`}
-                      >
-                        🎫 {event.name}
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Mobile Indicator Dots */}
+                  {/* Indicator Dots for Events */}
                   <div className="day-cell-dots-container">
                     {hasPersonal && <span className="dot dot-personal" />}
                     {hasRemote && <span className="dot dot-remote" />}

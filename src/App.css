@@ -6279,19 +6279,20 @@ body.player-open .music-bar-toggle {
 .calendar-cells-grid {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
-  grid-auto-rows: minmax(110px, 1fr);
+  grid-auto-rows: minmax(85px, 1fr);
 }
 
 .calendar-day-cell {
   border-right: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  padding: 0.5rem;
+  padding: 0.6rem 0.6rem 0.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
+  justify-content: space-between;
   cursor: pointer;
   transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
+  min-height: 85px;
 }
 
 .calendar-day-cell:nth-child(7n) {
@@ -6413,10 +6414,11 @@ body.player-open .music-bar-toggle {
 }
 
 .day-cell-dots-container {
-  display: none;
+  display: flex;
   justify-content: center;
-  gap: 3px;
+  gap: 5px;
   margin-top: auto;
+  padding-bottom: 4px;
 }
 
 .dot {
