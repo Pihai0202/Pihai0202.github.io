@@ -206,6 +206,7 @@ function App() {
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
 
   useEffect(() => {
     if (view === 'board') {
@@ -266,8 +267,21 @@ function App() {
     () => [...resolvedRemoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
     [resolvedRemoteConcerts],
   )
+  const categoryCounts = useMemo(() => {
+    const all = sortedRemoteConcerts.length
+    const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒').length
+    const concert = all - sport
+    return { all, sport, concert }
+  }, [sortedRemoteConcerts])
   const filteredRemoteConcerts = useMemo(() => {
     let list = sortedRemoteConcerts
+
+    if (categoryFilter !== 'all') {
+      list = list.filter((c) => {
+        const isSport = c.source === '中華職棒'
+        return categoryFilter === 'sport' ? isSport : !isSport
+      })
+    }
 
     if (selectedVenueId) {
       list = list.filter((concert) => {
@@ -296,7 +310,10 @@ function App() {
     }
 
     return list
-  }, [sortedRemoteConcerts, selectedVenueId, selectedVenue, searchQuery])
+  }, [sortedRemoteConcerts, selectedVenueId, selectedVenue, searchQuery, categoryFilter])
+  const activeVenueIds = useMemo(() => {
+    return new Set(filteredRemoteConcerts.map((rc) => rc.venue_id).filter(Boolean) as string[])
+  }, [filteredRemoteConcerts])
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
     try {
@@ -793,7 +810,10 @@ function App() {
 
             <div className="venue-chips-container">
               <div className="venue-chips">
-                {VENUES.map((v) => {
+                {VENUES.filter((v) => {
+                  if (categoryFilter === 'all') return true
+                  return activeVenueIds.has(v.id)
+                }).map((v) => {
                   const isActive = selectedVenueId === v.id
                   const hasVisits = concerts.some((c) => c.venueId === v.id)
                   return (
@@ -818,6 +838,8 @@ function App() {
               onClearVenue={() => setSelectedVenueId(null)}
               zoom={zoom}
               onZoomChange={setZoom}
+              activeVenueIds={activeVenueIds}
+              categoryFilter={categoryFilter}
             />
 
             {selectedVenue && (
@@ -912,6 +934,9 @@ function App() {
                 hasSelectedVenue={!!selectedVenueId}
                 onClearVenue={() => setSelectedVenueId(null)}
                 onSelectTicket={setSelectedTicket}
+                categoryFilter={categoryFilter}
+                onCategoryChange={setCategoryFilter}
+                categoryCounts={categoryCounts}
               />
               <ConcertList
                 concerts={selectedVenueConcerts}
@@ -1373,6 +1398,9 @@ function UpcomingConcerts({
   hasSelectedVenue,
   onClearVenue,
   onSelectTicket,
+  categoryFilter,
+  onCategoryChange,
+  categoryCounts,
 }: {
   concerts: RemoteConcert[]
   status: string
@@ -1383,6 +1411,9 @@ function UpcomingConcerts({
   hasSelectedVenue?: boolean
   onClearVenue?: () => void
   onSelectTicket: (ticket: RemoteConcert) => void
+  categoryFilter: 'all' | 'concert' | 'sport'
+  onCategoryChange: (category: 'all' | 'concert' | 'sport') => void
+  categoryCounts: { all: number; sport: number; concert: number }
 }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
@@ -1396,6 +1427,30 @@ function UpcomingConcerts({
         </div>
         <button className="refresh-events-btn" type="button" onClick={onRefresh} disabled={isRefreshing}>
           {isRefreshing ? '更新中' : '更新'}
+        </button>
+      </div>
+
+      <div className="category-filter-bar">
+        <button
+          type="button"
+          className={`filter-tab-btn${categoryFilter === 'all' ? ' active' : ''}`}
+          onClick={() => onCategoryChange('all')}
+        >
+          ✨ 全部 ({categoryCounts.all})
+        </button>
+        <button
+          type="button"
+          className={`filter-tab-btn${categoryFilter === 'concert' ? ' active' : ''}`}
+          onClick={() => onCategoryChange('concert')}
+        >
+          🎵 演唱會 ({categoryCounts.concert})
+        </button>
+        <button
+          type="button"
+          className={`filter-tab-btn${categoryFilter === 'sport' ? ' active' : ''}`}
+          onClick={() => onCategoryChange('sport')}
+        >
+          ⚾ 中華職棒 ({categoryCounts.sport})
         </button>
       </div>
 

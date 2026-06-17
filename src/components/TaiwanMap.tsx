@@ -28,6 +28,8 @@ interface TaiwanMapProps {
   onClearVenue: () => void
   zoom: number
   onZoomChange: (newZoom: number) => void
+  activeVenueIds?: Set<string>
+  categoryFilter?: 'all' | 'concert' | 'sport'
 }
 
 export function TaiwanMap({
@@ -37,6 +39,8 @@ export function TaiwanMap({
   onClearVenue,
   zoom,
   onZoomChange,
+  activeVenueIds,
+  categoryFilter = 'all',
 }: TaiwanMapProps) {
   const [center, setCenter] = useState({ x: 235, y: 295 })
   const [isDragging, setIsDragging] = useState(false)
@@ -270,13 +274,15 @@ export function TaiwanMap({
         {VENUES.map((venue) => {
           const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
           const isActive = selectedVenueId === venue.id
+          const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
 
           return (
             <g
               key={venue.id}
-              className={`venue-dot${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+              className={`venue-dot${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''}`}
               transform={`translate(${venue.x},${venue.y})`}
               onClick={(e) => {
+                if (isCategoryInactive) return
                 e.stopPropagation()
                 onSelectVenue(venue.id)
               }}

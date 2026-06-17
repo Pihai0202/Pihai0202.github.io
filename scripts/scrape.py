@@ -9,6 +9,7 @@ import json
 import re
 import sys
 import time
+import ssl
 from datetime import datetime, timezone
 from html import unescape
 from pathlib import Path
@@ -187,10 +188,19 @@ PROJECT_ROOT = Path(__file__).resolve().parents[1]
 MANUAL_EVENTS_PATH = PROJECT_ROOT / "public" / "manual-events.json"
 
 
+# Create a customized SSL context to bypass Cloudflare TLS fingerprinting blocks
+chrome_ssl_context = ssl.create_default_context()
+chrome_ssl_context.set_ciphers(
+    'ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:'
+    'ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:'
+    'ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:'
+    'DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
+)
+
 def fetch(url, as_json=False):
     req = Request(url, headers=HEADERS)
     try:
-        with urlopen(req, timeout=15) as r:
+        with urlopen(req, context=chrome_ssl_context, timeout=15) as r:
             raw = r.read().decode("utf-8", errors="replace")
             if as_json:
                 return json.loads(raw)
