@@ -80,6 +80,13 @@ VENUE_MAP = {
     "LIVE WAREHOUSE": "kaohsiung-music-center",  # Map to Kaohsiung Music Center
     "Live Warehouse": "kaohsiung-music-center",
     "SUB": "taipei-music-center",  # Map to Taipei Music Center (South Base)
+    "天母棒球場": "tianmu",
+    "新莊棒球場": "xinzhuang",
+    "亞太國際棒球訓練中心成棒主球場": "asia-pacific-main",
+    "亞太國際棒球訓練中心": "asia-pacific-main",
+    "亞太棒球場": "asia-pacific-main",
+    "亞太成棒主球場": "asia-pacific-main",
+    "澄清湖棒球場": "chengcing-lake",
 }
 
 VENUE_CITY = {
@@ -110,6 +117,10 @@ VENUE_CITY = {
     "the-wall": "台北",
     "legacy-taichung": "台中",
     "backstage-live": "高雄",
+    "tianmu": "台北",
+    "xinzhuang": "新北",
+    "asia-pacific-main": "台南",
+    "chengcing-lake": "高雄",
 }
 
 # 售票網資訊
