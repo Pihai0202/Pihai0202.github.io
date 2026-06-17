@@ -888,6 +888,26 @@ def parse_all_dates(text):
         except Exception:
             pass
 
+    # Range pattern 4: YYYY/MM/DD ~ DD (same month)
+    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text)
+    if m:
+        try:
+            year = int(m.group(1))
+            month = int(m.group(2))
+            start_day = int(m.group(3))
+            end_day = int(m.group(4))
+            start_dt = datetime(year, month, start_day)
+            end_dt = datetime(year, month, end_day)
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                dates = []
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+                return dates
+        except Exception:
+            pass
+
     # Range pattern 3: MM/DD ~ MM/DD (implicit current year)
     m = re.search(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})(?!\d)", text)
     if m:
@@ -895,6 +915,26 @@ def parse_all_dates(text):
             year = datetime.now(timezone.utc).year
             start_dt = datetime(year, int(m.group(1)), int(m.group(2)))
             end_dt = datetime(year, int(m.group(3)), int(m.group(4)))
+            if start_dt <= end_dt and (end_dt - start_dt).days < 15:
+                dates = []
+                curr = start_dt
+                while curr <= end_dt:
+                    dates.append(curr.strftime("%Y-%m-%d"))
+                    curr += timedelta(days=1)
+                return dates
+        except Exception:
+            pass
+
+    # Range pattern 5: MM/DD ~ DD (same month, implicit current year)
+    m = re.search(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text)
+    if m:
+        try:
+            year = datetime.now(timezone.utc).year
+            month = int(m.group(1))
+            start_day = int(m.group(2))
+            end_day = int(m.group(3))
+            start_dt = datetime(year, month, start_day)
+            end_dt = datetime(year, month, end_day)
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
                 dates = []
                 curr = start_dt
@@ -1247,12 +1287,12 @@ def resolve_generic_urls(events):
 
 def merge_ticket_links(events):
     """
-    If two events share a specific ticket URL, or share a very similar name and date,
+    If two events share a specific ticket URL and date, or share a very similar name and date,
     merge their ticket_links instead of listing duplicates, prioritizing official sources.
     """
     result = []
     name_date_index = {}  # (normalized_name, date) -> index
-    url_index = {}        # specific_url -> index
+    url_date_index = {}   # (specific_url, date) -> index
 
     def normalize(s):
         return re.sub(r'[\s\-_【】「」（）()【】、，,!！]', '', s or '').lower()
@@ -1272,10 +1312,11 @@ def merge_ticket_links(events):
         matched_idx = None
         ev_urls = get_specific_urls(ev)
         
-        # 1. Match by specific URL first
+        # 1. Match by specific URL + date first
         for url in ev_urls:
-            if url in url_index:
-                matched_idx = url_index[url]
+            url_date_key = (url, ev["date"] or "")
+            if url_date_key in url_date_index:
+                matched_idx = url_date_index[url_date_key]
                 break
 
         # 2. Match by name + date second
@@ -1322,13 +1363,13 @@ def merge_ticket_links(events):
             # Re-index specific URLs for the merged item
             new_urls = get_specific_urls(existing)
             for url in new_urls:
-                url_index[url] = matched_idx
+                url_date_index[(url, existing["date"] or "")] = matched_idx
         else:
             idx = len(result)
             result.append(ev)
             name_date_index[name_key] = idx
             for url in ev_urls:
-                url_index[url] = idx
+                url_date_index[(url, ev["date"] or "")] = idx
 
     resolve_generic_urls(result)
     return result
