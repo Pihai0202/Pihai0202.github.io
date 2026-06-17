@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-17T07:35:50.837597+00:00",
+  "updated_at": "2026-06-17T12:19:48.890294+00:00",
   "count": 302,
   "sources": [
     "KKTIX",
@@ -83,22 +83,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0402976-2026-06-18",
+      "id": "indievox-26_iv040619b-2026-06-18",
       "source": "iNDIEVOX",
-      "name": "6.18（四）初夜台中 #1",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
+      "name": "心與草——福夢 Unplug 巡演 台中場",
+      "venue_raw": "Legacy Taichung",
+      "venue_id": "legacy-taichung",
+      "venue_name": "Legacy Taichung",
+      "city": "台中",
       "date": "2026-06-18",
       "image": "",
-      "url": "https://www.indievox.com/activity/detail/26_iv0402976",
+      "url": "https://www.indievox.com/activity/detail/26_iv040619b",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0402976"
+          "url": "https://www.indievox.com/activity/detail/26_iv040619b"
         }
       ]
     },
@@ -123,26 +123,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv040619b-2026-06-18",
-      "source": "iNDIEVOX",
-      "name": "心與草——福夢 Unplug 巡演 台中場",
-      "venue_raw": "Legacy Taichung",
-      "venue_id": "legacy-taichung",
-      "venue_name": "Legacy Taichung",
-      "city": "台中",
-      "date": "2026-06-18",
-      "image": "",
-      "url": "https://www.indievox.com/activity/detail/26_iv040619b",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv040619b"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04037cd-2026-06-18",
       "source": "iNDIEVOX",
       "name": "饒舌霹靂雙人組《嘻哈王》台北專場",
@@ -159,6 +139,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04037cd"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0402976-2026-06-18",
+      "source": "iNDIEVOX",
+      "name": "6.18（四）初夜台中 #1",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-18",
+      "image": "",
+      "url": "https://www.indievox.com/activity/detail/26_iv0402976",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0402976"
         }
       ]
     },
@@ -238,26 +238,6 @@
       ]
     },
     {
-      "id": "kktix-org-e0j68kc74",
-      "source": "KKTIX",
-      "name": "【06/19 14:30 一般票】日本「63 ANGEL」魅惑盛夏",
-      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-06-19",
-      "image": "https://assets.kktix.io/upload_images/325492/kktix_1200x630_v2_medium.jpg",
-      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kktix",
-          "name": "KKTIX",
-          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74"
-        }
-      ]
-    },
-    {
       "id": "kktix-org-e0j68kc742",
       "source": "KKTIX",
       "name": "【06/19 14:30 包廂票，限KKTIX購買】日本「63 ANGEL」魅惑盛夏",
@@ -274,6 +254,26 @@
           "platform": "kktix",
           "name": "KKTIX",
           "url": "https://mediaspheretw.kktix.cc/events/e0j68kc742"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-e0j68kc74",
+      "source": "KKTIX",
+      "name": "【06/19 14:30 一般票】日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-19",
+      "image": "https://assets.kktix.io/upload_images/325492/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74"
         }
       ]
     },
@@ -778,26 +778,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0406707-2026-06-26",
-      "source": "iNDIEVOX",
-      "name": "6.26(五) 3M in Taiwan",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-06-26",
-      "image": "",
-      "url": "https://www.indievox.com/activity/detail/26_iv0406707",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0406707"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04071b5-2026-06-26",
       "source": "iNDIEVOX",
       "name": "Wah SUB！009 激三; COLD DEW X OK!COOL X 賽璐璐",
@@ -814,6 +794,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04071b5"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0406707-2026-06-26",
+      "source": "iNDIEVOX",
+      "name": "6.26(五) 3M in Taiwan",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-26",
+      "image": "",
+      "url": "https://www.indievox.com/activity/detail/26_iv0406707",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0406707"
         }
       ]
     },
@@ -1363,7 +1363,7 @@
       ]
     },
     {
-      "id": "webbboxx-8006328",
+      "id": "webbboxx-14203658",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2428,7 +2428,7 @@
       ]
     },
     {
-      "id": "webbboxx-4269378",
+      "id": "webbboxx-7305364",
       "source": "webbboxx 行事曆",
       "name": "滅火器 Fire EX. 首次攻蛋",
       "venue_raw": "台北小巨蛋 拓元售票 演出日期： 2026/07/18（六） 備註： 成軍 26 年首次小巨蛋演出 售票中 Jul 03",
@@ -2663,7 +2663,7 @@
       ]
     },
     {
-      "id": "webbboxx-3966960",
+      "id": "webbboxx-10212667",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4483,7 +4483,7 @@
       ]
     },
     {
-      "id": "webbboxx-3661287",
+      "id": "webbboxx-8351875",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -7173,7 +7173,7 @@
       ]
     },
     {
-      "id": "webbboxx-11570641",
+      "id": "webbboxx-2612305",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
