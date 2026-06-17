@@ -28,7 +28,7 @@ jobs:
       - name: 🎵 執行爬蟲（KKTIX + 拓元 + ibon + 年代）
         run: |
           mkdir -p public
-          python scripts/scrape.py > public/concerts.json
+          python scripts/scrape.py
           echo "--- concerts.json preview ---"
           head -30 public/concerts.json
 
