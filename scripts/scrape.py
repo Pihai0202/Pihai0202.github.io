@@ -1005,7 +1005,15 @@ def is_specific_url(url):
         "https://ticketplus.com.tw",
         "https://webbboxx.com",
         "https://webbboxx.com/calendar",
-        "https://www.indievox.com"
+        "https://www.indievox.com",
+        "https://www.cpbl.com.tw",
+        "https://www.cpbl.com.tw/schedule",
+        "https://tix.ctbcsports.com/brothers/utk0101_",
+        "https://ticket.ibon.com.tw/activityinfo/details/39428",
+        "https://guardians.fami.life/utk0101_",
+        "https://ticket.tsghawks.com",
+        "https://tix.wdragons.com/utk0101_",
+        "https://ticket.ibon.com.tw/activityinfo/details/39455"
     ]
     return not any(url_lower == g or url_lower == g + "/" for g in generic_urls)
 
@@ -1033,12 +1041,14 @@ def resolve_generic_urls(events):
         return None
 
     def normalize(s):
-        s = re.sub(r'[\s\-_【】「」（）()、，,!！]', '', s or '').lower()
+        s = re.sub(r'[\s\-_【】「”（）()、，,!！]', '', s or '').lower()
         s = re.sub(r'(台北站|高雄站|台中站|加場|加開|演唱會|音樂會|巡迴|live|tour)', '', s)
         return s
 
     # 1. Collect all specific URLs
     for ev in events:
+        if ev.get("source") == "中華職棒":
+            continue
         url = ev.get("url")
         if url and is_specific_url(url):
             pkey = get_platform_key(url)
@@ -1055,6 +1065,8 @@ def resolve_generic_urls(events):
 
     # 2. Resolve generic URLs
     for ev in events:
+        if ev.get("source") == "中華職棒":
+            continue
         main_url = ev.get("url")
         if main_url and not is_specific_url(main_url):
             pkey = get_platform_key(main_url)
@@ -1102,6 +1114,8 @@ def merge_ticket_links(events):
         return re.sub(r'[\s\-_【】「」（）()【】、，,!！]', '', s or '').lower()
 
     def get_specific_urls(ev):
+        if ev.get("source") == "中華職棒":
+            return []
         urls = []
         if ev.get("url") and is_specific_url(ev["url"]):
             urls.append(ev["url"].strip().rstrip("/"))
