@@ -1193,6 +1193,56 @@ def scrape_cpbl():
                     image_url = urljoin("https://www.cpbl.com.tw", logo_path)
                 else:
                     image_url = ""
+                
+                # Dynamic ticketing URL based on home team
+                team_tickets = {
+                    "中信兄弟": {
+                        "name": "中信兄弟售票網",
+                        "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
+                    },
+                    "樂天桃猿": {
+                        "name": "樂天桃猿售票網",
+                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39428"
+                    },
+                    "富邦悍將": {
+                        "name": "富邦悍將售票網",
+                        "url": "https://guardians.fami.life/UTK0101_"
+                    },
+                    "台鋼雄鷹": {
+                        "name": "台鋼雄鷹售票網",
+                        "url": "https://ticket.tsghawks.com/"
+                    },
+                    "味全龍": {
+                        "name": "味全龍售票網",
+                        "url": "https://tix.wdragons.com/UTK0101_"
+                    },
+                    "統一": {
+                        "name": "統一獅售票網",
+                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+                    }
+                }
+                
+                ticket_links = []
+                # Find ticket URL for home team
+                home_ticket = None
+                for team_keyword, info in team_tickets.items():
+                    if team_keyword in home:
+                        home_ticket = info
+                        break
+                
+                if home_ticket:
+                    ticket_links.append({
+                        "platform": "cpbl",
+                        "name": home_ticket["name"],
+                        "url": home_ticket["url"]
+                    })
+                
+                # Add default CPBL official schedule page as fallback
+                ticket_links.append({
+                    "platform": "manual",
+                    "name": "中華職棒官方賽程",
+                    "url": "https://www.cpbl.com.tw/schedule"
+                })
                     
                 events.append({
                     "id": f"cpbl-{current_year}-{game_no}",
@@ -1206,9 +1256,7 @@ def scrape_cpbl():
                     "image": image_url,
                     "url": "https://www.cpbl.com.tw/schedule",
                     "price": "依官網/主隊公告為準",
-                    "ticket_links": [
-                        {"platform": "cpbl", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"}
-                    ]
+                    "ticket_links": ticket_links
                 })
         print(f"  CPBL 賽程得到 {len(events)} 筆未來賽事", file=sys.stderr)
         return events
