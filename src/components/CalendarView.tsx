@@ -213,6 +213,10 @@ export function CalendarView({
     // Sort by date ascending
     return list
       .filter(item => {
+        // Filter by currently active month (year & month)
+        const targetPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
+        if (!item.date.startsWith(targetPrefix)) return false
+
         // Apply search query
         const query = searchQuery.trim().toLowerCase()
         if (query !== '') {
@@ -228,7 +232,7 @@ export function CalendarView({
         return true
       })
       .sort((a, b) => a.date.localeCompare(b.date))
-  }, [concerts, remoteConcerts, searchQuery, eventFilter])
+  }, [concerts, remoteConcerts, searchQuery, eventFilter, year, month])
 
   return (
     <div className="calendar-view-container">
