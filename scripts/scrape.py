@@ -777,24 +777,12 @@ def _generic_detail(url, platform):
         except Exception:
             pass
 
-    # If no range found, fall back to matching discrete full dates (first 5 YYYY/MM/DD in the HTML)
+    # If no range found, fall back to matching discrete dates using parse_all_dates on cleaned HTML
     if not dates:
-        full_dates = re.findall(r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})', html)
-        temp_set = set()
-        for y, m_str, d_str in full_dates[:5]:
-            try:
-                dt = datetime(int(y), int(m_str), int(d_str))
-                temp_set.add(dt.strftime("%Y-%m-%d"))
-            except Exception:
-                pass
-        if temp_set:
-            dates = sorted(list(temp_set))
-
-    # Fallback to single date search
-    if not dates:
-        m = re.search(r'(\d{4})[./-](\d{1,2})[./-](\d{1,2})', html)
-        if m:
-            dates = [f"{m.group(1)}-{int(m.group(2)):02d}-{int(m.group(3)):02d}"]
+        # Strip HTML tags and URLs to avoid false positives inside tags/attributes
+        clean_html = re.sub(r'<[^>]+>', ' ', html)
+        clean_html = re.sub(r'https?://[^\s]+', ' ', clean_html)
+        dates = parse_all_dates(clean_html)
 
     venue_raw = ""
     m = re.search(r'(?:場地|地點|演出地點|venue)[：:\s]+([^\n<]{2,50})', html)
@@ -855,42 +843,45 @@ def parse_all_dates(text):
     
     from datetime import datetime, timedelta
     
+    dates_set = set()
+    
+    # 1. Determine base year (look for any YYYY in the text)
+    year_match = re.search(r'\b(20\d{2})\b', text)
+    if year_match:
+        base_year = int(year_match.group(1))
+    else:
+        base_year = datetime.now(timezone.utc).year
+
+    # 2. Extract ranges
     # Range pattern 1: YYYY/MM/DD ~ YYYY/MM/DD
-    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{4})[./-](\d{1,2})[./-](\d{1,2})", text)
-    if m:
+    for m in re.finditer(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{4})[./-](\d{1,2})[./-](\d{1,2})", text):
         try:
             start_dt = datetime(int(m.group(1)), int(m.group(2)), int(m.group(3)))
             end_dt = datetime(int(m.group(4)), int(m.group(5)), int(m.group(6)))
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
-                dates = []
                 curr = start_dt
                 while curr <= end_dt:
-                    dates.append(curr.strftime("%Y-%m-%d"))
+                    dates_set.add(curr.strftime("%Y-%m-%d"))
                     curr += timedelta(days=1)
-                return dates
         except Exception:
             pass
 
     # Range pattern 2: YYYY/MM/DD ~ MM/DD (same year)
-    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})", text)
-    if m:
+    for m in re.finditer(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})", text):
         try:
             year = int(m.group(1))
             start_dt = datetime(year, int(m.group(2)), int(m.group(3)))
             end_dt = datetime(year, int(m.group(4)), int(m.group(5)))
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
-                dates = []
                 curr = start_dt
                 while curr <= end_dt:
-                    dates.append(curr.strftime("%Y-%m-%d"))
+                    dates_set.add(curr.strftime("%Y-%m-%d"))
                     curr += timedelta(days=1)
-                return dates
         except Exception:
             pass
 
     # Range pattern 4: YYYY/MM/DD ~ DD (same month)
-    m = re.search(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text)
-    if m:
+    for m in re.finditer(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text):
         try:
             year = int(m.group(1))
             month = int(m.group(2))
@@ -899,73 +890,74 @@ def parse_all_dates(text):
             start_dt = datetime(year, month, start_day)
             end_dt = datetime(year, month, end_day)
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
-                dates = []
                 curr = start_dt
                 while curr <= end_dt:
-                    dates.append(curr.strftime("%Y-%m-%d"))
+                    dates_set.add(curr.strftime("%Y-%m-%d"))
                     curr += timedelta(days=1)
-                return dates
         except Exception:
             pass
 
-    # Range pattern 3: MM/DD ~ MM/DD (implicit current year)
-    m = re.search(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})(?!\d)", text)
-    if m:
+    # Range pattern 3: MM/DD ~ MM/DD (implicit year)
+    for m in re.finditer(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})[./-](\d{1,2})(?!\d)", text):
         try:
-            year = datetime.now(timezone.utc).year
-            start_dt = datetime(year, int(m.group(1)), int(m.group(2)))
-            end_dt = datetime(year, int(m.group(3)), int(m.group(4)))
+            start_dt = datetime(base_year, int(m.group(1)), int(m.group(2)))
+            end_dt = datetime(base_year, int(m.group(3)), int(m.group(4)))
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
-                dates = []
                 curr = start_dt
                 while curr <= end_dt:
-                    dates.append(curr.strftime("%Y-%m-%d"))
+                    dates_set.add(curr.strftime("%Y-%m-%d"))
                     curr += timedelta(days=1)
-                return dates
         except Exception:
             pass
 
-    # Range pattern 5: MM/DD ~ DD (same month, implicit current year)
-    m = re.search(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text)
-    if m:
+    # Range pattern 5: MM/DD ~ DD (same month, implicit year)
+    for m in re.finditer(r"(?<!\d)(\d{1,2})[./-](\d{1,2})\s*(?:~|-|至|到)\s*(\d{1,2})(?!\d|[./])", text):
         try:
-            year = datetime.now(timezone.utc).year
             month = int(m.group(1))
             start_day = int(m.group(2))
             end_day = int(m.group(3))
-            start_dt = datetime(year, month, start_day)
-            end_dt = datetime(year, month, end_day)
+            start_dt = datetime(base_year, month, start_day)
+            end_dt = datetime(base_year, month, end_day)
             if start_dt <= end_dt and (end_dt - start_dt).days < 15:
-                dates = []
                 curr = start_dt
                 while curr <= end_dt:
-                    dates.append(curr.strftime("%Y-%m-%d"))
+                    dates_set.add(curr.strftime("%Y-%m-%d"))
                     curr += timedelta(days=1)
-                return dates
         except Exception:
             pass
 
-    # 2. Extract discrete dates
-    dates_set = set()
-    # Match YYYY/MM/DD
+    # 3. Extract discrete full dates YYYY/MM/DD
     full_dates = re.findall(r"(\d{4})[./-](\d{1,2})[./-](\d{1,2})", text)
+    first_full_month = None
+    if full_dates:
+        try:
+            first_full_month = int(full_dates[0][1])
+        except Exception:
+            pass
+
     for y, m_str, d_str in full_dates:
         try:
             dt = datetime(int(y), int(m_str), int(d_str))
             dates_set.add(dt.strftime("%Y-%m-%d"))
         except Exception:
             pass
-            
-    # Match MM/DD (fallback)
-    if not dates_set:
-        short_dates = re.findall(r"(?<!\d)(\d{1,2})[./-](\d{1,2})(?!\d)", text)
-        year = datetime.now(timezone.utc).year
-        for m_str, d_str in short_dates:
-            try:
-                dt = datetime(year, int(m_str), int(d_str))
-                dates_set.add(dt.strftime("%Y-%m-%d"))
-            except Exception:
-                pass
+
+    # 4. Extract discrete short dates MM/DD
+    short_dates = re.findall(r"(?<!\d)(\d{1,2})[./-](\d{1,2})(?!\d)", text)
+    for m_str, d_str in short_dates:
+        try:
+            m = int(m_str)
+            d = int(d_str)
+            # Cross-year heuristic: if first full date month is 12 and this short date month is 1, it's next year
+            yr = base_year
+            if first_full_month == 12 and m == 1:
+                yr = base_year + 1
+            elif first_full_month == 1 and m == 12:
+                yr = base_year - 1
+            dt = datetime(yr, m, d)
+            dates_set.add(dt.strftime("%Y-%m-%d"))
+        except Exception:
+            pass
 
     if dates_set:
         return sorted(list(dates_set))
@@ -1010,14 +1002,21 @@ def scrape_webbboxx_calendar():
         for d in dates:
             if d < today_str():
                 continue
+            v_id = venue_id
+            v_name = venue_name
+            # Patch for Crowd Lu concert: webbboxx lists it incorrectly as 台北小巨蛋, but Taipei station is actually at Taipei Music Center
+            if "盧廣仲" in title and "傷心早餐店" in title:
+                if d.startswith("2026-07-"):
+                    v_id = "taipei-music-center"
+                    v_name = "台北流行音樂中心"
             events.append({
                 "id": f"webbboxx-{abs(hash(title + d)) & 0xFFFFFF}",
                 "source": "webbboxx 行事曆",
                 "name": title,
                 "venue_raw": text[:80],
-                "venue_id": venue_id,
-                "venue_name": venue_name,
-                "city": VENUE_CITY.get(venue_id, ""),
+                "venue_id": v_id,
+                "venue_name": v_name,
+                "city": VENUE_CITY.get(v_id, ""),
                 "date": d,
                 "image": "",
                 "url": platform_url,
