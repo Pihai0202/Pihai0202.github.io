@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-06-18T01:39:57.613955+00:00",
-  "count": 448,
+  "updated_at": "2026-06-18T05:20:33.897936+00:00",
+  "count": 450,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -13,22 +13,22 @@
   ],
   "events": [
     {
-      "id": "indievox-26_iv040619b-2026-06-18",
+      "id": "indievox-26_iv0402976-2026-06-18",
       "source": "iNDIEVOX",
-      "name": "心與草——福夢 Unplug 巡演 台中場",
-      "venue_raw": "Legacy Taichung",
-      "venue_id": "legacy-taichung",
-      "venue_name": "Legacy Taichung",
-      "city": "台中",
+      "name": "6.18（四）初夜台中 #1",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-06-18",
       "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv040619b",
+      "url": "https://www.indievox.com/activity/detail/26_iv0402976",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv040619b"
+          "url": "https://www.indievox.com/activity/detail/26_iv0402976"
         }
       ]
     },
@@ -53,6 +53,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv040619b-2026-06-18",
+      "source": "iNDIEVOX",
+      "name": "心與草——福夢 Unplug 巡演 台中場",
+      "venue_raw": "Legacy Taichung",
+      "venue_id": "legacy-taichung",
+      "venue_name": "Legacy Taichung",
+      "city": "台中",
+      "date": "2026-06-18",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv040619b",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv040619b"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv04037cd-2026-06-18",
       "source": "iNDIEVOX",
       "name": "饒舌霹靂雙人組《嘻哈王》台北專場",
@@ -69,26 +89,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04037cd"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv0402976-2026-06-18",
-      "source": "iNDIEVOX",
-      "name": "6.18（四）初夜台中 #1",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-06-18",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0402976",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0402976"
         }
       ]
     },
@@ -998,26 +998,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv04006e5-2026-06-27",
-      "source": "iNDIEVOX",
-      "name": "6.27(六) Punk Strike Warm-Up Party #3",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-06-27",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv04006e5",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04006e5"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv040170f-2026-06-27",
       "source": "iNDIEVOX",
       "name": "SADOG — 《大後悔》｜世界巡迴 第四站：台中 Legacy Taichung",
@@ -1034,6 +1014,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv040170f"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04006e5-2026-06-27",
+      "source": "iNDIEVOX",
+      "name": "6.27(六) Punk Strike Warm-Up Party #3",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-27",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv04006e5",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04006e5"
         }
       ]
     },
@@ -1453,7 +1453,7 @@
       ]
     },
     {
-      "id": "webbboxx-12758730",
+      "id": "webbboxx-954485",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1813,7 +1813,7 @@
       ]
     },
     {
-      "id": "webbboxx-12614630",
+      "id": "webbboxx-4242619",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2113,7 +2113,7 @@
       ]
     },
     {
-      "id": "webbboxx-7167428",
+      "id": "webbboxx-8658612",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2323,7 +2323,7 @@
       ]
     },
     {
-      "id": "webbboxx-7635814",
+      "id": "webbboxx-14828385",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2458,7 +2458,7 @@
       ]
     },
     {
-      "id": "webbboxx-3806518",
+      "id": "webbboxx-10341890",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2663,7 +2663,7 @@
       ]
     },
     {
-      "id": "webbboxx-15021780",
+      "id": "webbboxx-1758740",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2843,7 +2843,7 @@
       ]
     },
     {
-      "id": "webbboxx-4125073",
+      "id": "webbboxx-882867",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3013,7 +3013,7 @@
       ]
     },
     {
-      "id": "webbboxx-7772140",
+      "id": "webbboxx-169934",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -3038,7 +3038,7 @@
       ]
     },
     {
-      "id": "webbboxx-8293470",
+      "id": "webbboxx-2046022",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3271,9 +3271,9 @@
       "id": "indievox-26_iv040937b-2026-07-11",
       "source": "iNDIEVOX",
       "name": "陳嫺靜 Hsien Ching X 雲端司機 CLOUDRIVER《夏日高峰會 2026 亞太區》高雄站",
-      "venue_raw": "高雄流行音樂中心",
+      "venue_raw": "LIVE WAREHOUSE",
       "venue_id": "kaohsiung-music-center",
-      "venue_name": "高雄流行音樂中心",
+      "venue_name": "LIVE WAREHOUSE",
       "city": "高雄",
       "date": "2026-07-11",
       "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
@@ -3308,7 +3308,7 @@
       ]
     },
     {
-      "id": "webbboxx-8460915",
+      "id": "webbboxx-10013456",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -3333,7 +3333,7 @@
       ]
     },
     {
-      "id": "webbboxx-13902722",
+      "id": "webbboxx-13527501",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3583,7 +3583,7 @@
       ]
     },
     {
-      "id": "webbboxx-9261020",
+      "id": "webbboxx-6293090",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -3608,7 +3608,7 @@
       ]
     },
     {
-      "id": "webbboxx-4751256",
+      "id": "webbboxx-915530",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3938,26 +3938,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv04085f2-2026-07-17",
-      "source": "iNDIEVOX",
-      "name": "7.17（五）DISORDER LIVE ＃18",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-07-17",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv04085f2",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04085f2"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0401040-2026-07-17",
       "source": "iNDIEVOX",
       "name": "2026 鄭宜農 Enno Cheng《缺與圓之後 Inter-Phases》台北演唱會",
@@ -3974,6 +3954,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0401040"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04085f2-2026-07-17",
+      "source": "iNDIEVOX",
+      "name": "7.17（五）DISORDER LIVE ＃18",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-07-17",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv04085f2",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04085f2"
         }
       ]
     },
@@ -4108,7 +4108,7 @@
       ]
     },
     {
-      "id": "webbboxx-230643",
+      "id": "webbboxx-10389416",
       "source": "webbboxx 行事曆",
       "name": "滅火器 Fire EX. 首次攻蛋",
       "venue_raw": "台北小巨蛋 拓元售票 演出日期： 2026/07/18（六） 備註： 成軍 26 年首次小巨蛋演出 售票中 Jul 03",
@@ -4493,7 +4493,7 @@
       ]
     },
     {
-      "id": "webbboxx-10019174",
+      "id": "webbboxx-14582886",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4713,7 +4713,7 @@
       ]
     },
     {
-      "id": "webbboxx-11779263",
+      "id": "webbboxx-2197317",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4893,7 +4893,7 @@
       ]
     },
     {
-      "id": "webbboxx-10927250",
+      "id": "webbboxx-1364780",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -6848,6 +6848,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv0409979-2026-08-21",
+      "source": "iNDIEVOX",
+      "name": "Legacy Presents【2026鐵漢柔情】： 人生如電—林生祥30週年演唱會 -台北場",
+      "venue_raw": "Legacy TERA",
+      "venue_id": "taipei-music-center",
+      "venue_name": "Legacy TERA",
+      "city": "台北",
+      "date": "2026-08-21",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0409979",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0409979"
+        }
+      ]
+    },
+    {
       "id": "cpbl-2026-277",
       "source": "中華職棒",
       "name": "中華職棒例行賽：樂天桃猿 vs 台鋼雄鷹",
@@ -6923,7 +6943,7 @@
       ]
     },
     {
-      "id": "webbboxx-16245760",
+      "id": "webbboxx-2994894",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -7063,7 +7083,7 @@
       ]
     },
     {
-      "id": "webbboxx-3005963",
+      "id": "webbboxx-9705027",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -8203,7 +8223,7 @@
       ]
     },
     {
-      "id": "webbboxx-6299343",
+      "id": "webbboxx-4732300",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -8488,6 +8508,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv04101ec-2026-09-13",
+      "source": "iNDIEVOX",
+      "name": "Legacy Presents【2026鐵漢柔情】： 人生如電—林生祥30週年演唱會 -台中場",
+      "venue_raw": "Legacy Taichung",
+      "venue_id": "legacy-taichung",
+      "venue_name": "Legacy Taichung",
+      "city": "台中",
+      "date": "2026-09-13",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv04101ec",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04101ec"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv0407244-2026-09-13",
       "source": "iNDIEVOX",
       "name": "小麻雀樂團《歡迎來到小麻雀樂園》五週年專場",
@@ -8508,7 +8548,7 @@
       ]
     },
     {
-      "id": "webbboxx-2188378",
+      "id": "webbboxx-637766",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -9838,7 +9878,7 @@
       ]
     },
     {
-      "id": "webbboxx-787595",
+      "id": "webbboxx-1037835",
       "source": "webbboxx 行事曆",
       "name": "Charlie Puth - Whatever's Clever! World Tour 桃園站",
       "venue_raw": "熱門 桃園陽光劇場 拓元售票 演出日期： 2026/10/18 現正售票中",
@@ -10093,7 +10133,7 @@
       ]
     },
     {
-      "id": "webbboxx-8549740",
+      "id": "webbboxx-14199045",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10158,7 +10198,7 @@
       ]
     },
     {
-      "id": "webbboxx-10471979",
+      "id": "webbboxx-14880989",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10223,7 +10263,7 @@
       ]
     },
     {
-      "id": "webbboxx-16294311",
+      "id": "webbboxx-9840555",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10288,7 +10328,7 @@
       ]
     },
     {
-      "id": "webbboxx-1020922",
+      "id": "webbboxx-8041112",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
