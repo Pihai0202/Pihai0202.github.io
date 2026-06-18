@@ -1,4 +1,19 @@
 import { useState, useEffect, useCallback } from 'react'
+import {
+  SunIcon,
+  CloudSunIcon,
+  CloudIcon,
+  UmbrellaIcon,
+  SnowflakeIcon,
+  CloudLightningIcon,
+  ThermometerIcon,
+  WarningIcon,
+  RefreshIcon,
+  CloseIcon,
+  CalendarIcon,
+  ClipboardIcon,
+  CheckIcon
+} from './SvgIcon'
 
 interface VenueWeatherProps {
   latitude?: number
@@ -33,60 +48,52 @@ interface DailyForecast {
 const weatherCache = new Map<string, { data: { weather: WeatherData; aqi: AqiData; daily: DailyForecast[] }; timestamp: number }>()
 const CACHE_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 
-// Map WMO Weather Codes to Description and Emoji
-function parseWeatherCode(code: number): { desc: string; emoji: string } {
+// Map WMO Weather Codes to Description and SVG Icon
+function parseWeatherCode(code: number): { desc: string; icon: React.ReactNode } {
   switch (code) {
     case 0:
-      return { desc: '晴朗', emoji: '☀️' }
+      return { desc: '晴朗', icon: <SunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 1:
-      return { desc: '晴間多雲', emoji: '🌤️' }
+      return { desc: '晴間多雲', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 2:
-      return { desc: '多雲', emoji: '⛅' }
+      return { desc: '多雲', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 3:
-      return { desc: '陰天', emoji: '☁️' }
+      return { desc: '陰天', icon: <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 45:
     case 48:
-      return { desc: '有霧', emoji: '🌫️' }
+      return { desc: '有霧', icon: <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 51:
     case 53:
     case 55:
-      return { desc: '毛毛雨', emoji: '🌧️' }
     case 56:
     case 57:
-      return { desc: '凍毛毛雨', emoji: '🌧️' }
     case 61:
-      return { desc: '小雨', emoji: '🌧️' }
     case 63:
-      return { desc: '中雨', emoji: '🌧️' }
     case 65:
-      return { desc: '大雨', emoji: '🌧️' }
     case 66:
     case 67:
-      return { desc: '凍雨', emoji: '🌧️' }
+      return { desc: '雨天', icon: <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 71:
-      return { desc: '小雪', emoji: '❄️' }
     case 73:
-      return { desc: '中雪', emoji: '❄️' }
     case 75:
-      return { desc: '大雪', emoji: '❄️' }
     case 77:
-      return { desc: '雪粒', emoji: '❄️' }
+      return { desc: '雪天', icon: <SnowflakeIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 80:
-      return { desc: '小陣雨', emoji: '🌦️' }
+      return { desc: '小陣雨', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 81:
-      return { desc: '陣雨', emoji: '🌧️' }
+      return { desc: '陣雨', icon: <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 82:
-      return { desc: '暴陣雨', emoji: '⛈️' }
+      return { desc: '暴陣雨', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 85:
     case 86:
-      return { desc: '陣雪', emoji: '❄️' }
+      return { desc: '陣雪', icon: <SnowflakeIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 95:
-      return { desc: '雷陣雨', emoji: '⛈️' }
+      return { desc: '雷陣雨', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     case 96:
     case 99:
-      return { desc: '雷雨伴有冰雹', emoji: '⛈️' }
+      return { desc: '雷雨伴有冰雹', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
     default:
-      return { desc: '未知天氣', emoji: '🌡️' }
+      return { desc: '未知天氣', icon: <ThermometerIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
   }
 }
 
@@ -96,25 +103,25 @@ function getAqiDetails(aqi: number): { label: string; className: string; advice:
     return {
       label: '良好',
       className: 'aqi-good',
-      advice: '🟢 空氣品質良好，非常適合前往演唱會與進行戶外活動！',
+      advice: '空氣品質良好，非常適合前往演唱會與進行戶外活動！',
     }
   } else if (aqi <= 100) {
     return {
       label: '普通',
       className: 'aqi-moderate',
-      advice: '🟡 空氣品質普通，敏感族群可適度防護。',
+      advice: '空氣品質普通，敏感族群可適度防護。',
     }
   } else if (aqi <= 150) {
     return {
       label: '敏感不良',
       className: 'aqi-sensitive',
-      advice: '🟠 空氣對敏感族群不健康，建議敏感族群配戴口罩。',
+      advice: '空氣對敏感族群不健康，建議敏感族群配戴口罩。',
     }
   } else {
     return {
       label: '不良',
       className: 'aqi-unhealthy',
-      advice: '🔴 空氣品質不良！一般樂迷也建議佩戴口罩，並減少戶外長時間劇烈運動。',
+      advice: '空氣品質不良！一般樂迷也建議佩戴口罩，並減少戶外長時間劇烈運動。',
     }
   }
 }
@@ -128,21 +135,21 @@ function getWeatherWarnings(weather: WeatherData): string[] {
   const lightRainCodes = [51, 53, 55, 56, 57, 61, 63, 66, 67, 80, 81]
 
   if (heavyRainCodes.includes(weather.weatherCode)) {
-    warnings.push('⚠️ 劇烈降雨警告：目前降雨強烈，請攜帶雨具，避開積水路段，注意安全！')
+    warnings.push('劇烈降雨警告：目前降雨強烈，請攜帶雨具，避開積水路段，注意安全！')
   } else if (lightRainCodes.includes(weather.weatherCode)) {
-    warnings.push('☔ 降雨提醒：目前有降雨，若屬半戶外/戶外場地請備妥雨傘或雨衣。')
+    warnings.push('降雨提醒：目前有降雨，若屬半戶外/戶外場地請備妥雨傘或雨衣。')
   }
 
   // Temperature alerts
   if (weather.feelsLike >= 35) {
-    warnings.push('🥵 高溫警報：體感溫度偏高，請多補水、防曬，防範熱傷害。')
+    warnings.push('高溫警報：體感溫度偏高，請多補水、防曬，防範熱傷害。')
   } else if (weather.temp <= 15) {
-    warnings.push('🥶 低溫提醒：天氣寒冷，前往場館請多穿衣物注意保暖防寒。')
+    warnings.push('低溫提醒：天氣寒冷，前往場館請多穿衣物注意保暖防寒。')
   }
 
   // Wind speed alert (wind speed from Open-Meteo is in km/h)
   if (weather.windSpeed >= 20) {
-    warnings.push('💨 強風提醒：風速較強，若在戶外排隊請注意防風，保管好隨身物品。')
+    warnings.push('強風提醒：風速較強，若在戶外排隊請注意防風，保管好隨身物品。')
   }
 
   return warnings
@@ -338,7 +345,10 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
     <div className="weather-widget">
       <div className="weather-header">
         <div className="weather-title">
-          <span>🌦️ 即時天氣預報</span>
+          <span>
+            <CloudSunIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            即時天氣預報
+          </span>
           {isFallback && <span className="fallback-badge" title="暫時無法連接中央氣象服務，顯示模擬氣候資訊">模擬數據</span>}
         </div>
         <div className="weather-header-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
@@ -349,7 +359,11 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
             disabled={loading}
             title="重新整理氣象資料"
           >
-            {loading ? '↻' : '⟲'}
+            {loading ? (
+              '↻'
+            ) : (
+              <RefreshIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+            )}
           </button>
           {onClose && (
             <button
@@ -358,7 +372,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
               onClick={onClose}
               title="關閉氣象預報"
             >
-              ✕
+              <CloseIcon />
             </button>
           )}
         </div>
@@ -369,7 +383,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
         <div className="weather-main">
           <div className="weather-temp-section">
             <span className="weather-emoji" role="img" aria-label={weatherInfo.desc}>
-              {weatherInfo.emoji}
+              {weatherInfo.icon}
             </span>
             <div className="weather-temp-wrap">
               <span className="temp-val">{weather.temp}°C</span>
@@ -410,7 +424,10 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
         {/* 7-day Weather Forecast */}
         {dailyForecast && dailyForecast.length > 0 && (
           <div className="weather-forecast-section">
-            <div className="forecast-title">📅 七日天氣預報</div>
+            <div className="forecast-title">
+              <CalendarIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              七日天氣預報
+            </div>
             <div className="forecast-grid">
               {dailyForecast.map((day) => {
                 const info = parseWeatherCode(day.weatherCode)
@@ -418,7 +435,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
                 return (
                   <div className="forecast-item" key={day.date}>
                     <span className="forecast-day">{dayLabel}</span>
-                    <span className="forecast-emoji" title={info.desc}>{info.emoji}</span>
+                    <span className="forecast-emoji" title={info.desc}>{info.icon}</span>
                     <span className="forecast-desc">{info.desc}</span>
                     <span className="forecast-temp">{day.tempMin}°~{day.tempMax}°C</span>
                   </div>
@@ -430,17 +447,29 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
 
         {/* Warnings & Suggestions alerts */}
         <div className="weather-alerts">
-          <div className="alerts-title">📝 貼心防護警語與建議</div>
+          <div className="alerts-title">
+            <ClipboardIcon size="1.05em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            貼心防護警語與建議
+          </div>
           <div className="alerts-list">
-            <div className="alert-item aqi-advice">{aqiInfo.advice}</div>
+            <div className="alert-item aqi-advice">
+              {aqi.aqi <= 100 ? (
+                <CheckIcon size="0.95em" style={{ marginRight: '6px', color: 'var(--success)', verticalAlign: 'middle' }} />
+              ) : (
+                <WarningIcon size="0.95em" style={{ marginRight: '6px', color: 'var(--warning)', verticalAlign: 'middle' }} />
+              )}
+              {aqiInfo.advice}
+            </div>
             {warnings.map((warning, index) => (
               <div key={index} className="alert-item weather-warning">
+                <WarningIcon size="0.95em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
                 {warning}
               </div>
             ))}
             {warnings.length === 0 && weather.weatherCode === 0 && (
               <div className="alert-item weather-sunny">
-                ☀️ 天氣晴朗炎熱，若前往戶外排隊請做好防曬，適時補充水分喔！
+                <SunIcon size="0.95em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                天氣晴朗炎熱，若前往戶外排隊請做好防曬，適時補充水分喔！
               </div>
             )}
           </div>
@@ -452,7 +481,8 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
             type="button"
             onClick={onViewDetails}
           >
-            📋 查看場館詳情與記錄 ➔
+            <ClipboardIcon size="1.05em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            查看場館詳情與記錄
           </button>
         )}
       </div>

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import type { Concert } from '../types'
 import { getConcertShareText, exportToMarkdownFile } from '../utils/shareUtils'
+import { LinkIcon, ClipboardIcon, DownloadIcon, EditIcon, MegaphoneIcon } from './SvgIcon'
 
 interface ShareMenuProps {
   concert: Concert
@@ -67,22 +68,27 @@ export function ShareMenu({ concert, onPublishToBoard }: ShareMenuProps) {
         onClick={() => setIsOpen(!isOpen)}
         title="分享觀後心得"
       >
-        🔗 分享 / 匯出心得
+        <LinkIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+        分享 / 匯出心得
       </button>
 
       {isOpen && (
         <div className="share-dropdown">
           <button type="button" onClick={handleCopyShareText}>
-            📋 複製分享文字 (含格式)
+            <ClipboardIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            複製分享文字 (含格式)
           </button>
           <button type="button" onClick={handleExportMarkdown}>
-            💾 匯出為 Markdown 檔案 (.md)
+            <DownloadIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            匯出為 Markdown 檔案 (.md)
           </button>
           <button type="button" onClick={handleCopyRawMarkdown}>
-            ✍️ 複製 Markdown 原始碼
+            <EditIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            複製 Markdown 原始碼
           </button>
           <button type="button" onClick={handlePublishClick}>
-            📢 發佈至分享牆
+            <MegaphoneIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            發佈至分享牆
           </button>
         </div>
       )}

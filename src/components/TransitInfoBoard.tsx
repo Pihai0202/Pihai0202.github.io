@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react'
+import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
 
@@ -259,17 +260,17 @@ export function TransitInfoBoard() {
 
   // 取得當前服務的顯示資訊
   const getStatusDetails = () => {
-    const serviceMap: Record<string, { name: string; icon: string; url: string }> = {
-      trtc: { name: '台北捷運', icon: '🚇', url: 'https://www.metro.taipei/' },
-      krtc: { name: '高雄捷運', icon: '🚇', url: 'https://www.krtc.com.tw/' },
-      tmrt: { name: '台中捷運', icon: '🚇', url: 'https://www.tmrt.com.tw/' },
-      thsr: { name: '台灣高鐵', icon: '🚄', url: 'https://www.thsrc.com.tw/' },
-      tra:  { name: '台灣鐵路', icon: '🚂', url: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList' },
+    const serviceMap: Record<string, { name: string; icon: React.ReactNode; url: string }> = {
+      trtc: { name: '台北捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.metro.taipei/' },
+      krtc: { name: '高雄捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.krtc.com.tw/' },
+      tmrt: { name: '台中捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.tmrt.com.tw/' },
+      thsr: { name: '台灣高鐵', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.thsrc.com.tw/' },
+      tra:  { name: '台灣鐵路', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList' },
     }
     const info = serviceMap[selectedService] ?? serviceMap.trtc
     const current = statuses[selectedService] ?? {
       name: info.name,
-      status: '🟢 營運正常',
+      status: '營運正常',
       detail: '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。',
       isNormal: true,
       updatedAt: '',
@@ -426,7 +427,14 @@ export function TransitInfoBoard() {
             disabled={loading}
             onClick={fetchStatus}
           >
-            {loading ? '讀取中' : '重新整理 ↻'}
+            {loading ? (
+              '讀取中'
+            ) : (
+              <>
+                <RefreshIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                重新整理
+              </>
+            )}
           </button>
         )}
       </div>
@@ -434,11 +442,31 @@ export function TransitInfoBoard() {
       {/* Tab 按鈕列 */}
       <div className="transit-tabs">
         {(['status', 'metro', 'train', 'bus'] as const).map((tab) => {
-          const labels: Record<string, string> = {
-            status: '🚨 營運通阻',
-            metro:  '🚇 捷運班距',
-            train:  '🚄 雙鐵動態 (開發中)',
-            bus:    '🚌 公車動態 (開發中)',
+          const labels: Record<string, React.ReactNode> = {
+            status: (
+              <>
+                <WarningIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                營運通阻
+              </>
+            ),
+            metro: (
+              <>
+                <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                捷運班距
+              </>
+            ),
+            train: (
+              <>
+                <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                雙鐵動態 (開發中)
+              </>
+            ),
+            bus: (
+              <>
+                <BusIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                公車動態 (開發中)
+              </>
+            ),
           }
           const isDisabled = tab === 'train' || tab === 'bus'
           return (
@@ -464,11 +492,11 @@ export function TransitInfoBoard() {
               onChange={(e) => setSelectedService(e.target.value)}
               className="transit-select"
             >
-              <option value="trtc">🚇 台北捷運</option>
-              <option value="krtc">🚇 高雄捷運</option>
-              <option value="tmrt">🚇 台中捷運</option>
-              <option value="thsr">🚄 台灣高鐵</option>
-              <option value="tra">🚂 台灣鐵路</option>
+              <option value="trtc">台北捷運</option>
+              <option value="krtc">高雄捷運</option>
+              <option value="tmrt">台中捷運</option>
+              <option value="thsr">台灣高鐵</option>
+              <option value="tra">台灣鐵路</option>
             </select>
           </div>
 
@@ -478,13 +506,13 @@ export function TransitInfoBoard() {
                 <span className="transit-icon">{info.icon}</span>
                 <span>{info.name}</span>
                 {tdxActive ? (
-                  <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>📡 TDX 即時資料</span>
+                  <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>即時資料</span>
                 ) : (
-                  <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>📄 靜態資料</span>
+                  <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>靜態資料</span>
                 )}
               </div>
               <div className={`transit-badge${current.isNormal ? ' normal' : ' warning'}${loading ? ' loading' : ''}`}>
-                {current.status}
+                {current.status.replace(/[\uD800-\uDFFF\u2600-\u27BF🟢🔴🟡]/g, '').trim()}
               </div>
             </div>
             <p className="transit-detail">{current.detail}</p>
@@ -494,7 +522,7 @@ export function TransitInfoBoard() {
               </div>
             )}
             <a href={info.url} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
-              🧭 前往官方網站查看即時動態 ↗
+              前往官方網站查看即時動態
             </a>
           </div>
         </div>
@@ -505,12 +533,15 @@ export function TransitInfoBoard() {
         <div className="transit-tab-content">
           <div className="metro-headway-wrapper">
             {([
-              { title: '🚇 台北捷運 班距時程', data: METRO_LINE_DATA.taipei },
-              { title: '🚇 高雄捷運 班距時程', data: METRO_LINE_DATA.kaohsiung },
-              { title: '🚇 台中捷運 班距時程', data: METRO_LINE_DATA.taichung },
+              { title: '台北捷運 班距時程', data: METRO_LINE_DATA.taipei },
+              { title: '高雄捷運 班距時程', data: METRO_LINE_DATA.kaohsiung },
+              { title: '台中捷運 班距時程', data: METRO_LINE_DATA.taichung },
             ] as const).map(({ title, data }, i) => (
               <div key={i}>
-                <div className="metro-sub-title" style={i > 0 ? { marginTop: '1.2rem' } : {}}>{title}</div>
+                <div className="metro-sub-title" style={i > 0 ? { marginTop: '1.2rem' } : {}}>
+                  <TrainIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                  {title}
+                </div>
                 <div className="metro-freq-table">
                   {data.map((m) => (
                     <div className="metro-freq-row" key={m.line}>
@@ -660,7 +691,8 @@ export function TransitInfoBoard() {
           {busRouteDetails && busStops.length > 0 && !isBusSearching && (
             <div className="bus-route-header-info">
               <div className="bus-route-title">
-                🚌 路線 {busRouteDetails.routeName} ({busRouteDetails.startTerminal} ⇄ {busRouteDetails.endTerminal})
+                <BusIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                路線 {busRouteDetails.routeName} ({busRouteDetails.startTerminal} ⇄ {busRouteDetails.endTerminal})
               </div>
               <div className="bus-direction-row">
                 <span className="bus-direction-label">
@@ -671,7 +703,8 @@ export function TransitInfoBoard() {
                   className="bus-direction-toggle-btn"
                   onClick={handleToggleBusDirection}
                 >
-                  🔄 切換方向
+                  <RefreshIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                  切換方向
                 </button>
               </div>
             </div>

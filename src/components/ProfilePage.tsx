@@ -1,6 +1,19 @@
 import { useState, useMemo, useEffect } from 'react'
 import type { Concert } from '../types'
 import { db } from '../firebase'
+import {
+  ArrowLeftIcon,
+  LogoutIcon,
+  EditIcon,
+  MailIcon,
+  MicIcon,
+  PinIcon,
+  FlameIcon,
+  BuildingIcon,
+  ActivityIcon,
+  MegaphoneIcon,
+  HeartFilledIcon
+} from './SvgIcon'
 import { collection, query, where, getDocs } from 'firebase/firestore'
 
 interface ProfilePageProps {
@@ -152,10 +165,12 @@ export function ProfilePage({
       {/* 頂部導航 */}
       <div className="profile-header-actions">
         <button className="profile-back-btn" type="button" onClick={onBack}>
-          🫵 返回場館地圖 ➔
+          <ArrowLeftIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          返回場館地圖
         </button>
         <button className="profile-logout-btn" type="button" onClick={onLogout}>
-          👋 登出帳戶
+          <LogoutIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          登出帳戶
         </button>
       </div>
 
@@ -186,37 +201,48 @@ export function ProfilePage({
               <div className="nickname-display-row">
                 <h2>{user.nickname}</h2>
                 <button type="button" onClick={() => setIsEditingName(true)} className="edit-name-trigger">
-                  ✏️
+                  <EditIcon size="0.9em" style={{ verticalAlign: 'middle' }} />
                 </button>
               </div>
             )}
-            <p className="profile-email-badge">📧 {user.email || '訪客模式'}</p>
+            <p className="profile-email-badge">
+              <MailIcon size="0.9em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              {user.email || '訪客模式'}
+            </p>
           </div>
 
           <div className="profile-stats-card-list">
             <div className="profile-stat-box">
-              <span className="stat-icon">🎤</span>
+              <span className="stat-icon">
+                <MicIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <div className="stat-content">
                 <div className="stat-value">{stats.totalCount}</div>
                 <div className="stat-label">演唱會記錄</div>
               </div>
             </div>
             <div className="profile-stat-box">
-              <span className="stat-icon">📍</span>
+              <span className="stat-icon">
+                <PinIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <div className="stat-content">
                 <div className="stat-value">{stats.uniqueVenues}</div>
                 <div className="stat-label">造訪場館</div>
               </div>
             </div>
             <div className="profile-stat-box">
-              <span className="stat-icon">🔥</span>
+              <span className="stat-icon">
+                <FlameIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <div className="stat-content">
                 <div className="stat-value">{stats.favoriteArtist}</div>
                 <div className="stat-label">最常看歌手</div>
               </div>
             </div>
             <div className="profile-stat-box">
-              <span className="stat-icon">🏰</span>
+              <span className="stat-icon">
+                <BuildingIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <div className="stat-content">
                 <div className="stat-value">{stats.favoriteVenue}</div>
                 <div className="stat-label">最常去場館</div>
@@ -230,7 +256,10 @@ export function ProfilePage({
           {/* 足跡管理 */}
           <section className="profile-content-section">
             <div className="section-header-row">
-              <h3>🐾 我的音樂現場足跡</h3>
+              <h3>
+                <ActivityIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                我的音樂現場足跡
+              </h3>
               <input
                 type="text"
                 placeholder="搜尋我的記錄..."
@@ -282,7 +311,10 @@ export function ProfilePage({
 
           {/* 社群分享牆發佈 */}
           <section className="profile-content-section">
-            <h3>📢 我在社群牆發佈的觀後感</h3>
+            <h3>
+              <MegaphoneIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              我在社群牆發佈的觀後感
+            </h3>
             <div className="profile-reviews-wrapper">
               {reviewsLoading ? (
                 <div className="profile-empty-state">載入發佈列表中...</div>
@@ -296,11 +328,17 @@ export function ProfilePage({
                     <div className="profile-review-card" key={rev.id}>
                       <div className="review-card-header">
                         <h4>{rev.artist}</h4>
-                        <span className="review-card-likes">❤️ {rev.likes}</span>
+                        <span className="review-card-likes">
+                          <HeartFilledIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {rev.likes}
+                        </span>
                       </div>
                       <p className="review-card-sub">{rev.concertName}</p>
                       <div className="review-card-footer">
-                        <span>📍 {rev.venueName}</span>
+                        <span>
+                          <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {rev.venueName}
+                        </span>
                         <span>{rev.date}</span>
                       </div>
                     </div>

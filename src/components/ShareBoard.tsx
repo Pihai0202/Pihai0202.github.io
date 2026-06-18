@@ -1,6 +1,19 @@
 import { useState, useMemo, useEffect } from 'react'
 import { marked } from 'marked'
 import type { SharedNote } from '../types'
+import {
+  MicIcon,
+  EditIcon,
+  SearchIcon,
+  CloseIcon,
+  TrashIcon,
+  HeartFilledIcon,
+  HeartOutlineIcon,
+  PinIcon,
+  CalendarIcon,
+  UserIcon,
+  CheckIcon
+} from './SvgIcon'
 import { COMMUNITY_MOCK_NOTES } from '../constants/communityMock'
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, increment, addDoc } from 'firebase/firestore'
 import { db, logCustomEvent } from '../firebase'
@@ -200,11 +213,11 @@ export function ShareBoard() {
       })
       setIsModalOpen(false)
       setTimeout(() => {
-        alert('🎉 發佈成功！您的心得已更新至分享牆。')
+        alert('發佈成功！您的心得已更新至分享牆。')
       }, 100)
     } catch (err) {
       console.error('Firebase write error:', err)
-      alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')
+      alert('發佈失敗，請檢查網路連線或 Firebase 設定！')
     }
   }
 
@@ -217,7 +230,7 @@ export function ShareBoard() {
       })
     } catch (err) {
       console.error("Firestore delete error:", err)
-      alert('❌ 刪除失敗，請檢查網路連線！')
+      alert('刪除失敗，請檢查網路連線！')
     }
   }
 
@@ -262,7 +275,10 @@ export function ShareBoard() {
   return (
     <div className="share-board-container">
       <div className="share-board-header">
-        <h2 className="share-board-title">🎤 演唱會觀後感分享牆</h2>
+        <h2 className="share-board-title">
+          <MicIcon size="1.2em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          演唱會觀後感分享牆
+        </h2>
         <div className="share-board-subtitle">COMMUNITY CONCERT REVIEWS</div>
         <p className="share-board-description">
           在這裡閱讀全台熱血歌迷分享的現場真實感受，感受音樂的感動與現場震撼！
@@ -275,12 +291,13 @@ export function ShareBoard() {
             setIsModalOpen(true)
           }}
         >
-          ✍️ 撰寫並分享我的心得
+          <EditIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          撰寫並分享我的心得
         </button>
       </div>
 
       <div className="board-search-bar">
-        <span className="search-icon">🔍</span>
+        <span className="search-icon"><SearchIcon /></span>
         <input
           type="text"
           value={searchQuery}
@@ -289,7 +306,7 @@ export function ShareBoard() {
         />
         {searchQuery && (
           <button className="clear-search" type="button" onClick={() => setSearchQuery('')}>
-            ✕
+            <CloseIcon />
           </button>
         )}
       </div>
@@ -320,7 +337,7 @@ export function ShareBoard() {
                         onClick={() => handleNoteDelete(note.id)}
                         title="刪除此分享"
                       >
-                        🗑️
+                        <TrashIcon size="1em" style={{ verticalAlign: 'middle' }} />
                       </button>
                     )}
                     <button
@@ -329,7 +346,13 @@ export function ShareBoard() {
                       onClick={() => handleLikeToggle(note.id)}
                       title={isLiked ? '取消按讚' : '點擊按讚'}
                     >
-                      <span className="heart-icon">{isLiked ? '❤️' : '🤍'}</span>
+                      <span className="heart-icon">
+                        {isLiked ? (
+                          <HeartFilledIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                        ) : (
+                          <HeartOutlineIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                        )}
+                      </span>
                       <span className="like-count">{note.likes}</span>
                     </button>
                   </div>
@@ -338,14 +361,23 @@ export function ShareBoard() {
                 <div className="shared-card-title">{note.concertName}</div>
 
                 <div className="shared-card-meta">
-                  <span>🏟️ {note.venueCity} · {note.venueName}</span>
-                  <span>📅 {note.date || '日期未定'}</span>
+                  <span>
+                    <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {note.venueCity} · {note.venueName}
+                  </span>
+                  <span>
+                    <CalendarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {note.date || '日期未定'}
+                  </span>
                 </div>
 
                 {renderNoteContent(note)}
 
                 <div className="shared-card-footer">
-                  <span className="author">👤 {note.author}</span>
+                  <span className="author">
+                    <UserIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {note.author}
+                  </span>
                   <span className="post-date">發佈於 {formattedDate}</span>
                 </div>
               </div>
@@ -358,9 +390,12 @@ export function ShareBoard() {
         <div className="modal-overlay active" onClick={() => setIsModalOpen(false)}>
           <div className="modal publish-modal" onClick={(e) => e.stopPropagation()}>
             <button className="modal-close" type="button" onClick={() => setIsModalOpen(false)}>
-              ×
+              <CloseIcon />
             </button>
-            <h2>✍️ 撰寫觀後心得分享</h2>
+            <h2>
+              <EditIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              撰寫觀後心得分享
+            </h2>
             <form onSubmit={handlePublish}>
               <div className="form-group">
                 <label htmlFor="input-board-author">您的暱稱</label>
@@ -491,7 +526,7 @@ export function ShareBoard() {
               </div>
               <div className="publish-actions">
                 <button className="publish-submit-btn" type="submit">
-                  發佈心得 🚀
+                  發佈心得 <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
                 </button>
                 <button
                   className="publish-cancel-btn"

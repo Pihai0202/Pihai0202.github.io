@@ -25,6 +25,24 @@ import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
 import { db, logCustomEvent } from './firebase'
+import {
+  MenuIcon,
+  CloseIcon,
+  SunIcon,
+  MoonIcon,
+  CheckIcon,
+  SparklesIcon,
+  BaseballIcon,
+  MapIcon,
+  CalendarIcon,
+  MessageIcon,
+  UserIcon,
+  MusicIcon,
+  SearchIcon,
+  CameraIcon,
+  PinIcon,
+  PlayIcon
+} from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
 const REMOTE_CONCERT_REFRESH_MS = 60_000
@@ -758,11 +776,11 @@ function App() {
             onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
             aria-label="選單"
           >
-            ☰
+            <MenuIcon />
           </button>
         )}
         <div className="logo" onClick={handleHeaderClick}>
-          <div className="logo-icon">🎵</div>
+          <div className="logo-icon"><MusicIcon /></div>
           <div className="logo-text">
             <h1>台灣演唱會地圖</h1>
             <span>TAIWAN CONCERT LOG</span>
@@ -770,7 +788,7 @@ function App() {
         </div>
 
         <div className="header-search">
-          <span className="search-icon">🔍</span>
+          <span className="search-icon"><SearchIcon /></span>
           <input
             type="text"
             placeholder="搜尋歌手、售票或場館..."
@@ -788,7 +806,7 @@ function App() {
               type="button"
               onClick={() => setSearchQuery('')}
             >
-              ✕
+              <CloseIcon />
             </button>
           )}
         </div>
@@ -805,21 +823,21 @@ function App() {
             type="button"
             onClick={() => setView('map')}
           >
-            🗺️ 場館地圖
+            <MapIcon style={{ marginRight: '6px' }} /> 場館地圖
           </button>
           <button
             className={`nav-toggle-btn${view === 'calendar' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('calendar')}
           >
-            📅 活動行事曆
+            <CalendarIcon style={{ marginRight: '6px' }} /> 活動行事曆
           </button>
           <button
             className={`nav-toggle-btn${view === 'board' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('board')}
           >
-            💬 社群分享牆
+            <MessageIcon style={{ marginRight: '6px' }} /> 社群分享牆
           </button>
           <button
             className="theme-toggle-btn"
@@ -828,7 +846,7 @@ function App() {
             title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
             aria-label="切換主題"
           >
-            {theme === 'dark' ? '☀️' : '🌙'}
+            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
           </button>
           {isLoggedIn && currentUser ? (
             <div className="user-profile-menu">
@@ -841,7 +859,7 @@ function App() {
                   color: view === 'profile' ? 'var(--gold)' : 'var(--text)'
                 }}
               >
-                👤 個人資料
+                <UserIcon style={{ marginRight: '6px' }} /> 個人資料
               </button>
               <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
                 登出
@@ -961,7 +979,7 @@ function App() {
             <div className="concert-list-area">
               {mobileTab === 'search' && (
                 <div className="mobile-search-bar">
-                  <span className="search-icon">🔍</span>
+                  <span className="search-icon"><SearchIcon /></span>
                   <input
                     type="text"
                     placeholder="搜尋歌手、售票或場館..."
@@ -974,7 +992,7 @@ function App() {
                       type="button"
                       onClick={() => setSearchQuery('')}
                     >
-                      ✕
+                      <CloseIcon />
                     </button>
                   )}
                 </div>
@@ -1078,7 +1096,7 @@ function App() {
                   {v.name} ({v.city})
                 </option>
               ))}
-              <option value="custom">✍️ 其他 / 自訂場館</option>
+              <option value="custom">其他 / 自訂場館</option>
             </select>
           </div>
 
@@ -1235,7 +1253,7 @@ function App() {
                     </div>
                   </div>
                   <button className="sp-selected-clear" type="button" onClick={clearSpotifySelection}>
-                    ✕
+                    <CloseIcon />
                   </button>
                 </div>
               )}
@@ -1253,7 +1271,7 @@ function App() {
           <div className="form-group">
             <label htmlFor="input-media">照片 / 影片</label>
             <div className="media-upload-area">
-              <div className="upload-icon">📷</div>
+              <div className="upload-icon"><CameraIcon /></div>
               <div className="upload-text">點擊或拖曳上傳</div>
               <div className="upload-sub">支援 JPG, PNG, MP4, MOV</div>
               <input
@@ -1268,7 +1286,7 @@ function App() {
           </div>
 
           <button className="modal-submit" type="button" onClick={saveConcert}>
-            儲存記錄 ✓
+            儲存記錄 <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
           </button>
         </Modal>
       )}
@@ -1678,27 +1696,27 @@ function UpcomingConcerts({
           className={`filter-tab-btn${categoryFilter === 'all' ? ' active' : ''}`}
           onClick={() => onCategoryChange('all')}
         >
-          ✨ 全部 ({categoryCounts.all})
+          <SparklesIcon style={{ marginRight: '4px' }} /> 全部 ({categoryCounts.all})
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'concert' ? ' active' : ''}`}
           onClick={() => onCategoryChange('concert')}
         >
-          🎵 演唱會 ({categoryCounts.concert})
+          <MusicIcon style={{ marginRight: '4px' }} /> 演唱會 ({categoryCounts.concert})
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'sport' ? ' active' : ''}`}
           onClick={() => onCategoryChange('sport')}
         >
-          ⚾ 中華職棒 ({categoryCounts.sport})
+          <BaseballIcon style={{ marginRight: '4px' }} /> 中華職棒 ({categoryCounts.sport})
         </button>
       </div>
 
       {searchQuery && searchQuery.trim() && (
         <div className="search-info-tip">
-          🔍 搜尋「{searchQuery}」：共 {concerts.length} 筆
+          <SearchIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> 搜尋「{searchQuery}」：共 {concerts.length} 筆
           {hasSelectedVenue && onClearVenue && (
             <button
               type="button"
@@ -1843,7 +1861,7 @@ function ConcertCard({
           title="刪除"
           onClick={(event) => onDelete(concert.id, event)}
         >
-          ✕
+          <CloseIcon />
         </button>
       )}
       <div className="concert-card-header">
@@ -1852,7 +1870,7 @@ function ConcertCard({
       </div>
       {showVenue && (
         <div className="concert-venue-tag">
-          📍 {concert.venueName} · {concert.venueCity}
+          <PinIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.venueName} · {concert.venueCity}
         </div>
       )}
       {concert.concertName && <div className="concert-venue-tag">{concert.concertName}</div>}
@@ -1875,7 +1893,7 @@ function MediaStrip({ media }: { media: ConcertMedia[] }) {
           <img className="media-thumb" key={`${item.name}-${index}`} src={item.dataUrl} alt="" />
         ) : (
           <div className="media-thumb-video" key={`${item.name}-${index}`}>
-            ▶
+            <PlayIcon />
           </div>
         ),
       )}
@@ -1902,11 +1920,11 @@ function MediaPreviewGrid({
           ) : (
             <>
               <video src={item.dataUrl} />
-              <div className="video-preview-overlay">▶</div>
+              <div className="video-preview-overlay"><PlayIcon /></div>
             </>
           )}
           <button className="remove-media" type="button" onClick={() => onRemove(index)}>
-            ✕
+            <CloseIcon />
           </button>
         </div>
       ))}

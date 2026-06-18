@@ -1,5 +1,16 @@
 import { useState, useMemo } from 'react'
 import type { Concert, RemoteConcert } from '../types'
+import {
+  CloseIcon,
+  SearchIcon,
+  ClipboardIcon,
+  TicketIcon,
+  StarIcon,
+  PinIcon,
+  TrashIcon,
+  CalendarIcon,
+  DollarIcon
+} from './SvgIcon'
 
 interface CalendarViewProps {
   concerts: Concert[]
@@ -259,20 +270,20 @@ export function CalendarView({
               className={`view-mode-tab ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
             >
-              📅 月曆視圖
+              <CalendarIcon style={{ marginRight: '6px' }} /> 月曆視圖
             </button>
             <button
               className={`view-mode-tab ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
             >
-              📋 清單視圖
+              <ClipboardIcon style={{ marginRight: '6px' }} /> 清單視圖
             </button>
           </div>
         </div>
 
         <div className="calendar-filters-row">
           <div className="calendar-search-box">
-            <span className="icon">🔍</span>
+            <span className="icon"><SearchIcon /></span>
             <input
               type="text"
               placeholder="搜尋行事曆中的活動、歌手、場館..."
@@ -281,7 +292,7 @@ export function CalendarView({
             />
             {searchQuery && (
               <button className="clear-search-btn" onClick={() => setSearchQuery('')}>
-                ✕
+                <CloseIcon />
               </button>
             )}
           </div>
@@ -297,13 +308,13 @@ export function CalendarView({
               className={`filter-btn filter-ticket ${eventFilter === 'ticket' ? 'active' : ''}`}
               onClick={() => setEventFilter('ticket')}
             >
-              🎫 售票活動
+              <TicketIcon style={{ marginRight: '6px' }} /> 售票活動
             </button>
             <button
               className={`filter-btn filter-record ${eventFilter === 'record' ? 'active' : ''}`}
               onClick={() => setEventFilter('record')}
             >
-              ⭐ 我的記錄
+              <StarIcon style={{ marginRight: '6px' }} /> 我的記錄
             </button>
           </div>
         </div>
@@ -398,12 +409,18 @@ export function CalendarView({
                     </div>
 
                     <div className="card-main-content">
-                      <div className="card-type-icon">{event.type === 'personal' ? '⭐' : '🎫'}</div>
+                      <div className="card-type-icon">
+                        {event.type === 'personal' ? (
+                          <StarIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                        ) : (
+                          <TicketIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                        )}
+                      </div>
                       <div className="card-details">
                         <h3 className="card-title">{event.title}</h3>
                         {event.subtitle && <p className="card-subtitle">{event.subtitle}</p>}
                         <div className="card-location">
-                          📍 {event.city} · {event.venue}
+                          <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {event.city} · {event.venue}
                         </div>
                       </div>
                     </div>
@@ -416,7 +433,7 @@ export function CalendarView({
                           onClick={(e) => onDeleteConcert(event.id, e)}
                           title="刪除此記錄"
                         >
-                          🗑️
+                          <TrashIcon size="1em" style={{ verticalAlign: 'middle' }} />
                         </button>
                       )}
                     </div>
@@ -432,7 +449,10 @@ export function CalendarView({
       {viewMode === 'grid' && (
         <div className="selected-day-details-drawer">
           <div className="drawer-header">
-            <h3>📅 {selectedDateStr} 活動清單</h3>
+            <h3>
+              <CalendarIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              {selectedDateStr} 活動清單
+            </h3>
             <button
               className="drawer-add-event-btn"
               onClick={() => onAddEventClick(selectedDateStr)}
@@ -454,11 +474,22 @@ export function CalendarView({
                     className="drawer-event-card personal"
                     onClick={() => onOpenConcertDetail(event.id)}
                   >
-                    <div className="card-badge">⭐ 我的自訂記錄</div>
+                    <div className="card-badge">
+                      <StarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      我的自訂記錄
+                    </div>
                     <h4 className="event-title">{event.artist}</h4>
                     {event.concertName && <p className="event-name">{event.concertName}</p>}
-                    <p className="event-venue">📍 {event.venueCity} · {event.venueName}</p>
-                    {event.seat && <p className="event-seat">🎫 位置：{event.seat}</p>}
+                    <p className="event-venue">
+                      <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      {event.venueCity} · {event.venueName}
+                    </p>
+                    {event.seat && (
+                      <p className="event-seat">
+                        <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                        位置：{event.seat}
+                      </p>
+                    )}
                     
                     <div className="card-footer">
                       <span className="card-more-action">查看心得筆記 &gt;</span>
@@ -467,7 +498,7 @@ export function CalendarView({
                         onClick={(e) => onDeleteConcert(event.id, e)}
                         title="刪除此記錄"
                       >
-                        🗑️ 刪除
+                        <TrashIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} /> 刪除
                       </button>
                     </div>
                   </div>
@@ -479,10 +510,21 @@ export function CalendarView({
                     className="drawer-event-card remote"
                     onClick={() => onOpenTicketDetail(event)}
                   >
-                    <div className="card-badge">🎫 公開售票活動 ({event.source})</div>
+                    <div className="card-badge">
+                      <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      公開售票活動 ({event.source})
+                    </div>
                     <h4 className="event-title">{event.name}</h4>
-                    <p className="event-venue">📍 {event.city} · {event.venue_name || event.venue_raw || '地點待確認'}</p>
-                    {event.price && <p className="event-price">💵 票價：{event.price}</p>}
+                    <p className="event-venue">
+                      <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      {event.city} · {event.venue_name || event.venue_raw || '地點待確認'}
+                    </p>
+                    {event.price && (
+                      <p className="event-price">
+                        <DollarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                        票價：{event.price}
+                      </p>
+                    )}
                     
                     <div className="card-footer">
                       <span className="card-more-action">查看售票詳情 &gt;</span>

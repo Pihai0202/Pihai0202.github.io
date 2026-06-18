@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import type { Venue } from '../types'
 import { logCustomEvent } from '../firebase'
+import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon } from './SvgIcon'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -22,7 +23,7 @@ export function VenueInfo({
     return (
       <div className="venue-info empty">
         <div className="empty-hint">
-          <div className="icon">🗺️</div>
+          <div className="icon"><MapIcon size="2.5em" /></div>
           <p>
             點擊地圖上的場館
             <br />
@@ -46,7 +47,8 @@ export function VenueInfo({
             {isCollapsed ? '▼ 展開' : '▲ 收起'}
           </button>
           <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
-            ✕ 清除選取
+            <CloseIcon size="0.85em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+            清除選取
           </button>
         </div>
       </div>
@@ -57,7 +59,14 @@ export function VenueInfo({
       >
         <div className="venue-name">{venue.name}</div>
         <div className={`venue-count${concertCount > 0 ? ' has-visits' : ''}`}>
-          {concertCount > 0 ? `✓ ${concertCount} 場` : '未造訪'}
+          {concertCount > 0 ? (
+            <>
+              <CheckIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+              {concertCount} 場
+            </>
+          ) : (
+            '未造訪'
+          )}
         </div>
       </div>
 
@@ -67,7 +76,9 @@ export function VenueInfo({
 
           {venue.address && (
             <div className="venue-address">
-              <span className="icon">📍</span>
+              <span className="icon">
+                <PinIcon size="0.9em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <span className="text">{venue.address}</span>
               <button
                 className={`address-nav-btn${showMap ? ' active' : ''}`}
@@ -83,13 +94,16 @@ export function VenueInfo({
                   }
                 }}
               >
-                🧭 導航
+                <CompassIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                導航
               </button>
             </div>
           )}
           {venue.transit && showMap && (
             <div className="venue-transit">
-              <span className="icon">🚇</span>
+              <span className="icon">
+                <TrainIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+              </span>
               <span className="text">{venue.transit}</span>
             </div>
           )}
@@ -121,7 +135,8 @@ export function VenueInfo({
                   })
                 }}
               >
-                🧭 Google 地圖導航 ↗
+                <CompassIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                Google 地圖導航
               </a>
             )}
           </div>

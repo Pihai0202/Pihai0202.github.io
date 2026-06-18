@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, MusicIcon } from './SvgIcon'
 
 interface LoginPageProps {
   onLoginSuccess: (user: { nickname: string; email: string }) => void
@@ -148,11 +149,11 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     <div className="login-page-container">
       <div className="login-card">
         <button className="login-back-btn" type="button" onClick={onCancel}>
-          ✕
+          <CloseIcon />
         </button>
 
         <div className="login-header">
-          <div className="login-logo">🎸</div>
+          <div className="login-logo"><MusicIcon size="2em" /></div>
           <h2>{isRegisterMode ? '加入台灣演唱會地圖' : '登入您的帳戶'}</h2>
           <p className="login-subtitle">
             {isRegisterMode
@@ -161,7 +162,12 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           </p>
         </div>
 
-        {errorMsg && <div className="login-error-alert">⚠️ {errorMsg}</div>}
+        {errorMsg && (
+          <div className="login-error-alert">
+            <WarningIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+            {errorMsg}
+          </div>
+        )}
 
         <form className="login-form" onSubmit={handleEmailAuthSubmit}>
           {isRegisterMode && (
@@ -203,7 +209,17 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           </div>
 
           <button className="login-submit-btn" type="submit" disabled={isLoading}>
-            {isLoading ? '處理中...' : isRegisterMode ? '註冊帳戶 ✓' : '信箱登入 🔓'}
+            {isLoading ? (
+              '處理中...'
+            ) : isRegisterMode ? (
+              <>
+                註冊帳戶 <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+              </>
+            ) : (
+              <>
+                信箱登入 <LockOpenIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+              </>
+            )}
           </button>
         </form>
 
@@ -241,7 +257,8 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           onClick={handleGuestLogin}
           disabled={isLoading}
         >
-          🔑 快速免登入體驗 (訪客模式)
+          <KeyIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          快速免登入體驗 (訪客模式)
         </button>
 
         <div className="login-footer">
