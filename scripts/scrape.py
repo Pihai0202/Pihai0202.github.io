@@ -197,8 +197,9 @@ chrome_ssl_context.set_ciphers(
     'DHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384'
 )
 
-def fetch(url, as_json=False):
-    req = Request(url, headers=HEADERS)
+def fetch(url, as_json=False, headers=None):
+    req_headers = headers if headers is not None else HEADERS
+    req = Request(url, headers=req_headers)
     try:
         with urlopen(req, context=chrome_ssl_context, timeout=15) as r:
             raw = r.read().decode("utf-8", errors="replace")
@@ -1030,85 +1031,154 @@ def scrape_webbboxx_calendar():
     return events
 
 
+def parse_indievox_cards(html, base_url):
+    """Parse card structures directly from list or AJAX pages."""
+    cards = []
+    matches = list(re.finditer(r'href=["\']([^"\']*/activity/detail/([26_ivA-Za-z0-9_-]+))["\']', html))
+    for match in matches:
+        url = urljoin(base_url, match.group(1))
+        act_id = match.group(2)
+        
+        # Look ahead in the HTML for the next 600 chars to find details
+        chunk = html[match.end():match.end()+600]
+        
+        # Date
+        date_match = re.search(r'<div class="date">([\s\S]*?)</div>', chunk)
+        date_str = ""
+        if date_match:
+            ymd_match = re.search(r'\b\d{4}/\d{2}/\d{2}\b', date_match.group(1))
+            if ymd_match:
+                date_str = ymd_match.group(0).replace("/", "-")
+                
+        # Title
+        title_match = re.search(r'<div class="multi_ellipsis">([\s\S]*?)</div>', chunk)
+        title_str = ""
+        if title_match:
+            title_str = re.sub(r'<[^>]+>', ' ', title_match.group(1))
+            title_str = ' '.join(title_str.split()).strip()
+            
+        # Image
+        img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', chunk)
+        image = img_match.group(1) if img_match else ""
+        if image and image.startswith("/"):
+            image = urljoin(base_url, image)
+            
+        cards.append({
+            "id": act_id,
+            "url": url,
+            "date": date_str,
+            "title": title_str,
+            "image": image
+        })
+    return cards
+
+
 def scrape_indievox():
     """Scrape iNDIEVOX concert events."""
     events = []
     seen_urls = set()
+    cards = []
 
     list_url = "https://www.indievox.com/activity/list"
     print("  Fetching iNDIEVOX activity list...", file=sys.stderr)
     html_content = fetch(list_url)
-    if not html_content:
-        return events
+    if html_content:
+        for card in parse_indievox_cards(html_content, list_url):
+            if card["url"] not in seen_urls:
+                seen_urls.add(card["url"])
+                cards.append(card)
 
-    # Get all event detail links or event IDs
-    detail_links = re.findall(r'href=["\']([^"\']*/activity/detail/[26_ivA-Za-z0-9_-]+)["\']', html_content)
-    unique_links = []
-    for link in detail_links:
-        full_url = urljoin(list_url, link)
-        if full_url not in seen_urls:
-            seen_urls.add(full_url)
-            unique_links.append(full_url)
+    # Fetch subsequent pages via AJAX
+    today_slash = datetime.now(timezone.utc).strftime("%Y/%m/%d")
+    offset = 1
+    consecutive_empty = 0
+    while True:
+        ajax_url = f"https://www.indievox.com/activity/get-more-game-list?type=card&offset={offset}&startDate={quote(today_slash)}&endDate="
+        print(f"  Fetching iNDIEVOX activity list (AJAX offset {offset})...", file=sys.stderr)
+        ajax_headers = HEADERS.copy()
+        ajax_headers["X-Requested-With"] = "XMLHttpRequest"
+        ajax_html = fetch(ajax_url, headers=ajax_headers)
+        if not ajax_html:
+            break
+        page_cards = parse_indievox_cards(ajax_html, list_url)
+        if not page_cards:
+            consecutive_empty += 1
+            if consecutive_empty >= 3:
+                break
+        else:
+            consecutive_empty = 0
+            for card in page_cards:
+                if card["url"] not in seen_urls:
+                    seen_urls.add(card["url"])
+                    cards.append(card)
+        
+        offset += 1
+        time.sleep(0.3)
+        if offset > 100:  # Safety limit
+            break
 
-    print(f"  Found {len(unique_links)} iNDIEVOX activities. Fetching session details...", file=sys.stderr)
+    print(f"  Found {len(cards)} total unique iNDIEVOX activities. Fetching details...", file=sys.stderr)
     
-    for activity_url in unique_links:
-        # Extract ID
-        parts = activity_url.rstrip("/").split("/")
-        if not parts:
-            continue
-        activity_id = parts[-1]
+    for card in cards:
+        activity_url = card["url"]
+        activity_id = card["id"]
+        name = card["title"]
+        image = card["image"]
+        card_date = card["date"]
         
         game_url = f"https://www.indievox.com/activity/game/{activity_id}"
         game_html = fetch(game_url)
-        if not game_html:
-            continue
-            
-        # Extract name from title
-        name_match = re.search(r'<h2 class="title activity-title">([\s\S]*?)</h2>', game_html)
-        if not name_match:
-            continue
-        name = clean_text(name_match.group(1))
         
-        # Extract image
-        img_match = re.search(r'<div class="title-img">[\s\S]*?<img[^>]+src=["\']([^"\']+)["\']', game_html)
-        image = img_match.group(1) if img_match else ""
-        if not image:
-            # Fallback image search
-            img_match_fb = re.search(r'<meta[^>]+property="og:image"[^>]+content="([^"]+)"', game_html)
-            image = img_match_fb.group(1) if img_match_fb else ""
+        sessions = []
+        if game_html:
+            # Extract sessions from the table
+            rows = re.findall(r'<tr[^>]*>([\s\S]*?)</tr>', game_html)
+            for row in rows:
+                tds = re.findall(r'<td[^>]*>([\s\S]*?)</td>', row)
+                if len(tds) < 3:
+                    continue
+                
+                date_raw = clean_text(tds[0])
+                venue_raw = clean_text(tds[2])
+                
+                date_str = parse_first_date(date_raw)
+                if not date_str:
+                    continue
+                if date_str < today_str():
+                    continue
+                sessions.append((date_str, venue_raw))
 
-        # Extract sessions from the table
-        rows = re.findall(r'<tr[^>]*>([\s\S]*?)</tr>', game_html)
-        
-        for row in rows:
-            tds = re.findall(r'<td[^>]*>([\s\S]*?)</td>', row)
-            if len(tds) < 3:
+        # If no sessions are found on game page, fall back to card's date and find venue on the detail page
+        if not sessions:
+            if not card_date or card_date < today_str():
                 continue
             
-            # First TD: Date & Time
-            date_raw = clean_text(tds[0])
-            # Third TD: Venue name
-            venue_raw = clean_text(tds[2])
+            detail_html = fetch(activity_url)
+            venue_id, venue_name = None, None
+            venue_raw = ""
+            if detail_html:
+                clean_detail_text = re.sub(r'<[^>]+>', ' ', detail_html)
+                venue_id, venue_name = match_venue(name + " " + clean_detail_text)
+                if venue_id:
+                    for keyword, vid in VENUE_MAP.items():
+                        if vid == venue_id and keyword in detail_html:
+                            venue_raw = keyword
+                            break
             
-            # Format Date
-            date_str = parse_first_date(date_raw)
-            if not date_str:
-                continue
-            if date_str < today_str():
-                continue
-            
-            venue_id, venue_name = match_venue(name + " " + venue_raw)
+            if not venue_id:
+                venue_id, venue_name = match_venue(name)
+                if venue_id:
+                    venue_raw = venue_name
             
             events.append({
-                "id": f"indievox-{activity_id}-{date_str}",
+                "id": f"indievox-{activity_id}-{card_date}",
                 "source": "iNDIEVOX",
                 "name": name,
-                "venue_raw": venue_raw,
+                "venue_raw": venue_raw or venue_name or "",
                 "venue_id": venue_id,
                 "venue_name": venue_name,
                 "city": VENUE_CITY.get(venue_id, ""),
-                "date": date_str,
+                "date": card_date,
                 "image": image,
                 "url": activity_url,
                 "price": "",
@@ -1116,6 +1186,25 @@ def scrape_indievox():
                     {"platform": "indievox", "name": "iNDIEVOX", "url": activity_url}
                 ]
             })
+        else:
+            for date_str, venue_raw in sessions:
+                venue_id, venue_name = match_venue(name + " " + venue_raw)
+                events.append({
+                    "id": f"indievox-{activity_id}-{date_str}",
+                    "source": "iNDIEVOX",
+                    "name": name,
+                    "venue_raw": venue_raw,
+                    "venue_id": venue_id,
+                    "venue_name": venue_name,
+                    "city": VENUE_CITY.get(venue_id, ""),
+                    "date": date_str,
+                    "image": image,
+                    "url": activity_url,
+                    "price": "",
+                    "ticket_links": [
+                        {"platform": "indievox", "name": "iNDIEVOX", "url": activity_url}
+                    ]
+                })
             
         time.sleep(0.3)
         
