@@ -2,6 +2,19 @@ import { useState, useEffect } from 'react'
 import type { RemoteConcert, SpotifyItem } from '../types'
 import { db } from '../firebase'
 import { collection, query, where, orderBy, onSnapshot, addDoc } from 'firebase/firestore'
+import {
+  CalendarIcon,
+  MapPinIcon,
+  BanknoteIcon,
+  TicketIcon,
+  StarIcon,
+  MusicIcon,
+  LightbulbIcon,
+  PauseIcon,
+  PlayIcon,
+  CommentIcon,
+  RocketIcon
+} from './Icons'
 
 interface TicketDetailModalProps {
   ticket: RemoteConcert
@@ -233,16 +246,16 @@ export function TicketDetailModal({
         <h2 className="ticket-title">{ticket.name}</h2>
         <div className="ticket-meta-grid">
           <div className="meta-item">
-            <span className="icon">📅</span>
+            <span className="icon" style={{ color: '#64b5f6' }}><CalendarIcon /></span>
             <span className="text">演出日期：<strong>{ticket.date || '日期未定'}</strong></span>
           </div>
           <div className="meta-item">
-            <span className="icon">📍</span>
+            <span className="icon" style={{ color: 'var(--accent)' }}><MapPinIcon /></span>
             <span className="text">演出場館：<strong>{ticket.venue_raw || ticket.venue_name || '地點待確認'}</strong></span>
           </div>
           {ticket.price && (
             <div className="meta-item">
-              <span className="icon">💵</span>
+              <span className="icon" style={{ color: 'var(--teal)' }}><BanknoteIcon /></span>
               <span className="text">票價估計：<strong>{ticket.price}</strong></span>
             </div>
           )}
@@ -258,7 +271,7 @@ export function TicketDetailModal({
                 rel="noopener noreferrer"
                 className="ticket-buy-btn"
               >
-                🎟️ 前往 {link.name} 購票 ↗
+                <TicketIcon /> 前往 {link.name} 購票 ↗
               </a>
             ))}
           </div>
@@ -270,7 +283,7 @@ export function TicketDetailModal({
             className="ticket-log-personal-btn"
             onClick={() => onLogAsPersonal(ticket)}
           >
-            ⭐ 登錄為我的演唱會記錄 / 自訂活動
+            <StarIcon /> 登錄為我的演唱會記錄 / 自訂活動
           </button>
         )}
       </div>
@@ -278,7 +291,7 @@ export function TicketDetailModal({
       {/* 音樂播放與選項整合區 */}
       <div className="ticket-music-section">
         <div className="section-title-row">
-          <h3>🎵 演出歌手精選音樂</h3>
+          <h3><MusicIcon style={{ color: '#ba68c8', marginRight: '0.4rem' }} /> 演出歌手精選音樂</h3>
           <div className="autoplay-control">
             <label className="toggle-switch">
               <input
@@ -356,21 +369,25 @@ export function TicketDetailModal({
                     ↗
                   </a>
                 </div>
-                <div className="player-instructions">
-                  💡 音樂已在下方主播放器啟動，關閉此彈窗可繼續聆聽。
+                <div className="player-instructions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
+                  <LightbulbIcon style={{ color: 'var(--gold)', flexShrink: 0 }} />
+                  <span>音樂已在下方主播放器啟動，關閉此彈窗可繼續聆聽。</span>
                 </div>
               </div>
             )}
             
             {!autoPlay && (
               <div className="embedded-player-placeholder">
-                <span>⏸ 已暫停自動播放</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <PauseIcon style={{ color: 'var(--muted)' }} /> 已暫停自動播放
+                </span>
                 <button
                   type="button"
                   className="play-now-btn"
                   onClick={() => handleAutoPlayToggle(true)}
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                 >
-                  立即播放 ▶
+                  立即播放 <PlayIcon />
                 </button>
               </div>
             )}
@@ -378,11 +395,9 @@ export function TicketDetailModal({
         )}
       </div>
 
-
-
       {/* 售票資訊留言牆 */}
       <div className="ticket-comments-section">
-        <h3>💬 售票討論留言牆</h3>
+        <h3><CommentIcon style={{ color: 'var(--teal)', marginRight: '0.4rem' }} /> 售票討論留言牆</h3>
         
         {/* Comments List */}
         <div className="comments-scroll-area">
@@ -447,8 +462,11 @@ export function TicketDetailModal({
               type="submit"
               className="comment-submit-btn"
               disabled={isSubmitting}
+              style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
             >
-              {isSubmitting ? '傳送中' : '發佈留言 🚀'}
+              {isSubmitting ? '傳送中' : (
+                <>發佈留言 <RocketIcon /></>
+              )}
             </button>
           </div>
         </form>
