@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-06-18T22:13:39.287492+00:00",
-  "count": 447,
+  "updated_at": "2026-06-19T00:12:00.860812+00:00",
+  "count": 446,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -13,77 +13,42 @@
   ],
   "events": [
     {
-      "id": "cpbl-2026-169",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：台鋼雄鷹 vs 統一7-ELEVEn獅",
-      "venue_raw": "亞太主",
-      "venue_id": "asia-pacific-main",
-      "venue_name": "亞太國際棒球訓練中心成棒主球場",
-      "city": "台南",
-      "date": "2026-06-18",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021496162893869773/logo_lions.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
+      "id": "kktix-org-e0j68kc74-2026-06-19",
+      "source": "KKTIX",
+      "name": "【06/19 14:30 一般票】日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-19",
+      "image": "https://assets.kktix.io/upload_images/325492/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74",
+      "price": "",
       "ticket_links": [
         {
-          "platform": "cpbl",
-          "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc74"
         }
       ]
     },
     {
-      "id": "cpbl-2026-170",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：味全龍 vs 樂天桃猿",
-      "venue_raw": "樂天桃園",
-      "venue_id": "taoyuan-arena",
-      "venue_name": "桃園國際棒球場",
-      "city": "桃園",
-      "date": "2026-06-18",
-      "image": "https://www.cpbl.com.tw/files/atts/0L015574823122453305/2024_CPBL六隊Logo_R2_官網.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
+      "id": "kktix-org-e0j68kc742-2026-06-19",
+      "source": "KKTIX",
+      "name": "【06/19 14:30 包廂票，限KKTIX購買】日本「63 ANGEL」魅惑盛夏",
+      "venue_raw": "【加場確定！最後機會】 《63ANGEL》台灣公演開賣後反應超乎預期，門票已快速銷售一空！ 在眾多粉絲熱烈敲碗下，經與日方協調確認—— 正式加開一場演出 加場演出時間 2026/6/19 (五)下午2:30~4:00 這是最後一次入場機會 ",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-19",
+      "image": "https://assets.kktix.io/upload_images/325499/kktix_1200x630_v2_medium.jpg",
+      "url": "https://mediaspheretw.kktix.cc/events/e0j68kc742",
+      "price": "",
       "ticket_links": [
         {
-          "platform": "cpbl",
-          "name": "樂天桃猿售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39428"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-171",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：富邦悍將 vs 中信兄弟",
-      "venue_raw": "洲際",
-      "venue_id": "taichung-dome",
-      "venue_name": "台中洲際棒球場",
-      "city": "台中",
-      "date": "2026-06-18",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "中信兄弟售票網",
-          "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://mediaspheretw.kktix.cc/events/e0j68kc742"
         }
       ]
     },
@@ -1333,7 +1298,7 @@
       ]
     },
     {
-      "id": "webbboxx-1164846",
+      "id": "webbboxx-12357558",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1693,7 +1658,7 @@
       ]
     },
     {
-      "id": "webbboxx-16347024",
+      "id": "webbboxx-9162532",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1993,7 +1958,7 @@
       ]
     },
     {
-      "id": "webbboxx-13119949",
+      "id": "webbboxx-6183836",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2203,7 +2168,7 @@
       ]
     },
     {
-      "id": "webbboxx-9082493",
+      "id": "webbboxx-6286643",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2338,7 +2303,7 @@
       ]
     },
     {
-      "id": "webbboxx-7259557",
+      "id": "webbboxx-9827144",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2543,7 +2508,7 @@
       ]
     },
     {
-      "id": "webbboxx-14177901",
+      "id": "webbboxx-14863149",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2723,7 +2688,7 @@
       ]
     },
     {
-      "id": "webbboxx-8152809",
+      "id": "webbboxx-13225902",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2893,7 +2858,7 @@
       ]
     },
     {
-      "id": "webbboxx-16061346",
+      "id": "webbboxx-1149932",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -2918,7 +2883,7 @@
       ]
     },
     {
-      "id": "webbboxx-6325219",
+      "id": "webbboxx-3553266",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3188,7 +3153,7 @@
       ]
     },
     {
-      "id": "webbboxx-1109980",
+      "id": "webbboxx-2887923",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -3213,7 +3178,7 @@
       ]
     },
     {
-      "id": "webbboxx-6927243",
+      "id": "webbboxx-10867917",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3463,7 +3428,7 @@
       ]
     },
     {
-      "id": "webbboxx-6484616",
+      "id": "webbboxx-10923317",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -3488,7 +3453,7 @@
       ]
     },
     {
-      "id": "webbboxx-854959",
+      "id": "webbboxx-3527272",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3988,7 +3953,7 @@
       ]
     },
     {
-      "id": "webbboxx-16018948",
+      "id": "webbboxx-11706854",
       "source": "webbboxx 行事曆",
       "name": "滅火器 Fire EX. 首次攻蛋",
       "venue_raw": "台北小巨蛋 拓元售票 演出日期： 2026/07/18（六） 備註： 成軍 26 年首次小巨蛋演出 售票中 Jul 03",
@@ -4373,7 +4338,7 @@
       ]
     },
     {
-      "id": "webbboxx-1526102",
+      "id": "webbboxx-10241996",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4593,7 +4558,7 @@
       ]
     },
     {
-      "id": "webbboxx-4929555",
+      "id": "webbboxx-5774913",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4773,7 +4738,7 @@
       ]
     },
     {
-      "id": "webbboxx-1052391",
+      "id": "webbboxx-9567664",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -6883,7 +6848,7 @@
       ]
     },
     {
-      "id": "webbboxx-1205767",
+      "id": "webbboxx-4587260",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -7023,7 +6988,7 @@
       ]
     },
     {
-      "id": "webbboxx-12592307",
+      "id": "webbboxx-16155699",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -8163,7 +8128,7 @@
       ]
     },
     {
-      "id": "webbboxx-7883116",
+      "id": "webbboxx-3780698",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -8488,7 +8453,7 @@
       ]
     },
     {
-      "id": "webbboxx-13462968",
+      "id": "webbboxx-2376353",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -9818,7 +9783,7 @@
       ]
     },
     {
-      "id": "webbboxx-2866668",
+      "id": "webbboxx-5397264",
       "source": "webbboxx 行事曆",
       "name": "Charlie Puth - Whatever's Clever! World Tour 桃園站",
       "venue_raw": "熱門 桃園陽光劇場 拓元售票 演出日期： 2026/10/18 現正售票中",
@@ -10073,7 +10038,7 @@
       ]
     },
     {
-      "id": "webbboxx-10977043",
+      "id": "webbboxx-6275536",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10138,7 +10103,7 @@
       ]
     },
     {
-      "id": "webbboxx-13063888",
+      "id": "webbboxx-11360691",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10203,7 +10168,7 @@
       ]
     },
     {
-      "id": "webbboxx-12334411",
+      "id": "webbboxx-9418254",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10268,7 +10233,7 @@
       ]
     },
     {
-      "id": "webbboxx-11681977",
+      "id": "webbboxx-10690881",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
