@@ -6889,3 +6889,144 @@ body.player-open .music-bar-toggle {
   }
 }
 
+/* ==========================================================================
+   響應式排版與佈局擴充樣式 (Responsive Web Design Extensions)
+   ========================================================================== */
+
+/* 桌機與平板大螢幕 (769px - 1199px) 導覽列與標頭優化 */
+@media (max-width: 1200px) {
+  header {
+    padding: 1.2rem 1.8rem 0.8rem !important;
+    gap: 1rem !important;
+  }
+  
+  .header-right {
+    gap: 0.8rem !important;
+  }
+}
+
+@media (max-width: 1080px) {
+  .header-search {
+    max-width: 220px !important;
+    margin: 0 1rem !important;
+  }
+}
+
+/* 當螢幕寬度小於 992px，但仍在桌機/平板模式下 (992px - 769px) */
+@media (max-width: 992px) {
+  .nav-toggle-btn:not(.login-trigger-btn):not(.logout-btn):not(.profile-trigger-btn) {
+    font-size: 0 !important;
+    padding: 0 !important;
+    width: 38px;
+    height: 38px;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+  
+  [data-theme='light'] .nav-toggle-btn:not(.login-trigger-btn):not(.logout-btn):not(.profile-trigger-btn) {
+    border-color: rgba(0, 0, 0, 0.1);
+  }
+  
+  .nav-toggle-btn:not(.login-trigger-btn):not(.logout-btn):not(.profile-trigger-btn) svg {
+    margin-right: 0 !important;
+    width: 1.1rem;
+    height: 1.1rem;
+  }
+}
+
+/* 平板尺寸 (769px - 1024px) 側邊欄寬度最佳化 */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .main-layout {
+    grid-template-columns: 1fr 380px !important;
+  }
+}
+
+/* 側邊欄收合佈局 (Sidebar Collapsibility) */
+.main-layout.sidebar-collapsed {
+  grid-template-columns: 1fr 0px !important;
+}
+
+.main-layout.sidebar-collapsed .sidebar {
+  display: none !important;
+  visibility: hidden;
+}
+
+/* 側邊欄收合切換按鈕 */
+.sidebar-collapse-toggle-btn {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 60px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: -4px 0 10px rgba(0, 0, 0, 0.25);
+  font-size: 0.75rem;
+  font-family: monospace;
+  outline: none;
+}
+
+.sidebar-collapse-toggle-btn:hover {
+  background: var(--border);
+  color: var(--gold);
+  box-shadow: -4px 0 12px rgba(var(--gold-rgb), 0.3);
+}
+
+.sidebar-collapse-toggle-btn.collapsed {
+  border-right: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  left: 0;
+  right: auto;
+  box-shadow: 4px 0 10px rgba(0, 0, 0, 0.25);
+}
+
+.sidebar-collapse-toggle-btn.collapsed:hover {
+  box-shadow: 4px 0 12px rgba(var(--gold-rgb), 0.3);
+}
+
+/* 超小螢幕手機 (<= 360px) 底部導覽列優化 */
+@media (max-width: 360px) {
+  .bottom-nav-item .label {
+    font-size: 0.58rem !important;
+    letter-spacing: 0.02em !important;
+  }
+  
+  .bottom-nav-item .icon {
+    font-size: 1.15rem !important;
+  }
+  
+  .bottom-nav-item .badge {
+    right: 15% !important;
+    top: 2px !important;
+    font-size: 0.55rem !important;
+    padding: 0.1rem 0.25rem !important;
+  }
+}
+
+/* 日曆中等螢幕與小螢幕優化 */
+@media (max-width: 992px) {
+  .calendar-day-cell {
+    min-height: 80px;
+  }
+  
+  .calendar-event-pill {
+    padding: 2px 4px !important;
+    font-size: 0.68rem !important;
+  }
+}
+
+

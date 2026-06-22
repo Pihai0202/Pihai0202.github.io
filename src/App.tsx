@@ -244,6 +244,7 @@ function App() {
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   useEffect(() => {
     if (view === 'board') {
@@ -878,7 +879,7 @@ function App() {
       </header>
 
       {view === 'map' ? (
-        <main className={`main-layout mobile-tab-${mobileTab}`}>
+        <main className={`main-layout mobile-tab-${mobileTab}${isSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
@@ -964,6 +965,15 @@ function App() {
 
             <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
               📋 全部記錄
+            </button>
+
+            <button
+              className={`sidebar-collapse-toggle-btn${isSidebarCollapsed ? ' collapsed' : ''}`}
+              type="button"
+              onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+              title={isSidebarCollapsed ? "展開側邊欄" : "收合側邊欄"}
+            >
+              {isSidebarCollapsed ? '◀' : '▶'}
             </button>
           </section>
           <aside className="sidebar">
