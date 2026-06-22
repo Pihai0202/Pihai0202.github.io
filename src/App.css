@@ -1726,12 +1726,8 @@ body.player-open .music-bar-toggle {
     font-size: 0.75rem;
   }
 
-  .logo-text h1 {
-    font-size: 0.9rem;
-  }
-
-  .logo-text span {
-    display: none;
+  .logo-text {
+    display: none !important;
   }
 
   .venue-name {
