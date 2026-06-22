@@ -5896,7 +5896,7 @@ body.player-open .music-bar-toggle {
   }
 
   .all-concerts-btn {
-    bottom: calc(var(--bottom-offset) + 55px) !important;
+    bottom: calc(var(--bottom-offset) + 70px) !important;
   }
 
   .map-zoom-control.vertical {
