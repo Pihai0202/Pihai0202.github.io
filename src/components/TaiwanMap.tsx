@@ -265,6 +265,24 @@ export function TaiwanMap({
     }
   }
 
+  const SPORT_VENUE_IDS = [
+    'taipei-dome',
+    'taoyuan-arena',
+    'hsinchu',
+    'taichung-dome',
+    'changhua',
+    'tainan',
+    'kaohsiung-natl',
+    'hualien',
+    'taitung',
+    'tianmu',
+    'xinzhuang',
+    'asia-pacific-main',
+    'chengcing-lake',
+    'douliou',
+    'chiayi'
+  ]
+
   const width = 370 / displayZoom
   const height = 450 / displayZoom
   const minX = displayCenter.x - width / 2
@@ -351,10 +369,7 @@ export function TaiwanMap({
                                    displayZoom >= 1.5 ||
                                    (hoveredVenue && hoveredVenue.id === venue.id)
 
-            const isSport = venue.name.includes('棒球場') ||
-                            venue.name.includes('體育場') ||
-                            venue.name.includes('體育館') ||
-                            venue.name.includes('巨蛋')
+            const isSport = SPORT_VENUE_IDS.includes(venue.id)
 
             const iconSize = 16 / displayZoom
             const halfSize = iconSize / 2
