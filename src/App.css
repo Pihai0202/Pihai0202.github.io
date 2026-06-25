@@ -6167,6 +6167,30 @@ body.player-open .music-bar-toggle {
     font-size: 1.8rem !important;
   }
 
+  .profile-stats-card-list {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 0.6rem !important;
+    width: 100% !important;
+  }
+
+  .profile-stat-box {
+    padding: 0.6rem 0.8rem !important;
+    gap: 0.5rem !important;
+  }
+
+  .profile-stat-box .stat-icon {
+    font-size: 1.2rem !important;
+  }
+
+  .stat-value {
+    font-size: 0.85rem !important;
+  }
+
+  .stat-label {
+    font-size: 0.62rem !important;
+  }
+
   /* ==========================================================================
      Mobile Bottom Navigation Bar & Dynamic Layout Offsets
      ========================================================================== */
