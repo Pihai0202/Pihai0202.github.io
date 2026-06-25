@@ -5287,6 +5287,8 @@ body.player-open .music-bar-toggle {
   align-items: center;
   gap: 0.5rem;
   margin-bottom: 0.5rem;
+  max-width: 100%;
+  min-width: 0;
 }
 
 .nickname-display-row h2 {
@@ -5294,6 +5296,9 @@ body.player-open .music-bar-toggle {
   font-weight: 800;
   color: var(--text);
   margin: 0;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 .edit-name-trigger {
@@ -5304,6 +5309,7 @@ body.player-open .music-bar-toggle {
   padding: 0.2rem;
   opacity: 0.6;
   transition: opacity 0.2s;
+  flex-shrink: 0;
 }
 
 .edit-name-trigger:hover {
@@ -5361,6 +5367,7 @@ body.player-open .music-bar-toggle {
 }
 
 .profile-email-badge {
+  display: inline-block;
   font-size: 0.78rem;
   color: var(--muted);
   background: rgba(255, 255, 255, 0.04);
@@ -5368,6 +5375,11 @@ body.player-open .music-bar-toggle {
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.02);
   margin: 0;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
 .profile-stats-card-list {
@@ -6160,6 +6172,16 @@ body.player-open .music-bar-toggle {
   .profile-header-actions {
     margin-bottom: 1.2rem !important;
     padding-bottom: 0.8rem !important;
+    flex-wrap: wrap !important;
+    gap: 0.5rem !important;
+  }
+  .profile-back-btn {
+    padding: 0.45rem 1rem !important;
+    font-size: 0.78rem !important;
+  }
+  .profile-logout-btn {
+    padding: 0.45rem 0.9rem !important;
+    font-size: 0.75rem !important;
   }
   .profile-sidebar-card {
     padding: 1.2rem 1rem !important;
@@ -6169,7 +6191,7 @@ body.player-open .music-bar-toggle {
 
   .profile-card-header {
     display: grid !important;
-    grid-template-columns: auto 1fr !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
     grid-template-rows: auto auto !important;
     column-gap: 1rem !important;
     row-gap: 0.25rem !important;
@@ -6200,10 +6222,15 @@ body.player-open .music-bar-toggle {
     align-items: center !important;
     gap: 0.5rem !important;
     width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
   }
 
   .nickname-display-row h2 {
     font-size: 1.15rem !important;
+    text-overflow: ellipsis !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
   }
 
   .profile-email-badge {
@@ -6212,7 +6239,12 @@ body.player-open .music-bar-toggle {
     margin: 0 !important;
     padding: 0.15rem 0.5rem !important;
     font-size: 0.72rem !important;
-    width: fit-content !important;
+    max-width: 100% !important;
+    display: inline-block !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    box-sizing: border-box !important;
   }
 
   .edit-nickname-row input {
