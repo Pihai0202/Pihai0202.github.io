@@ -1879,7 +1879,10 @@ body.player-open .music-bar-toggle {
   }
 
   .music-bar-toggle {
-    right: 1rem;
+    top: calc(62px + 1rem) !important;
+    left: 1rem !important;
+    right: auto !important;
+    bottom: auto !important;
     max-width: calc(100vw - 2rem);
   }
 
@@ -4368,8 +4371,10 @@ body.player-open .music-bar-toggle {
 
   /* Music Player Button Spacing */
   .music-bar-toggle {
-    bottom: 20px !important; /* Float at bottom */
-    right: 1rem;
+    top: calc(62px + 1rem) !important;
+    left: 1rem !important;
+    right: auto !important;
+    bottom: auto !important;
     max-width: calc(100vw - 2rem);
   }
 
@@ -6194,7 +6199,10 @@ body.player-open .music-bar-toggle {
   }
 
   .music-bar-toggle {
-    bottom: calc(var(--bottom-offset) + 16px) !important;
+    top: calc(62px + 1rem) !important;
+    left: 1rem !important;
+    right: auto !important;
+    bottom: auto !important;
     z-index: 290 !important;
   }
 
