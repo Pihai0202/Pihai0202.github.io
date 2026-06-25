@@ -23,7 +23,7 @@ import { TicketDetailModal } from './components/TicketDetailModal'
 import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
-import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
+import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
 import {
@@ -506,118 +506,97 @@ function App() {
     }
   }, [])
 
+  const updateConcertsList = async (updatedList: Concert[]) => {
+    if (isLoggedIn && currentUser?.email) {
+      const email = currentUser.email
+      try {
+        const docRef = doc(db, 'users_concerts', email)
+        await setDoc(docRef, {
+          email,
+          concerts: updatedList,
+          updatedAt: new Date().toISOString()
+        })
+        // Also update local cache for quick loading next time
+        localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(updatedList))
+      } catch (error) {
+        console.error('Failed to save to Firestore:', error)
+      }
+    } else {
+      setConcerts(updatedList)
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList))
+      } catch (error) {
+        console.error('Failed to save guest concerts:', error)
+      }
+    }
+  }
+
   // Sync and load user-specific concerts from Firestore when login state changes
   useEffect(() => {
-    async function syncConcerts() {
-      if (isLoggedIn && currentUser?.email) {
-        const email = currentUser.email
-        try {
-          const docRef = doc(db, 'users_concerts', email)
-          const docSnap = await getDoc(docRef)
+    let unsubscribe = () => {}
 
-          // Load current local guest concerts to merge
-          const guestCached = localStorage.getItem(STORAGE_KEY)
-          const guestConcerts = guestCached ? (JSON.parse(guestCached) as Concert[]) : []
+    if (isLoggedIn && currentUser?.email) {
+      const email = currentUser.email
+      const docRef = doc(db, 'users_concerts', email)
 
-          if (docSnap.exists()) {
-            const remoteConcerts = docSnap.data().concerts as Concert[]
-            
-            // Merge guest concerts into remote concerts (deduplicated by id)
-            let mergedConcerts = [...remoteConcerts]
-            let hasNewMerge = false
-            guestConcerts.forEach((gc) => {
-              if (!mergedConcerts.some((rc) => rc.id === gc.id)) {
-                mergedConcerts.push(gc)
-                hasNewMerge = true
-              }
-            })
+      unsubscribe = onSnapshot(docRef, (docSnap) => {
+        // Load current local guest concerts to merge
+        const guestCached = localStorage.getItem(STORAGE_KEY)
+        const guestConcerts = guestCached ? (JSON.parse(guestCached) as Concert[]) : []
 
-            setConcerts(mergedConcerts)
-            localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
+        if (docSnap.exists()) {
+          const remoteConcerts = docSnap.data().concerts as Concert[]
 
-            if (hasNewMerge) {
-              await setDoc(docRef, {
-                email,
-                concerts: mergedConcerts,
-                updatedAt: new Date().toISOString()
-              })
+          // Merge guest concerts into remote concerts (deduplicated by id)
+          let mergedConcerts = [...remoteConcerts]
+          let hasNewMerge = false
+          guestConcerts.forEach((gc) => {
+            if (!mergedConcerts.some((rc) => rc.id === gc.id)) {
+              mergedConcerts.push(gc)
+              hasNewMerge = true
             }
-          } else {
-            // Check if there is a local cache for this email
-            const cached = localStorage.getItem(`tw-concerts-${email}`)
-            if (cached) {
-              const localParsed = JSON.parse(cached) as Concert[]
-              
-              // Merge guest concerts into local user cache
-              let mergedConcerts = [...localParsed]
-              guestConcerts.forEach((gc) => {
-                if (!mergedConcerts.some((lc) => lc.id === gc.id)) {
-                  mergedConcerts.push(gc)
-                }
-              })
+          })
 
-              setConcerts(mergedConcerts)
-              localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
-              await setDoc(docRef, {
-                email,
-                concerts: mergedConcerts,
-                updatedAt: new Date().toISOString()
-              })
-            } else {
-              // No remote data and no account cache: initialize with guest concerts
-              setConcerts(guestConcerts)
-              localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(guestConcerts))
-              await setDoc(docRef, {
-                email,
-                concerts: guestConcerts,
-                updatedAt: new Date().toISOString()
-              })
-            }
+          setConcerts(mergedConcerts)
+          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
+
+          if (hasNewMerge) {
+            setDoc(docRef, {
+              email,
+              concerts: mergedConcerts,
+              updatedAt: new Date().toISOString()
+            }).catch((err) => console.error('Failed to merge guest concerts to Firestore:', err))
+            // Clear guest local storage after successful merge
+            localStorage.setItem(STORAGE_KEY, '[]')
           }
-        } catch (error) {
-          console.error('Failed to sync concerts from Firestore:', error)
-          // Fallback to local cache if offline/error
-          const cached = localStorage.getItem(`tw-concerts-${email}`)
-          if (cached) {
-            setConcerts(JSON.parse(cached) as Concert[])
-          }
+        } else {
+          // Document doesn't exist, initialize with guest concerts
+          setConcerts(guestConcerts)
+          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(guestConcerts))
+          setDoc(docRef, {
+            email,
+            concerts: guestConcerts,
+            updatedAt: new Date().toISOString()
+          }).catch((err) => console.error('Failed to initialize user concerts in Firestore:', err))
+          // Clear guest local storage
+          localStorage.setItem(STORAGE_KEY, '[]')
         }
-      } else {
-        // Fallback to guest list
-        setConcerts(loadConcerts())
-      }
+      }, (error) => {
+        console.error('Firestore real-time sync failed:', error)
+        // Fallback to local cache if offline/error
+        const cached = localStorage.getItem(`tw-concerts-${email}`)
+        if (cached) {
+          setConcerts(JSON.parse(cached) as Concert[])
+        }
+      })
+    } else {
+      // Fallback to guest list
+      setConcerts(loadConcerts())
     }
-    syncConcerts()
+
+    return () => unsubscribe()
   }, [isLoggedIn, currentUser])
 
-  // Persist concerts when state changes
-  useEffect(() => {
-    async function persistConcerts() {
-      if (isLoggedIn && currentUser?.email) {
-        const email = currentUser.email
-        try {
-          // 1. Save locally to account cache
-          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(concerts))
-          // 2. Sync to Firestore
-          const docRef = doc(db, 'users_concerts', email)
-          await setDoc(docRef, {
-            email,
-            concerts,
-            updatedAt: new Date().toISOString()
-          })
-        } catch (error) {
-          console.error('Failed to persist concerts:', error)
-        }
-      } else {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(concerts))
-        } catch {
-          alert('儲存空間不足，請清理一些照片再試。')
-        }
-      }
-    }
-    persistConcerts()
-  }, [concerts, isLoggedIn, currentUser])
 
   useEffect(() => {
     loadRemoteConcerts()
@@ -723,7 +702,8 @@ function App() {
       createdAt: new Date().toISOString(),
     }
 
-    setConcerts((current) => [...current, concert])
+    const updatedList = [...concerts, concert]
+    updateConcertsList(updatedList)
     setIsAddModalOpen(false)
     logCustomEvent('add_concert_record', {
       venue_id: concert.venueId,
@@ -736,7 +716,8 @@ function App() {
   const deleteConcert = (id: string, event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
     if (!confirm('確定要刪除這筆記錄嗎？')) return
-    setConcerts((current) => current.filter((concert) => concert.id !== id))
+    const updatedList = concerts.filter((c) => c.id !== id)
+    updateConcertsList(updatedList)
   }
 
   const handlePublishToBoard = async (authorName: string) => {
