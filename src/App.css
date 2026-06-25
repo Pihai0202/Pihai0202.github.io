@@ -340,52 +340,53 @@ svg#taiwan-map.dragging {
 
 .venue-dot {
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .venue-dot circle.bg {
   fill: var(--accent);
-  opacity: 0.15;
-  transition: all 0.3s ease;
+  opacity: 0;
+  r: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .venue-dot circle.core {
   fill: var(--accent);
-  r: calc(6px / var(--map-zoom, 1));
-  transition: all 0.3s ease;
-}
-
-.venue-dot circle.bg {
-  r: calc(16px / var(--map-zoom, 1));
+  r: calc(4px / var(--map-zoom, 1));
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .venue-dot circle.click-target {
   r: calc(25px / var(--map-zoom, 1));
 }
 
-.venue-dot.visited circle.core,
+.venue-dot.visited circle.core {
+  fill: var(--teal);
+  r: calc(4.5px / var(--map-zoom, 1));
+}
+
 .venue-dot.visited circle.bg {
   fill: var(--teal);
 }
 
 .venue-dot:hover circle.bg {
-  opacity: 0.5;
-  r: calc(22px / var(--map-zoom, 1));
+  opacity: 0.25;
+  r: calc(14px / var(--map-zoom, 1));
 }
 
 .venue-dot:hover circle.core {
-  r: calc(9px / var(--map-zoom, 1));
+  r: calc(7px / var(--map-zoom, 1));
 }
 
 .venue-dot.active circle.core {
   fill: var(--gold);
-  r: calc(10px / var(--map-zoom, 1));
+  r: calc(8px / var(--map-zoom, 1));
 }
 
 .venue-dot.active circle.bg {
   fill: var(--gold);
   opacity: 0.3;
-  r: calc(24px / var(--map-zoom, 1));
+  r: calc(18px / var(--map-zoom, 1));
 }
 
 .pulse-ring {
@@ -393,21 +394,32 @@ svg#taiwan-map.dragging {
   stroke: var(--accent);
   stroke-width: calc(1.5px / var(--map-zoom, 1));
   opacity: 0;
-  animation: pulse-ring 2.5s ease-out infinite;
+  pointer-events: none;
 }
 
-.venue-dot.visited .pulse-ring {
+.venue-dot:hover .pulse-ring {
+  opacity: 0.6;
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.venue-dot.active .pulse-ring {
+  opacity: 0.8;
+  stroke: var(--gold);
+  animation: pulse-ring 2s ease-out infinite;
+}
+
+.venue-dot.visited:hover .pulse-ring {
   stroke: var(--teal);
 }
 
 @keyframes pulse-ring {
   0% {
-    r: calc(8px / var(--map-zoom, 1));
+    r: calc(6px / var(--map-zoom, 1));
     opacity: 0.8;
   }
 
   100% {
-    r: calc(28px / var(--map-zoom, 1));
+    r: calc(22px / var(--map-zoom, 1));
     opacity: 0;
   }
 }
@@ -2378,10 +2390,18 @@ body.player-open .music-bar-toggle {
 
 /* 圓點發光效果 */
 .venue-dot circle.core {
-  filter: drop-shadow(0 0 6px var(--accent));
+  filter: drop-shadow(0 0 2px rgba(255, 107, 0, 0.4));
 }
 
 .venue-dot.visited circle.core {
+  filter: drop-shadow(0 0 2px rgba(20, 110, 120, 0.4));
+}
+
+.venue-dot:hover circle.core {
+  filter: drop-shadow(0 0 6px var(--accent));
+}
+
+.venue-dot.visited:hover circle.core {
   filter: drop-shadow(0 0 6px var(--teal));
 }
 
