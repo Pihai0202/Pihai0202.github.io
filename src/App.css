@@ -6161,10 +6161,76 @@ body.player-open .music-bar-toggle {
     margin-bottom: 1.2rem !important;
     padding-bottom: 0.8rem !important;
   }
+  .profile-sidebar-card {
+    padding: 1.2rem 1rem !important;
+    border-radius: 12px !important;
+    background: rgba(var(--surface-rgb), 0.95) !important;
+  }
+
+  .profile-card-header {
+    display: grid !important;
+    grid-template-columns: auto 1fr !important;
+    grid-template-rows: auto auto !important;
+    column-gap: 1rem !important;
+    row-gap: 0.25rem !important;
+    align-items: center !important;
+    justify-items: start !important;
+    padding-bottom: 1rem !important;
+    margin-bottom: 1rem !important;
+    text-align: left !important;
+    border-bottom: 1px solid var(--border) !important;
+  }
+
   .profile-avatar-large {
-    width: 76px !important;
-    height: 76px !important;
-    font-size: 1.8rem !important;
+    grid-row: 1 / span 2 !important;
+    grid-column: 1 !important;
+    width: 56px !important;
+    height: 56px !important;
+    font-size: 1.4rem !important;
+    margin-bottom: 0 !important;
+    align-self: center !important;
+  }
+
+  .nickname-display-row,
+  .edit-nickname-row {
+    grid-row: 1 !important;
+    grid-column: 2 !important;
+    margin-bottom: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    width: 100% !important;
+  }
+
+  .nickname-display-row h2 {
+    font-size: 1.15rem !important;
+  }
+
+  .profile-email-badge {
+    grid-row: 2 !important;
+    grid-column: 2 !important;
+    margin: 0 !important;
+    padding: 0.15rem 0.5rem !important;
+    font-size: 0.72rem !important;
+    width: fit-content !important;
+  }
+
+  .edit-nickname-row input {
+    padding: 0.3rem 0.5rem !important;
+    font-size: 0.8rem !important;
+    max-width: 110px !important;
+    height: 28px !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--border) !important;
+    color: var(--text) !important;
+    border-radius: 4px !important;
+  }
+
+  .edit-nickname-row button {
+    padding: 0.3rem 0.6rem !important;
+    font-size: 0.75rem !important;
+    border-radius: 4px !important;
+    height: 28px !important;
   }
 
   .profile-stats-card-list {
