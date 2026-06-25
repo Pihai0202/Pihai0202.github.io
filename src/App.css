@@ -331,95 +331,109 @@ svg#taiwan-map.dragging {
   cursor: grabbing;
 }
 
-.venue-dot.category-inactive {
+.venue-icon-group.category-inactive {
   opacity: 0.12;
   pointer-events: none;
   filter: grayscale(85%);
   transition: all 0.3s ease;
 }
 
-.venue-dot {
+.venue-icon-group {
   cursor: pointer;
+}
+
+.venue-icon {
+  overflow: visible;
+  pointer-events: none;
+}
+
+.venue-icon-group .icon-plate {
+  fill: #1a1a24;
+  stroke: var(--accent);
+  stroke-width: 1.5px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.venue-dot circle.bg {
+.venue-icon-group .icon-symbol {
   fill: var(--accent);
-  opacity: 0;
-  r: 0;
+  stroke: var(--accent);
+  stroke-width: 1.2px;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.venue-dot circle.core {
+.venue-icon-group.visited .icon-plate {
+  stroke: var(--teal);
+}
+
+.venue-icon-group.visited .icon-symbol {
+  fill: var(--teal);
+  stroke: var(--teal);
+}
+
+.venue-icon-group:hover .icon-plate {
+  stroke: var(--accent);
   fill: var(--accent);
-  r: calc(4px / var(--map-zoom, 1));
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 0 6px var(--accent));
 }
 
-.venue-dot circle.click-target {
-  r: calc(25px / var(--map-zoom, 1));
+.venue-icon-group:hover .icon-symbol {
+  fill: #1a1a24;
+  stroke: #1a1a24;
 }
 
-.venue-dot.visited circle.core {
+.venue-icon-group.visited:hover .icon-plate {
+  stroke: var(--teal);
   fill: var(--teal);
-  r: calc(4.5px / var(--map-zoom, 1));
+  filter: drop-shadow(0 0 6px var(--teal));
 }
 
-.venue-dot.visited circle.bg {
-  fill: var(--teal);
+.venue-icon-group.visited:hover .icon-symbol {
+  fill: #1a1a24;
+  stroke: #1a1a24;
 }
 
-.venue-dot:hover circle.bg {
-  opacity: 0.25;
-  r: calc(14px / var(--map-zoom, 1));
-}
-
-.venue-dot:hover circle.core {
-  r: calc(7px / var(--map-zoom, 1));
-}
-
-.venue-dot.active circle.core {
+.venue-icon-group.active .icon-plate {
+  stroke: var(--gold);
   fill: var(--gold);
-  r: calc(8px / var(--map-zoom, 1));
+  filter: drop-shadow(0 0 8px var(--gold));
 }
 
-.venue-dot.active circle.bg {
-  fill: var(--gold);
-  opacity: 0.3;
-  r: calc(18px / var(--map-zoom, 1));
+.venue-icon-group.active .icon-symbol {
+  fill: #1a1a24;
+  stroke: #1a1a24;
 }
 
 .pulse-ring {
   fill: none;
   stroke: var(--accent);
-  stroke-width: calc(1.5px / var(--map-zoom, 1));
+  stroke-width: calc(1.2px / var(--map-zoom, 1));
   opacity: 0;
   pointer-events: none;
 }
 
-.venue-dot:hover .pulse-ring {
+.venue-icon-group:hover .pulse-ring {
   opacity: 0.6;
   animation: pulse-ring 2s ease-out infinite;
 }
 
-.venue-dot.active .pulse-ring {
+.venue-icon-group.active .pulse-ring {
   opacity: 0.8;
   stroke: var(--gold);
   animation: pulse-ring 2s ease-out infinite;
 }
 
-.venue-dot.visited:hover .pulse-ring {
+.venue-icon-group.visited:hover .pulse-ring {
   stroke: var(--teal);
 }
 
 @keyframes pulse-ring {
   0% {
-    r: calc(6px / var(--map-zoom, 1));
+    r: calc(10px / var(--map-zoom, 1));
     opacity: 0.8;
   }
 
   100% {
-    r: calc(22px / var(--map-zoom, 1));
+    r: calc(26px / var(--map-zoom, 1));
     opacity: 0;
   }
 }
@@ -2388,26 +2402,7 @@ body.player-open .music-bar-toggle {
   border: 1px solid rgba(20, 110, 120, 0.25);
 }
 
-/* 圓點發光效果 */
-.venue-dot circle.core {
-  filter: drop-shadow(0 0 2px rgba(255, 107, 0, 0.4));
-}
 
-.venue-dot.visited circle.core {
-  filter: drop-shadow(0 0 2px rgba(20, 110, 120, 0.4));
-}
-
-.venue-dot:hover circle.core {
-  filter: drop-shadow(0 0 6px var(--accent));
-}
-
-.venue-dot.visited:hover circle.core {
-  filter: drop-shadow(0 0 6px var(--teal));
-}
-
-.venue-dot.active circle.core {
-  filter: drop-shadow(0 0 8px var(--gold));
-}
 
 @media (max-width: 768px) {
   .venue-panel-container {

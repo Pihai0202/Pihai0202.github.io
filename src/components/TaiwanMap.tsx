@@ -343,10 +343,18 @@ export function TaiwanMap({
             const isActive = selectedVenueId === venue.id
             const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
 
+            const isSport = venue.name.includes('棒球場') ||
+                            venue.name.includes('體育場') ||
+                            venue.name.includes('體育館') ||
+                            venue.name.includes('巨蛋')
+
+            const iconSize = 16 / displayZoom
+            const halfSize = iconSize / 2
+
             return (
               <g
                 key={venue.id}
-                className={`venue-dot${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''}`}
+                className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''}`}
                 transform={`translate(${venue.x},${venue.y})`}
                 onClick={(e) => {
                   if (isCategoryInactive) return
@@ -364,10 +372,30 @@ export function TaiwanMap({
                   setHoveredVenue(null)
                 }}
               >
-                <circle className="click-target" r="25" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
-                <circle className="pulse-ring" r="8" cx="0" cy="0" />
-                <circle className="bg" r="16" cx="0" cy="0" />
-                <circle className="core" r="6" cx="0" cy="0" />
+                <circle className="click-target" r="18" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
+                <circle className="pulse-ring" r="12" cx="0" cy="0" />
+                <svg
+                  x={-halfSize}
+                  y={-halfSize}
+                  width={iconSize}
+                  height={iconSize}
+                  viewBox="0 0 24 24"
+                  className="venue-icon"
+                >
+                  <circle className="icon-plate" cx="12" cy="12" r="11" />
+                  {isSport ? (
+                    <g className="icon-symbol" strokeWidth="1.5" fill="none" stroke="currentColor">
+                      <path d="M6 12a6 6 0 0 1 12 0" />
+                      <path d="M6 12a6 6 0 0 0 12 0" />
+                    </g>
+                  ) : (
+                    <g className="icon-symbol" stroke="currentColor">
+                      <path d="M9 18V5l12-2v13" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                      <circle cx="6" cy="18" r="3" />
+                      <circle cx="18" cy="16" r="3" />
+                    </g>
+                  )}
+                </svg>
               </g>
             )
           })}
