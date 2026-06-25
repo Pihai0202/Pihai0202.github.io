@@ -63,6 +63,14 @@ const SPOTIFY_TYPE_LABELS: Record<SpotifyItem['type'], string> = {
   track: '歌曲',
 }
 
+function getRegionForCity(city: string): string {
+  if (['台北', '新北', '桃園', '新竹'].includes(city)) return '北部地區'
+  if (['台中', '彰化', '雲林', '嘉義'].includes(city)) return '中部地區'
+  if (['台南', '高雄'].includes(city)) return '南部地區'
+  if (['花蓮', '台東'].includes(city)) return '東部地區'
+  return '其他地區'
+}
+
 let spotifyToken: string | null = null
 let spotifyTokenExpiry = 0
 
@@ -246,6 +254,17 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
+  const [isVenuePanelExpanded, setIsVenuePanelExpanded] = useState(() => {
+    return typeof window !== 'undefined' ? window.innerWidth > 768 : true
+  })
+  const [venueSearchQuery, setVenueSearchQuery] = useState('')
+  const [expandedRegions, setExpandedRegions] = useState<Record<string, boolean>>({
+    '北部地區': true,
+    '中部地區': false,
+    '南部地區': false,
+    '東部地區': false,
+  })
+
   useEffect(() => {
     if (view === 'board') {
       setMobileTab('board')
@@ -352,6 +371,50 @@ function App() {
   const activeVenueIds = useMemo(() => {
     return new Set(filteredRemoteConcerts.map((rc) => rc.venue_id).filter(Boolean) as string[])
   }, [filteredRemoteConcerts])
+
+  const groupedVenues = useMemo(() => {
+    const grouped: Record<string, typeof VENUES> = {
+      '北部地區': [],
+      '中部地區': [],
+      '南部地區': [],
+      '東部地區': [],
+    }
+
+    const filtered = VENUES.filter((v) => {
+      if (categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(v.id)) {
+        return false
+      }
+      if (venueSearchQuery) {
+        const query = venueSearchQuery.toLowerCase()
+        return (
+          v.name.toLowerCase().includes(query) ||
+          v.city.toLowerCase().includes(query) ||
+          (v.address && v.address.toLowerCase().includes(query))
+        )
+      }
+      return true
+    })
+
+    filtered.forEach((v) => {
+      const region = getRegionForCity(v.city)
+      if (grouped[region]) {
+        grouped[region].push(v)
+      }
+    })
+
+    return grouped
+  }, [venueSearchQuery, categoryFilter, activeVenueIds])
+
+  useEffect(() => {
+    if (venueSearchQuery) {
+      setExpandedRegions({
+        '北部地區': true,
+        '中部地區': true,
+        '南部地區': true,
+        '東部地區': true,
+      })
+    }
+  }, [venueSearchQuery])
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
     try {
@@ -883,27 +946,94 @@ function App() {
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
-            <div className="venue-chips-container">
-              <div className="venue-chips">
-                {VENUES.filter((v) => {
-                  if (categoryFilter === 'all') return true
-                  return activeVenueIds.has(v.id)
-                }).map((v) => {
-                  const isActive = selectedVenueId === v.id
-                  const hasVisits = concerts.some((c) => c.venueId === v.id)
-                  return (
+            <div className={`venue-panel-container ${isVenuePanelExpanded ? 'expanded' : 'collapsed'}`}>
+              <div className="venue-panel-header">
+                <div className="search-input-wrapper">
+                  <span className="search-icon"><SearchIcon /></span>
+                  <input
+                    type="text"
+                    placeholder="搜尋場館..."
+                    value={venueSearchQuery}
+                    onChange={(e) => setVenueSearchQuery(e.target.value)}
+                    onClick={() => {
+                      if (!isVenuePanelExpanded) setIsVenuePanelExpanded(true)
+                    }}
+                  />
+                  {venueSearchQuery && (
                     <button
-                      key={v.id}
+                      className="search-clear-btn"
                       type="button"
-                      className={`venue-chip${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
-                      onClick={() => setSelectedVenueId(v.id)}
+                      onClick={() => setVenueSearchQuery('')}
                     >
-                      <span className="dot" />
-                      {v.name}
+                      <CloseIcon />
                     </button>
-                  )
-                })}
+                  )}
+                </div>
+                <button
+                  className="panel-toggle-btn"
+                  type="button"
+                  onClick={() => setIsVenuePanelExpanded(!isVenuePanelExpanded)}
+                  title={isVenuePanelExpanded ? "收合面版" : "展開面版"}
+                >
+                  {isVenuePanelExpanded ? <CloseIcon /> : <MapIcon />}
+                </button>
               </div>
+
+              {isVenuePanelExpanded && (
+                <div className="venue-panel-content">
+                  {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
+                    <div className="no-venues-found">找不到符合的場館</div>
+                  ) : (
+                    Object.entries(groupedVenues).map(([region, list]) => {
+                      if (list.length === 0) return null
+                      const isExpanded = expandedRegions[region]
+                      return (
+                        <div key={region} className="region-group">
+                          <button
+                            className="region-group-header"
+                            type="button"
+                            onClick={() =>
+                              setExpandedRegions((prev) => ({
+                                ...prev,
+                                [region]: !prev[region],
+                              }))
+                            }
+                          >
+                            <span className="region-title">{region}</span>
+                            <span className="region-count">{list.length}</span>
+                            <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
+                          </button>
+                          {isExpanded && (
+                            <div className="region-group-list">
+                              {list.map((v) => {
+                                const isActive = selectedVenueId === v.id
+                                const hasVisits = concerts.some((c) => c.venueId === v.id)
+                                return (
+                                  <button
+                                    key={v.id}
+                                    type="button"
+                                    className={`venue-list-item${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
+                                    onClick={() => {
+                                      setSelectedVenueId(v.id)
+                                      if (window.innerWidth <= 768) {
+                                        setIsVenuePanelExpanded(false)
+                                      }
+                                    }}
+                                  >
+                                    <span className="dot" />
+                                    <span className="name">{v.name}</span>
+                                    {hasVisits && <span className="visited-badge">✓</span>}
+                                  </button>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              )}
             </div>
 
             <TaiwanMap
