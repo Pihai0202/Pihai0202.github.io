@@ -5238,7 +5238,7 @@ body.player-open .music-bar-toggle {
 
 @media (max-width: 992px) {
   .profile-layout-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -5254,6 +5254,7 @@ body.player-open .music-bar-toggle {
   align-self: start;
   box-shadow: 0 4px 25px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(10px);
+  min-width: 0;
 }
 
 .profile-card-header {
@@ -5398,6 +5399,7 @@ body.player-open .music-bar-toggle {
   border-radius: 10px;
   padding: 0.9rem 1.2rem;
   transition: all 0.25s ease;
+  min-width: 0;
 }
 
 .profile-stat-box:hover {
@@ -5438,6 +5440,7 @@ body.player-open .music-bar-toggle {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  min-width: 0;
 }
 
 .profile-content-section {
@@ -6155,10 +6158,20 @@ body.player-open .music-bar-toggle {
 @media (max-width: 768px) {
   .profile-board-container {
     padding: 1rem 0.8rem 5rem !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+  .profile-layout-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 1.2rem !important;
+    width: 100% !important;
   }
   .profile-content-section {
     padding: 1.2rem !important;
     border-radius: 12px !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
   .profile-concert-table-wrapper {
     overflow-x: auto !important;
@@ -6187,6 +6200,14 @@ body.player-open .music-bar-toggle {
     padding: 1.2rem 1rem !important;
     border-radius: 12px !important;
     background: rgba(var(--surface-rgb), 0.95) !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .profile-main-content {
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
   }
 
   .profile-card-header {
@@ -6267,7 +6288,7 @@ body.player-open .music-bar-toggle {
 
   .profile-stats-card-list {
     display: grid !important;
-    grid-template-columns: 1fr 1fr !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
     gap: 0.6rem !important;
     width: 100% !important;
   }
