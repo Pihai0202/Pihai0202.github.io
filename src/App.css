@@ -7598,4 +7598,76 @@ body.player-open .music-bar-toggle {
   .music-bar.visible {
     transform: translateY(0) !important;
   }
+
+  /* Mobile Bottom Sheet Drawer Inline Search */
+  .drawer-search-bar-inline {
+    flex: 1;
+    margin-right: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    max-width: calc(100% - 70px);
+  }
+
+  .drawer-search-bar-inline input {
+    width: 100%;
+    height: 38px;
+    padding: 0 12px 0 34px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    color: #fff;
+    font-size: 0.82rem;
+    outline: none;
+    transition: all 0.2s ease;
+  }
+
+  .drawer-search-bar-inline input:focus {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+  }
+
+  .drawer-search-bar-inline .search-icon {
+    position: absolute;
+    left: 12px;
+    color: rgba(255, 255, 255, 0.4);
+    display: flex;
+    align-items: center;
+  }
+
+  .drawer-search-bar-inline .search-clear-btn {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.4);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+  }
+
+  .selected-venue-header-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .clear-selected-venue-btn {
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
+    color: #fff;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .clear-selected-venue-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 }
