@@ -1,11 +1,11 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, MusicIcon } from './SvgIcon'
 import { auth } from '../firebase'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   updateProfile,
-  signInWithCredential,
+  signInWithPopup,
   GoogleAuthProvider
 } from 'firebase/auth'
 
@@ -22,7 +22,6 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
   const [nickname, setNickname] = useState('')
   const [errorMsg, setErrorMsg] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isGoogleSdkReady, setIsGoogleSdkReady] = useState(false)
 
   const handleEmailAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -80,18 +79,6 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     }
   }
 
-  // Fallback Mock Login
-  const handleMockGoogleLogin = () => {
-    setIsLoading(true)
-    setErrorMsg('')
-    setTimeout(() => {
-      setIsLoading(false)
-      onLoginSuccess({
-        nickname: 'Google樂迷小王',
-        email: 'fan-google@example.com',
-      })
-    }, 1000)
-  }
 
   const handleGuestLogin = () => {
     onLoginSuccess({
@@ -101,77 +88,30 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
   }
 
 
-  // Load Google Sign-In SDK
-  useEffect(() => {
-    const win = window as any
-    // If SDK is already loaded globally
-    if (win.google && win.google.accounts) {
-      setIsGoogleSdkReady(true)
-      return
-    }
-
-    const scriptId = 'google-gsi-client'
-    const existingScript = document.getElementById(scriptId)
-    if (existingScript) return
-
-    const script = document.createElement('script')
-    script.id = scriptId
-    script.src = 'https://accounts.google.com/gsi/client'
-    script.async = true
-    script.defer = true
-    script.onload = () => {
-      if (win.google && win.google.accounts) {
-        setIsGoogleSdkReady(true)
-      }
-    }
-    script.onerror = () => {
-      console.warn('Google GSI SDK failed to load. Falling back to mock login.')
-    }
-    document.body.appendChild(script)
-  }, [])
-
-  // Initialize and render Google button when SDK is ready or when states update
-  useEffect(() => {
-    const win = window as any
-    if (!isGoogleSdkReady || !win.google || !win.google.accounts) return
-
+  const handleGoogleSignInPopup = async () => {
+    setIsLoading(true)
+    setErrorMsg('')
     try {
-      win.google.accounts.id.initialize({
-        client_id: '214241689990-k3f18pigogq6i5r15cstmh3t4vl33lhn.apps.googleusercontent.com',
-        callback: async (response: any) => {
-          setIsLoading(true)
-          setErrorMsg('')
-          try {
-            const credential = GoogleAuthProvider.credential(response.credential)
-            const userCredential = await signInWithCredential(auth, credential)
-            const firebaseUser = userCredential.user
-            onLoginSuccess({
-              nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Google樂迷',
-              email: firebaseUser.email || '',
-            })
-          } catch (err: any) {
-            console.error('Google Sign-In Error:', err)
-            setErrorMsg(err.message || 'Google 登入失敗！')
-          } finally {
-            setIsLoading(false)
-          }
-        },
+      const provider = new GoogleAuthProvider()
+      const userCredential = await signInWithPopup(auth, provider)
+      const firebaseUser = userCredential.user
+      onLoginSuccess({
+        nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Google樂迷',
+        email: firebaseUser.email || '',
       })
-
-      const container = document.getElementById('google-signin-btn-container')
-      if (container) {
-        win.google.accounts.id.renderButton(container, {
-          theme: 'outline',
-          size: 'large',
-          text: 'signin_with',
-          shape: 'rectangular',
-          width: container.clientWidth || 360,
-        })
+    } catch (err: any) {
+      console.error('Google Sign-In Error:', err)
+      if (err.code === 'auth/popup-closed-by-user') {
+        setErrorMsg('登入視窗已關閉！')
+      } else if (err.code === 'auth/cancelled-popup-request') {
+        setErrorMsg('登入請求已被取消！')
+      } else {
+        setErrorMsg(err.message || 'Google 登入失敗！')
       }
-    } catch (err) {
-      console.error('Failed to render Google login button:', err)
+    } finally {
+      setIsLoading(false)
     }
-  }, [isGoogleSdkReady, isRegisterMode, isLoading])
+  }
 
   return (
     <div className="login-page-container">
@@ -256,27 +196,16 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         </div>
 
         <div className="login-oauth-group">
-          {isGoogleSdkReady ? (
-            <div
-              id="google-signin-btn-container"
-              style={{
-                width: '100%',
-                display: 'flex',
-                justifyContent: 'center',
-                minHeight: '40px',
-              }}
-            />
-          ) : (
-            <button
-              className="oauth-btn google-btn"
-              type="button"
-              onClick={handleMockGoogleLogin}
-              disabled={isLoading}
-            >
-              <span className="oauth-icon g-icon" />
-              使用 Google 帳戶登入 (Mock Fallback)
-            </button>
-          )}
+          <button
+            className="oauth-btn google-btn"
+            type="button"
+            onClick={handleGoogleSignInPopup}
+            disabled={isLoading}
+            style={{ width: '100%' }}
+          >
+            <span className="oauth-icon g-icon" />
+            使用 Google 帳戶登入
+          </button>
         </div>
 
         <button
