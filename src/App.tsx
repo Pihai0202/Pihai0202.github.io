@@ -13,7 +13,7 @@ import type {
 } from './types'
 
 import { VENUES } from './constants/venues'
-import { TaiwanMap, Stat, LegendItem } from './components/TaiwanMap'
+import { TaiwanMap, LegendItem } from './components/TaiwanMap'
 import { VenueInfo } from './components/VenueInfo'
 import { VenueWeather } from './components/VenueWeather'
 import { ConcertDetail } from './components/ConcertDetail'
@@ -254,9 +254,6 @@ function App() {
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
-  const [isVenuePanelExpanded, setIsVenuePanelExpanded] = useState(() => {
-    return typeof window !== 'undefined' ? window.innerWidth > 768 : true
-  })
   const [venueSearchQuery, setVenueSearchQuery] = useState('')
   const [expandedRegions, setExpandedRegions] = useState<Record<string, boolean>>({
     '北部地區': true,
@@ -850,16 +847,6 @@ function App() {
   return (
     <>
       <header>
-        {view !== 'login' && (
-          <button
-            className="mobile-menu-toggle-btn"
-            type="button"
-            onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
-            aria-label="選單"
-          >
-            <MenuIcon />
-          </button>
-        )}
         <div className="logo" onClick={handleHeaderClick}>
           <div className="logo-icon"><MusicIcon /></div>
           <div className="logo-text">
@@ -867,191 +854,133 @@ function App() {
             <span>TAIWAN CONCERT LOG</span>
           </div>
         </div>
+        {view !== 'login' && (
+          <button
+            className="mobile-menu-toggle-btn-new"
+            type="button"
+            onClick={() => setIsMobileSidebarOpen(true)}
+            aria-label="選單"
+          >
+            <MenuIcon />
+          </button>
+        )}
+      </header>
 
-        <div className="header-search">
-          <span className="search-icon"><SearchIcon /></span>
-          <input
-            type="text"
-            placeholder="搜尋歌手、售票或場館..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value)
-              if (window.innerWidth <= 768 && e.target.value) {
-                setMobileTab('list')
-              }
-            }}
-          />
-          {searchQuery && (
-            <button
-              className="search-clear-btn"
-              type="button"
-              onClick={() => setSearchQuery('')}
-            >
-              <CloseIcon />
-            </button>
-          )}
-        </div>
+      <div className="app-body-container">
+        {view !== 'login' && (
+          <aside className="desktop-left-sidebar">
+            <div className="sidebar-section search-section">
+              <div className="sidebar-search">
+                <span className="search-icon"><SearchIcon /></span>
+                <input
+                  type="text"
+                  placeholder="搜尋歌手、售票或場館..."
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    if (window.innerWidth <= 768 && e.target.value) {
+                      setMobileTab('list')
+                    }
+                  }}
+                />
+                {searchQuery && (
+                  <button
+                    className="search-clear-btn"
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                  >
+                    <CloseIcon />
+                  </button>
+                )}
+              </div>
+            </div>
 
-        <div className="header-right">
-          <div className="stats-bar">
-            <Stat number={concerts.length} label="演唱會" />
-            <Stat number={visitedVenueCount} label="場館" />
-            <Stat number={remoteConcerts.length} label="售票" />
-            <Stat number={totalMedia} label="照片/影片" />
-          </div>
-          <button
-            className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
-            type="button"
-            onClick={() => setView('map')}
-          >
-            <MapIcon style={{ marginRight: '6px' }} /> 場館地圖
-          </button>
-          <button
-            className={`nav-toggle-btn${view === 'calendar' ? ' active' : ''}`}
-            type="button"
-            onClick={() => setView('calendar')}
-          >
-            <CalendarIcon style={{ marginRight: '6px' }} /> 活動行事曆
-          </button>
-          <button
-            className={`nav-toggle-btn${view === 'board' ? ' active' : ''}`}
-            type="button"
-            onClick={() => setView('board')}
-          >
-            <MessageIcon style={{ marginRight: '6px' }} /> 社群分享牆
-          </button>
-          <button
-            className="theme-toggle-btn"
-            type="button"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
-            aria-label="切換主題"
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
-          {isLoggedIn && currentUser ? (
-            <div className="user-profile-menu">
+            <div className="sidebar-section nav-section">
               <button
-                className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
+                className={`sidebar-nav-btn${view === 'map' ? ' active' : ''}`}
                 type="button"
-                onClick={() => setView('profile')}
-                style={{
-                  border: view === 'profile' ? '1px solid var(--gold)' : '1px solid rgba(255, 255, 255, 0.15)',
-                  color: view === 'profile' ? 'var(--gold)' : 'var(--text)'
-                }}
+                onClick={() => setView('map')}
               >
-                <UserIcon style={{ marginRight: '6px' }} /> 個人資料
+                <MapIcon /> <span>場館地圖</span>
               </button>
-              <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
-                登出
+              <button
+                className={`sidebar-nav-btn${view === 'calendar' ? ' active' : ''}`}
+                type="button"
+                onClick={() => setView('calendar')}
+              >
+                <CalendarIcon /> <span>活動行事曆</span>
+              </button>
+              <button
+                className={`sidebar-nav-btn${view === 'board' ? ' active' : ''}`}
+                type="button"
+                onClick={() => setView('board')}
+              >
+                <MessageIcon /> <span>社群分享牆</span>
               </button>
             </div>
-          ) : (
-            <button
-              className="nav-toggle-btn login-trigger-btn"
-              type="button"
-              onClick={() => setView('login')}
-            >
-              🔑 登入
-            </button>
-          )}
-        </div>
-      </header>
+
+            <div className="sidebar-section stats-section">
+              <div className="sidebar-stat-item">
+                <span className="num">{concerts.length}</span>
+                <span className="lbl">已造訪活動</span>
+              </div>
+              <div className="sidebar-stat-item">
+                <span className="num">{visitedVenueCount}</span>
+                <span className="lbl">造訪場館數</span>
+              </div>
+              <div className="sidebar-stat-item">
+                <span className="num">{remoteConcerts.length}</span>
+                <span className="lbl">售票中活動</span>
+              </div>
+              <div className="sidebar-stat-item">
+                <span className="num">{totalMedia}</span>
+                <span className="lbl">照片與影片</span>
+              </div>
+            </div>
+
+            <div className="sidebar-section footer-section">
+              <button
+                className="sidebar-theme-btn"
+                type="button"
+                onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
+              >
+                {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+                <span>{theme === 'dark' ? '淺色主題' : '深色主題'}</span>
+              </button>
+              
+              {isLoggedIn && currentUser ? (
+                <div className="sidebar-user-menu">
+                  <button
+                    className={`sidebar-user-btn${view === 'profile' ? ' active' : ''}`}
+                    type="button"
+                    onClick={() => setView('profile')}
+                  >
+                    <UserIcon /> <span>個人資料</span>
+                  </button>
+                  <button className="sidebar-logout-btn" type="button" onClick={handleLogout}>
+                    登出
+                  </button>
+                </div>
+              ) : (
+                <button
+                  className="sidebar-login-btn"
+                  type="button"
+                  onClick={() => setView('login')}
+                >
+                  🔑 <span>帳戶登入</span>
+                </button>
+              )}
+            </div>
+          </aside>
+        )}
+
+        <div className="app-main-content">
 
       {view === 'map' ? (
         <main className={`main-layout mobile-tab-${mobileTab}${isSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
-
-            <div className={`venue-panel-container ${isVenuePanelExpanded ? 'expanded' : 'collapsed'}`}>
-              <div className="venue-panel-header">
-                <div className="search-input-wrapper">
-                  <span className="search-icon"><SearchIcon /></span>
-                  <input
-                    type="text"
-                    placeholder="搜尋場館..."
-                    value={venueSearchQuery}
-                    onChange={(e) => setVenueSearchQuery(e.target.value)}
-                    onClick={() => {
-                      if (!isVenuePanelExpanded) setIsVenuePanelExpanded(true)
-                    }}
-                  />
-                  {venueSearchQuery && (
-                    <button
-                      className="search-clear-btn"
-                      type="button"
-                      onClick={() => setVenueSearchQuery('')}
-                    >
-                      <CloseIcon />
-                    </button>
-                  )}
-                </div>
-                <button
-                  className="panel-toggle-btn"
-                  type="button"
-                  onClick={() => setIsVenuePanelExpanded(!isVenuePanelExpanded)}
-                  title={isVenuePanelExpanded ? "收合面版" : "展開面版"}
-                >
-                  {isVenuePanelExpanded ? <CloseIcon /> : <MapIcon />}
-                </button>
-              </div>
-
-              {isVenuePanelExpanded && (
-                <div className="venue-panel-content">
-                  {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
-                    <div className="no-venues-found">找不到符合的場館</div>
-                  ) : (
-                    Object.entries(groupedVenues).map(([region, list]) => {
-                      if (list.length === 0) return null
-                      const isExpanded = expandedRegions[region]
-                      return (
-                        <div key={region} className="region-group">
-                          <button
-                            className="region-group-header"
-                            type="button"
-                            onClick={() =>
-                              setExpandedRegions((prev) => ({
-                                ...prev,
-                                [region]: !prev[region],
-                              }))
-                            }
-                          >
-                            <span className="region-title">{region}</span>
-                            <span className="region-count">{list.length}</span>
-                            <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
-                          </button>
-                          {isExpanded && (
-                            <div className="region-group-list">
-                              {list.map((v) => {
-                                const isActive = selectedVenueId === v.id
-                                const hasVisits = concerts.some((c) => c.venueId === v.id)
-                                return (
-                                  <button
-                                    key={v.id}
-                                    type="button"
-                                    className={`venue-list-item${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
-                                    onClick={() => {
-                                      setSelectedVenueId(v.id)
-                                      if (window.innerWidth <= 768) {
-                                        setIsVenuePanelExpanded(false)
-                                      }
-                                    }}
-                                  >
-                                    <span className="dot" />
-                                    <span className="name">{v.name}</span>
-                                    {hasVisits && <span className="visited-badge">✓</span>}
-                                  </button>
-                                )
-                              })}
-                            </div>
-                          )}
-                        </div>
-                      )
-                    })
-                  )}
-                </div>
-              )}
-            </div>
 
             <TaiwanMap
               concerts={concerts}
@@ -1122,11 +1051,54 @@ function App() {
                 onClick={handleDrawerHeaderClick}
               >
                 <div className="drawer-handle" />
-                <div className="drawer-title-row">
+                <div className="drawer-title-row" onClick={(e) => {
+                  if ((e.target as HTMLElement).closest('.drawer-search-bar-inline')) {
+                    e.stopPropagation();
+                  }
+                }}>
                   {selectedVenue ? (
-                    <span className="drawer-title">📍 {selectedVenue.name}</span>
+                    <div className="selected-venue-header-title">
+                      <span className="drawer-title">📍 {selectedVenue.name}</span>
+                      <button 
+                        className="clear-selected-venue-btn" 
+                        type="button" 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedVenueId(null);
+                          setMobileDrawerState('collapsed');
+                        }}
+                      >
+                        ✕
+                      </button>
+                    </div>
                   ) : (
-                    <span className="drawer-title">🔍 探索與搜尋場館</span>
+                    <div className="drawer-search-bar-inline">
+                      <span className="search-icon"><SearchIcon /></span>
+                      <input
+                        type="text"
+                        placeholder="搜尋場館或城市..."
+                        value={venueSearchQuery}
+                        onChange={(e) => setVenueSearchQuery(e.target.value)}
+                        onFocus={(e) => {
+                          e.stopPropagation();
+                          if (mobileDrawerState === 'collapsed') {
+                            setMobileDrawerState('half');
+                          }
+                        }}
+                      />
+                      {venueSearchQuery && (
+                        <button
+                          className="search-clear-btn"
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setVenueSearchQuery('');
+                          }}
+                        >
+                          <CloseIcon />
+                        </button>
+                      )}
+                    </div>
                   )}
                   <span className="drawer-state-indicator">
                     {mobileDrawerState === 'collapsed' ? '▲' : mobileDrawerState === 'half' ? '展開 ▴' : '收起 ▾'}
@@ -1137,18 +1109,12 @@ function App() {
               {/* Drawer Body */}
               <div className="drawer-body">
                 {/* 1. Collapsed Preview */}
-                {mobileDrawerState === 'collapsed' && (
+                {mobileDrawerState === 'collapsed' && selectedVenue && (
                   <div className="drawer-collapsed-preview" onClick={() => setMobileDrawerState('half')}>
-                    {selectedVenue ? (
-                      <div className="venue-preview-info">
-                        <span className="city-tag">{selectedVenue.city}</span>
-                        <span className="preview-capacity">👤 {selectedVenue.capacity} 人</span>
-                      </div>
-                    ) : (
-                      <div className="search-preview-box">
-                        <span>點此搜尋或選擇 26 個場館...</span>
-                      </div>
-                    )}
+                    <div className="venue-preview-info">
+                      <span className="city-tag">{selectedVenue.city}</span>
+                      <span className="preview-capacity">👤 {selectedVenue.capacity} 人</span>
+                    </div>
                   </div>
                 )}
 
@@ -1214,25 +1180,6 @@ function App() {
                       </div>
                     ) : (
                       <div className="drawer-explore-mode">
-                        <div className="drawer-search-bar">
-                          <span className="search-icon"><SearchIcon /></span>
-                          <input
-                            type="text"
-                            placeholder="搜尋場館名稱或城市..."
-                            value={venueSearchQuery}
-                            onChange={(e) => setVenueSearchQuery(e.target.value)}
-                          />
-                          {venueSearchQuery && (
-                            <button
-                              className="search-clear-btn"
-                              type="button"
-                              onClick={() => setVenueSearchQuery('')}
-                            >
-                              <CloseIcon />
-                            </button>
-                          )}
-                        </div>
-
                         <div className="drawer-region-accordion">
                           {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
                             <div className="no-venues-found">找不到符合的場館</div>
@@ -1320,58 +1267,131 @@ function App() {
             </button>
           </section>
           <aside className="sidebar">
-            {mobileTab !== 'search' && (
-              <VenueInfo
-                key={selectedVenue?.id ?? 'empty'}
-                venue={selectedVenue}
-                concertCount={selectedVenueConcerts.length}
-                onAddConcert={openAddModal}
-                onClearVenue={() => setSelectedVenueId(null)}
-              />
-            )}
-            <div className="concert-list-area">
-              {mobileTab === 'search' && (
-                <div className="mobile-search-bar">
-                  <span className="search-icon"><SearchIcon /></span>
-                  <input
-                    type="text"
-                    placeholder="搜尋歌手、售票或場館..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+            {selectedVenue ? (
+              <>
+                <VenueInfo
+                  key={selectedVenue.id}
+                  venue={selectedVenue}
+                  concertCount={selectedVenueConcerts.length}
+                  onAddConcert={openAddModal}
+                  onClearVenue={() => setSelectedVenueId(null)}
+                />
+                <div className="concert-list-area">
+                  <TransitInfoBoard />
+                  <UpcomingConcerts
+                    concerts={filteredRemoteConcerts}
+                    status={remoteStatus}
+                    updatedAt={remoteUpdatedAt}
+                    isRefreshing={isRemoteRefreshing}
+                    onRefresh={loadRemoteConcerts}
+                    searchQuery={searchQuery}
+                    hasSelectedVenue={true}
+                    onClearVenue={() => setSelectedVenueId(null)}
+                    onSelectTicket={setSelectedTicket}
+                    categoryFilter={categoryFilter}
+                    onCategoryChange={setCategoryFilter}
+                    categoryCounts={categoryCounts}
                   />
-                  {searchQuery && (
-                    <button
-                      className="search-clear-btn"
-                      type="button"
-                      onClick={() => setSearchQuery('')}
-                    >
-                      <CloseIcon />
-                    </button>
-                  )}
+                  <ConcertList
+                    concerts={selectedVenueConcerts}
+                    hasSelectedVenue={true}
+                    onOpenDetail={openConcertDetail}
+                    onDelete={deleteConcert}
+                  />
                 </div>
-              )}
-              {mobileTab !== 'search' && <TransitInfoBoard />}
-              <UpcomingConcerts
-                concerts={filteredRemoteConcerts}
-                status={remoteStatus}
-                updatedAt={remoteUpdatedAt}
-                isRefreshing={isRemoteRefreshing}
-                onRefresh={loadRemoteConcerts}
-                searchQuery={searchQuery}
-                hasSelectedVenue={!!selectedVenueId}
-                onClearVenue={() => setSelectedVenueId(null)}
-                onSelectTicket={setSelectedTicket}
-                categoryFilter={categoryFilter}
-                onCategoryChange={setCategoryFilter}
-                categoryCounts={categoryCounts}
-              />
-              <ConcertList
-                concerts={selectedVenueConcerts}
-                hasSelectedVenue={Boolean(selectedVenue)}
-                onOpenDetail={openConcertDetail}
-                onDelete={deleteConcert}
-              />
-            </div>
+              </>
+            ) : (
+              <>
+                <div className="sidebar-venue-finder">
+                  <h3 className="section-title">🔍 探索與搜尋場館</h3>
+                  <div className="venue-search-box">
+                    <span className="search-icon"><SearchIcon /></span>
+                    <input
+                      type="text"
+                      placeholder="搜尋場館名稱或城市..."
+                      value={venueSearchQuery}
+                      onChange={(e) => setVenueSearchQuery(e.target.value)}
+                    />
+                    {venueSearchQuery && (
+                      <button
+                        className="search-clear-btn"
+                        type="button"
+                        onClick={() => setVenueSearchQuery('')}
+                      >
+                        <CloseIcon />
+                      </button>
+                    )}
+                  </div>
+                  
+                  <div className="sidebar-region-accordion">
+                    {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
+                      <div className="no-venues-found">找不到符合的場館</div>
+                    ) : (
+                      Object.entries(groupedVenues).map(([region, list]) => {
+                        if (list.length === 0) return null
+                        const isExpanded = expandedRegions[region]
+                        return (
+                          <div key={region} className="region-group">
+                            <button
+                              className="region-group-header"
+                              type="button"
+                              onClick={() =>
+                                setExpandedRegions((prev) => ({
+                                  ...prev,
+                                  [region]: !prev[region],
+                                }))
+                              }
+                            >
+                              <span className="region-title">{region}</span>
+                              <span className="region-count">{list.length}</span>
+                              <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
+                            </button>
+                            {isExpanded && (
+                              <div className="region-group-list">
+                                {list.map((v) => {
+                                  const isActive = selectedVenueId === v.id
+                                  const hasVisits = concerts.some((c) => c.venueId === v.id)
+                                  return (
+                                    <button
+                                      key={v.id}
+                                      type="button"
+                                      className={`venue-list-item${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
+                                      onClick={() => setSelectedVenueId(v.id)}
+                                    >
+                                      <span className="dot" />
+                                      <span className="name">{v.name}</span>
+                                      {hasVisits && <span className="visited-badge">✓</span>}
+                                    </button>
+                                  )
+                                })}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+                
+                <div className="concert-list-area">
+                  <TransitInfoBoard />
+                  <UpcomingConcerts
+                    concerts={filteredRemoteConcerts}
+                    status={remoteStatus}
+                    updatedAt={remoteUpdatedAt}
+                    isRefreshing={isRemoteRefreshing}
+                    onRefresh={loadRemoteConcerts}
+                    searchQuery={searchQuery}
+                    hasSelectedVenue={false}
+                    onClearVenue={() => setSelectedVenueId(null)}
+                    onSelectTicket={setSelectedTicket}
+                    categoryFilter={categoryFilter}
+                    onCategoryChange={setCategoryFilter}
+                    categoryCounts={categoryCounts}
+                  />
+                </div>
+              </>
+            )}
           </aside>
         </main>
       ) : view === 'calendar' ? (
@@ -1812,6 +1832,8 @@ function App() {
           ✕
         </button>
       </div>
+      </div> {/* app-main-content */}
+      </div> {/* app-body-container */}
 
       {view !== 'login' && (
         <>
@@ -1918,6 +1940,31 @@ function App() {
                 >
                   <span className="icon">🔑</span>
                   <span className="label">帳戶登入</span>
+                </button>
+              )}
+              <button
+                className="sidebar-nav-item"
+                type="button"
+                onClick={() => {
+                  setTheme(theme === 'dark' ? 'light' : 'dark')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+                <span className="label">{theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}</span>
+              </button>
+              {isLoggedIn && currentUser && (
+                <button
+                  className="sidebar-nav-item"
+                  type="button"
+                  style={{ color: '#ff4d4d' }}
+                  onClick={() => {
+                    handleLogout()
+                    setIsMobileSidebarOpen(false)
+                  }}
+                >
+                  <span className="icon">🚪</span>
+                  <span className="label">帳戶登出</span>
                 </button>
               )}
             </div>
