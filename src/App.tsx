@@ -265,6 +265,23 @@ function App() {
     '東部地區': false,
   })
 
+  const [mobileDrawerState, setMobileDrawerState] = useState<'collapsed' | 'half' | 'full'>('collapsed')
+
+  const handleDrawerHeaderClick = () => {
+    setMobileDrawerState((current) => {
+      if (current === 'collapsed') return 'half'
+      if (current === 'half') return 'full'
+      return 'collapsed'
+    })
+  }
+
+  // Auto-expand drawer on mobile when venue is selected
+  useEffect(() => {
+    if (selectedVenueId && typeof window !== 'undefined' && window.innerWidth <= 768) {
+      setMobileDrawerState('half')
+    }
+  }, [selectedVenueId])
+
   useEffect(() => {
     if (view === 'board') {
       setMobileTab('board')
@@ -1097,6 +1114,202 @@ function App() {
               📋 全部記錄
             </button>
 
+            {/* Mobile Bottom Sheet (Sliding Drawer) */}
+            <div className={`mobile-bottom-drawer ${mobileDrawerState}`}>
+              {/* Drawer Drag Handle / Header */}
+              <div 
+                className="drawer-header" 
+                onClick={handleDrawerHeaderClick}
+              >
+                <div className="drawer-handle" />
+                <div className="drawer-title-row">
+                  {selectedVenue ? (
+                    <span className="drawer-title">📍 {selectedVenue.name}</span>
+                  ) : (
+                    <span className="drawer-title">🔍 探索與搜尋場館</span>
+                  )}
+                  <span className="drawer-state-indicator">
+                    {mobileDrawerState === 'collapsed' ? '▲' : mobileDrawerState === 'half' ? '展開 ▴' : '收起 ▾'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Drawer Body */}
+              <div className="drawer-body">
+                {/* 1. Collapsed Preview */}
+                {mobileDrawerState === 'collapsed' && (
+                  <div className="drawer-collapsed-preview" onClick={() => setMobileDrawerState('half')}>
+                    {selectedVenue ? (
+                      <div className="venue-preview-info">
+                        <span className="city-tag">{selectedVenue.city}</span>
+                        <span className="preview-capacity">👤 {selectedVenue.capacity} 人</span>
+                      </div>
+                    ) : (
+                      <div className="search-preview-box">
+                        <span>點此搜尋或選擇 26 個場館...</span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 2. Expanded Content */}
+                {mobileDrawerState !== 'collapsed' && (
+                  <div className="drawer-scroll-content">
+                    {selectedVenue ? (
+                      <div className="drawer-venue-detail">
+                        <div className="drawer-section">
+                          <VenueWeather
+                            latitude={selectedVenue.latitude}
+                            longitude={selectedVenue.longitude}
+                            cityName={selectedVenue.city}
+                            onClose={() => {
+                              setSelectedVenueId(null)
+                              setMobileDrawerState('collapsed')
+                            }}
+                            onViewDetails={() => setMobileDrawerState('full')}
+                          />
+                        </div>
+
+                        <div className="drawer-section transit-section">
+                          <TransitInfoBoard />
+                        </div>
+
+                        {mobileDrawerState === 'half' ? (
+                          <div className="drawer-view-list-action">
+                            <button 
+                              className="view-concerts-btn" 
+                              type="button"
+                              onClick={() => setMobileDrawerState('full')}
+                            >
+                              🎵 查看此場館的演唱會記錄 ({selectedVenueConcerts.length} 次)
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="drawer-concert-list-wrapper">
+                            <UpcomingConcerts
+                              concerts={filteredRemoteConcerts}
+                              status={remoteStatus}
+                              updatedAt={remoteUpdatedAt}
+                              isRefreshing={isRemoteRefreshing}
+                              onRefresh={loadRemoteConcerts}
+                              searchQuery={searchQuery}
+                              hasSelectedVenue={!!selectedVenueId}
+                              onClearVenue={() => {
+                                setSelectedVenueId(null)
+                                setMobileDrawerState('collapsed')
+                              }}
+                              onSelectTicket={setSelectedTicket}
+                              categoryFilter={categoryFilter}
+                              onCategoryChange={setCategoryFilter}
+                              categoryCounts={categoryCounts}
+                            />
+                            <ConcertList
+                              concerts={selectedVenueConcerts}
+                              hasSelectedVenue={Boolean(selectedVenue)}
+                              onOpenDetail={openConcertDetail}
+                              onDelete={deleteConcert}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="drawer-explore-mode">
+                        <div className="drawer-search-bar">
+                          <span className="search-icon"><SearchIcon /></span>
+                          <input
+                            type="text"
+                            placeholder="搜尋場館名稱或城市..."
+                            value={venueSearchQuery}
+                            onChange={(e) => setVenueSearchQuery(e.target.value)}
+                          />
+                          {venueSearchQuery && (
+                            <button
+                              className="search-clear-btn"
+                              type="button"
+                              onClick={() => setVenueSearchQuery('')}
+                            >
+                              <CloseIcon />
+                            </button>
+                          )}
+                        </div>
+
+                        <div className="drawer-region-accordion">
+                          {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
+                            <div className="no-venues-found">找不到符合的場館</div>
+                          ) : (
+                            Object.entries(groupedVenues).map(([region, list]) => {
+                              if (list.length === 0) return null
+                              const isExpanded = expandedRegions[region]
+                              return (
+                                <div key={region} className="region-group">
+                                  <button
+                                    className="region-group-header"
+                                    type="button"
+                                    onClick={() =>
+                                      setExpandedRegions((prev) => ({
+                                        ...prev,
+                                        [region]: !prev[region],
+                                      }))
+                                    }
+                                  >
+                                    <span className="region-title">{region}</span>
+                                    <span className="region-count">{list.length}</span>
+                                    <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
+                                  </button>
+                                  {isExpanded && (
+                                    <div className="region-group-list">
+                                      {list.map((v) => {
+                                        const isActive = selectedVenueId === v.id
+                                        const hasVisits = concerts.some((c) => c.venueId === v.id)
+                                        return (
+                                          <button
+                                            key={v.id}
+                                            type="button"
+                                            className={`venue-list-item${isActive ? ' active' : ''}${hasVisits ? ' visited' : ''}`}
+                                            onClick={() => {
+                                              setSelectedVenueId(v.id)
+                                              setMobileDrawerState('half')
+                                            }}
+                                          >
+                                            <span className="dot" />
+                                            <span className="name">{v.name}</span>
+                                            {hasVisits && <span className="visited-badge">✓</span>}
+                                          </button>
+                                        )
+                                      })}
+                                    </div>
+                                  )}
+                                </div>
+                              )
+                            })
+                          )}
+                        </div>
+
+                        {mobileDrawerState === 'full' && (
+                          <div className="drawer-general-concerts">
+                            <UpcomingConcerts
+                              concerts={filteredRemoteConcerts}
+                              status={remoteStatus}
+                              updatedAt={remoteUpdatedAt}
+                              isRefreshing={isRemoteRefreshing}
+                              onRefresh={loadRemoteConcerts}
+                              searchQuery={searchQuery}
+                              hasSelectedVenue={false}
+                              onClearVenue={() => setSelectedVenueId(null)}
+                              onSelectTicket={setSelectedTicket}
+                              categoryFilter={categoryFilter}
+                              onCategoryChange={setCategoryFilter}
+                              categoryCounts={categoryCounts}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+
             <button
               className={`sidebar-collapse-toggle-btn${isSidebarCollapsed ? ' collapsed' : ''}`}
               type="button"
@@ -1620,44 +1833,45 @@ function App() {
             </div>
             <div className="sidebar-nav-items">
               <button
-                className={`sidebar-nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
+                className={`sidebar-nav-item${view === 'map' && mobileDrawerState === 'collapsed' ? ' active' : ''}`}
                 type="button"
                 onClick={() => {
                   setView('map')
                   setMobileTab('map')
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon">🗺️</span>
-                <span className="label">場館地圖</span>
-              </button>
-              <button
-                className={`sidebar-nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('map')
-                  setMobileTab('list')
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon">📋</span>
-                <span className="label">場館資訊</span>
-                {selectedVenueConcerts.length > 0 && (
-                  <span className="badge">{selectedVenueConcerts.length}</span>
-                )}
-              </button>
-              <button
-                className={`sidebar-nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('map')
-                  setMobileTab('search')
+                  setMobileDrawerState('collapsed')
                   setSelectedVenueId(null)
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">🔍</span>
-                <span className="label">活動搜尋</span>
+                <span className="icon">🗺️</span>
+                <span className="label">探索地圖</span>
+              </button>
+              <button
+                className={`sidebar-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && !selectedVenueId ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('map')
+                  setMobileTab('map')
+                  setMobileDrawerState('half')
+                  setSelectedVenueId(null)
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">📋</span>
+                <span className="label">所有場館</span>
+              </button>
+              <button
+                className={`sidebar-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && selectedVenueId ? ' active' : ''}`}
+                type="button"
+                onClick={() => {
+                  setView('map')
+                  setMobileTab('map')
+                  setMobileDrawerState('full')
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">🎵</span>
+                <span className="label">演唱會活動</span>
               </button>
               <button
                 className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -1711,41 +1925,45 @@ function App() {
           
           <div className="mobile-bottom-nav">
             <button
-              className={`bottom-nav-item${mobileTab === 'map' && view === 'map' ? ' active' : ''}`}
+              className={`bottom-nav-item${view === 'map' && mobileDrawerState === 'collapsed' ? ' active' : ''}`}
               type="button"
               onClick={() => {
                 setView('map')
                 setMobileTab('map')
+                setMobileDrawerState('collapsed')
+                setSelectedVenueId(null)
               }}
             >
               <span className="icon">🗺️</span>
               <span className="label">地圖</span>
             </button>
             <button
-              className={`bottom-nav-item${mobileTab === 'list' && view === 'map' ? ' active' : ''}`}
+              className={`bottom-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && !selectedVenueId ? ' active' : ''}`}
               type="button"
               onClick={() => {
                 setView('map')
-                setMobileTab('list')
+                setMobileTab('map')
+                setMobileDrawerState('half')
+                setSelectedVenueId(null)
               }}
             >
               <span className="icon">📋</span>
               <span className="label">場館</span>
-              {selectedVenueConcerts.length > 0 && (
-                <span className="badge">{selectedVenueConcerts.length}</span>
-              )}
             </button>
             <button
-              className={`bottom-nav-item${mobileTab === 'search' && view === 'map' ? ' active' : ''}`}
+              className={`bottom-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && selectedVenueId ? ' active' : ''}`}
               type="button"
               onClick={() => {
                 setView('map')
-                setMobileTab('search')
-                setSelectedVenueId(null)
+                setMobileTab('map')
+                setMobileDrawerState('full')
               }}
             >
-              <span className="icon">🔍</span>
-              <span className="label">搜尋</span>
+              <span className="icon">🎵</span>
+              <span className="label">活動</span>
+              {selectedVenueConcerts.length > 0 && (
+                <span className="badge">{selectedVenueConcerts.length}</span>
+              )}
             </button>
             <button
               className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
