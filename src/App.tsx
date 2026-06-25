@@ -1975,6 +1975,17 @@ function App() {
                 <span className="icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
                 <span className="label">{theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}</span>
               </button>
+              <button
+                className="sidebar-nav-item"
+                type="button"
+                onClick={() => {
+                  setIsMusicBarVisible((visible) => !visible)
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">🎵</span>
+                <span className="label">{isMusicBarVisible ? '隱藏音樂播放器' : '顯示音樂播放器'}</span>
+              </button>
               {isLoggedIn && currentUser && (
                 <button
                   className="sidebar-nav-item"

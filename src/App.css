@@ -1879,11 +1879,7 @@ body.player-open .music-bar-toggle {
   }
 
   .music-bar-toggle {
-    top: calc(62px + 1rem) !important;
-    left: 1rem !important;
-    right: auto !important;
-    bottom: auto !important;
-    max-width: calc(100vw - 2rem);
+    display: none !important;
   }
 
   .music-bar-placeholder {
@@ -4371,11 +4367,7 @@ body.player-open .music-bar-toggle {
 
   /* Music Player Button Spacing */
   .music-bar-toggle {
-    top: calc(62px + 1rem) !important;
-    left: 1rem !important;
-    right: auto !important;
-    bottom: auto !important;
-    max-width: calc(100vw - 2rem);
+    display: none !important;
   }
 
   body.player-open .music-bar-toggle {
@@ -6199,11 +6191,7 @@ body.player-open .music-bar-toggle {
   }
 
   .music-bar-toggle {
-    top: calc(62px + 1rem) !important;
-    left: 1rem !important;
-    right: auto !important;
-    bottom: auto !important;
-    z-index: 290 !important;
+    display: none !important;
   }
 
   .map-legend {
@@ -7690,5 +7678,49 @@ body.player-open .music-bar-toggle {
 
   .clear-selected-venue-btn:hover {
     background: rgba(255, 255, 255, 0.15);
+  }
+
+  /* Mobile Login Page Optimization */
+  .login-page-container {
+    min-height: calc(100vh - 62px - 60px) !important;
+    padding: 1.5rem 1rem !important;
+    align-items: flex-start !important;
+    overflow-y: auto !important;
+  }
+
+  .login-card {
+    padding: 1.8rem 1.4rem !important;
+    border-radius: 16px !important;
+    max-width: 100% !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .login-header h2 {
+    font-size: 1.3rem !important;
+  }
+
+  .login-logo {
+    font-size: 2rem !important;
+    margin-bottom: 0.4rem !important;
+  }
+
+  .login-form {
+    gap: 0.8rem !important;
+  }
+
+  .login-form .form-group input {
+    padding: 0.65rem 0.85rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .login-submit-btn,
+  .oauth-btn,
+  .guest-login-btn {
+    padding: 0.65rem !important;
+    font-size: 0.82rem !important;
+  }
+
+  .login-divider {
+    margin: 1rem 0 !important;
   }
 }
