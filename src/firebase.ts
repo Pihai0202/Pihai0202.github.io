@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getFirestore } from 'firebase/firestore'
 import { getAnalytics, logEvent } from 'firebase/analytics'
+import { getAuth } from 'firebase/auth'
 
 // Reads Firebase configuration from Vite environment variables
 const firebaseConfig = {
@@ -18,6 +19,9 @@ const app = initializeApp(firebaseConfig)
 
 // Export Firestore Database
 export const db = getFirestore(app)
+
+// Export Firebase Authentication
+export const auth = getAuth(app)
 
 // Initialize & Export Analytics (check if window is defined for SSR/build safety)
 export const analytics = typeof window !== 'undefined' && firebaseConfig.measurementId ? getAnalytics(app) : null

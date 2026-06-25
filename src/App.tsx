@@ -24,7 +24,8 @@ import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { collection, addDoc, doc, getDoc, setDoc } from 'firebase/firestore'
-import { db, logCustomEvent } from './firebase'
+import { db, logCustomEvent, auth } from './firebase'
+import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
 import {
   MenuIcon,
   CloseIcon,
@@ -322,6 +323,37 @@ function App() {
     const stored = localStorage.getItem('tw-user-info')
     return stored ? JSON.parse(stored) : null
   })
+
+  // Listen to Firebase Auth state changes
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        const user = {
+          nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '樂迷',
+          email: firebaseUser.email || ''
+        }
+        setIsLoggedIn(true)
+        setCurrentUser(user)
+        setNickname(user.nickname)
+        localStorage.setItem('tw-logged-in', 'true')
+        localStorage.setItem('tw-user-info', JSON.stringify(user))
+        localStorage.setItem('tw-nickname', user.nickname)
+      } else {
+        // Maintain guest@example.com session if active (mock guest login)
+        const stored = localStorage.getItem('tw-user-info')
+        const parsed = stored ? JSON.parse(stored) : null
+        if (parsed && parsed.email === 'guest@example.com') {
+          setIsLoggedIn(true)
+          setCurrentUser(parsed)
+          setNickname(parsed.nickname)
+        } else {
+          setIsLoggedIn(false)
+          setCurrentUser(null)
+        }
+      }
+    })
+    return () => unsubscribe()
+  }, [])
 
   const selectedVenue = useMemo(
     () => VENUES.find((venue) => venue.id === selectedVenueId) ?? null,
@@ -751,7 +783,12 @@ function App() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await signOut(auth)
+    } catch (err) {
+      console.error('Firebase Auth sign out error:', err)
+    }
     localStorage.removeItem('tw-logged-in')
     localStorage.removeItem('tw-user-info')
     setIsLoggedIn(false)
@@ -1409,12 +1446,20 @@ function App() {
         <ProfilePage
           user={currentUser}
           concerts={concerts}
-          onUpdateNickname={(newName) => {
+          onUpdateNickname={async (newName) => {
             const updated = { ...currentUser, nickname: newName }
             setCurrentUser(updated)
             localStorage.setItem('tw-user-info', JSON.stringify(updated))
             localStorage.setItem('tw-nickname', newName)
             setNickname(newName)
+
+            if (auth.currentUser) {
+              try {
+                await updateProfile(auth.currentUser, { displayName: newName })
+              } catch (err) {
+                console.error('Failed to update Firebase display name:', err)
+              }
+            }
           }}
           onLogout={handleLogout}
           onBack={() => setView('map')}

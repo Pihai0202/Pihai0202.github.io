@@ -1,27 +1,19 @@
 import { useState, useEffect } from 'react'
 import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, MusicIcon } from './SvgIcon'
+import { auth } from '../firebase'
+import {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile,
+  signInWithCredential,
+  GoogleAuthProvider
+} from 'firebase/auth'
 
 interface LoginPageProps {
   onLoginSuccess: (user: { nickname: string; email: string }) => void
   onCancel: () => void
 }
 
-function parseJwt(token: string) {
-  try {
-    const base64Url = token.split('.')[1]
-    const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
-    const jsonPayload = decodeURIComponent(
-      window.atob(base64)
-        .split('')
-        .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
-        .join('')
-    )
-    return JSON.parse(jsonPayload)
-  } catch (e) {
-    console.error('Failed to parse JWT:', e)
-    return null
-  }
-}
 
 export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
   const [isRegisterMode, setIsRegisterMode] = useState(false)
@@ -32,7 +24,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [isGoogleSdkReady, setIsGoogleSdkReady] = useState(false)
 
-  const handleEmailAuthSubmit = (e: React.FormEvent) => {
+  const handleEmailAuthSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMsg('')
 
@@ -50,14 +42,42 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     }
 
     setIsLoading(true)
-    setTimeout(() => {
+    try {
+      if (isRegisterMode) {
+        // Real Sign Up
+        const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password)
+        const firebaseUser = userCredential.user
+        // Save user nickname as display name
+        await updateProfile(firebaseUser, { displayName: nickname.trim() })
+        onLoginSuccess({
+          nickname: nickname.trim(),
+          email: firebaseUser.email || email.trim(),
+        })
+      } else {
+        // Real Sign In
+        const userCredential = await signInWithEmailAndPassword(auth, email.trim(), password)
+        const firebaseUser = userCredential.user
+        onLoginSuccess({
+          nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || email.split('@')[0],
+          email: firebaseUser.email || email.trim(),
+        })
+      }
+    } catch (err: any) {
+      console.error('Email Auth Error:', err)
+      if (err.code === 'auth/email-already-in-use') {
+        setErrorMsg('此信箱已被註冊！')
+      } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
+        setErrorMsg('信箱或密碼錯誤！')
+      } else if (err.code === 'auth/invalid-email') {
+        setErrorMsg('電子信箱格式不正確！')
+      } else if (err.code === 'auth/weak-password') {
+        setErrorMsg('密碼強度不足，必須至少為 6 個字元！')
+      } else {
+        setErrorMsg(err.message || '認證失敗，請稍後再試！')
+      }
+    } finally {
       setIsLoading(false)
-      const userNickname = isRegisterMode ? nickname.trim() : email.split('@')[0]
-      onLoginSuccess({
-        nickname: userNickname,
-        email: email.trim(),
-      })
-    }, 1200)
+    }
   }
 
   // Fallback Mock Login
@@ -79,6 +99,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
       email: 'guest@example.com',
     })
   }
+
 
   // Load Google Sign-In SDK
   useEffect(() => {
@@ -117,15 +138,22 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     try {
       win.google.accounts.id.initialize({
         client_id: '214241689990-k3f18pigogq6i5r15cstmh3t4vl33lhn.apps.googleusercontent.com',
-        callback: (response: any) => {
-          const payload = parseJwt(response.credential)
-          if (payload) {
+        callback: async (response: any) => {
+          setIsLoading(true)
+          setErrorMsg('')
+          try {
+            const credential = GoogleAuthProvider.credential(response.credential)
+            const userCredential = await signInWithCredential(auth, credential)
+            const firebaseUser = userCredential.user
             onLoginSuccess({
-              nickname: payload.name || payload.email.split('@')[0],
-              email: payload.email,
+              nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Google樂迷',
+              email: firebaseUser.email || '',
             })
-          } else {
-            setErrorMsg('解析 Google 帳戶資訊失敗！')
+          } catch (err: any) {
+            console.error('Google Sign-In Error:', err)
+            setErrorMsg(err.message || 'Google 登入失敗！')
+          } finally {
+            setIsLoading(false)
           }
         },
       })
