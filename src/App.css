@@ -4033,12 +4033,42 @@ body.player-open .music-bar-toggle {
     flex-wrap: nowrap !important;
   }
 
+  .logo {
+    order: 1;
+  }
+
+  .logo-text {
+    display: flex !important;
+    flex-direction: column;
+  }
+
+  .logo-text h1 {
+    font-size: 1.05rem !important;
+  }
+
+  .logo-text span {
+    font-size: 0.55rem !important;
+    letter-spacing: 0.15em !important;
+  }
+
   .mobile-menu-toggle-btn {
-    display: none !important; /* Hide hamburger menu as we have bottom nav */
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    padding: 0;
+    order: 2; /* Position on the right side of header */
   }
 
   .mobile-menu-toggle-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.15);
     color: var(--gold);
     border-color: rgba(var(--gold-rgb), 0.3);
   }
@@ -4052,11 +4082,7 @@ body.player-open .music-bar-toggle {
   }
 
   .header-right {
-    flex-direction: row !important;
-    width: auto !important;
-    gap: 0.5rem !important;
-    display: flex !important;
-    align-items: center !important;
+    display: none !important; /* Hide all header buttons and stats on mobile */
   }
 
   .header-search {
@@ -4069,20 +4095,7 @@ body.player-open .music-bar-toggle {
 
   .login-trigger-btn,
   .logout-btn {
-    display: flex !important; /* Keep login/logout buttons visible */
-    font-size: 0.72rem !important;
-    padding: 0.35rem 0.75rem !important;
-    border-radius: 15px !important;
-  }
-
-  .user-profile-menu {
-    padding: 0.15rem 0.25rem 0.15rem 0.6rem !important;
-    gap: 0.4rem !important;
-  }
-
-  .user-name {
-    max-width: 75px !important;
-    font-size: 0.72rem !important;
+    display: none !important;
   }
 
   /* Full Screen Tab Layout */
