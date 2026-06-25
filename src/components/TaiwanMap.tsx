@@ -342,6 +342,14 @@ export function TaiwanMap({
             const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
             const isActive = selectedVenueId === venue.id
             const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
+            const hasActiveConcerts = Boolean(activeVenueIds && activeVenueIds.has(venue.id))
+
+            // Show full icon if active, visited, has active concerts, zoomed in (>=1.5), or currently hovered
+            const shouldShowIcon = isActive ||
+                                   hasVisits ||
+                                   hasActiveConcerts ||
+                                   displayZoom >= 1.5 ||
+                                   (hoveredVenue && hoveredVenue.id === venue.id)
 
             const isSport = venue.name.includes('棒球場') ||
                             venue.name.includes('體育場') ||
@@ -354,7 +362,7 @@ export function TaiwanMap({
             return (
               <g
                 key={venue.id}
-                className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''}`}
+                className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
                 transform={`translate(${venue.x},${venue.y})`}
                 onClick={(e) => {
                   if (isCategoryInactive) return
@@ -374,6 +382,7 @@ export function TaiwanMap({
               >
                 <circle className="click-target" r="18" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
                 <circle className="pulse-ring" r="12" cx="0" cy="0" />
+                <circle className="placeholder-dot" r={4 / displayZoom} cx="0" cy="0" />
                 <svg
                   x={-halfSize}
                   y={-halfSize}

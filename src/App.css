@@ -345,6 +345,53 @@ svg#taiwan-map.dragging {
 .venue-icon {
   overflow: visible;
   pointer-events: none;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.venue-icon-group .placeholder-dot {
+  fill: #1a1a24;
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+  opacity: 1;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.venue-icon-group.visited .placeholder-dot {
+  stroke: var(--teal);
+}
+
+/* Default state: show dot, hide icon */
+.venue-icon-group.show-dot .venue-icon {
+  opacity: 0;
+  transform: scale(0.5);
+  pointer-events: none;
+}
+
+.venue-icon-group.show-dot .placeholder-dot {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Icon state: show icon, hide dot */
+.venue-icon-group.show-icon .venue-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.venue-icon-group.show-icon .placeholder-dot {
+  opacity: 0;
+  transform: scale(0);
+}
+
+/* Hover override triggers smooth swap */
+.venue-icon-group:hover .venue-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.venue-icon-group:hover .placeholder-dot {
+  opacity: 0;
+  transform: scale(0);
 }
 
 .venue-icon-group .icon-plate {
