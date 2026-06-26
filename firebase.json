@@ -32,6 +32,10 @@
         "function": "tdxProxy"
       },
       {
+        "source": "/api/cwa/**",
+        "function": "cwaProxy"
+      },
+      {
         "source": "/api/suspension",
         "function": "suspension"
       },
