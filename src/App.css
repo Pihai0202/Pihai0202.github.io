@@ -8359,4 +8359,159 @@ body.player-open .music-bar-toggle {
   background: rgba(255, 255, 255, 0.1);
 }
 
+/* Light Theme Overrides for panels, cards and tooltips */
+[data-theme='light'] .venue-panel-container {
+  background: rgba(255, 255, 255, 0.88);
+  border-color: var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme='light'] .search-input-wrapper input {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+[data-theme='light'] .search-input-wrapper input:focus {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .panel-toggle-btn {
+  color: var(--text);
+}
+
+[data-theme='light'] .panel-toggle-btn:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .venue-panel-content {
+  border-top-color: var(--border);
+}
+
+[data-theme='light'] .region-group-header {
+  color: var(--text);
+}
+
+[data-theme='light'] .region-group-header:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .region-count {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--muted);
+}
+
+[data-theme='light'] .region-group-list {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .venue-list-item {
+  color: var(--muted);
+}
+
+[data-theme='light'] .venue-list-item:hover {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--text);
+}
+
+[data-theme='light'] .venue-list-item.active {
+  background: rgba(var(--gold-rgb), 0.12);
+  color: var(--gold);
+}
+
+[data-theme='light'] .venue-list-item.visited {
+  color: var(--teal);
+}
+
+[data-theme='light'] .venue-list-item.visited.active {
+  color: var(--gold);
+}
+
+[data-theme='light'] .map-tooltip {
+  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+}
+
+/* Mobile Bottom Drawer Light Mode */
+[data-theme='light'] .mobile-bottom-drawer {
+  background: rgba(255, 255, 255, 0.96);
+  border-top-color: var(--border);
+  box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.08);
+}
+
+[data-theme='light'] .drawer-header {
+  border-bottom-color: var(--border);
+  background: rgba(0, 0, 0, 0.01);
+}
+
+[data-theme='light'] .drawer-handle {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='light'] .drawer-title {
+  color: var(--text);
+}
+
+[data-theme='light'] .drawer-state-indicator {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--muted);
+}
+
+[data-theme='light'] .search-preview-box {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+/* Share Board Cards Light Mode */
+[data-theme='light'] .shared-note-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 243, 235, 0.9) 100%);
+  border-color: var(--border);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .shared-note-card:hover {
+  border-color: rgba(var(--gold-rgb), 0.5);
+  box-shadow: 0 15px 35px rgba(var(--gold-rgb), 0.06);
+}
+
+[data-theme='light'] .card-like-btn {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--border);
+}
+
+[data-theme='light'] .card-like-btn:hover {
+  background: rgba(var(--accent-rgb), 0.04);
+}
+
+[data-theme='light'] .expand-card-btn {
+  border-top-color: var(--border);
+}
+
+[data-theme='light'] .shared-card-footer {
+  border-top-color: var(--border);
+}
+
+/* Transit dynamic cards Light Mode */
+[data-theme='light'] .transit-card {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .transit-card:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+[data-theme='light'] .transit-tab-btn:hover {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+[data-theme='light'] .close-btn {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+[data-theme='light'] .close-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
 
