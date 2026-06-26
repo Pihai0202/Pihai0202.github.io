@@ -7867,3 +7867,263 @@ body.player-open .music-bar-toggle {
     margin: 1rem 0 !important;
   }
 }
+
+/* Shuangbei Cluster Marker & Inset Map Popover */
+.shuangbei-cluster-group {
+  cursor: pointer;
+  pointer-events: auto;
+}
+
+.shuangbei-cluster-group .cluster-plate {
+  fill: #1a1a24;
+  stroke: var(--accent);
+  stroke-width: 2px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.shuangbei-cluster-group .cluster-text {
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  fill: var(--accent);
+  transition: all 0.3s ease;
+}
+
+.shuangbei-cluster-group .cluster-label {
+  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-size: 10px;
+  font-weight: bold;
+  fill: var(--map-label, #8c7869);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+
+.shuangbei-cluster-group .pulse-ring-cluster {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5px;
+  opacity: 0.8;
+  animation: pulse-ring-cluster-anim 2.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes pulse-ring-cluster-anim {
+  0% {
+    r: 14px;
+    opacity: 0.8;
+  }
+  100% {
+    r: 28px;
+    opacity: 0;
+  }
+}
+
+.shuangbei-cluster-group:hover .cluster-plate {
+  fill: var(--accent);
+  stroke: var(--accent);
+  filter: drop-shadow(0 0 6px var(--accent));
+}
+
+.shuangbei-cluster-group:hover .cluster-text {
+  fill: #1a1a24;
+}
+
+.shuangbei-cluster-group:hover .cluster-label {
+  fill: var(--accent);
+  font-weight: bold;
+}
+
+.shuangbei-popover {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  width: 280px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: popover-fade-in 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes popover-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.popover-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.popover-title {
+  font-size: 0.9rem;
+  font-weight: bold;
+  color: var(--text);
+}
+
+.popover-close-btn {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  opacity: 0.6;
+  padding: 0;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+
+.popover-close-btn:hover {
+  opacity: 1;
+}
+
+.popover-map-container {
+  padding: 0.5rem;
+  background: rgba(0, 0, 0, 0.15);
+  display: flex;
+  justify-content: center;
+  border-bottom: 1px solid var(--border);
+}
+
+.shuangbei-mini-map {
+  width: 100%;
+  height: 140px;
+  background: transparent;
+}
+
+.mini-map-county {
+  fill: var(--map-land);
+  stroke: var(--map-land-stroke);
+  stroke-width: 0.8px;
+  transition: fill 0.3s;
+}
+
+.mini-venue-icon-group {
+  cursor: pointer;
+}
+
+.mini-venue-icon-group .mini-placeholder-dot {
+  fill: #1a1a24;
+  stroke: var(--accent);
+  stroke-width: 0.8px;
+  transition: all 0.25s ease;
+}
+
+.mini-venue-icon-group.visited .mini-placeholder-dot {
+  stroke: var(--teal);
+}
+
+.mini-venue-icon-group.active .mini-placeholder-dot {
+  stroke: var(--gold);
+  fill: var(--gold);
+}
+
+.mini-venue-icon-group .mini-pulse-ring {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 0.5px;
+  opacity: 0;
+}
+
+.mini-venue-icon-group:hover .mini-pulse-ring {
+  opacity: 0.7;
+  animation: mini-pulse-ring-anim 1.8s ease-out infinite;
+}
+
+.mini-venue-icon-group.active .mini-pulse-ring {
+  opacity: 0.8;
+  stroke: var(--gold);
+  animation: mini-pulse-ring-anim 1.8s ease-out infinite;
+}
+
+@keyframes mini-pulse-ring-anim {
+  0% {
+    r: 3px;
+    opacity: 0.8;
+  }
+  100% {
+    r: 9px;
+    opacity: 0;
+  }
+}
+
+.popover-venue-list {
+  max-height: 180px;
+  overflow-y: auto;
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.popover-venue-list::-webkit-scrollbar {
+  width: 4px;
+}
+.popover-venue-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+.popover-venue-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+}
+.popover-venue-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+.popover-venue-item {
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background 0.2s, border-left 0.2s;
+  border-left: 2px solid transparent;
+}
+
+.popover-venue-item:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-left-color: var(--accent);
+}
+
+.popover-venue-item.active {
+  background: rgba(var(--accent-rgb), 0.08);
+  border-left-color: var(--gold);
+}
+
+.popover-venue-name-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.15rem;
+}
+
+.popover-venue-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.visited-tick {
+  color: var(--teal);
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.popover-venue-meta {
+  display: flex;
+  gap: 0.75rem;
+  font-size: 0.7rem;
+  color: var(--text-muted, #8c8c8c);
+}
+

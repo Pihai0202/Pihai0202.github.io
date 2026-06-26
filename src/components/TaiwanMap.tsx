@@ -10,6 +10,18 @@ const project = (lon: number, lat: number) => {
   return { x, y }
 }
 
+const SHUANGBEI_VENUE_IDS = [
+  'taipei-dome',
+  'taipei-arena',
+  'nangang',
+  'taipei-music-center',
+  'zepp-new-taipei',
+  'legacy-taipei',
+  'the-wall',
+  'tianmu',
+  'xinzhuang'
+]
+
 export function Stat({ number, label }: { number: number; label: string }) {
   return (
     <div className="stat">
@@ -51,6 +63,7 @@ export function TaiwanMap({
 }: TaiwanMapProps) {
   const [center, setCenter] = useState({ x: 455, y: 500 })
   const [isDragging, setIsDragging] = useState(false)
+  const [showShuangbeiDetail, setShowShuangbeiDetail] = useState(false)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
   const dragStartRef = useRef<{ clientX: number; clientY: number; centerX: number; centerY: number } | null>(null)
@@ -269,6 +282,7 @@ export function TaiwanMap({
   const handleSvgClick = () => {
     if (!didDragRef.current) {
       onClearVenue()
+      setShowShuangbeiDetail(false)
     }
   }
 
@@ -343,6 +357,28 @@ export function TaiwanMap({
           馬祖
         </text>
 
+        {displayZoom < 1.5 && (
+          <g
+            className={`shuangbei-cluster-group${showShuangbeiDetail ? ' active' : ''}`}
+            transform={`translate(537,247)`}
+            onClick={(e) => {
+              e.stopPropagation()
+              setShowShuangbeiDetail(true)
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
+            <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
+            <circle className="cluster-plate" cx="0" cy="0" r="14" />
+            <text x="0" y="4" textAnchor="middle" className="cluster-text">
+              9
+            </text>
+            <text x="0" y="27" textAnchor="middle" className="cluster-label">
+              雙北場館
+            </text>
+          </g>
+        )}
+
         <g>
           {VENUES.map((venue) => {
             const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
@@ -356,6 +392,11 @@ export function TaiwanMap({
                                    hasActiveConcerts ||
                                    displayZoom >= 1.5 ||
                                    (hoveredVenue && hoveredVenue.id === venue.id)
+
+            const isShuangbei = SHUANGBEI_VENUE_IDS.includes(venue.id)
+            if (displayZoom < 1.5 && isShuangbei) {
+              return null
+            }
 
             const isSport = SPORT_VENUE_IDS.includes(venue.id)
 
@@ -371,6 +412,7 @@ export function TaiwanMap({
                   if (isCategoryInactive) return
                   e.stopPropagation()
                   onSelectVenue(venue.id)
+                  setShowShuangbeiDetail(false)
                 }}
                 onMouseEnter={() => {
                   if (isCategoryInactive) return
@@ -413,6 +455,78 @@ export function TaiwanMap({
           })}
         </g>
       </svg>
+
+      {showShuangbeiDetail && (
+        <div className="shuangbei-popover">
+          <div className="popover-header">
+            <span className="popover-title">📍 雙北地區場館特寫</span>
+            <button className="popover-close-btn" onClick={() => setShowShuangbeiDetail(false)}>×</button>
+          </div>
+          
+          <div className="popover-map-container">
+            <svg viewBox="495 205 125 115" className="shuangbei-mini-map">
+              {['Taipei', 'New Taipei', 'Keelung'].map((countyName) => (
+                <path
+                  key={countyName}
+                  d={TAIWAN_PATHS[countyName]}
+                  className="mini-map-county"
+                />
+              ))}
+              
+              {VENUES.filter(v => SHUANGBEI_VENUE_IDS.includes(v.id)).map((venue) => {
+                const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+                const isActive = selectedVenueId === venue.id
+                const { x, y } = project(venue.longitude || 0, venue.latitude || 0)
+                
+                return (
+                  <g
+                    key={venue.id}
+                    className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                    transform={`translate(${x},${y})`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onSelectVenue(venue.id)
+                      setShowShuangbeiDetail(false)
+                    }}
+                    style={{ cursor: 'pointer' }}
+                  >
+                    <circle className="mini-click-target" r="6" cx="0" cy="0" fill="transparent" />
+                    <circle className="mini-pulse-ring" r="4.5" cx="0" cy="0" />
+                    <circle className="mini-placeholder-dot" r="1.8" cx="0" cy="0" />
+                  </g>
+                )
+              })}
+            </svg>
+          </div>
+          
+          <div className="popover-venue-list">
+            {VENUES.filter(v => SHUANGBEI_VENUE_IDS.includes(v.id)).map((venue) => {
+              const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+              const isActive = selectedVenueId === venue.id
+              
+              return (
+                <div
+                  key={venue.id}
+                  className={`popover-venue-item${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                  onClick={() => {
+                    onSelectVenue(venue.id)
+                    setShowShuangbeiDetail(false)
+                  }}
+                >
+                  <div className="popover-venue-name-row">
+                    <span className="popover-venue-name">{venue.name}</span>
+                    {hasVisits && <span className="visited-tick">✓</span>}
+                  </div>
+                  <div className="popover-venue-meta">
+                    <span>👥 {venue.capacity} 人</span>
+                    <span>📍 {venue.city}</span>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
 
       {hoveredVenue && (
         <div
