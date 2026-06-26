@@ -13,6 +13,10 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/api\/tdx/, ''),
       },
+      '/api/suspension': {
+        target: 'https://concert-c399d.web.app',
+        changeOrigin: true,
+      },
     },
   },
 })

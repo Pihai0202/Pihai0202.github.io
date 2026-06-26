@@ -162,8 +162,13 @@ function getBusStopStatus(eta?: TdxBusEta) {
  * TRA 使用 v3；THSR / Bus 使用 v2。
  */
 async function fetchTdx<T>(path: string): Promise<T> {
-  // path 開頭已含版本號，例如 /v2/Rail/THSR/... 或 /v3/Rail/TRA/...
-  const url = `${TDX_PROXY_BASE}${path}${path.includes('?') ? '&' : '?'}$format=JSON`
+  const hostname = window.location.hostname
+  const isLocal = hostname === 'localhost' || hostname === '127.0.0.1'
+  const base = isLocal || !hostname.endsWith('github.io')
+    ? TDX_PROXY_BASE
+    : `https://concert-c399d.web.app${TDX_PROXY_BASE}`
+
+  const url = `${base}${path}${path.includes('?') ? '&' : '?'}$format=JSON`
   const response = await fetch(url)
   if (!response.ok) {
     // 嘗試解析後端錯誤訊息

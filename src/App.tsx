@@ -362,7 +362,13 @@ function App() {
   useEffect(() => {
     const fetchSuspension = async () => {
       try {
-        const response = await fetch('/api/suspension')
+        const hostname = window.location.hostname
+        const isLocal = hostname === 'localhost' || hostname === '127.0.0.1'
+        const apiUrl = isLocal || !hostname.endsWith('github.io')
+          ? '/api/suspension'
+          : 'https://concert-c399d.web.app/api/suspension'
+
+        const response = await fetch(apiUrl)
         if (!response.ok) throw new Error('Failed to fetch suspension status')
         const data = (await response.json()) as SuspensionInfo
         setSuspensionData(data)
