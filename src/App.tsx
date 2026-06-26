@@ -1877,7 +1877,7 @@ function App() {
             </div>
             <div className="sidebar-nav-items">
               <button
-                className={`sidebar-nav-item${view === 'map' && mobileDrawerState === 'collapsed' ? ' active' : ''}`}
+                className={`sidebar-nav-item${view === 'map' ? ' active' : ''}`}
                 type="button"
                 onClick={() => {
                   setView('map')
@@ -1891,31 +1891,15 @@ function App() {
                 <span className="label">探索地圖</span>
               </button>
               <button
-                className={`sidebar-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && !selectedVenueId ? ' active' : ''}`}
+                className="sidebar-nav-item"
                 type="button"
                 onClick={() => {
-                  setView('map')
-                  setMobileTab('map')
-                  setMobileDrawerState('half')
-                  setSelectedVenueId(null)
                   setIsMobileSidebarOpen(false)
+                  openAddModal()
                 }}
               >
-                <span className="icon">📋</span>
-                <span className="label">所有場館</span>
-              </button>
-              <button
-                className={`sidebar-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && selectedVenueId ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('map')
-                  setMobileTab('map')
-                  setMobileDrawerState('full')
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon">🎵</span>
-                <span className="label">演唱會活動</span>
+                <span className="icon">➕</span>
+                <span className="label">新增活動紀錄</span>
               </button>
               <button
                 className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -2005,45 +1989,25 @@ function App() {
           
           <div className="mobile-bottom-nav">
             <button
-              className={`bottom-nav-item${view === 'map' && mobileDrawerState === 'collapsed' ? ' active' : ''}`}
+              className={`bottom-nav-item${view === 'map' ? ' active' : ''}`}
               type="button"
               onClick={() => {
-                setView('map')
-                setMobileTab('map')
-                setMobileDrawerState('collapsed')
-                setSelectedVenueId(null)
+                if (view !== 'map') {
+                  setView('map')
+                  setMobileTab('map')
+                  setMobileDrawerState('collapsed')
+                } else {
+                  if (selectedVenueId) {
+                    setSelectedVenueId(null)
+                    setMobileDrawerState('collapsed')
+                  } else {
+                    setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))
+                  }
+                }
               }}
             >
               <span className="icon">🗺️</span>
               <span className="label">地圖</span>
-            </button>
-            <button
-              className={`bottom-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && !selectedVenueId ? ' active' : ''}`}
-              type="button"
-              onClick={() => {
-                setView('map')
-                setMobileTab('map')
-                setMobileDrawerState('half')
-                setSelectedVenueId(null)
-              }}
-            >
-              <span className="icon">📋</span>
-              <span className="label">場館</span>
-            </button>
-            <button
-              className={`bottom-nav-item${view === 'map' && mobileDrawerState !== 'collapsed' && selectedVenueId ? ' active' : ''}`}
-              type="button"
-              onClick={() => {
-                setView('map')
-                setMobileTab('map')
-                setMobileDrawerState('full')
-              }}
-            >
-              <span className="icon">🎵</span>
-              <span className="label">活動</span>
-              {selectedVenueConcerts.length > 0 && (
-                <span className="badge">{selectedVenueConcerts.length}</span>
-              )}
             </button>
             <button
               className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -2055,6 +2019,17 @@ function App() {
               <span className="icon">📅</span>
               <span className="label">行事曆</span>
             </button>
+            <div className="bottom-nav-item-record">
+              <button
+                className="record-btn-inner"
+                type="button"
+                onClick={() => openAddModal()}
+                title="新增演唱會紀錄"
+              >
+                <span className="icon">＋</span>
+                <span className="label">紀錄</span>
+              </button>
+            </div>
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
               type="button"
