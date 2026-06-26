@@ -2,7 +2,7 @@ import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 
-// TDX API 金鑰透過 Firebase Secret Manager 安全儲存；氣象金鑰改用 Functions .env 安全載入以相容 Spark 方案
+// TDX API 金鑰透過 Firebase Secret Manager 安全儲存
 const TDX_CLIENT_ID = defineSecret("TDX_CLIENT_ID");
 const TDX_CLIENT_SECRET = defineSecret("TDX_CLIENT_SECRET");
 
@@ -185,77 +185,6 @@ export const suspension = onRequest(
       res.status(200).json({ updateTime, items });
     } catch (err) {
       logger.error("Suspension fetch error:", err);
-      const message = err instanceof Error ? err.message : "未知錯誤";
-      res.status(500).json({ error: message });
-    }
-  }
-);
-
-/**
- * 中央氣象署 API 代理 Cloud Function
- *
- * 路由格式：/api/cwa/<path>
- * 例如：/api/cwa/F-D0047-091?locationsName=臺北市
- */
-export const cwaProxy = onRequest(
-  {
-    cors: true,        // 允許前端跨域呼叫
-    region: "asia-east1", // 台灣最近的區域
-    timeoutSeconds: 30,
-    memory: "256MiB",
-  },
-  async (req, res) => {
-    // 只允許 GET
-    if (req.method !== "GET") {
-      res.status(405).json({ error: "Method Not Allowed" });
-      return;
-    }
-
-    try {
-      const apiKey = process.env.CWA_API_KEY;
-
-      if (!apiKey) {
-        res.status(503).json({ error: "CWA API 金鑰尚未設定" });
-        return;
-      }
-
-      // 從 URL 取出要代理的路徑
-      // req.path 會是 /cwaProxy/<cwaPath> 在直接呼叫時
-      // 透過 Hosting rewrite 後 path 為 /api/cwa/<cwaPath>
-      // 取出 path 中 /api/cwa/ 之後的部分
-      const rawPath = req.path.replace(/^\/+/, "");
-      
-      const queryParams = new URLSearchParams();
-      for (const [key, val] of Object.entries(req.query)) {
-        if (key !== "Authorization") {
-          queryParams.append(key, String(val));
-        }
-      }
-      queryParams.set("Authorization", apiKey);
-      queryParams.set("format", "JSON");
-
-      const cwaUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/${rawPath}?${queryParams.toString()}`;
-      logger.info("CWA proxy →", cwaUrl.replace(apiKey, "HIDDEN"));
-
-      const cwaResponse = await fetch(cwaUrl);
-
-      if (!cwaResponse.ok) {
-        const errText = await cwaResponse.text();
-        logger.warn("CWA API error", cwaResponse.status, errText.slice(0, 200));
-        res.status(cwaResponse.status).json({
-          error: `CWA API 查詢失敗 (${cwaResponse.status})`,
-        });
-        return;
-      }
-
-      const data = await cwaResponse.json();
-
-      // 設定快取標頭（快取 10 分鐘，因為天氣預報更新頻率不高）
-      res.set("Cache-Control", "public, max-age=600, s-maxage=600");
-      res.set("Content-Type", "application/json; charset=utf-8");
-      res.status(200).json(data);
-    } catch (err) {
-      logger.error("CWA proxy error:", err);
       const message = err instanceof Error ? err.message : "未知錯誤";
       res.status(500).json({ error: message });
     }
