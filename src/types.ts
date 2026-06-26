@@ -90,3 +90,14 @@ export type SharedNote = {
   likes: number
   createdAt: string
 }
+
+export interface SuspensionItem {
+  city: string
+  status: string
+}
+
+export interface SuspensionInfo {
+  updateTime: string
+  items: SuspensionItem[]
+}
+

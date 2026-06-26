@@ -137,3 +137,57 @@ export const tdxProxy = onRequest(
     }
   }
 );
+
+/**
+ * 停班停課資訊 Cloud Function
+ * 抓取人事行政總處網站並解析為 JSON 回傳
+ */
+export const suspension = onRequest(
+  {
+    cors: true,
+    region: "asia-east1",
+    timeoutSeconds: 30,
+    memory: "256MiB",
+  },
+  async (req, res) => {
+    if (req.method !== "GET") {
+      res.status(405).json({ error: "Method Not Allowed" });
+      return;
+    }
+
+    try {
+      const response = await fetch("https://www.dgpa.gov.tw/typh/daily/nds.html");
+      if (!response.ok) {
+        throw new Error(`Failed to fetch DGPA page (${response.status})`);
+      }
+      const html = await response.text();
+
+      // 提取更新時間
+      const updateTimeMatch = html.match(/更新時間：\s*([\d\/\:\s]+)/);
+      const updateTime = updateTimeMatch ? updateTimeMatch[1].trim() : "";
+
+      // 提取表格列
+      const rowRegex = /<tr[^>]*>\s*<td[^>]*headers=['"]?city_Name['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<td[^>]*headers=['"]?StopWorkSchool_Info['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<\/tr>/gi;
+
+      let match;
+      const items: { city: string; status: string }[] = [];
+      while ((match = rowRegex.exec(html)) !== null) {
+        const city = match[1].replace(/<[^>]+>/g, "").trim();
+        const status = match[2].replace(/<[^>]+>/g, "").trim().replace(/\s+/g, " ");
+        if (city && status) {
+          items.push({ city, status });
+        }
+      }
+
+      // 快取 5 分鐘
+      res.set("Cache-Control", "public, max-age=300, s-maxage=300");
+      res.set("Content-Type", "application/json; charset=utf-8");
+      res.status(200).json({ updateTime, items });
+    } catch (err) {
+      logger.error("Suspension fetch error:", err);
+      const message = err instanceof Error ? err.message : "未知錯誤";
+      res.status(500).json({ error: message });
+    }
+  }
+);
+

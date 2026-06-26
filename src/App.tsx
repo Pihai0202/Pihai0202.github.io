@@ -9,7 +9,8 @@ import type {
   RemoteConcert,
   RemoteConcertPayload,
   ConcertForm,
-  SpotifyItem
+  SpotifyItem,
+  SuspensionInfo
 } from './types'
 
 import { VENUES } from './constants/venues'
@@ -228,6 +229,8 @@ function App() {
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
+  const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
+  const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
   const [selectedTicket, setSelectedTicket] = useState<RemoteConcert | null>(null)
@@ -353,6 +356,47 @@ function App() {
       }
     })
     return () => unsubscribe()
+  }, [])
+
+  // 抓取停班停課資訊，並判斷是否彈窗
+  useEffect(() => {
+    const fetchSuspension = async () => {
+      try {
+        const response = await fetch('/api/suspension')
+        if (!response.ok) throw new Error('Failed to fetch suspension status')
+        const data = (await response.json()) as SuspensionInfo
+        setSuspensionData(data)
+
+        // 檢查是否有實際停班停課資訊（包含「停止」或「停班」或「停課」，且排除單純的照常）
+        const hasSuspension = data.items.some(
+          (item) =>
+            item.status.includes('停止') ||
+            item.status.includes('停班') ||
+            item.status.includes('停課') ||
+            !item.status.includes('照常')
+        )
+
+        if (hasSuspension) {
+          // 取得台北時間 YYYY-MM-DD
+          const d = new Date()
+          const utc = d.getTime() + d.getTimezoneOffset() * 60000
+          const taipeiTime = new Date(utc + 3600000 * 8)
+          const yyyy = taipeiTime.getFullYear()
+          const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+          const dd = String(taipeiTime.getDate()).padStart(2, '0')
+          const todayStr = `${yyyy}-${mm}-${dd}`
+
+          const dismissedDate = localStorage.getItem('suspension-dismissed-date')
+          if (dismissedDate !== todayStr) {
+            setIsSuspensionModalOpen(true)
+          }
+        }
+      } catch (e) {
+        console.error('Failed to fetch suspension info:', e)
+      }
+    }
+
+    fetchSuspension()
   }, [])
 
   const selectedVenue = useMemo(
@@ -646,6 +690,18 @@ function App() {
   }
   const closeDetailModal = () => setDetailConcertId(null)
   const closeAllModal = () => setIsAllModalOpen(false)
+
+  const handleDismissSuspensionToday = () => {
+    const d = new Date()
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000
+    const taipeiTime = new Date(utc + 3600000 * 8)
+    const yyyy = taipeiTime.getFullYear()
+    const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+    const dd = String(taipeiTime.getDate()).padStart(2, '0')
+    const todayStr = `${yyyy}-${mm}-${dd}`
+    localStorage.setItem('suspension-dismissed-date', todayStr)
+    setIsSuspensionModalOpen(false)
+  }
 
   const updateForm = (field: keyof ConcertForm, value: string) => {
     setForm((current) => ({ ...current, [field]: value }))
@@ -1746,6 +1802,87 @@ function App() {
               setIsAddModalOpen(true)
             }}
           />
+        </Modal>
+      )}
+
+      {isSuspensionModalOpen && suspensionData && (
+        <Modal className="suspension-modal" onClose={() => setIsSuspensionModalOpen(false)}>
+          <div className="suspension-header">
+            <span className="suspension-icon">⚠️</span>
+            <div>
+              <h2 className="suspension-title">天然災害停班停課公告</h2>
+              <div className="suspension-subtitle">
+                行政院人事行政總處 (更新時間：{suspensionData.updateTime})
+              </div>
+            </div>
+          </div>
+
+          <div className="suspension-body">
+            {(() => {
+              const warningItems = suspensionData.items.filter(
+                (item) =>
+                  item.status.includes('停止') ||
+                  item.status.includes('停班') ||
+                  item.status.includes('停課') ||
+                  !item.status.includes('照常')
+              )
+              const normalItems = suspensionData.items.filter(
+                (item) =>
+                  item.status.includes('照常')
+              )
+
+              return (
+                <>
+                  {warningItems.length > 0 && (
+                    <div className="suspension-section warning-section">
+                      <div className="section-title">⚠️ 停止上班上課縣市</div>
+                      <div className="warning-list">
+                        {warningItems.map((item, idx) => (
+                          <div key={idx} className="suspension-card warning-card">
+                            <div className="county-name">{item.city}</div>
+                            <div className="county-status">{item.status}</div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {normalItems.length > 0 && (
+                    <details className="suspension-section normal-section" open>
+                      <summary className="section-title collapsible-title">
+                        ✅ 照常上班上課縣市 ({normalItems.length})
+                      </summary>
+                      <div className="normal-list">
+                        {normalItems.map((item, idx) => (
+                          <div key={idx} className="suspension-card normal-card">
+                            <span className="normal-county">{item.city}</span>
+                            <span className="normal-status">{item.status}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </>
+              )
+            })()}
+          </div>
+
+          <div className="suspension-actions">
+            <button
+              className="suspension-btn dismiss-btn"
+              type="button"
+              onClick={handleDismissSuspensionToday}
+            >
+              本日不再顯示 🔇
+            </button>
+            <button
+              className="suspension-btn close-btn"
+              type="button"
+              onClick={() => setIsSuspensionModalOpen(false)}
+            >
+              關閉
+            </button>
+          </div>
         </Modal>
       )}
 

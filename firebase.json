@@ -32,6 +32,10 @@
         "function": "tdxProxy"
       },
       {
+        "source": "/api/suspension",
+        "function": "suspension"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
