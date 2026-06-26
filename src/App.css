@@ -498,14 +498,23 @@ svg#taiwan-map.dragging {
   position: absolute;
   bottom: 1.5rem;
   left: 1.5rem;
-  background: var(--legend-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.8rem 1rem;
+  background: rgba(var(--surface-rgb), 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
   display: flex;
-  gap: 1.2rem;
-  backdrop-filter: blur(8px);
+  gap: 1.5rem;
   z-index: 2;
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.map-legend:hover {
+  background: rgba(var(--surface-rgb), 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
 .legend-item {
@@ -530,10 +539,18 @@ svg#taiwan-map.dragging {
 }
 
 .venue-info {
-  padding: 2rem;
-  border-bottom: 1px solid var(--border);
-  min-height: 160px;
-  background: linear-gradient(135deg, var(--surface2) 0%, var(--surface) 100%);
+  margin: 1rem 1rem 1.2rem;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(var(--surface-rgb), 0.7) 0%, rgba(var(--surface-rgb), 0.2) 100%);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+.venue-info:hover {
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+  border-color: rgba(var(--gold-rgb), 0.25);
 }
 
 .venue-info.empty {
@@ -541,6 +558,10 @@ svg#taiwan-map.dragging {
   align-items: center;
   justify-content: center;
   text-align: center;
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.1);
+  background: rgba(var(--surface-rgb), 0.15);
+  min-height: 160px;
 }
 
 .empty-hint {
@@ -690,19 +711,29 @@ svg#taiwan-map.dragging {
 }
 
 .concert-list-area::-webkit-scrollbar,
+.venue-panel-content::-webkit-scrollbar,
 .modal::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
+  height: 6px;
 }
 
 .concert-list-area::-webkit-scrollbar-track,
+.venue-panel-content::-webkit-scrollbar-track,
 .modal::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .concert-list-area::-webkit-scrollbar-thumb,
+.venue-panel-content::-webkit-scrollbar-thumb,
 .modal::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 2px;
+  background: rgba(51, 39, 30, 0.5);
+  border-radius: 4px;
+}
+
+.concert-list-area::-webkit-scrollbar-thumb:hover,
+.venue-panel-content::-webkit-scrollbar-thumb:hover,
+.modal::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 190, 11, 0.5);
 }
 
 .section-title {
@@ -1185,20 +1216,26 @@ svg#taiwan-map.dragging {
   position: absolute;
   bottom: 5rem;
   right: 1.5rem;
-  background: var(--legend-bg);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.6rem 1rem;
+  background: rgba(var(--surface-rgb), 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
   color: var(--text);
-  font-size: 0.8rem;
-  transition: all 0.2s;
-  backdrop-filter: blur(8px);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
   z-index: 2;
 }
 
 .all-concerts-btn:hover {
+  background: rgba(var(--gold-rgb), 0.15);
   border-color: var(--gold);
   color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px 0 rgba(var(--gold-rgb), 0.2);
 }
 
 .empty-state {
@@ -1213,9 +1250,18 @@ svg#taiwan-map.dragging {
 }
 
 .upcoming-section {
-  margin-bottom: 1.4rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.2rem;
+  padding: 1.25rem;
+  background: rgba(var(--surface-rgb), 0.3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.upcoming-section:hover {
+  border-color: rgba(var(--gold-rgb), 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .section-row {
@@ -1987,9 +2033,18 @@ body.player-open .music-bar-toggle {
 
 /* 大眾運輸即時動態 */
 .transit-board {
-  margin-bottom: 1.4rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 1.2rem;
+  padding: 1.25rem;
+  background: rgba(var(--surface-rgb), 0.3);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.transit-board:hover {
+  border-color: rgba(var(--gold-rgb), 0.25);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
 .transit-selector-row {
@@ -2214,10 +2269,14 @@ body.player-open .music-bar-toggle {
   transition: all 0.2s;
 }
 
+.search-input-wrapper input:hover {
+  border-color: rgba(var(--gold-rgb), 0.4);
+}
+
 .search-input-wrapper input:focus {
   background: rgba(255, 255, 255, 0.08);
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255, 107, 0, 0.2);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 2px rgba(var(--gold-rgb), 0.25);
 }
 
 .search-input-wrapper .search-icon {
@@ -2331,11 +2390,26 @@ body.player-open .music-bar-toggle {
   color: var(--muted);
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+    max-height: 0;
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    max-height: 1000px;
+  }
+}
+
 .region-group-list {
   display: flex;
   flex-direction: column;
   background: rgba(0, 0, 0, 0.15);
   padding: 4px 0;
+  animation: slideDown 0.28s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  overflow: hidden;
 }
 
 .venue-list-item {
@@ -2350,12 +2424,13 @@ body.player-open .music-bar-toggle {
   text-align: left;
   font-size: 0.8rem;
   box-sizing: border-box;
-  transition: all 0.2s;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .venue-list-item:hover {
   background: rgba(255, 255, 255, 0.05);
   color: var(--text);
+  transform: translateX(4px);
 }
 
 .venue-list-item.active {
@@ -2472,18 +2547,25 @@ body.player-open .music-bar-toggle {
   bottom: 6.5rem;
   left: 1.5rem;
   right: auto;
-  background: var(--legend-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 0.5rem;
+  background: rgba(var(--surface-rgb), 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.6rem;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.4rem;
+  gap: 0.5rem;
   z-index: 10;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.map-zoom-control.vertical:hover {
+  background: rgba(var(--surface-rgb), 0.85);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
 }
 
 .map-zoom-control.vertical .zoom-btn {
@@ -8533,6 +8615,40 @@ body.player-open .music-bar-toggle {
 
 [data-theme='light'] .board-empty-state {
   background: rgba(0, 0, 0, 0.01);
+}
+
+/* LoginPage Light Mode */
+[data-theme='light'] .login-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(246, 243, 235, 0.9) 100%);
+  border-color: var(--border);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .login-back-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--border);
+  color: var(--muted);
+}
+
+[data-theme='light'] .login-back-btn:hover {
+  background: rgba(var(--accent-rgb), 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+[data-theme='light'] .oauth-btn {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--border);
+  color: var(--text);
+}
+
+[data-theme='light'] .oauth-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+[data-theme='light'] .login-logo {
+  filter: drop-shadow(0 0 10px rgba(var(--gold-rgb), 0.25));
 }
 
 
