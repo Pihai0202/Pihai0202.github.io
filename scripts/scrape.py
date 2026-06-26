@@ -175,7 +175,7 @@ KKTIX_ORGANIZER_URLS = [
     "https://amusetaiwan.kktix.cc/",
     "https://legacy.kktix.cc/",
     "https://warnermusictw.kktix.cc/",
-    "https://universalmusictw.kktix.cc/",
+    "https://umusic.kktix.cc/",
     "https://sonymusictw.kktix.cc/",
     "https://acrmedia.kktix.cc/",
     "https://windmusic.kktix.cc/",
@@ -409,6 +409,48 @@ def scrape_kktix_organizers():
                 continue
 
             venue_id, venue_name = match_venue(name + " " + description)
+            venue_raw = description[:120]
+            skip_event = False
+
+            if not venue_id:
+                print(f"    Fetching KKTIX event detail for venue: {url}", file=sys.stderr)
+                detail_html = fetch(url)
+                if detail_html:
+                    ld_matches = re.findall(
+                        r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
+                        detail_html, re.DOTALL
+                    )
+                    for ld_raw in ld_matches:
+                        try:
+                            ld = json.loads(ld_raw)
+                            items = ld if isinstance(ld, list) else [ld]
+                            for ld_item in items:
+                                if ld_item.get("@type") in ("Event", "MusicEvent"):
+                                    loc = ld_item.get("location", {})
+                                    if isinstance(loc, dict):
+                                        loc_name = loc.get("name", "")
+                                        loc_addr = loc.get("address", "")
+                                        if loc_name and "請依活動頁面為主" in loc_name:
+                                            skip_event = True
+                                            break
+                                        if loc_name:
+                                            v_id, v_name = match_venue(loc_name + " " + loc_addr)
+                                            if v_id:
+                                                venue_id, venue_name = v_id, v_name
+                                                venue_raw = loc_name
+                                                break
+                                            else:
+                                                venue_raw = loc_name
+                            if skip_event or venue_id:
+                                break
+                        except Exception as e:
+                            print(f"      Detail JSON-LD parse error: {e}", file=sys.stderr)
+                time.sleep(0.3)
+
+            if skip_event:
+                print(f"    Skipping parent/placeholder event: {name}", file=sys.stderr)
+                continue
+
             slug = re.sub(r"[^A-Za-z0-9_-]+", "-", url.rstrip("/").split("/")[-1]) or str(len(events))
 
             for d in dates:
@@ -418,7 +460,7 @@ def scrape_kktix_organizers():
                     "id":         f"kktix-org-{slug}-{d}",
                     "source":     "KKTIX",
                     "name":       name,
-                    "venue_raw":  description[:120],
+                    "venue_raw":  venue_raw,
                     "venue_id":   venue_id,
                     "venue_name": venue_name,
                     "city":       VENUE_CITY.get(venue_id, ""),
