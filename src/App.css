@@ -8514,4 +8514,25 @@ body.player-open .music-bar-toggle {
   background: rgba(0, 0, 0, 0.06);
 }
 
+/* Share Board Search Bar Light Mode */
+[data-theme='light'] .board-search-bar {
+  background: rgba(255, 255, 255, 0.85);
+  border-color: var(--border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+}
+
+[data-theme='light'] .board-search-bar .clear-search {
+  background: rgba(0, 0, 0, 0.03);
+  color: var(--muted);
+}
+
+[data-theme='light'] .board-search-bar .clear-search:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+[data-theme='light'] .board-empty-state {
+  background: rgba(0, 0, 0, 0.01);
+}
+
 
