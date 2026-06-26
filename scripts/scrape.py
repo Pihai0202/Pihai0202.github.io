@@ -1527,12 +1527,23 @@ def scrape_cpbl():
     events = []
     
     # 1. Fetch main page to get Verification Token and Cookies
-    url = "https://www.cpbl.com.tw/schedule"
-    req = Request(url, headers=HEADERS)
+    # Add a cache buster query parameter to force CDN redirect so we get the cookie
+    url = f"https://www.cpbl.com.tw/schedule?_t={int(time.time())}"
+    
+    import http.cookiejar
+    from urllib.request import HTTPCookieProcessor, build_opener
+    
+    cj = http.cookiejar.CookieJar()
+    opener = build_opener(HTTPCookieProcessor(cj))
+    
+    req = Request(url, headers={
+        "User-Agent": HEADERS["User-Agent"],
+        "Accept-Language": HEADERS["Accept-Language"],
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
+    })
     try:
-        with urlopen(req, timeout=15) as response:
+        with opener.open(req, timeout=15) as response:
             html = response.read().decode('utf-8', errors='replace')
-            cookie = response.info().get('Set-Cookie')
             
             # Find the anti-forgery token in the script
             tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", html)
@@ -1560,13 +1571,10 @@ def scrape_cpbl():
         "X-Requested-With": "XMLHttpRequest",
         "RequestVerificationToken": token
     }
-    if cookie:
-        c_vals = [c.split(';')[0] for c in cookie.split(',')]
-        post_headers["Cookie"] = "; ".join(c_vals)
-        
+    
     post_req = Request(post_url, data=post_data, headers=post_headers)
     try:
-        with urlopen(post_req, timeout=15) as post_resp:
+        with opener.open(post_req, timeout=15) as post_resp:
             resp_str = post_resp.read().decode('utf-8', errors='replace')
             resp_json = json.loads(resp_str)
             if not resp_json.get("Success"):
@@ -1668,7 +1676,7 @@ def scrape_cpbl():
                     },
                     "統一": {
                         "name": "統一獅售票網",
-                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+                        "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
                     }
                 }
                 

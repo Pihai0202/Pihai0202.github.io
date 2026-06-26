@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-06-26T11:48:08.042090+00:00",
-  "count": 459,
+  "updated_at": "2026-06-26T14:18:38.824128+00:00",
+  "count": 460,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -103,26 +103,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_latency_v-2026-06-27",
-      "source": "拓元售票",
-      "name": "2026 LATENCY PHOTO EVENT IN TAIPEI",
-      "venue_raw": "THE WALL LIVE HOUSE",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-06-27",
-      "image": "https://static.tixcraft.com/images/activity/26_latency_v_76889748143d126156c38cbdb4cb2e51.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_latency_v",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_latency_v"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_kyuhyun_d-2026-06-27",
       "source": "拓元售票",
       "name": "[身心障礙優惠票購票頁面] KYUHYUN 20th Anniversary Fanmeeting ＜Hotel 203＞ IN TAIPEI",
@@ -149,6 +129,26 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_kyuhyun_d"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_latency_v-2026-06-27",
+      "source": "拓元售票",
+      "name": "2026 LATENCY PHOTO EVENT IN TAIPEI",
+      "venue_raw": "THE WALL LIVE HOUSE",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-06-27",
+      "image": "https://static.tixcraft.com/images/activity/26_latency_v_76889748143d126156c38cbdb4cb2e51.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_latency_v",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_latency_v"
         }
       ]
     },
@@ -558,7 +558,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -588,6 +588,31 @@
       ]
     },
     {
+      "id": "cpbl-2026-165",
+      "source": "中華職棒",
+      "name": "中華職棒例行賽：樂天桃猿 vs 中信兄弟",
+      "venue_raw": "洲際",
+      "venue_id": "taichung-dome",
+      "venue_name": "台中洲際棒球場",
+      "city": "台中",
+      "date": "2026-07-02",
+      "image": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
+      "url": "https://www.cpbl.com.tw/schedule",
+      "price": "依官網/主隊公告為準",
+      "ticket_links": [
+        {
+          "platform": "cpbl",
+          "name": "中信兄弟售票網",
+          "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
+        },
+        {
+          "platform": "manual",
+          "name": "中華職棒官方賽程",
+          "url": "https://www.cpbl.com.tw/schedule"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_mdbusdome-2026-07-03",
       "source": "拓元售票",
       "name": "【歌迷返鄉專車】x MAYDAY #5525+2 LIVE TOUR 五月天25週年巡迴演唱會｜台北站",
@@ -604,26 +629,6 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_mdbusdome"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_maydaytp-2026-07-03",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-03",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -664,6 +669,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-03",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-03",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -738,7 +763,7 @@
       ]
     },
     {
-      "id": "webbboxx-14115660",
+      "id": "webbboxx-10799093",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -878,6 +903,46 @@
       ]
     },
     {
+      "id": "tixcraft-26_csc_v-2026-07-04",
+      "source": "拓元售票",
+      "name": "【CHOIJONGHYUN CLOSE-UP SHOWCASE in TAIPEI】限量拍照簽名會",
+      "venue_raw": "Clapper Studio",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-07-04",
+      "image": "https://static.tixcraft.com/images/activity/26_csc_v_ad5218304168cec73015be985c6174af.png",
+      "url": "https://tixcraft.com/activity/detail/26_csc_v",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_csc_v"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_csc-2026-07-04",
+      "source": "拓元售票",
+      "name": "【CHOIJONGHYUN CLOSE-UP SHOWCASE in TAIPEI】",
+      "venue_raw": "Clapper Studio",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-07-04",
+      "image": "https://static.tixcraft.com/images/activity/26_csc_b26b51c1f45eef4e88c7fb47e9981bc1.png",
+      "url": "https://tixcraft.com/activity/detail/26_csc",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_csc"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_jaehyun-2026-07-04",
       "source": "拓元售票",
       "name": "JAEHYUN FAN-CON TOUR ＜Mono＞ in TAIPEI",
@@ -908,26 +973,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_csc-2026-07-04",
-      "source": "拓元售票",
-      "name": "【CHOIJONGHYUN CLOSE-UP SHOWCASE in TAIPEI】",
-      "venue_raw": "Clapper Studio",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-07-04",
-      "image": "https://static.tixcraft.com/images/activity/26_csc_b26b51c1f45eef4e88c7fb47e9981bc1.png",
-      "url": "https://tixcraft.com/activity/detail/26_csc",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_csc"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_mdbusdome-2026-07-04",
       "source": "拓元售票",
       "name": "【歌迷返鄉專車】x MAYDAY #5525+2 LIVE TOUR 五月天25週年巡迴演唱會｜台北站",
@@ -944,26 +989,6 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_mdbusdome"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_maydaytp-2026-07-04",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-04",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -1004,6 +1029,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-04",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-04",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -1118,7 +1163,7 @@
       ]
     },
     {
-      "id": "webbboxx-7093002",
+      "id": "webbboxx-2519705",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1258,26 +1303,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_ffotp-2026-07-05",
-      "source": "拓元售票",
-      "name": "《F.F.One Way Ticket – FarFarLand》",
-      "venue_raw": "Legacy TERA",
-      "venue_id": "taipei-music-center",
-      "venue_name": "Legacy TERA",
-      "city": "台北",
-      "date": "2026-07-05",
-      "image": "https://static.tixcraft.com/images/activity/26_ffotp_98f3ca628bca9df491060191f9385ad2.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_ffotp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_ffotp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_mltr-2026-07-05",
       "source": "拓元售票",
       "name": "Michael Learns to Rock Encore All The Hits Taiwan",
@@ -1294,6 +1319,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_mltr"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_ffotp-2026-07-05",
+      "source": "拓元售票",
+      "name": "《F.F.One Way Ticket – FarFarLand》",
+      "venue_raw": "Legacy TERA",
+      "venue_id": "taipei-music-center",
+      "venue_name": "Legacy TERA",
+      "city": "台北",
+      "date": "2026-07-05",
+      "image": "https://static.tixcraft.com/images/activity/26_ffotp_98f3ca628bca9df491060191f9385ad2.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_ffotp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_ffotp"
         }
       ]
     },
@@ -1348,26 +1393,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-05",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-05",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-05",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -1408,6 +1433,26 @@
       ]
     },
     {
+      "id": "tixcraft-26_maydaytp-2026-07-05",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-05",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_tkl-2026-07-05",
       "source": "拓元售票",
       "name": "The Kid LAROI - A Perfect World Tour",
@@ -1438,7 +1483,7 @@
       ]
     },
     {
-      "id": "webbboxx-16728564",
+      "id": "webbboxx-15847067",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1558,26 +1603,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-06",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-06",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-06",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -1618,6 +1643,26 @@
       ]
     },
     {
+      "id": "tixcraft-26_maydaytp-2026-07-06",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-06",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_tkl-2026-07-06",
       "source": "拓元售票",
       "name": "The Kid LAROI - A Perfect World Tour",
@@ -1648,7 +1693,7 @@
       ]
     },
     {
-      "id": "webbboxx-7256487",
+      "id": "webbboxx-15172642",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1693,26 +1738,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-07",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-07",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-07",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -1753,6 +1778,26 @@
       ]
     },
     {
+      "id": "tixcraft-26_maydaytp-2026-07-07",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-07",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_tkl-2026-07-07",
       "source": "拓元售票",
       "name": "The Kid LAROI - A Perfect World Tour",
@@ -1783,7 +1828,7 @@
       ]
     },
     {
-      "id": "webbboxx-9310715",
+      "id": "webbboxx-3198185",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -1848,7 +1893,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -1874,26 +1919,6 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_mdbusdome"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_maydaytp-2026-07-08",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-08",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -1934,6 +1959,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-08",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-08",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -1988,7 +2033,7 @@
       ]
     },
     {
-      "id": "webbboxx-9633463",
+      "id": "webbboxx-10255374",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2053,7 +2098,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -2108,26 +2153,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-09",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-09",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-09",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -2168,7 +2193,27 @@
       ]
     },
     {
-      "id": "webbboxx-14987312",
+      "id": "tixcraft-26_maydaytp-2026-07-09",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-09",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
+        }
+      ]
+    },
+    {
+      "id": "webbboxx-4609469",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2238,26 +2283,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-10",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-10",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-10",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -2294,6 +2319,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-10",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-10",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -2338,7 +2383,7 @@
       ]
     },
     {
-      "id": "webbboxx-6165290",
+      "id": "webbboxx-12623133",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -2363,7 +2408,7 @@
       ]
     },
     {
-      "id": "webbboxx-5315933",
+      "id": "webbboxx-1955083",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2453,7 +2498,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -2573,26 +2618,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-11",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-11",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-11",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -2629,6 +2654,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-11",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-11",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -2673,7 +2718,7 @@
       ]
     },
     {
-      "id": "webbboxx-9101642",
+      "id": "webbboxx-6548616",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -2698,7 +2743,7 @@
       ]
     },
     {
-      "id": "webbboxx-11928877",
+      "id": "webbboxx-3320333",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -2738,7 +2783,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -2868,26 +2913,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_maydaytp-2026-07-12",
-      "source": "拓元售票",
-      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
-      "venue_raw": "臺北大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "臺北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-12",
-      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_maydaytp_c-2026-07-12",
       "source": "拓元售票",
       "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站 玉山卡友專區",
@@ -2924,6 +2949,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_maydaytp-2026-07-12",
+      "source": "拓元售票",
+      "name": "玉山銀行冠名贊助 MAYDAY #5525+2 LIVE TOUR 五月天 [ #5525+2 回到那一天 ] 25週年巡迴演唱會｜台北站",
+      "venue_raw": "臺北大巨蛋",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-07-12",
+      "image": "https://static.tixcraft.com/images/activity/26_maydaytp_9c69edd091606a69bfa2d69052f12141.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_maydaytp",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_maydaytp"
         }
       ]
     },
@@ -2968,7 +3013,7 @@
       ]
     },
     {
-      "id": "webbboxx-7263224",
+      "id": "webbboxx-2449233",
       "source": "webbboxx 行事曆",
       "name": "盧廣仲 傷心早餐店演唱會 2026",
       "venue_raw": "已開賣 高雄巨蛋 / 台北小巨蛋 添翼售票 演出日期： 高雄 5/22-24、台北 7/10-12 已開賣，部分場次售罄 May 23",
@@ -2993,7 +3038,7 @@
       ]
     },
     {
-      "id": "webbboxx-3569981",
+      "id": "webbboxx-2641005",
       "source": "webbboxx 行事曆",
       "name": "五月天 MAYDAY《回到那一天》#5525+2 台北大巨蛋",
       "venue_raw": "熱門 臺北大巨蛋 拓元售票 演出日期： 2026/07/03-12（多場） 五月天搶票練習與攻略 → 現正售票中 Jul 03",
@@ -3033,7 +3078,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -3483,6 +3528,46 @@
       ]
     },
     {
+      "id": "tixcraft-26_nctjnjm-2026-07-18",
+      "source": "拓元售票",
+      "name": "2026 NCT JNJM FANMEETING TOUR [DUALITY] # KAOHSIUNG",
+      "venue_raw": "高雄流行音樂中心海音館",
+      "venue_id": "kaohsiung-music-center",
+      "venue_name": "高雄流行音樂中心",
+      "city": "高雄",
+      "date": "2026-07-18",
+      "image": "https://static.tixcraft.com/images/activity/26_nctjnjm_47c8d9163e9a584dec4ff452f6a9e134.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_nctjnjm",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_nctjnjm"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_kumachan-2026-07-18",
+      "source": "拓元售票",
+      "name": "熊仔 Kumachan 《人格特化療程→0》演唱會",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-07-18",
+      "image": "https://static.tixcraft.com/images/activity/26_kumachan_d630b14221979a1f19c5341c8721c9fd.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_kumachan",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_kumachan"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_exokh-2026-07-18",
       "source": "拓元售票",
       "name": "EXO PLANET #6 - EXhOrizon in KAOHSIUNG",
@@ -3513,46 +3598,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_kumachan-2026-07-18",
-      "source": "拓元售票",
-      "name": "熊仔 Kumachan 《人格特化療程→0》演唱會",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-07-18",
-      "image": "https://static.tixcraft.com/images/activity/26_kumachan_d630b14221979a1f19c5341c8721c9fd.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_kumachan",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_kumachan"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_nctjnjm-2026-07-18",
-      "source": "拓元售票",
-      "name": "2026 NCT JNJM FANMEETING TOUR [DUALITY] # KAOHSIUNG",
-      "venue_raw": "高雄流行音樂中心海音館",
-      "venue_id": "kaohsiung-music-center",
-      "venue_name": "高雄流行音樂中心",
-      "city": "高雄",
-      "date": "2026-07-18",
-      "image": "https://static.tixcraft.com/images/activity/26_nctjnjm_47c8d9163e9a584dec4ff452f6a9e134.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_nctjnjm",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_nctjnjm"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0408875-2026-07-18",
       "source": "iNDIEVOX",
       "name": "Diana Wang 王詩安《AURORA極光 演唱會》台中場",
@@ -3573,7 +3618,7 @@
       ]
     },
     {
-      "id": "webbboxx-3750771",
+      "id": "webbboxx-7912492",
       "source": "webbboxx 行事曆",
       "name": "滅火器 Fire EX. 首次攻蛋",
       "venue_raw": "台北小巨蛋 拓元售票 演出日期： 2026/07/18（六） 備註： 成軍 26 年首次小巨蛋演出 售票中 Jul 03",
@@ -3618,6 +3663,26 @@
       ]
     },
     {
+      "id": "tixcraft-26_kumachan-2026-07-19",
+      "source": "拓元售票",
+      "name": "熊仔 Kumachan 《人格特化療程→0》演唱會",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-07-19",
+      "image": "https://static.tixcraft.com/images/activity/26_kumachan_d630b14221979a1f19c5341c8721c9fd.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_kumachan",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_kumachan"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_exokh-2026-07-19",
       "source": "拓元售票",
       "name": "EXO PLANET #6 - EXhOrizon in KAOHSIUNG",
@@ -3644,26 +3709,6 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_exokh"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_kumachan-2026-07-19",
-      "source": "拓元售票",
-      "name": "熊仔 Kumachan 《人格特化療程→0》演唱會",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-07-19",
-      "image": "https://static.tixcraft.com/images/activity/26_kumachan_d630b14221979a1f19c5341c8721c9fd.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_kumachan",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_kumachan"
         }
       ]
     },
@@ -3823,7 +3868,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -3888,7 +3933,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -3998,7 +4043,7 @@
       ]
     },
     {
-      "id": "webbboxx-16517565",
+      "id": "webbboxx-12620917",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4098,26 +4143,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_dxs-2026-07-25",
-      "source": "拓元售票",
-      "name": "【0725場次】DxS [SERENADE] ON STAGE - KAOHSIUNG",
-      "venue_raw": "高雄巨蛋",
-      "venue_id": "kaohsiung-dome",
-      "venue_name": "高雄巨蛋",
-      "city": "高雄",
-      "date": "2026-07-25",
-      "image": "https://static.tixcraft.com/images/activity/26_dxs_af2bb90ca3a4b0b2a4cbcdb12de6337f.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_dxs",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_dxs"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_tleague-2026-07-25",
       "source": "拓元售票",
       "name": "NOJIMA T.LEAGUE 蛋牌2026-2027 賽季開幕戰",
@@ -4134,6 +4159,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_tleague"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_dxs-2026-07-25",
+      "source": "拓元售票",
+      "name": "【0725場次】DxS [SERENADE] ON STAGE - KAOHSIUNG",
+      "venue_raw": "高雄巨蛋",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-07-25",
+      "image": "https://static.tixcraft.com/images/activity/26_dxs_af2bb90ca3a4b0b2a4cbcdb12de6337f.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_dxs",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_dxs"
         }
       ]
     },
@@ -4238,7 +4283,7 @@
       ]
     },
     {
-      "id": "webbboxx-12734008",
+      "id": "webbboxx-16117059",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4438,7 +4483,7 @@
       ]
     },
     {
-      "id": "webbboxx-4882702",
+      "id": "webbboxx-7396411",
       "source": "webbboxx 行事曆",
       "name": "SEVENTEEN DxS [SERENADE] 高雄巨蛋",
       "venue_raw": "熱門 高雄巨蛋 拓元售票 演出日期： 2026/07/24-26（三場） 現正售票中",
@@ -4598,7 +4643,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -4668,7 +4713,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -4873,7 +4918,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -4998,7 +5043,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -5138,7 +5183,7 @@
       ]
     },
     {
-      "id": "webbboxx-12626554",
+      "id": "webbboxx-10238720",
       "source": "webbboxx 行事曆",
       "name": "2026 ASH ISLAND ASIA TOUR 台北站",
       "venue_raw": "Zepp New Taipei 拓元售票 演出日期： 2026/08/02 現正售票中 Aug 24",
@@ -5147,7 +5192,7 @@
       "city": "新北",
       "date": "2026-08-02",
       "image": "",
-      "url": "https://tixcraft.com/activity/detail/26_ampersone",
+      "url": "https://tixcraft.com/activity/detail/26_aaa",
       "price": "",
       "ticket_links": [
         {
@@ -5158,7 +5203,7 @@
         {
           "platform": "拓元售票",
           "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_ampersone"
+          "url": "https://tixcraft.com/activity/detail/26_aaa"
         }
       ]
     },
@@ -5203,7 +5248,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -5918,7 +5963,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -5968,7 +6013,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6168,7 +6213,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6363,7 +6408,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6503,7 +6548,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6748,7 +6793,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6823,7 +6868,7 @@
       ]
     },
     {
-      "id": "webbboxx-11935610",
+      "id": "webbboxx-5887645",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -6888,7 +6933,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -6963,7 +7008,7 @@
       ]
     },
     {
-      "id": "webbboxx-8917692",
+      "id": "webbboxx-8765026",
       "source": "webbboxx 行事曆",
       "name": "BABYMONSTER 台北小巨蛋",
       "venue_raw": "熱門 台北小巨蛋 TICKET PLUS 演出日期： 2026/08/22-23（兩場） 5/7 12:00 TICKET PLUS 開賣 Aug 02",
@@ -7028,7 +7073,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -7153,7 +7198,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -7203,7 +7248,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -7738,7 +7783,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -7788,7 +7833,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -7888,7 +7933,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -8103,7 +8148,7 @@
       ]
     },
     {
-      "id": "webbboxx-4441090",
+      "id": "webbboxx-494305",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -8468,7 +8513,7 @@
       ]
     },
     {
-      "id": "webbboxx-12570247",
+      "id": "webbboxx-10148350",
       "source": "webbboxx 行事曆",
       "name": "潘越雲「坐看雲起時」演唱會",
       "venue_raw": "臺北流行音樂中心 拓元售票 演出日期： 2026/09/11-13（三場） 售票資訊即將公布 Sep 19",
@@ -8608,7 +8653,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -8793,26 +8838,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_youngji_c-2026-09-19",
-      "source": "拓元售票",
-      "name": "【Mastercard專區】2026 LEE YOUNGJI WORLD TOUR ＜2.0＞",
-      "venue_raw": "台北流行音樂中心表演廳",
-      "venue_id": "taipei-music-center",
-      "venue_name": "台北流行音樂中心",
-      "city": "台北",
-      "date": "2026-09-19",
-      "image": "https://static.tixcraft.com/images/activity/26_youngji_c_79db2c05ec1de0110b7c753217d4b7ed.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_youngji_c",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_youngji_c"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_youngji-2026-09-19",
       "source": "拓元售票",
       "name": "2026 LEE YOUNGJI WORLD TOUR ＜2.0＞",
@@ -8839,26 +8864,6 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_youngji"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_pmkhbus-2026-09-19",
-      "source": "拓元售票",
-      "name": "【歌迷返鄉專車】x Post Malone Presents The BIG ASS Stadium World Tour",
-      "venue_raw": "【返鄉專車】指定搭車點",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-09-19",
-      "image": "https://static.tixcraft.com/images/activity/26_pmkhbus_ea715fcc803ffb610ce1ce4b3e97db44.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_pmkhbus",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_pmkhbus"
         }
       ]
     },
@@ -8893,6 +8898,26 @@
       ]
     },
     {
+      "id": "tixcraft-26_youngji_c-2026-09-19",
+      "source": "拓元售票",
+      "name": "【Mastercard專區】2026 LEE YOUNGJI WORLD TOUR ＜2.0＞",
+      "venue_raw": "台北流行音樂中心表演廳",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-09-19",
+      "image": "https://static.tixcraft.com/images/activity/26_youngji_c_79db2c05ec1de0110b7c753217d4b7ed.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_youngji_c",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_youngji_c"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_malone_c-2026-09-19",
       "source": "拓元售票",
       "name": "【Mastercard專區】Post Malone Presents The BIG ASS Stadium World Tour",
@@ -8909,6 +8934,26 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_malone_c"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_pmkhbus-2026-09-19",
+      "source": "拓元售票",
+      "name": "【歌迷返鄉專車】x Post Malone Presents The BIG ASS Stadium World Tour",
+      "venue_raw": "【返鄉專車】指定搭車點",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-19",
+      "image": "https://static.tixcraft.com/images/activity/26_pmkhbus_ea715fcc803ffb610ce1ce4b3e97db44.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_pmkhbus",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_pmkhbus"
         }
       ]
     },
@@ -8968,7 +9013,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -9118,7 +9163,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -9258,7 +9303,7 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
@@ -9333,12 +9378,32 @@
         {
           "platform": "cpbl",
           "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39455"
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
         },
         {
           "platform": "manual",
           "name": "中華職棒官方賽程",
           "url": "https://www.cpbl.com.tw/schedule"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_lany_c-2026-09-26",
+      "source": "拓元售票",
+      "name": "【Mastercard專區】LANY：soft world tour",
+      "venue_raw": "台北小巨蛋",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-26",
+      "image": "https://static.tixcraft.com/images/activity/26_lany_c_7aa28ab843a56ab3e22d4b3476e61885.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_lany_c",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_lany_c"
         }
       ]
     },
@@ -9369,26 +9434,6 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_lany"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_lany_c-2026-09-26",
-      "source": "拓元售票",
-      "name": "【Mastercard專區】LANY：soft world tour",
-      "venue_raw": "台北小巨蛋",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
-      "date": "2026-09-26",
-      "image": "https://static.tixcraft.com/images/activity/26_lany_c_7aa28ab843a56ab3e22d4b3476e61885.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_lany_c",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_lany_c"
         }
       ]
     },
@@ -9858,31 +9903,6 @@
       ]
     },
     {
-      "id": "webbboxx-1264412",
-      "source": "webbboxx 行事曆",
-      "name": "Charlie Puth - Whatever's Clever! World Tour 桃園站",
-      "venue_raw": "熱門 桃園陽光劇場 拓元售票 演出日期： 2026/10/18 現正售票中",
-      "venue_id": "taoyuan-sunlight-arena",
-      "venue_name": "桃園陽光劇場",
-      "city": "桃園",
-      "date": "2026-10-18",
-      "image": "",
-      "url": "https://tixcraft.com/activity/detail/26_cptp",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "webbboxx",
-          "name": "行事曆來源",
-          "url": "https://webbboxx.com/calendar"
-        },
-        {
-          "platform": "拓元售票",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_cptp"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_cptp-2026-10-20",
       "source": "拓元售票",
       "name": "Charlie Puth - Whatever’s Clever! World Tour",
@@ -10213,7 +10233,7 @@
       ]
     },
     {
-      "id": "webbboxx-5393011",
+      "id": "webbboxx-8081224",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10278,7 +10298,7 @@
       ]
     },
     {
-      "id": "webbboxx-10949667",
+      "id": "webbboxx-3627373",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10343,7 +10363,7 @@
       ]
     },
     {
-      "id": "webbboxx-4677576",
+      "id": "webbboxx-5445348",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10408,7 +10428,7 @@
       ]
     },
     {
-      "id": "webbboxx-3996592",
+      "id": "webbboxx-6056366",
       "source": "webbboxx 行事曆",
       "name": "BTS 防彈少年團 高雄演唱會",
       "venue_raw": "熱門 高雄 拓元售票 演出日期： 2026/11/19-22（四場） 售票資訊即將公布 Nov 24",
@@ -10429,6 +10449,26 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_wte_v-2026-11-24",
+      "source": "拓元售票",
+      "name": "【VIP Upgrade/升級VIP】wave to earth - the pieces tour",
+      "venue_raw": "台北國際會議中心TICC",
+      "venue_id": "ticc",
+      "venue_name": "TICC",
+      "city": "台北",
+      "date": "2026-11-24",
+      "image": "https://static.tixcraft.com/images/activity/26_wte_v_aa4bd6db8b92a50fa7c9245a12536cd9.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_wte_v",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_wte_v"
         }
       ]
     },
@@ -10459,26 +10499,6 @@
           "platform": "拓元售票",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_wte"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_wte_v-2026-11-24",
-      "source": "拓元售票",
-      "name": "【VIP Upgrade/升級VIP】wave to earth - the pieces tour",
-      "venue_raw": "台北國際會議中心TICC",
-      "venue_id": "ticc",
-      "venue_name": "TICC",
-      "city": "台北",
-      "date": "2026-11-24",
-      "image": "https://static.tixcraft.com/images/activity/26_wte_v_aa4bd6db8b92a50fa7c9245a12536cd9.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_wte_v",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_wte_v"
         }
       ]
     },
