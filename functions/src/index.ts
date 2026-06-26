@@ -2,10 +2,9 @@ import { onRequest } from "firebase-functions/v2/https";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 
-// TDX API 金鑰與氣象 API 金鑰透過 Firebase Secret Manager 安全儲存
+// TDX API 金鑰透過 Firebase Secret Manager 安全儲存；氣象金鑰改用 Functions .env 安全載入以相容 Spark 方案
 const TDX_CLIENT_ID = defineSecret("TDX_CLIENT_ID");
 const TDX_CLIENT_SECRET = defineSecret("TDX_CLIENT_SECRET");
-const CWA_API_KEY = defineSecret("CWA_API_KEY");
 
 const TDX_API_BASE = "https://tdx.transportdata.tw/api/basic";
 const TDX_TOKEN_URL =
@@ -200,7 +199,6 @@ export const suspension = onRequest(
  */
 export const cwaProxy = onRequest(
   {
-    secrets: [CWA_API_KEY],
     cors: true,        // 允許前端跨域呼叫
     region: "asia-east1", // 台灣最近的區域
     timeoutSeconds: 30,
@@ -214,7 +212,7 @@ export const cwaProxy = onRequest(
     }
 
     try {
-      const apiKey = CWA_API_KEY.value();
+      const apiKey = process.env.CWA_API_KEY;
 
       if (!apiKey) {
         res.status(503).json({ error: "CWA API 金鑰尚未設定" });
