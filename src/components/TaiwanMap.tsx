@@ -2,6 +2,13 @@ import { useState, useRef, useMemo, useEffect } from 'react'
 import type { MouseEvent, TouchEvent } from 'react'
 import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
+import { TAIWAN_PATHS } from '../constants/taiwanPaths'
+
+const project = (lon: number, lat: number) => {
+  const x = 159.787256 * lon - 18882.141068
+  const y = -172.627301 * lat + 4572.883143
+  return { x, y }
+}
 
 export function Stat({ number, label }: { number: number; label: string }) {
   return (
@@ -42,7 +49,7 @@ export function TaiwanMap({
   activeVenueIds,
   categoryFilter = 'all',
 }: TaiwanMapProps) {
-  const [center, setCenter] = useState({ x: 235, y: 295 })
+  const [center, setCenter] = useState({ x: 455, y: 500 })
   const [isDragging, setIsDragging] = useState(false)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
@@ -86,8 +93,8 @@ export function TaiwanMap({
     lastSelectedVenueId.current = selectedVenueId
 
     // Calculate targets
-    const targetX = selectedVenue ? selectedVenue.x : 235
-    const targetY = selectedVenue ? selectedVenue.y : 295
+    const targetX = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).x : 455
+    const targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
     const targetZoom = selectedVenue ? 1.8 : 1.1
 
     // Update target states in React first
@@ -148,8 +155,8 @@ export function TaiwanMap({
       const pctX = clientX / rect.width
       const pctY = clientY / rect.height
 
-      const w = 370 / zoom
-      const h = 450 / zoom
+      const w = 800 / zoom
+      const h = 800 / zoom
 
       const minX = center.x - w / 2
       const minY = center.y - h / 2
@@ -165,8 +172,8 @@ export function TaiwanMap({
         newZoom = Math.max(0.7, zoom / zoomFactor)
       }
 
-      const newWidth = 370 / newZoom
-      const newHeight = 450 / newZoom
+      const newWidth = 800 / newZoom
+      const newHeight = 800 / newZoom
 
       const newMinX = mx - pctX * newWidth
       const newMinY = my - pctY * newHeight
@@ -221,8 +228,8 @@ export function TaiwanMap({
     }
 
     const svgRect = svgRef.current.getBoundingClientRect()
-    const w = 370 / zoom
-    const h = 450 / zoom
+    const w = 800 / zoom
+    const h = 800 / zoom
     const scaleX = w / svgRect.width
     const scaleY = h / svgRect.height
 
@@ -243,8 +250,8 @@ export function TaiwanMap({
     }
 
     const svgRect = svgRef.current.getBoundingClientRect()
-    const w = 370 / zoom
-    const h = 450 / zoom
+    const w = 800 / zoom
+    const h = 800 / zoom
     const scaleX = w / svgRect.width
     const scaleY = h / svgRect.height
 
@@ -283,8 +290,8 @@ export function TaiwanMap({
     'chiayi'
   ]
 
-  const width = 370 / displayZoom
-  const height = 450 / displayZoom
+  const width = 800 / displayZoom
+  const height = 800 / displayZoom
   const minX = displayCenter.x - width / 2
   const minY = displayCenter.y - height / 2
   const viewBoxStr = `${minX} ${minY} ${width} ${height}`
@@ -314,45 +321,26 @@ export function TaiwanMap({
           </radialGradient>
         </defs>
 
-        <ellipse cx="235" cy="285" rx="180" ry="220" fill="url(#mapGlow)" />
-        <path
-          d="M 225,95 L 232,88 L 248,82 L 262,78 L 278,76 L 292,78 L 305,84 L 315,92 L 322,104 L 325,118 L 323,134 L 318,150 L 310,165 L 320,178 L 330,195 L 335,215 L 334,235 L 328,255 L 318,272 L 310,290 L 305,310 L 302,332 L 298,355 L 292,378 L 282,400 L 270,420 L 256,438 L 240,452 L 225,462 L 212,468 L 198,472 L 185,472 L 172,468 L 162,460 L 155,448 L 152,434 L 154,420 L 160,405 L 168,390 L 172,374 L 170,358 L 164,344 L 156,330 L 150,316 L 148,302 L 150,288 L 156,274 L 162,260 L 165,244 L 162,228 L 156,212 L 152,196 L 154,178 L 162,160 L 172,143 L 182,128 L 194,114 L 206,103 L 216,97 L 225,95 Z"
-          fill="var(--map-land, #1e2040)"
-          stroke="var(--map-land-stroke, #2a2a60)"
-          strokeWidth="1.5"
-          opacity="0.9"
-        />
-        <path
-          d="M 220,200 Q 240,190 260,205 Q 275,220 265,240 Q 250,255 235,248 Q 218,238 215,220 Q 212,207 220,200 Z"
-          fill="none"
-          stroke="var(--map-contour, #2a2a55)"
-          strokeWidth="0.8"
-          opacity="0.5"
-        />
-        <path
-          d="M 218,195 Q 245,182 268,200 Q 285,218 272,244 Q 256,262 236,254 Q 212,243 208,222 Q 205,204 218,195 Z"
-          fill="none"
-          stroke="var(--map-contour, #2a2a55)"
-          strokeWidth="0.6"
-          opacity="0.3"
-        />
-        <path
-          d="M 230,150 L 250,110 L 268,145 L 280,125 L 295,160 L 285,185 L 265,200 L 245,205 L 228,190 Z"
-          fill="var(--map-mountain, #1a1a35)"
-          stroke="var(--map-mountain-stroke, #252545)"
-          strokeWidth="1"
-          opacity="0.6"
-        />
-        <circle cx="120" cy="330" r="12" fill="var(--map-land, #1e2040)" stroke="var(--map-land-stroke, #2a2a60)" strokeWidth="1" />
-        <circle cx="108" cy="320" r="7" fill="var(--map-land, #1e2040)" stroke="var(--map-land-stroke, #2a2a60)" strokeWidth="1" />
-        <circle cx="128" cy="315" r="5" fill="var(--map-land, #1e2040)" stroke="var(--map-land-stroke, #2a2a60)" strokeWidth="1" />
-        <text x="110" y="348" fill="var(--map-label, #4a4a70)" fontSize="9" textAnchor="middle">
+        <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
+        {Object.entries(TAIWAN_PATHS).map(([countyName, pathD]) => (
+          <path
+            key={countyName}
+            d={pathD}
+            fill="var(--map-land, #1e2040)"
+            stroke="var(--map-land-stroke, #2a2a60)"
+            strokeWidth="1.2"
+            opacity="0.9"
+            style={{ transition: 'fill 0.3s' }}
+          />
+        ))}
+        <text x="213" y="585" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
           澎湖
         </text>
-        <circle cx="355" cy="450" r="8" fill="var(--map-land, #1e2040)" stroke="var(--map-land-stroke, #2a2a60)" strokeWidth="1" />
-        <rect x="58" y="280" width="25" height="15" rx="4" fill="var(--map-land, #1e2040)" stroke="var(--map-land-stroke, #2a2a60)" strokeWidth="1" />
-        <text x="70" y="306" fill="var(--map-label, #4a4a70)" fontSize="9" textAnchor="middle">
+        <text x="25" y="375" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
           金門
+        </text>
+        <text x="324" y="115" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
+          馬祖
         </text>
 
         <g>
@@ -378,7 +366,7 @@ export function TaiwanMap({
               <g
                 key={venue.id}
                 className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
-                transform={`translate(${venue.x},${venue.y})`}
+                transform={`translate(${project(venue.longitude || 0, venue.latitude || 0).x},${project(venue.longitude || 0, venue.latitude || 0).y})`}
                 onClick={(e) => {
                   if (isCategoryInactive) return
                   e.stopPropagation()
