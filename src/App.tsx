@@ -361,6 +361,9 @@ function App() {
   // 抓取停班停課資訊，並判斷是否彈窗
   useEffect(() => {
     const fetchSuspension = async () => {
+      let data: SuspensionInfo | null = null
+
+      // 方法一：嘗試從自有機關 API 抓取
       try {
         const hostname = window.location.hostname
         const isLocal = hostname === 'localhost' || hostname === '127.0.0.1'
@@ -369,8 +372,48 @@ function App() {
           : 'https://concert-c399d.web.app/api/suspension'
 
         const response = await fetch(apiUrl)
-        if (!response.ok) throw new Error('Failed to fetch suspension status')
-        const data = (await response.json()) as SuspensionInfo
+        if (response.ok) {
+          data = (await response.json()) as SuspensionInfo
+        }
+      } catch (e) {
+        console.log('Backend API fetch skipped or failed, using client-side fallback:', e)
+      }
+
+      // 方法二：若自有機關 API 失敗（例如使用免費的 Firebase Spark 方案無法部署 Cloud Functions），
+      // 則使用免費的公共 CORS 代理直接在瀏覽器端爬取並解析
+      if (!data) {
+        try {
+          const targetUrl = 'https://www.dgpa.gov.tw/typh/daily/nds.html'
+          const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(targetUrl)}`
+          
+          const response = await fetch(proxyUrl)
+          if (!response.ok) throw new Error('CORS proxy response was not ok')
+          const html = await response.text()
+
+          // 提取更新時間
+          const updateTimeMatch = html.match(/更新時間：\s*([\d\/\:\s]+)/)
+          const updateTime = updateTimeMatch ? updateTimeMatch[1].trim() : ''
+
+          // 提取表格列
+          const rowRegex = /<tr[^>]*>\s*<td[^>]*headers=['"]?city_Name['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<td[^>]*headers=['"]?StopWorkSchool_Info['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<\/tr>/gi
+
+          let match
+          const items: { city: string; status: string }[] = []
+          while ((match = rowRegex.exec(html)) !== null) {
+            const city = match[1].replace(/<[^>]+>/g, '').trim()
+            const status = match[2].replace(/<[^>]+>/g, '').trim().replace(/\s+/g, ' ')
+            if (city && status) {
+              items.push({ city, status })
+            }
+          }
+
+          data = { updateTime, items }
+        } catch (e) {
+          console.error('Failed to fetch suspension info via CORS proxy:', e)
+        }
+      }
+
+      if (data) {
         setSuspensionData(data)
 
         // 檢查是否有實際停班停課資訊（包含「停止」或「停班」或「停課」，且排除單純的照常）
@@ -397,8 +440,6 @@ function App() {
             setIsSuspensionModalOpen(true)
           }
         }
-      } catch (e) {
-        console.error('Failed to fetch suspension info:', e)
       }
     }
 
