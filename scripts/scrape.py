@@ -167,6 +167,19 @@ KKTIX_ORGANIZER_URLS = [
     "https://wve.kktix.cc/",
     "https://mediaspheretw.kktix.cc/",
     "https://jslive.kktix.cc/",
+    "https://superdome.kktix.cc/",
+    "https://kklivetw.kktix.cc/",
+    "https://imetw.kktix.cc/",
+    "https://farglorycreative.kktix.cc/",
+    "https://livenationtw.kktix.cc/",
+    "https://amusetaiwan.kktix.cc/",
+    "https://legacy.kktix.cc/",
+    "https://warnermusictw.kktix.cc/",
+    "https://universalmusictw.kktix.cc/",
+    "https://sonymusictw.kktix.cc/",
+    "https://acrmedia.kktix.cc/",
+    "https://windmusic.kktix.cc/",
+    "https://onion.kktix.cc/",
 ]
 
 CONCERT_KEYWORDS = (
