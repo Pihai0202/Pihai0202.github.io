@@ -36,6 +36,10 @@ jobs:
         run: |
           python scripts/scrape_transit.py
 
+      - name: ⚠️ 執行停班停課狀態爬蟲
+        run: |
+          python scripts/scrape_suspension.py
+
       - name: 📊 確認結果
         run: |
           COUNT=$(python3 -c "import json; d=json.load(open('public/concerts.json')); print(d['count'])")
@@ -43,12 +47,14 @@ jobs:
           echo "✅ 共抓到 $COUNT 筆活動（來源：$SOURCES）"
           echo "--- transit-status.json preview ---"
           cat public/transit-status.json
+          echo "--- suspension.json preview ---"
+          cat public/suspension.json
 
       - name: 💾 Commit & Push
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add public/concerts.json public/transit-status.json
+          git add public/concerts.json public/transit-status.json public/suspension.json
           # 若沒有變更就不 commit（避免空 commit）
-          git diff --staged --quiet || git commit -m "🎵 自動更新演唱會及交通資料 $(date -u '+%Y-%m-%d %H:%M UTC')"
+          git diff --staged --quiet || git commit -m "🎵 自動更新演唱會、交通及停班停課資料 $(date -u '+%Y-%m-%d %H:%M UTC')"
           git push
