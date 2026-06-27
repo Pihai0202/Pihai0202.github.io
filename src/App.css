@@ -7528,7 +7528,7 @@ body.player-open .music-bar-toggle {
 /* 平板尺寸 (769px - 1024px) 側邊欄寬度最佳化 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .main-layout {
-    grid-template-columns: 1fr 380px !important;
+    grid-template-columns: 1fr 360px !important;
   }
 }
 
@@ -8994,6 +8994,57 @@ body.player-open .music-bar-toggle {
     z-index: 15 !important;
   }
 }
+
+/* ==========================================================================
+   Desktop & Laptop Layout Adaptiveness (自適應優化)
+   ========================================================================== */
+
+/* 筆電與中等螢幕電腦 (1025px - 1440px) 側邊欄與版面自適應 */
+@media (min-width: 1025px) and (max-width: 1440px) {
+  .main-layout {
+    grid-template-columns: 1fr 400px !important;
+  }
+}
+
+/* 平板橫向與小螢幕電腦 (769px - 1200px) 頂部導覽列優化，避免內容擁擠換行 */
+@media (min-width: 769px) and (max-width: 1200px) {
+  header {
+    padding: 1.2rem 1.5rem 0.8rem !important;
+    gap: 1rem !important;
+  }
+
+  .logo-text h1 {
+    font-size: 1.15rem !important;
+  }
+
+  .logo-text span {
+    font-size: 0.6rem !important;
+    letter-spacing: 0.1em !important;
+  }
+
+  .stats-bar {
+    gap: 0.8rem !important;
+    padding: 0.35rem 1rem !important;
+  }
+
+  .stat-box {
+    gap: 0.3rem !important;
+  }
+
+  .stat-num {
+    font-size: 0.95rem !important;
+  }
+
+  .stat-label {
+    font-size: 0.55rem !important;
+  }
+
+  .nav-toggle-btn {
+    padding: 0.45rem 0.8rem !important;
+    font-size: 0.8rem !important;
+  }
+}
+
 
 
 
