@@ -7626,7 +7626,7 @@ body.player-open .music-bar-toggle {
     display: flex;
     flex-direction: column;
     position: fixed;
-    bottom: 60px; /* Above bottom nav */
+    bottom: var(--bottom-offset); /* Dynamically adjusts when player is open */
     left: 0;
     right: 0;
     background: rgba(26, 26, 38, 0.95);
@@ -7636,7 +7636,7 @@ body.player-open .music-bar-toggle {
     border-radius: 20px 20px 0 0;
     box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.5);
     z-index: 290;
-    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1), bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
   }
 
@@ -7673,7 +7673,7 @@ body.player-open .music-bar-toggle {
   }
 
   .mobile-bottom-drawer.full {
-    height: calc(100vh - 150px);
+    height: calc(100vh - var(--bottom-offset) - 90px);
   }
 
   /* Header / Grab Handle */
