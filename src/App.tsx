@@ -1831,7 +1831,7 @@ function App() {
               )
               const normalItems = suspensionData.items.filter(
                 (item) =>
-                  item.status.includes('照常')
+                  !warningItems.includes(item)
               )
 
               return (
