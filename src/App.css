@@ -9045,6 +9045,217 @@ body.player-open .music-bar-toggle {
   }
 }
 
+/* ==========================================================================
+   Scheme 1: Minimalist Design Overrides (極簡風格扁平化設計)
+   ========================================================================== */
+
+/* 1. 全域與版面背景扁平化 */
+body {
+  background-color: var(--bg);
+}
+
+header {
+  background: var(--bg) !important;
+  border-bottom: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+}
+
+.stats-bar {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+}
+
+.main-layout {
+  border-top: none !important;
+}
+
+.map-container {
+  background: var(--bg) !important;
+}
+
+.map-bg {
+  background: var(--bg) !important; /* 移除放射狀背景，保持極簡單色 */
+}
+
+/* 2. 移除所有卡片的 3D 漸層與投影，改為扁平線框設計 */
+.concert-card,
+.shared-note-card,
+.profile-sidebar-card,
+.profile-review-card,
+.reply-card,
+.login-card,
+.normal-card,
+.detail-post-content {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+  backdrop-filter: none !important;
+  transition: border-color 0.2s, background-color 0.2s !important;
+}
+
+[data-theme='light'] .concert-card,
+[data-theme='light'] .shared-note-card,
+[data-theme='light'] .profile-sidebar-card,
+[data-theme='light'] .profile-review-card,
+[data-theme='light'] .reply-card,
+[data-theme='light'] .login-card,
+[data-theme='light'] .normal-card,
+[data-theme='light'] .detail-post-content {
+  background: var(--surface2) !important;
+  box-shadow: none !important;
+}
+
+/* 3. 簡化 Hover 動效，移除平移 (Translate) 與發光，保持單色線條感 */
+.concert-card:hover,
+.shared-note-card:hover,
+.profile-review-card:hover,
+.reply-card:hover {
+  transform: none !important;
+  border-color: var(--gold) !important;
+  box-shadow: none !important;
+}
+
+.concert-card:hover {
+  border-color: var(--teal) !important;
+}
+
+.concert-card::before {
+  display: none !important; /* 移除側邊裝飾條，保持純粹 */
+}
+
+/* 4. 彈窗與浮動卡片扁平化 */
+.modal,
+.detail-modal,
+.publish-modal,
+.mobile-bottom-drawer,
+.shuangbei-popover,
+.map-weather-overlay {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 12px !important;
+  backdrop-filter: none !important;
+}
+
+[data-theme='light'] .modal,
+[data-theme='light'] .detail-modal,
+[data-theme='light'] .publish-modal,
+[data-theme='light'] .mobile-bottom-drawer,
+[data-theme='light'] .shuangbei-popover,
+[data-theme='light'] .map-weather-overlay {
+  background: var(--surface2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
+}
+
+.map-zoom-control.vertical {
+  background: var(--surface2) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: none !important;
+  border-radius: 8px !important;
+}
+
+.map-zoom-control.vertical:hover {
+  border-color: var(--border) !important;
+  box-shadow: none !important;
+}
+
+/* 5. 按鈕與表單極簡化（去除漸層背景） */
+.nav-toggle-btn,
+.profile-back-btn,
+.profile-logout-btn,
+.reply-submit-btn,
+.publish-submit-btn,
+.publish-cancel-btn,
+.avatar-upload-btn,
+.avatar-reset-btn,
+.oauth-btn,
+.login-back-btn,
+.all-concerts-btn {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border-radius: 6px !important;
+  transition: all 0.2s !important;
+}
+
+/* 主按鈕（亮色強調）扁平化 */
+.reply-submit-btn,
+.publish-submit-btn,
+.avatar-upload-btn,
+.save-name-btn {
+  background: var(--gold) !important;
+  border: none !important;
+  color: #000 !important;
+  font-weight: 700 !important;
+}
+
+.reply-submit-btn:hover:not(:disabled),
+.publish-submit-btn:hover,
+.avatar-upload-btn:hover,
+.save-name-btn:hover {
+  background: #ffe3a3 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* 刪除或取消按鈕 */
+.card-delete-btn:hover,
+.avatar-reset-btn:hover {
+  background: rgba(255, 77, 79, 0.08) !important;
+  border-color: #ff4d4f !important;
+  color: #ff4d4f !important;
+}
+
+/* 6. 輸入框極簡化 */
+input,
+textarea,
+select {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: 6px !important;
+  color: var(--text) !important;
+  box-shadow: none !important;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  border-color: var(--gold) !important;
+  box-shadow: none !important;
+}
+
+/* 7. 社群標籤與微小元素去裝飾 */
+.card-artist-tag {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  color: var(--text) !important;
+  border-radius: 4px !important;
+  font-weight: 500 !important;
+}
+
+.shared-card-title,
+.detail-modal-title {
+  text-shadow: none !important;
+}
+
+.profile-avatar-large {
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border: 2px solid var(--border) !important;
+}
+
+/* 地圖浮點動畫去陰影 */
+.venue-pulse-ring,
+.mini-pulse-ring {
+  box-shadow: none !important;
+}
+
+
 
 
 
