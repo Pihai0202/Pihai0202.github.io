@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo, useEffect, useRef } from 'react'
 import type { Concert } from '../types'
 import { db } from '../firebase'
 import {
@@ -17,9 +17,10 @@ import {
 import { collection, query, where, getDocs } from 'firebase/firestore'
 
 interface ProfilePageProps {
-  user: { nickname: string; email?: string }
+  user: { nickname: string; email?: string; avatarUrl?: string }
   concerts: Concert[]
   onUpdateNickname: (newNickname: string) => void
+  onUpdateAvatar: (newAvatar: string) => void
   onLogout: () => void
   onBack: () => void
   onOpenConcertDetail: (id: string) => void
@@ -39,6 +40,7 @@ export function ProfilePage({
   user,
   concerts,
   onUpdateNickname,
+  onUpdateAvatar,
   onLogout,
   onBack,
   onOpenConcertDetail
@@ -48,6 +50,81 @@ export function ProfilePage({
   const [myReviews, setMyReviews] = useState<UserReview[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
+
+  const PRESET_EMOJIS = ['🎵', '🎤', '🎸', '🎹', '🎧', '🥁', '💃', '🕺', '✨', '🔥', '🤘', '🎟️']
+
+  const compressImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.src = base64Str
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 120
+        const MAX_HEIGHT = 120
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', 0.7))
+        } else {
+          resolve(base64Str)
+        }
+      }
+      img.onerror = () => {
+        resolve(base64Str)
+      }
+    })
+  }
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (file.size > 5 * 1024 * 1024) {
+      alert('圖片大小不能超過 5MB')
+      return
+    }
+
+    const reader = new FileReader()
+    reader.onload = async (event) => {
+      const base64 = event.target?.result as string
+      if (base64) {
+        const compressed = await compressImage(base64)
+        onUpdateAvatar(compressed)
+        setIsAvatarModalOpen(false)
+      }
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleSelectEmoji = (emoji: string) => {
+    onUpdateAvatar(emoji)
+    setIsAvatarModalOpen(false)
+  }
+
+  const handleResetAvatar = () => {
+    onUpdateAvatar('')
+    setIsAvatarModalOpen(false)
+  }
 
   // 1. Calculate Statistics
   const stats = useMemo(() => {
@@ -178,8 +255,24 @@ export function ProfilePage({
         {/* 左側：個人名片與統計資料 */}
         <aside className="profile-sidebar-card">
           <div className="profile-card-header">
-            <div className="profile-avatar-large" style={{ backgroundColor: avatarBg }}>
-              {user.nickname.charAt(0).toUpperCase()}
+            <div 
+              className="profile-avatar-large editable" 
+              style={{ backgroundColor: avatarBg }}
+              onClick={() => setIsAvatarModalOpen(true)}
+              title="點擊更換頭像"
+            >
+              {user.avatarUrl ? (
+                user.avatarUrl.startsWith('data:image') || user.avatarUrl.startsWith('http') ? (
+                  <img src={user.avatarUrl} alt="Avatar" className="avatar-img" />
+                ) : (
+                  <span className="avatar-emoji">{user.avatarUrl}</span>
+                )
+              ) : (
+                user.nickname.charAt(0).toUpperCase()
+              )}
+              <div className="avatar-overlay">
+                <span>更換頭像</span>
+              </div>
             </div>
             {isEditingName ? (
               <div className="edit-nickname-row">
@@ -349,6 +442,58 @@ export function ProfilePage({
           </section>
         </main>
       </div>
+
+      {isAvatarModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsAvatarModalOpen(false)}>
+          <div className="modal publish-modal" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setIsAvatarModalOpen(false)}>
+              ✕
+            </button>
+            <h2 style={{ fontFamily: '"Microsoft JhengHei", "微軟正黑體", sans-serif', fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1rem' }}>
+              自訂個人頭像
+            </h2>
+            
+            <div className="avatar-selection-grid">
+              {PRESET_EMOJIS.map((emoji) => (
+                <button
+                  key={emoji}
+                  type="button"
+                  className="avatar-option-btn"
+                  onClick={() => handleSelectEmoji(emoji)}
+                >
+                  {emoji}
+                </button>
+              ))}
+            </div>
+
+            <div className="avatar-upload-row">
+              <input
+                type="file"
+                ref={fileInputRef}
+                accept="image/*"
+                style={{ display: 'none' }}
+                onChange={handleFileChange}
+              />
+              <button
+                type="button"
+                className="avatar-upload-btn"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                📷 上傳自訂照片
+              </button>
+              {user.avatarUrl && (
+                <button
+                  type="button"
+                  className="avatar-reset-btn"
+                  onClick={handleResetAvatar}
+                >
+                  🗑️ 清除並恢復預設
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -322,7 +322,7 @@ function App() {
   }, [searchQuery])
   const [nickname, setNickname] = useState(() => localStorage.getItem('tw-nickname') || '')
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('tw-logged-in') === 'true')
-  const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string } | null>(() => {
+  const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string; avatarUrl?: string } | null>(() => {
     const stored = localStorage.getItem('tw-user-info')
     return stored ? JSON.parse(stored) : null
   })
@@ -331,9 +331,11 @@ function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
       if (firebaseUser) {
+        const localAvatar = localStorage.getItem(`tw-avatar-${firebaseUser.email || firebaseUser.uid}`) || undefined
         const user = {
           nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '樂迷',
-          email: firebaseUser.email || ''
+          email: firebaseUser.email || '',
+          avatarUrl: localAvatar
         }
         setIsLoggedIn(true)
         setCurrentUser(user)
@@ -1501,6 +1503,17 @@ function App() {
               }
             }
           }}
+          onUpdateAvatar={(newAvatar) => {
+            const emailKey = currentUser?.email || 'guest'
+            if (newAvatar) {
+              localStorage.setItem(`tw-avatar-${emailKey}`, newAvatar)
+            } else {
+              localStorage.removeItem(`tw-avatar-${emailKey}`)
+            }
+            const updated = { ...currentUser, avatarUrl: newAvatar || undefined }
+            setCurrentUser(updated)
+            localStorage.setItem('tw-user-info', JSON.stringify(updated))
+          }}
           onLogout={handleLogout}
           onBack={() => setView('map')}
           onOpenConcertDetail={openConcertDetail}
@@ -1508,10 +1521,12 @@ function App() {
       ) : (
         <LoginPage
           onLoginSuccess={(user) => {
+            const localAvatar = localStorage.getItem(`tw-avatar-${user.email || 'guest'}`) || undefined
+            const userWithAvatar = { ...user, avatarUrl: localAvatar }
             setIsLoggedIn(true)
-            setCurrentUser(user)
+            setCurrentUser(userWithAvatar)
             localStorage.setItem('tw-logged-in', 'true')
-            localStorage.setItem('tw-user-info', JSON.stringify(user))
+            localStorage.setItem('tw-user-info', JSON.stringify(userWithAvatar))
             localStorage.setItem('tw-nickname', user.nickname)
             setNickname(user.nickname)
             setView('map')
