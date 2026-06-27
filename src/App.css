@@ -9300,6 +9300,26 @@ select:focus {
   box-shadow: none !important;
 }
 
+/* 解決極簡風格中，搜尋框內部產生的雙重邊框與背景色問題 */
+.header-search input,
+.search-input-wrapper input,
+.drawer-search-bar input,
+.drawer-search-bar-inline input,
+.mobile-search-bar input,
+.spotify-search-row input,
+.board-search-bar input,
+.calendar-search-box input,
+.bus-search-input,
+.profile-search-input,
+.venue-select-input {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 0 !important;
+  padding: 0 !important;
+}
+
+
 
 
 
