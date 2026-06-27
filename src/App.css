@@ -8983,17 +8983,24 @@ body.player-open .music-bar-toggle {
   background: rgba(255, 77, 79, 0.05);
 }
 
+/* 當雙北特寫彈窗開啟時，提升地圖包裝容器的 z-index，使其高於同層後方的「全部記錄」按鈕 */
+.taiwan-map-wrapper:has(.shuangbei-popover) {
+  z-index: 12 !important;
+}
+
 @media (max-width: 768px) {
   .shuangbei-popover {
-    top: 5rem !important; /* Push down to clear header and top-right list button */
-    right: 1rem !important;
-    left: 1rem !important;
-    width: auto !important;
-    max-width: 300px !important;
-    margin: 0 auto;
+    top: 5.5rem !important; /* 往下位移，避開頂部搜尋框與全部記錄按鈕 */
+    left: 50% !important;
+    right: auto !important;
+    transform: translateX(-50%) !important;
+    width: calc(100% - 2rem) !important;
+    max-width: 320px !important;
+    margin: 0 !important;
     z-index: 15 !important;
   }
 }
+
 
 /* ==========================================================================
    Desktop & Laptop Layout Adaptiveness (自適應優化)
