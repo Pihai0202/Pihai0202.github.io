@@ -38,6 +38,16 @@ export function ShareBoard() {
     notes: '',
   })
 
+  // Selected note for detail and replies
+  const [selectedNote, setSelectedNote] = useState<SharedNote | null>(null)
+  const [replies, setReplies] = useState<any[]>([])
+  const [replyForm, setReplyForm] = useState({
+    author: localStorage.getItem('tw-nickname') || '',
+    content: ''
+  })
+  const [replyActiveTab, setReplyActiveTab] = useState<'edit' | 'preview'>('edit')
+  const [isPublishingReply, setIsPublishingReply] = useState(false)
+
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
     try {
@@ -114,6 +124,75 @@ export function ShareBoard() {
 
     return () => unsubscribe()
   }, [])
+
+  // Listen to replies collection when a note is selected
+  useEffect(() => {
+    if (!selectedNote) {
+      setReplies([])
+      return
+    }
+
+    const repliesRef = collection(db, 'reviews', selectedNote.id, 'replies')
+    const q = query(repliesRef, orderBy('createdAt', 'asc'))
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const list: any[] = []
+      snapshot.forEach((doc) => {
+        const data = doc.data()
+        list.push({
+          id: doc.id,
+          author: data.author,
+          content: data.content,
+          createdAt: data.createdAt
+        })
+      })
+      setReplies(list)
+    }, (err) => {
+      console.error("Failed to fetch replies:", err)
+    })
+
+    return () => unsubscribe()
+  }, [selectedNote])
+
+  // Select active note with latest real-time likes
+  const activeNote = useMemo(() => {
+    if (!selectedNote) return null
+    return notes.find(n => n.id === selectedNote.id) || selectedNote
+  }, [notes, selectedNote])
+
+  const handleAddReply = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!selectedNote) return
+    const author = replyForm.author.trim() || '匿名樂迷'
+    const content = replyForm.content.trim()
+
+    if (!content) {
+      alert('請輸入回覆內容')
+      return
+    }
+
+    setIsPublishingReply(true)
+    try {
+      await addDoc(collection(db, 'reviews', selectedNote.id, 'replies'), {
+        author,
+        content,
+        createdAt: new Date().toISOString()
+      })
+      // Save author nickname
+      localStorage.setItem('tw-nickname', author)
+      // Reset form
+      setReplyForm((prev) => ({ ...prev, content: '' }))
+      setReplyActiveTab('edit')
+      logCustomEvent('reply_community_note', {
+        note_id: selectedNote.id
+      })
+    } catch (err) {
+      console.error('Failed to add reply:', err)
+      alert('發表回覆失敗，請檢查連線並重試！')
+    } finally {
+      setIsPublishingReply(false)
+    }
+  }
 
   // Filter notes by search query
   const filteredNotes = useMemo(() => {
@@ -263,7 +342,10 @@ export function ShareBoard() {
           <button
             className="expand-card-btn"
             type="button"
-            onClick={() => toggleExpand(note.id)}
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleExpand(note.id)
+            }}
           >
             {isExpanded ? '收起全文 ▴' : '展開全文 ▾'}
           </button>
@@ -326,7 +408,7 @@ export function ShareBoard() {
             })
 
             return (
-              <div key={note.id} className="shared-note-card">
+              <div key={note.id} className="shared-note-card" onClick={() => setSelectedNote(note)}>
                 <div className="shared-card-header">
                   <div className="card-artist-tag">{note.artist}</div>
                   <div className="card-header-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
@@ -334,7 +416,10 @@ export function ShareBoard() {
                       <button
                         className="card-delete-btn"
                         type="button"
-                        onClick={() => handleNoteDelete(note.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleNoteDelete(note.id)
+                        }}
                         title="刪除此分享"
                       >
                         <TrashIcon size="1em" style={{ verticalAlign: 'middle' }} />
@@ -343,7 +428,10 @@ export function ShareBoard() {
                     <button
                       className={`card-like-btn${isLiked ? ' liked' : ''}`}
                       type="button"
-                      onClick={() => handleLikeToggle(note.id)}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        handleLikeToggle(note.id)
+                      }}
                       title={isLiked ? '取消按讚' : '點擊按讚'}
                     >
                       <span className="heart-icon">
@@ -537,6 +625,203 @@ export function ShareBoard() {
                 </button>
               </div>
             </form>
+          </div>
+        </div>
+      )}
+
+      {selectedNote && activeNote && (
+        <div className="modal-overlay active" onClick={() => setSelectedNote(null)}>
+          <div className="modal detail-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setSelectedNote(null)}>
+              <CloseIcon />
+            </button>
+            
+            <div className="detail-modal-header">
+              <div className="card-artist-tag">{activeNote.artist}</div>
+              <h2 className="detail-modal-title">{activeNote.concertName}</h2>
+              <div className="shared-card-meta">
+                <span>
+                  <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                  {activeNote.venueCity} · {activeNote.venueName}
+                </span>
+                <span>
+                  <CalendarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                  {activeNote.date || '日期未定'}
+                </span>
+              </div>
+            </div>
+
+            <div className="detail-modal-body" style={{ maxHeight: 'calc(80vh - 120px)', overflowY: 'auto', paddingRight: '0.4rem' }}>
+              {/* Original Post Content */}
+              <div className="detail-post-content">
+                <div className="detail-post-author-row">
+                  <span className="author">
+                    <UserIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    {activeNote.author}
+                  </span>
+                  <span className="post-date">
+                    發佈於 {new Date(activeNote.createdAt).toLocaleDateString('zh-TW', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </span>
+                </div>
+                
+                <div 
+                  className="markdown-body detail-notes-content" 
+                  dangerouslySetInnerHTML={{ 
+                    __html: (() => {
+                      try {
+                        return marked.parse(activeNote.notes) as string
+                      } catch {
+                        return activeNote.notes
+                      }
+                    })() 
+                  }} 
+                />
+
+                <div className="detail-post-actions">
+                  <button
+                    className={`card-like-btn${likedIds[activeNote.id] ? ' liked' : ''}`}
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      handleLikeToggle(activeNote.id)
+                    }}
+                    title={likedIds[activeNote.id] ? '取消按讚' : '點擊按讚'}
+                  >
+                    <span className="heart-icon">
+                      {likedIds[activeNote.id] ? (
+                        <HeartFilledIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                      ) : (
+                        <HeartOutlineIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                      )}
+                    </span>
+                    <span className="like-count">{activeNote.likes} 人按讚</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Replies Section */}
+              <div className="replies-section">
+                <h3>💬 樂迷回覆 ({replies.length})</h3>
+                
+                <div className="replies-list">
+                  {replies.length === 0 ? (
+                    <div className="replies-empty">
+                      目前尚無回覆，快來跟大家交流吧！
+                    </div>
+                  ) : (
+                    replies.map((reply) => {
+                      const replyDate = new Date(reply.createdAt).toLocaleString('zh-TW', {
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })
+                      return (
+                        <div key={reply.id} className="reply-card">
+                          <div className="reply-header">
+                            <span className="reply-author">
+                              <UserIcon size="0.8em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                              {reply.author}
+                            </span>
+                            <span className="reply-date">{replyDate}</span>
+                          </div>
+                          <div 
+                            className="markdown-body reply-content" 
+                            dangerouslySetInnerHTML={{ 
+                              __html: (() => {
+                                try {
+                                  return marked.parse(reply.content) as string
+                                } catch {
+                                  return reply.content
+                                }
+                              })() 
+                            }} 
+                          />
+                        </div>
+                      )
+                    })
+                  )}
+                </div>
+              </div>
+
+              {/* Reply Form */}
+              <div className="reply-form-container">
+                <h4>✍️ 發表回覆</h4>
+                <form onSubmit={handleAddReply}>
+                  <div className="form-group">
+                    <label htmlFor="reply-author">您的暱稱</label>
+                    <input
+                      id="reply-author"
+                      type="text"
+                      value={replyForm.author}
+                      onChange={(e) => setReplyForm({ ...replyForm, author: e.target.value })}
+                      placeholder="e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)"
+                      maxLength={20}
+                    />
+                  </div>
+                  <div className="form-group">
+                    <div className="notes-label-row">
+                      <label htmlFor="reply-content">回覆內容 * (支援 Markdown)</label>
+                      <div className="notes-tabs">
+                        <button
+                          type="button"
+                          className={`notes-tab-btn${replyActiveTab === 'edit' ? ' active' : ''}`}
+                          onClick={() => setReplyActiveTab('edit')}
+                        >
+                          編輯
+                        </button>
+                        <button
+                          type="button"
+                          className={`notes-tab-btn${replyActiveTab === 'preview' ? ' active' : ''}`}
+                          onClick={() => setReplyActiveTab('preview')}
+                        >
+                          預覽
+                        </button>
+                      </div>
+                    </div>
+                    {replyActiveTab === 'edit' ? (
+                      <textarea
+                        id="reply-content"
+                        value={replyForm.content}
+                        required
+                        placeholder="寫下您的回覆... (支援 Markdown 語法)"
+                        onChange={(e) => setReplyForm({ ...replyForm, content: e.target.value })}
+                        style={{
+                          width: '100%',
+                          height: '90px',
+                          background: 'var(--surface)',
+                          border: '1px solid var(--border)',
+                          borderRadius: '8px',
+                          padding: '0.6rem 0.8rem',
+                          color: 'var(--text)',
+                          fontSize: '0.85rem',
+                          fontFamily: 'inherit',
+                          outline: 'none',
+                          resize: 'vertical'
+                        }}
+                      />
+                    ) : (
+                      <div
+                        className="notes-preview-box markdown-body"
+                        style={{ height: '90px', padding: '0.6rem 0.8rem', fontSize: '0.85rem' }}
+                        dangerouslySetInnerHTML={{ 
+                          __html: replyForm.content.trim() 
+                            ? (marked.parse(replyForm.content) as string) 
+                            : '<p style="color: var(--muted); font-style: italic; font-size: 0.8rem;">（輸入內容後可在此預覽 Markdown 效果）</p>' 
+                        }}
+                      />
+                    )}
+                  </div>
+                  <button className="reply-submit-btn" type="submit" disabled={isPublishingReply}>
+                    {isPublishingReply ? '發表中...' : '發表回覆'}
+                  </button>
+                </form>
+              </div>
+            </div>
           </div>
         </div>
       )}

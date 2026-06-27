@@ -8654,4 +8654,216 @@ body.player-open .music-bar-toggle {
   filter: drop-shadow(0 0 10px rgba(var(--gold-rgb), 0.25));
 }
 
+/* ==========================================================================
+   Detail & Reply Modal Styles
+   ========================================================================== */
+.detail-modal {
+  max-width: 650px !important;
+}
+
+.detail-modal-header {
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 1rem;
+  margin-bottom: 1.2rem;
+}
+
+.detail-modal-title {
+  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--text);
+  margin-top: 0.5rem;
+  margin-bottom: 0.6rem;
+  line-height: 1.35;
+}
+
+.detail-post-content {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 2rem;
+}
+
+[data-theme='light'] .detail-post-content {
+  background: rgba(0, 0, 0, 0.01);
+}
+
+.detail-post-author-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  color: var(--muted);
+  margin-bottom: 1rem;
+  border-bottom: 1px dashed var(--border);
+  padding-bottom: 0.6rem;
+}
+
+.detail-post-author-row .author {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.detail-notes-content {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin-bottom: 1.2rem;
+}
+
+.detail-post-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.replies-section {
+  margin-bottom: 2rem;
+}
+
+.replies-section h3 {
+  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-size: 1.15rem;
+  color: var(--gold);
+  margin-bottom: 1rem;
+  border-bottom: 2px solid var(--border);
+  padding-bottom: 0.4rem;
+}
+
+[data-theme='light'] .replies-section h3 {
+  color: var(--gold);
+}
+
+.replies-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.replies-empty {
+  padding: 2rem;
+  text-align: center;
+  color: var(--muted);
+  font-style: italic;
+  font-size: 0.88rem;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+.reply-card {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.85rem 1.1rem;
+  transition: border-color 0.2s;
+}
+
+[data-theme='light'] .reply-card {
+  background: rgba(0, 0, 0, 0.015);
+}
+
+.reply-card:hover {
+  border-color: rgba(var(--gold-rgb), 0.3);
+}
+
+.reply-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(var(--border-rgb), 0.3);
+  padding-bottom: 0.3rem;
+  width: 100%;
+}
+
+.reply-author {
+  font-weight: 700;
+  color: var(--text);
+}
+
+.reply-content {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.reply-form-container {
+  border-top: 1px dashed var(--border);
+  padding-top: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.reply-form-container h4 {
+  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-size: 1.05rem;
+  color: var(--text);
+  margin-bottom: 1rem;
+}
+
+.reply-form-container .form-group {
+  margin-bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.reply-form-container label {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 600;
+}
+
+.reply-form-container input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  color: var(--text);
+  font-size: 0.85rem;
+  outline: none;
+}
+
+.reply-form-container input:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 8px rgba(var(--gold-rgb), 0.15);
+}
+
+.reply-submit-btn {
+  width: 100%;
+  padding: 0.65rem;
+  background: var(--gold);
+  border: none;
+  color: #000;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.reply-submit-btn:hover:not(:disabled) {
+  background: #ffe3a3;
+  transform: translateY(-1px);
+}
+
+.reply-submit-btn:disabled {
+  background: #555;
+  color: #888;
+  cursor: not-allowed;
+}
+
+[data-theme='light'] .reply-submit-btn:disabled {
+  background: #ddd;
+  color: #aaa;
+}
+
+.shared-note-card {
+  cursor: pointer;
+}
+
+
 
