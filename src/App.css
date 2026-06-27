@@ -9062,8 +9062,8 @@ header {
 }
 
 .stats-bar {
-  background: var(--surface2) !important;
-  border: 1px solid var(--border) !important;
+  background: transparent !important;
+  border: none !important;
   box-shadow: none !important;
 }
 
@@ -9163,9 +9163,6 @@ header {
 }
 
 /* 5. 按鈕與表單極簡化（去除漸層背景） */
-.nav-toggle-btn,
-.profile-back-btn,
-.profile-logout-btn,
 .reply-submit-btn,
 .publish-submit-btn,
 .publish-cancel-btn,
@@ -9182,6 +9179,54 @@ header {
   border-radius: 6px !important;
   transition: all 0.2s !important;
 }
+
+/* 保持主導覽與個人資料按鈕的主題色（金黃色 / 青綠色），僅做扁平化與去陰影 */
+.nav-toggle-btn {
+  background: rgba(var(--gold-rgb), 0.05) !important;
+  border: 1px solid rgba(var(--gold-rgb), 0.3) !important;
+  color: var(--gold) !important;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  border-radius: 20px !important; /* 保持精緻的膠囊形狀 */
+  transition: all 0.2s ease !important;
+}
+
+.nav-toggle-btn:hover {
+  background: rgba(var(--teal-rgb), 0.06) !important;
+  border-color: var(--teal) !important;
+  color: var(--teal) !important;
+}
+
+.nav-toggle-btn.active {
+  background: rgba(var(--teal-rgb), 0.08) !important;
+  border-color: var(--teal) !important;
+  color: var(--teal) !important;
+}
+
+.profile-back-btn {
+  background: rgba(var(--teal-rgb), 0.05) !important;
+  border: 1px solid rgba(var(--teal-rgb), 0.3) !important;
+  color: var(--teal) !important;
+  box-shadow: none !important;
+  border-radius: 20px !important;
+}
+
+.profile-back-btn:hover {
+  background: rgba(var(--teal-rgb), 0.1) !important;
+}
+
+.profile-logout-btn {
+  background: rgba(255, 90, 95, 0.05) !important;
+  border: 1px solid rgba(255, 90, 95, 0.35) !important;
+  color: #ff5a5f !important;
+  box-shadow: none !important;
+  border-radius: 20px !important;
+}
+
+.profile-logout-btn:hover {
+  background: rgba(255, 90, 95, 0.1) !important;
+}
+
 
 /* 主按鈕（亮色強調）扁平化 */
 .reply-submit-btn,
