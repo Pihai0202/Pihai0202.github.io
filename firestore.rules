@@ -36,6 +36,15 @@ service cloud.firestore {
                     && request.resource.data.createdAt == resource.data.createdAt;
                     
       allow delete: if true;
+
+      // 2a. Replies Subcollection under each review: Allow read and create.
+      match /replies/{replyId} {
+        allow read: if true;
+        allow create: if request.resource.data.author is string
+                      && request.resource.data.content is string
+                      && request.resource.data.createdAt is string;
+        allow update, delete: if false;
+      }
     }
 
     // 3. Ticket Comments: Allow anyone to read and create. Updates/deletes are blocked.
