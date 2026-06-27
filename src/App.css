@@ -8983,6 +8983,19 @@ body.player-open .music-bar-toggle {
   background: rgba(255, 77, 79, 0.05);
 }
 
+@media (max-width: 768px) {
+  .shuangbei-popover {
+    top: 5rem !important; /* Push down to clear header and top-right list button */
+    right: 1rem !important;
+    left: 1rem !important;
+    width: auto !important;
+    max-width: 300px !important;
+    margin: 0 auto;
+    z-index: 15 !important;
+  }
+}
+
+
 
 
 
