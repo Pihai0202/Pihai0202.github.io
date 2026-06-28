@@ -9287,6 +9287,11 @@ select {
   box-shadow: none !important;
 }
 
+option {
+  background: var(--surface2) !important;
+  color: var(--text) !important;
+}
+
 input:focus,
 textarea:focus,
 select:focus {
