@@ -180,7 +180,7 @@ export function TaiwanMap({
       const zoomFactor = 1.08
       let newZoom = zoom
       if (e.deltaY < 0) {
-        newZoom = Math.min(2.5, zoom * zoomFactor)
+        newZoom = Math.min(5.0, zoom * zoomFactor)
       } else {
         newZoom = Math.max(0.7, zoom / zoomFactor)
       }

@@ -1159,7 +1159,7 @@ function App() {
               <button
                 className="zoom-btn"
                 type="button"
-                onClick={() => setZoom((z) => Math.min(2.5, z + 0.1))}
+                onClick={() => setZoom((z) => Math.min(5.0, z + 0.1))}
                 title="放大地圖"
               >
                 +
