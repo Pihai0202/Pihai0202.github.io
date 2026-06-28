@@ -209,6 +209,7 @@ export function TaiwanMap({
     if (e.button !== 0) return
     e.preventDefault()
     didDragRef.current = false
+    setHoveredVenue(null)
     dragStartRef.current = {
       clientX: e.clientX,
       clientY: e.clientY,
@@ -222,6 +223,7 @@ export function TaiwanMap({
     if (e.touches.length !== 1) return
     const touch = e.touches[0]
     didDragRef.current = false
+    setHoveredVenue(null)
     dragStartRef.current = {
       clientX: touch.clientX,
       clientY: touch.clientY,
@@ -362,6 +364,7 @@ export function TaiwanMap({
             className={`shuangbei-cluster-group${showShuangbeiDetail ? ' active' : ''}`}
             transform={`translate(537,247)`}
             onClick={(e) => {
+              if (didDragRef.current) return
               e.stopPropagation()
               setShowShuangbeiDetail(true)
             }}
@@ -409,13 +412,13 @@ export function TaiwanMap({
                 className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
                 transform={`translate(${project(venue.longitude || 0, venue.latitude || 0).x},${project(venue.longitude || 0, venue.latitude || 0).y})`}
                 onClick={(e) => {
-                  if (isCategoryInactive) return
+                  if (isCategoryInactive || didDragRef.current) return
                   e.stopPropagation()
                   onSelectVenue(venue.id)
                   setShowShuangbeiDetail(false)
                 }}
                 onMouseEnter={() => {
-                  if (isCategoryInactive) return
+                  if (isCategoryInactive || isDragging) return
                   setHoveredVenue(venue)
                 }}
                 onMouseMove={(e) => {
@@ -425,7 +428,7 @@ export function TaiwanMap({
                   setHoveredVenue(null)
                 }}
               >
-                <circle className="click-target" r="18" cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
+                <circle className="click-target" r={22 / displayZoom} cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
                 <circle className="pulse-ring" r="12" cx="0" cy="0" />
                 <circle className="placeholder-dot" r={4 / displayZoom} cx="0" cy="0" />
                 <svg
