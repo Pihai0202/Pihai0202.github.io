@@ -403,9 +403,6 @@ export function TaiwanMap({
 
             const isSport = SPORT_VENUE_IDS.includes(venue.id)
 
-            const iconSize = 16 / displayZoom
-            const halfSize = iconSize / 2
-
             return (
               <g
                 key={venue.id}
@@ -430,29 +427,24 @@ export function TaiwanMap({
               >
                 <circle className="click-target" r={22 / displayZoom} cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
                 <circle className="pulse-ring" r="12" cx="0" cy="0" />
-                <circle className="placeholder-dot" r={4 / displayZoom} cx="0" cy="0" />
-                <svg
-                  x={-halfSize}
-                  y={-halfSize}
-                  width={iconSize}
-                  height={iconSize}
-                  viewBox="0 0 24 24"
-                  className="venue-icon"
-                >
-                  <circle className="icon-plate" cx="12" cy="12" r="11" />
-                  {isSport ? (
-                    <g className="icon-symbol" strokeWidth="1.5" fill="none" stroke="currentColor">
-                      <path d="M6 12a6 6 0 0 1 12 0" />
-                      <path d="M6 12a6 6 0 0 0 12 0" />
-                    </g>
-                  ) : (
-                    <g className="icon-symbol" stroke="currentColor">
-                      <path d="M9 18V5l12-2v13" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                      <circle cx="6" cy="18" r="3" />
-                      <circle cx="18" cy="16" r="3" />
-                    </g>
-                  )}
-                </svg>
+                <circle className="placeholder-dot" r="4" cx="0" cy="0" />
+                <g className="venue-icon">
+                  <g transform="scale(0.666667) translate(-12, -12)">
+                    <circle className="icon-plate" cx="12" cy="12" r="11" />
+                    {isSport ? (
+                      <g className="icon-symbol" strokeWidth="1.5" fill="none" stroke="currentColor">
+                        <path d="M6 12a6 6 0 0 1 12 0" />
+                        <path d="M6 12a6 6 0 0 0 12 0" />
+                      </g>
+                    ) : (
+                      <g className="icon-symbol" stroke="currentColor">
+                        <path d="M9 18V5l12-2v13" fill="none" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                        <circle cx="6" cy="18" r="3" />
+                        <circle cx="18" cy="16" r="3" />
+                      </g>
+                    )}
+                  </g>
+                </g>
               </g>
             )
           })}
