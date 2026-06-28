@@ -73,26 +73,39 @@ interface TdxBusEta {
   StopStatus?: number
 }
 
+interface TdxMetroLiveBoard {
+  StationID: string
+  StationName?: { Zh_tw?: string; En?: string }
+  DestinationStationName?: { Zh_tw?: string; En?: string }
+  Direction?: number
+  EstimateTime?: number
+}
+
+interface TdxMetroStationTimeTable {
+  StationID: string
+  Direction?: number
+  ServiceDay?: {
+    Monday?: number
+    Tuesday?: number
+    Wednesday?: number
+    Thursday?: number
+    Friday?: number
+    Saturday?: number
+    Sunday?: number
+  }
+  TimeTables?: Array<{
+    DestinationStationName?: { Zh_tw?: string; En?: string }
+    DepartureTime?: string
+  }>
+  Timetables?: Array<{
+    DestinationStationName?: { Zh_tw?: string; En?: string }
+    DepartureTime?: string
+  }>
+}
+
+
 // ─── 靜態資料 ────────────────────────────────────────────────────────────────
 
-const METRO_LINE_DATA = {
-  taipei: [
-    { line: '板南線 (藍線)', peak: '2~3 分鐘', offpeak: '4~6 分鐘', first: '06:00', last: '00:00' },
-    { line: '淡水信義線 (紅線)', peak: '3~4 分鐘', offpeak: '4~8 分鐘', first: '06:00', last: '00:00' },
-    { line: '松山新店線 (綠線)', peak: '3~4 分鐘', offpeak: '5~7 分鐘', first: '06:00', last: '00:00' },
-    { line: '中和新蘆線 (橘線)', peak: '3~4 分鐘', offpeak: '5~9 分鐘', first: '06:00', last: '00:00' },
-    { line: '文湖線 (棕線)', peak: '2~4 分鐘', offpeak: '4~7 分鐘', first: '06:00', last: '00:00' },
-    { line: '環狀線 (黃線)', peak: '4~6 分鐘', offpeak: '5~10 分鐘', first: '06:00', last: '00:00' },
-  ],
-  kaohsiung: [
-    { line: '紅線 (R)', peak: '4~6 分鐘', offpeak: '8~10 分鐘', first: '05:55', last: '00:00' },
-    { line: '橘線 (O)', peak: '4~6 分鐘', offpeak: '8~10 分鐘', first: '06:00', last: '00:00' },
-    { line: '輕軌 (C)', peak: '10 分鐘', offpeak: '15 分鐘', first: '06:30', last: '22:00' },
-  ],
-  taichung: [
-    { line: '綠線 (10)', peak: '5~8 分鐘', offpeak: '10 分鐘', first: '06:00', last: '00:00' },
-  ],
-}
 
 const THSR_STATIONS = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營']
 const TRA_STATIONS = ['基隆', '七堵', '南港', '松山', '台北', '板橋', '樹林', '桃園', '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義', '新營', '台南', '岡山', '新左營', '高雄', '屏東', '宜蘭', '羅東', '花蓮', '玉里', '台東']
@@ -105,14 +118,22 @@ const COUNTIES = [
   { id: 'Tainan', name: '台南市' },
 ]
 
+const METRO_OPERATORS = [
+  { id: 'TRTC', name: '台北捷運' },
+  { id: 'NTMC', name: '新北捷運 (環狀線/輕軌)' },
+  { id: 'TYMC', name: '桃園捷運' },
+  { id: 'TMRT', name: '台中捷運' },
+  { id: 'KRTC', name: '高雄捷運' },
+]
+
+
 // 外部連結
 const TDX_OFFICIAL_QUERY_URL = 'https://tdx.transportdata.tw/maas'
 const TDX_SWAGGER_URL = 'https://tdx.transportdata.tw/api-service/swagger'
 const TAIPEI_BUS_API_DOC_URL = 'https://pto.gov.taipei/News_Content.aspx?n=A1DF07A86105B6BB&s=55E8ADD164E4F579'
 
-// Firebase Function proxy 端點（由 firebase.json rewrite /api/tdx/** → tdxProxy Function）
-// 本地開發時透過 Vite proxy 轉發；部署後由 Firebase Hosting rewrite 處理
-const TDX_PROXY_BASE = '/api/tdx'
+// TDX API 代理端點。若使用 Cloudflare Workers，可在 .env 中設定 VITE_TDX_PROXY_URL（如 https://xxxx.workers.dev，結尾不加斜線）
+const TDX_PROXY_BASE = import.meta.env.VITE_TDX_PROXY_URL || '/api/tdx'
 
 // ─── 工具函式 ────────────────────────────────────────────────────────────────
 
@@ -234,6 +255,18 @@ export function TransitInfoBoard() {
     stops: string[]
   } | null>(null)
 
+  // 捷運時刻與看板查詢
+  const [metroOperator, setMetroOperator] = useState('TRTC')
+  const [metroStations, setMetroStations] = useState<TdxStation[]>([])
+  const [selectedMetroStation, setSelectedMetroStation] = useState('')
+  const [metroStationsLoading, setMetroStationsLoading] = useState(false)
+  const [metroLiveBoard, setMetroLiveBoard] = useState<TdxMetroLiveBoard[]>([])
+  const [metroTimetables, setMetroTimetables] = useState<TdxMetroStationTimeTable[]>([])
+  const [metroQueryLoading, setMetroQueryLoading] = useState(false)
+  const [metroQueryError, setMetroQueryError] = useState('')
+  const [showAllMetroTimes, setShowAllMetroTimes] = useState(false)
+
+
   // 1. 讀取營運通阻狀態（transit-status.json，由 GitHub Actions 每小時更新）
   const fetchStatus = useCallback(async () => {
     setLoading(true)
@@ -257,6 +290,125 @@ export function TransitInfoBoard() {
     const interval = setInterval(fetchStatus, 300_000)
     return () => { clearTimeout(timer); clearInterval(interval) }
   }, [fetchStatus])
+
+  // 載入捷運車站清單
+  useEffect(() => {
+    let active = true
+    const loadStations = async () => {
+      setMetroStationsLoading(true)
+      try {
+        const data = await fetchTdx<TdxStation[]>(
+          `/v2/Rail/Metro/Station/${metroOperator}?$select=StationID,StationName`
+        )
+        if (active) {
+          // 排序車站以利閱讀
+          const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
+          setMetroStations(sorted)
+          if (sorted.length > 0) {
+            setSelectedMetroStation(sorted[0].StationID)
+          } else {
+            setSelectedMetroStation('')
+          }
+        }
+      } catch (e) {
+        console.error('Failed to load metro stations:', e)
+      } finally {
+        if (active) setMetroStationsLoading(false)
+      }
+    }
+    
+    if (activeTab === 'metro') {
+      loadStations()
+    }
+    return () => { active = false }
+  }, [metroOperator, activeTab])
+
+  // 查詢捷運即時看板與時刻表
+  const queryMetroData = useCallback(async (operator: string, stationId: string) => {
+    if (!stationId) return
+    setMetroQueryLoading(true)
+    setMetroQueryError('')
+    try {
+      const [liveData, timetableData] = await Promise.all([
+        fetchTdx<TdxMetroLiveBoard[]>(
+          `/v2/Rail/Metro/LiveBoard/${operator}?$filter=StationID eq '${stationId}'`
+        ).catch((err) => {
+          console.error('LiveBoard error:', err)
+          return []
+        }),
+        fetchTdx<TdxMetroStationTimeTable[]>(
+          `/v2/Rail/Metro/StationTimeTable/${operator}?$filter=StationID eq '${stationId}'`
+        ).catch((err) => {
+          console.error('StationTimeTable error:', err)
+          return []
+        })
+      ])
+      setMetroLiveBoard(liveData)
+      setMetroTimetables(timetableData)
+    } catch (e) {
+      console.error('Metro query error:', e)
+      setMetroQueryError(e instanceof Error ? e.message : '查詢捷運時刻失敗，請稍後再試')
+    } finally {
+      setMetroQueryLoading(false)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (activeTab === 'metro' && selectedMetroStation) {
+      queryMetroData(metroOperator, selectedMetroStation)
+    }
+  }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
+
+  // 取得台北時區的星期幾（英文名稱對應 ServiceDay 欄位）
+  const getTodayDayOfWeek = () => {
+    const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+    const date = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }))
+    return days[date.getDay()]
+  }
+
+  // 取得台北時區的時間字串 (HH:MM)
+  const getTaipeiTimeStr = () => {
+    return new Intl.DateTimeFormat('zh-TW', {
+      timeZone: 'Asia/Taipei',
+      hour12: false,
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date())
+  }
+
+  // 過濾今日時刻表並進行終點站分群
+  const getFilteredTimetables = () => {
+    const todayDay = getTodayDayOfWeek()
+    const todayTimetableList: Array<{ departureTime: string; destination: string }> = []
+
+    metroTimetables.forEach((item) => {
+      const serviceDay = item.ServiceDay as Record<string, number | undefined>
+      if (serviceDay && serviceDay[todayDay] === 1) {
+        const trainTimes = item.TimeTables || item.Timetables || []
+        trainTimes.forEach((t) => {
+          if (t.DepartureTime) {
+            todayTimetableList.push({
+              departureTime: t.DepartureTime.slice(0, 5),
+              destination: t.DestinationStationName?.Zh_tw ?? '未定',
+            })
+          }
+        })
+      }
+    })
+
+    todayTimetableList.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
+
+    const grouped: Record<string, string[]> = {}
+    todayTimetableList.forEach((t) => {
+      if (!grouped[t.destination]) {
+        grouped[t.destination] = []
+      }
+      grouped[t.destination].push(t.departureTime)
+    })
+
+    return grouped
+  }
+
 
   // 取得當前服務的顯示資訊
   const getStatusDetails = () => {
@@ -452,23 +604,23 @@ export function TransitInfoBoard() {
             metro: (
               <>
                 <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                捷運班距
+                捷運時刻表
               </>
             ),
             train: (
               <>
                 <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                雙鐵動態 (開發中)
+                雙鐵動態
               </>
             ),
             bus: (
               <>
                 <BusIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                公車動態 (開發中)
+                公車動態
               </>
             ),
           }
-          const isDisabled = tab === 'train' || tab === 'bus'
+          const isDisabled = false
           return (
             <button
               key={tab}
@@ -528,34 +680,166 @@ export function TransitInfoBoard() {
         </div>
       )}
 
-      {/* ── Tab 2：捷運班距 ── */}
+      {/* ── Tab 2：捷運時刻與即時看板 ── */}
       {activeTab === 'metro' && (
         <div className="transit-tab-content">
-          <div className="metro-headway-wrapper">
-            {([
-              { title: '台北捷運 班距時程', data: METRO_LINE_DATA.taipei },
-              { title: '高雄捷運 班距時程', data: METRO_LINE_DATA.kaohsiung },
-              { title: '台中捷運 班距時程', data: METRO_LINE_DATA.taichung },
-            ] as const).map(({ title, data }, i) => (
-              <div key={i}>
-                <div className="metro-sub-title" style={i > 0 ? { marginTop: '1.2rem' } : {}}>
-                  <TrainIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                  {title}
-                </div>
-                <div className="metro-freq-table">
-                  {data.map((m) => (
-                    <div className="metro-freq-row" key={m.line}>
-                      <div className="metro-line-name">{m.line}</div>
-                      <div className="metro-freq-details">
-                        <span>尖峰: <strong>{m.peak}</strong></span>
-                        <span>離峰: <strong>{m.offpeak}</strong></span>
-                        <span>首尾班: <strong>{m.first}~{m.last}</strong></span>
-                      </div>
-                    </div>
+          <div className="train-query-form">
+            <div className="train-station-selects">
+              <div className="station-select-group">
+                <label>捷運系統</label>
+                <select
+                  value={metroOperator}
+                  onChange={(e) => setMetroOperator(e.target.value)}
+                  className="transit-select"
+                >
+                  {METRO_OPERATORS.map((op) => (
+                    <option key={op.id} value={op.id}>{op.name}</option>
                   ))}
-                </div>
+                </select>
               </div>
-            ))}
+              <div className="station-select-group">
+                <label>選擇車站</label>
+                <select
+                  value={selectedMetroStation}
+                  onChange={(e) => setSelectedMetroStation(e.target.value)}
+                  className="transit-select"
+                  disabled={metroStationsLoading || metroStations.length === 0}
+                >
+                  {metroStationsLoading ? (
+                    <option>讀取車站中...</option>
+                  ) : metroStations.length === 0 ? (
+                    <option>無車站資料</option>
+                  ) : (
+                    metroStations.map((st) => (
+                      <option key={st.StationID} value={st.StationID}>
+                        {st.StationID} - {st.StationName.Zh_tw}
+                      </option>
+                    ))
+                  )}
+                </select>
+              </div>
+            </div>
+            
+            <button
+              type="button"
+              className="bus-search-btn"
+              onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
+              disabled={metroQueryLoading || !selectedMetroStation}
+            >
+              {metroQueryLoading ? '查詢中...' : '重新整理即時資料'}
+            </button>
+          </div>
+
+          {/* 查詢結果區塊 */}
+          <div className="metro-dynamic-results">
+            {metroQueryLoading && metroLiveBoard.length === 0 && metroTimetables.length === 0 ? (
+              <div className="bus-stops-loading" style={{ margin: '2rem 0' }}>
+                正在向 TDX 查詢捷運時刻與即時看板...
+              </div>
+            ) : metroQueryError ? (
+              <div className="bus-stops-empty">
+                {metroQueryError}
+              </div>
+            ) : !selectedMetroStation ? (
+              <div className="bus-stops-empty">請選擇捷運系統與車站。</div>
+            ) : (
+              <div className="metro-results-grid">
+                
+                {/* 1. 即時列車看板 */}
+                <div className="metro-column">
+                  <div className="metro-column-title">
+                    <span className="live-pulse-dot"></span>
+                    即時到站看板
+                  </div>
+                  <div className="metro-live-list">
+                    {metroLiveBoard.length === 0 ? (
+                      <div className="metro-no-data">暫無即時到站資訊（可能非營運時間或該站點不支援）</div>
+                    ) : (
+                      [...metroLiveBoard]
+                        .sort((a, b) => (a.EstimateTime ?? 9999) - (b.EstimateTime ?? 9999))
+                        .map((train, idx) => {
+                          const est = train.EstimateTime
+                          let timeText = '列車進站中'
+                          let badgeClass = 'approaching'
+                          if (est !== undefined && est > 0) {
+                            timeText = `${Math.ceil(est / 60)} 分鐘`
+                            badgeClass = Math.ceil(est / 60) <= 2 ? 'soon' : 'normal'
+                          } else if (est === undefined || est < 0) {
+                            timeText = '已到站/即將發車'
+                            badgeClass = 'approaching'
+                          }
+
+                          return (
+                            <div className="metro-live-item" key={idx}>
+                              <div className="metro-live-destination">
+                                往 <strong>{train.DestinationStationName?.Zh_tw ?? '終點站'}</strong>
+                              </div>
+                              <span className={`metro-live-eta eta-${badgeClass}`}>
+                                {timeText}
+                              </span>
+                            </div>
+                          )
+                        })
+                    )}
+                  </div>
+                </div>
+
+                {/* 2. 今日時刻表 */}
+                <div className="metro-column">
+                  <div className="metro-column-title-row">
+                    <div className="metro-column-title">今日班表時刻表</div>
+                    <button
+                      type="button"
+                      className="metro-toggle-times-btn"
+                      onClick={() => setShowAllMetroTimes(!showAllMetroTimes)}
+                    >
+                      {showAllMetroTimes ? '只顯示未發車' : '顯示整天班表'}
+                    </button>
+                  </div>
+                  
+                  <div className="metro-timetables-wrapper">
+                    {Object.keys(getFilteredTimetables()).length === 0 ? (
+                      <div className="metro-no-data">此車站今日無時刻表資料</div>
+                    ) : (
+                      Object.entries(getFilteredTimetables()).map(([dest, times]) => {
+                        const nowTime = getTaipeiTimeStr()
+                        const displayedTimes = showAllMetroTimes 
+                          ? times 
+                          : times.filter(t => t >= nowTime)
+
+                        return (
+                          <div className="metro-timetable-group" key={dest}>
+                            <div className="metro-timetable-dest-header">
+                              往 <strong>{dest}</strong>
+                              <span className="metro-dest-count">({displayedTimes.length} 班次)</span>
+                            </div>
+                            <div className="metro-time-chips">
+                              {displayedTimes.length === 0 ? (
+                                <div className="metro-no-data-small">今日後續無發車班次</div>
+                              ) : (
+                                displayedTimes.map((time, tIdx) => {
+                                  const isNext = time >= nowTime && times.filter(t => t >= nowTime)[0] === time
+                                  return (
+                                    <span 
+                                      className={`metro-time-chip${isNext ? ' next-train' : ''}`} 
+                                      key={tIdx}
+                                      title={isNext ? '最接近的下一班車' : undefined}
+                                    >
+                                      {time}
+                                    </span>
+                                  )
+                                })
+                              )}
+                            </div>
+                          </div>
+                        )
+                      })
+                    )}
+                  </div>
+                </div>
+
+              </div>
+            )}
           </div>
         </div>
       )}

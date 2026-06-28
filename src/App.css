@@ -9325,6 +9325,226 @@ select:focus {
   border-radius: 0 !important;
 }
 
+/* Metro Dynamic Search and Timetable */
+.metro-dynamic-results {
+  margin-top: 0.8rem;
+  animation: fadeInBoard 0.3s ease-out;
+}
+
+.metro-results-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+@media (max-width: 768px) {
+  .metro-results-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metro-column {
+  background: rgba(255, 255, 255, 0.015);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 0.8rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.metro-column-title-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid rgba(var(--gold-rgb), 0.1);
+  padding-bottom: 0.4rem;
+}
+
+.metro-column-title {
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gold);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+/* Pulsing dot for live status */
+.live-pulse-dot {
+  width: 8px;
+  height: 8px;
+  background-color: var(--teal);
+  border-radius: 50%;
+  display: inline-block;
+  position: relative;
+  box-shadow: 0 0 8px var(--teal);
+  animation: pulseGreen 1.6s infinite;
+}
+
+@keyframes pulseGreen {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--teal);
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+.metro-toggle-times-btn {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 0.68rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.metro-toggle-times-btn:hover {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.05);
+}
+
+.metro-live-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.metro-live-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+}
+
+.metro-live-destination {
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.metro-live-destination strong {
+  color: var(--gold);
+}
+
+.metro-live-eta {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+}
+
+.metro-live-eta.eta-approaching {
+  background: rgba(var(--teal-rgb), 0.15);
+  color: var(--teal);
+  border: 1px solid rgba(var(--teal-rgb), 0.3);
+  animation: flashTeal 1.5s infinite;
+}
+
+@keyframes flashTeal {
+  0% { opacity: 0.75; }
+  50% { opacity: 1; }
+  100% { opacity: 0.75; }
+}
+
+.metro-live-eta.eta-soon {
+  background: rgba(244, 162, 97, 0.15);
+  color: #f4a261;
+  border: 1px solid rgba(244, 162, 97, 0.3);
+}
+
+.metro-live-eta.eta-normal {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.metro-no-data {
+  text-align: center;
+  padding: 2rem 0;
+  color: var(--muted);
+  font-size: 0.74rem;
+}
+
+.metro-no-data-small {
+  color: var(--muted);
+  font-size: 0.7rem;
+  padding: 0.4rem;
+}
+
+.metro-timetables-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+.metro-timetable-group {
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  border-radius: 8px;
+  padding: 0.6rem;
+}
+
+.metro-timetable-dest-header {
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  padding-bottom: 0.2rem;
+}
+
+.metro-timetable-dest-header strong {
+  color: var(--gold);
+}
+
+.metro-dest-count {
+  font-size: 0.65rem;
+  color: var(--muted);
+  margin-left: 0.4rem;
+}
+
+.metro-time-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.metro-time-chip {
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.15rem 0.45rem;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.metro-time-chip.next-train {
+  background: rgba(var(--gold-rgb), 0.15);
+  color: var(--gold);
+  border-color: rgba(var(--gold-rgb), 0.4);
+  font-weight: 700;
+  box-shadow: 0 0 5px rgba(var(--gold-rgb), 0.2);
+}
+
+
 
 
 
