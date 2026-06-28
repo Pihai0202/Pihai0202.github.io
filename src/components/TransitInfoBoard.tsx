@@ -487,7 +487,7 @@ export function TransitInfoBoard() {
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime),
             isExpress: true,
-            status: '🟢 今日班表',
+            status: '🟢',
           }]
         })
         .slice(0, 8)
@@ -916,7 +916,7 @@ export function TransitInfoBoard() {
                     <span className="train-time-arr">{tr.arrTime}</span>
                     <div className="train-dur-info">
                       <span className="train-dur">{tr.duration}</span>
-                      <span className={`train-status-badge ${tr.status.includes('今日') ? 'status-ontime' : 'status-delayed'}`}>
+                      <span className={`train-status-badge ${tr.status.includes('🟢') || tr.status.includes('今日') ? 'status-ontime' : 'status-delayed'}`}>
                         {tr.status}
                       </span>
                     </div>
