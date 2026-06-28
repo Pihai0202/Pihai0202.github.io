@@ -40,19 +40,22 @@ interface TdxStation {
   }
 }
 
-interface TdxTrainStopTime {
-  StationID: string
-  StationName?: { Zh_tw?: string; En?: string }
-  ArrivalTime?: string
-  DepartureTime?: string
-}
-
-interface TdxTrainTimetable {
-  TrainInfo?: {
+// THSR v2 /DailyTimetable/OD/... 回傳結構（OData 包裝，每筆為獨立的 OD 項）
+interface TdxThsrDailyTimetableItem {
+  DailyTrainInfo?: {
     TrainNo?: string
-    TrainTypeName?: { Zh_tw?: string; En?: string }
+    Overnight?: boolean
   }
-  StopTimes?: TdxTrainStopTime[]
+  OriginStopTime?: {
+    StationID?: string
+    ArrivalTime?: string
+    DepartureTime?: string
+  }
+  DestinationStopTime?: {
+    StationID?: string
+    ArrivalTime?: string
+    DepartureTime?: string
+  }
 }
 
 interface TdxBusRoute {
@@ -81,24 +84,29 @@ interface TdxMetroLiveBoard {
   EstimateTime?: number
 }
 
+// TDX 捷運時刻表：ServiceDay 欄位為布林值（非整數）
+// Timetables 內每個條目只有 DepartureTime，無 DestinationStationName
 interface TdxMetroStationTimeTable {
   StationID: string
   Direction?: number
   ServiceDay?: {
-    Monday?: number
-    Tuesday?: number
-    Wednesday?: number
-    Thursday?: number
-    Friday?: number
-    Saturday?: number
-    Sunday?: number
+    Monday?: boolean | number
+    Tuesday?: boolean | number
+    Wednesday?: boolean | number
+    Thursday?: boolean | number
+    Friday?: boolean | number
+    Saturday?: boolean | number
+    Sunday?: boolean | number
+    NationalHolidays?: boolean | number
   }
-  TimeTables?: Array<{
-    DestinationStationName?: { Zh_tw?: string; En?: string }
-    DepartureTime?: string
-  }>
+  // 實際 API 欄位名稱（不含終點站資訊）
   Timetables?: Array<{
-    DestinationStationName?: { Zh_tw?: string; En?: string }
+    Sequence?: number
+    DepartureTime?: string
+    TrainType?: number
+  }>
+  // 備用舊欄位名稱
+  TimeTables?: Array<{
     DepartureTime?: string
   }>
 }
@@ -108,7 +116,15 @@ interface TdxMetroStationTimeTable {
 
 
 const THSR_STATIONS = ['南港', '台北', '板橋', '桃園', '新竹', '苗栗', '台中', '彰化', '雲林', '嘉義', '台南', '左營']
-const TRA_STATIONS = ['基隆', '七堵', '南港', '松山', '台北', '板橋', '樹林', '桃園', '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義', '新營', '台南', '岡山', '新左營', '高雄', '屏東', '宜蘭', '羅東', '花蓮', '玉里', '台東']
+
+// 高鐵車站 ID 對照（直接硬編碼，省去 Station API 呼叫）
+const THSR_STATION_IDS: Record<string, string> = {
+  '南港': '0990', '台北': '1000', '板橋': '1010', '桃園': '1020',
+  '新竹': '1030', '苗栗': '1035', '台中': '1040', '彰化': '1043',
+  '雲林': '1047', '嘉義': '1050', '台南': '1060', '左營': '1070',
+}
+
+const TRA_STATION_IDS: Record<string, string> = {}
 
 const COUNTIES = [
   { id: 'Taipei', name: '台北市' },
@@ -178,9 +194,12 @@ function getBusStopStatus(eta?: TdxBusEta) {
 }
 
 /**
- * 透過 Firebase Function proxy 呼叫 TDX API。
- * 路徑格式：fetchTdx('/v2/Rail/THSR/Station') → GET /api/tdx/v2/Rail/THSR/Station
+ * 透過 Cloudflare Worker proxy 呼叫 TDX API。
+ * 路徑格式：fetchTdx('/v2/Rail/THSR/Station') → GET {TDX_PROXY_BASE}/v2/Rail/THSR/Station
  * TRA 使用 v3；THSR / Bus 使用 v2。
+ *
+ * TDX API 使用 OData 格式，所有列表端點均回傳 { value: [...], Count: N }。
+ * 此函式會自動偵測並解包，確保呼叫端永遠收到純陣列或原始物件。
  */
 async function fetchTdx<T>(path: string): Promise<T> {
   // path 開頭已含版本號，例如 /v2/Rail/THSR/... 或 /v3/Rail/TRA/...
@@ -188,41 +207,32 @@ async function fetchTdx<T>(path: string): Promise<T> {
   const response = await fetch(url)
   if (!response.ok) {
     // 嘗試解析後端錯誤訊息
-    let msg = `TDX 查詢失敗 (${response.status})`
+    let msg = `TDX API 查詢失敗 (${response.status})`
     try {
       const errJson = await response.json() as { error?: string }
       if (errJson.error) msg = errJson.error
     } catch { /* ignore */ }
     throw new Error(msg)
   }
-  return (await response.json()) as T
+  const json = await response.json()
+  // 自動解包 OData 回應格式：{ value: [...], Count: N } → [...]
+  if (json && typeof json === 'object' && !Array.isArray(json) && Array.isArray((json as Record<string, unknown>).value)) {
+    return (json as Record<string, unknown>).value as T
+  }
+  return json as T
 }
 
-// 車站清單快取（同一個 session 內只查一次）
-const stationCache: Record<string, TdxStation[]> = {}
-
-async function getTdxStations(type: 'THSR' | 'TRA') {
-  if (stationCache[type]) return stationCache[type]
-  // THSR → v2，TRA → v2（車站清單 v2 仍有效）
-  const stations = await fetchTdx<TdxStation[]>(
-    `/v2/Rail/${type}/Station?$select=StationID,StationName`
-  )
-  stationCache[type] = stations
-  return stations
+// 直接用硬編碼對照表取得車站 ID，不呼叫 Station API
+function getStationId(type: 'THSR' | 'TRA', stationName: string): string | undefined {
+  const normalized = normalizeStationName(stationName)
+  const map = type === 'THSR' ? THSR_STATION_IDS : TRA_STATION_IDS
+  return map[normalized]
 }
 
-function findStationId(stations: TdxStation[], stationName: string) {
-  const target = normalizeStationName(stationName)
-  return stations.find(
-    (s) => normalizeStationName(s.StationName?.Zh_tw ?? '') === target
-  )?.StationID
-}
+// 捷運車站快取（同一個 session 內只查一次，鍵為 METRO_TRTC 等格式）
+const metroStationCache: Record<string, TdxStation[]> = {}
 
-function getStopTime(timetable: TdxTrainTimetable, stationId: string) {
-  return timetable.StopTimes?.find((stop) => stop.StationID === stationId)
-}
 
-// ─── 主元件 ──────────────────────────────────────────────────────────────────
 
 export function TransitInfoBoard() {
   const [tdxActive, setTdxActive] = useState(false)
@@ -233,8 +243,7 @@ export function TransitInfoBoard() {
   // Tabs: 'status' | 'metro' | 'train' | 'bus'
   const [activeTab, setActiveTab] = useState<'status' | 'metro' | 'train' | 'bus'>('status')
 
-  // 雙鐵查詢
-  const [trainType, setTrainType] = useState<'thsr' | 'tra'>('thsr')
+  // 高鐵查詢
   const [originStation, setOriginStation] = useState('台北')
   const [destinationStation, setDestinationStation] = useState('左營')
   const [queryResults, setQueryResults] = useState<TrainQueryResult[]>([])
@@ -296,10 +305,10 @@ export function TransitInfoBoard() {
     let active = true
     const loadStations = async () => {
       const cacheKey = `METRO_${metroOperator}`
-      if (stationCache[cacheKey]) {
-        setMetroStations(stationCache[cacheKey])
-        if (stationCache[cacheKey].length > 0) {
-          setSelectedMetroStation(stationCache[cacheKey][0].StationID)
+      if (metroStationCache[cacheKey]) {
+        setMetroStations(metroStationCache[cacheKey])
+        if (metroStationCache[cacheKey].length > 0) {
+          setSelectedMetroStation(metroStationCache[cacheKey][0].StationID)
         } else {
           setSelectedMetroStation('')
         }
@@ -314,7 +323,7 @@ export function TransitInfoBoard() {
         if (active) {
           // 排序車站以利閱讀
           const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
-          stationCache[cacheKey] = sorted
+          metroStationCache[cacheKey] = sorted
           setMetroStations(sorted)
           if (sorted.length > 0) {
             setSelectedMetroStation(sorted[0].StationID)
@@ -366,9 +375,9 @@ export function TransitInfoBoard() {
   }, [])
 
   useEffect(() => {
-    if (activeTab === 'metro' && selectedMetroStation) {
-      queryMetroData(metroOperator, selectedMetroStation)
-    }
+    // 捕運時刻表查詢：僅在使用者主動按下、或捕運系統改變時才開始查詢
+    // （載入車站清單後不自動發起，避免發生 429）
+    // queryMetroData 由使用者按「重新整理」按鈕主動呼叫
   }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
 
   // 取得台北時區的星期幾（英文名稱對應 ServiceDay 欄位）
@@ -388,20 +397,22 @@ export function TransitInfoBoard() {
     }).format(new Date())
   }
 
-  // 過濾今日時刻表並進行終點站分群
+  // 過濾今日時刻表（捷運 API 不回傳終點站，改用方向分群）
   const getFilteredTimetables = () => {
     const todayDay = getTodayDayOfWeek()
-    const todayTimetableList: Array<{ departureTime: string; destination: string }> = []
+    const todayTimetableList: Array<{ departureTime: string; direction: number }> = []
 
     metroTimetables.forEach((item) => {
-      const serviceDay = item.ServiceDay as Record<string, number | undefined>
-      if (serviceDay && serviceDay[todayDay] === 1) {
-        const trainTimes = item.TimeTables || item.Timetables || []
+      const serviceDay = item.ServiceDay as Record<string, boolean | number | undefined>
+      // ServiceDay 欄位為布林值，需同時支援 true（布林）和 1（整數）
+      const isServiceDay = serviceDay && (serviceDay[todayDay] === true || serviceDay[todayDay] === 1)
+      if (isServiceDay) {
+        const trainTimes = item.Timetables || item.TimeTables || []
         trainTimes.forEach((t) => {
           if (t.DepartureTime) {
             todayTimetableList.push({
               departureTime: t.DepartureTime.slice(0, 5),
-              destination: t.DestinationStationName?.Zh_tw ?? '未定',
+              direction: item.Direction ?? 0,
             })
           }
         })
@@ -410,12 +421,14 @@ export function TransitInfoBoard() {
 
     todayTimetableList.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
 
+    // 以方向（去程/回程）分群
     const grouped: Record<string, string[]> = {}
     todayTimetableList.forEach((t) => {
-      if (!grouped[t.destination]) {
-        grouped[t.destination] = []
+      const dirLabel = t.direction === 0 ? '去程' : '回程'
+      if (!grouped[dirLabel]) {
+        grouped[dirLabel] = []
       }
-      grouped[t.destination].push(t.departureTime)
+      grouped[dirLabel].push(t.departureTime)
     })
 
     return grouped
@@ -444,53 +457,40 @@ export function TransitInfoBoard() {
 
   const { info, current } = getStatusDetails()
 
-  // 2. 雙鐵時刻查詢（透過 Firebase Function → TDX API）
+  // 高鐵時刻查詢
   const handleTrainSearch = useCallback(async () => {
     setIsTrainSearching(true)
     setTdxActive(false)
     setTrainError('')
     setQueryResults([])
     try {
-      const railType = trainType === 'thsr' ? 'THSR' : 'TRA'
-      const stations = await getTdxStations(railType)
-      const originId = findStationId(stations, originStation)
-      const destinationId = findStationId(stations, destinationStation)
+      const originId = getStationId('THSR', originStation)
+      const destinationId = getStationId('THSR', destinationStation)
       if (!originId || !destinationId) throw new Error('找不到對應車站代碼，請換一個站名試試')
 
       const today = getTodayTaipei()
-
-      // TRA 使用 v3 API；THSR 使用 v2 OD 時刻表
-      const apiVersion = trainType === 'tra' ? 'v3' : 'v2'
-      const path = `/${apiVersion}/Rail/${railType}/DailyTrainTimetable/OD/${originId}/to/${destinationId}/${today}?$top=20`
-      const data = await fetchTdx<TdxTrainTimetable[]>(path)
-
       const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
-      const results = data
-        .map((item) => {
-          const originStop = getStopTime(item, originId)
-          const destinationStop = getStopTime(item, destinationId)
-          const depTime = originStop?.DepartureTime ?? originStop?.ArrivalTime
-          const arrTime = destinationStop?.ArrivalTime ?? destinationStop?.DepartureTime
-          if (!depTime || !arrTime) return null
+
+      const path = `/v2/Rail/THSR/DailyTimetable/OD/${originId}/to/${destinationId}/${today}?$top=20`
+      const data = await fetchTdx<TdxThsrDailyTimetableItem[]>(path)
+      const results = (Array.isArray(data) ? data : [])
+        .flatMap((item): TrainQueryResult[] => {
+          const depTime = item.OriginStopTime?.DepartureTime ?? item.OriginStopTime?.ArrivalTime
+          const arrTime = item.DestinationStopTime?.ArrivalTime ?? item.DestinationStopTime?.DepartureTime
+          if (!depTime || !arrTime) return []
           const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
-          const trainTypeName =
-            item.TrainInfo?.TrainTypeName?.Zh_tw ?? (trainType === 'thsr' ? '高鐵' : '列車')
-          return {
-            trainType: trainTypeName,
-            trainNo: item.TrainInfo?.TrainNo ?? '--',
+          if (depMinutes < nowMinutes) return []
+          return [{
+            trainType: '高鐵',
+            trainNo: item.DailyTrainInfo?.TrainNo ?? '--',
             depTime: depTime.slice(0, 5),
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime),
-            isExpress: !['區間', '區間車', '站站停'].some((t) => trainTypeName.includes(t)),
-            status: depMinutes >= nowMinutes ? '🟢 今日班表' : '⚪ 已發車',
-          } satisfies TrainQueryResult
+            isExpress: true,
+            status: '🟢 今日班表',
+          }]
         })
-        .filter((item): item is TrainQueryResult => item !== null)
-        .filter((item) => {
-          const dep = Number(item.depTime.slice(0, 2)) * 60 + Number(item.depTime.slice(3, 5))
-          return dep >= nowMinutes
-        })
-        .slice(0, 6)
+        .slice(0, 8)
 
       setQueryResults(results)
       setTdxActive(true)
@@ -499,11 +499,11 @@ export function TransitInfoBoard() {
       }
     } catch (e) {
       console.error('Train search error:', e)
-      setTrainError(e instanceof Error ? e.message : '雙鐵時刻查詢失敗，請稍後再試')
+      setTrainError(e instanceof Error ? e.message : '高鐵時刻查詢失敗，請稍後再試')
     } finally {
       setIsTrainSearching(false)
     }
-  }, [trainType, originStation, destinationStation])
+  }, [originStation, destinationStation])
 
   // 3. 公車動態查詢（透過 Firebase Function → TDX API）
   const handleBusSearch = useCallback(async (directionOverride?: number) => {
@@ -568,14 +568,8 @@ export function TransitInfoBoard() {
     handleBusSearch(next)
   }
 
-  // Tab 切換時自動觸發查詢
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      if (activeTab === 'train') handleTrainSearch()
-      else if (activeTab === 'bus') handleBusSearch()
-    }, 0)
-    return () => clearTimeout(timer)
-  }, [activeTab, handleTrainSearch, handleBusSearch])
+  // Tab 切換時不再自動觸發查詢（避免 useCallback 重建導致連鎖 429）
+  // 使用者需自行按下查詢按鈕才會發起對 TDX 的呼叫
 
   // ─── JSX ──────────────────────────────────────────────────────────────────
 
@@ -622,7 +616,7 @@ export function TransitInfoBoard() {
             train: (
               <>
                 <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                雙鐵動態
+                高鐵動態
               </>
             ),
             bus: (
@@ -856,31 +850,15 @@ export function TransitInfoBoard() {
         </div>
       )}
 
-      {/* ── Tab 3：雙鐵時刻 ── */}
+      {/* ── Tab 3：高鐵動態 ── */}
       {activeTab === 'train' && (
         <div className="transit-tab-content">
           <div className="train-query-form">
-            <div className="train-type-row">
-              <button
-                type="button"
-                className={`train-type-btn${trainType === 'thsr' ? ' active' : ''}`}
-                onClick={() => { setTrainType('thsr'); setOriginStation('台北'); setDestinationStation('左營') }}
-              >
-                高鐵時刻表
-              </button>
-              <button
-                type="button"
-                className={`train-type-btn${trainType === 'tra' ? ' active' : ''}`}
-                onClick={() => { setTrainType('tra'); setOriginStation('台北'); setDestinationStation('台中') }}
-              >
-                台鐵時刻表
-              </button>
-            </div>
             <div className="train-station-selects">
               <div className="station-select-group">
                 <label>起程站</label>
                 <select value={originStation} onChange={(e) => setOriginStation(e.target.value)} className="transit-select">
-                  {(trainType === 'thsr' ? THSR_STATIONS : TRA_STATIONS).map((st) => (
+                  {THSR_STATIONS.map((st) => (
                     <option key={st} value={st}>{st}</option>
                   ))}
                 </select>
@@ -888,7 +866,7 @@ export function TransitInfoBoard() {
               <div className="station-select-group">
                 <label>到達站</label>
                 <select value={destinationStation} onChange={(e) => setDestinationStation(e.target.value)} className="transit-select">
-                  {(trainType === 'thsr' ? THSR_STATIONS : TRA_STATIONS)
+                  {THSR_STATIONS
                     .filter((st) => st !== originStation)
                     .map((st) => (
                       <option key={st} value={st}>{st}</option>
@@ -917,7 +895,7 @@ export function TransitInfoBoard() {
             </div>
             <div className="train-board-rows">
               {isTrainSearching ? (
-                <div className="bus-stops-loading">正在向 TDX 查詢雙鐵時刻...</div>
+                <div className="bus-stops-loading">正在向 TDX 查詢高鐵時刻...</div>
               ) : trainError ? (
                 <div className="bus-stops-empty">
                   {trainError}
