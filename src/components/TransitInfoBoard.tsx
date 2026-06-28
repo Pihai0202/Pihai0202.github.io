@@ -199,10 +199,10 @@ async function fetchTdx<T>(path: string): Promise<T> {
 }
 
 // 車站清單快取（同一個 session 內只查一次）
-const stationCache: Partial<Record<'THSR' | 'TRA', TdxStation[]>> = {}
+const stationCache: Record<string, TdxStation[]> = {}
 
 async function getTdxStations(type: 'THSR' | 'TRA') {
-  if (stationCache[type]) return stationCache[type]!
+  if (stationCache[type]) return stationCache[type]
   // THSR → v2，TRA → v2（車站清單 v2 仍有效）
   const stations = await fetchTdx<TdxStation[]>(
     `/v2/Rail/${type}/Station?$select=StationID,StationName`
@@ -295,6 +295,17 @@ export function TransitInfoBoard() {
   useEffect(() => {
     let active = true
     const loadStations = async () => {
+      const cacheKey = `METRO_${metroOperator}`
+      if (stationCache[cacheKey]) {
+        setMetroStations(stationCache[cacheKey])
+        if (stationCache[cacheKey].length > 0) {
+          setSelectedMetroStation(stationCache[cacheKey][0].StationID)
+        } else {
+          setSelectedMetroStation('')
+        }
+        return
+      }
+
       setMetroStationsLoading(true)
       try {
         const data = await fetchTdx<TdxStation[]>(
@@ -303,6 +314,7 @@ export function TransitInfoBoard() {
         if (active) {
           // 排序車站以利閱讀
           const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
+          stationCache[cacheKey] = sorted
           setMetroStations(sorted)
           if (sorted.length > 0) {
             setSelectedMetroStation(sorted[0].StationID)
