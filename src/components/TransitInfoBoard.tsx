@@ -309,12 +309,18 @@ export function TransitInfoBoard() {
     let active = true
     const loadStations = async () => {
       const cacheKey = `METRO_${metroOperator}`
+
+      // 切換系統時立即清空舊車站資料，避免殘留上一個系統的車站
+      setMetroStations([])
+      setSelectedMetroStation('')
+      setMetroQueryError('')
+      setMetroLiveBoard([])
+      setMetroTimetables([])
+
       if (metroStationCache[cacheKey]) {
         setMetroStations(metroStationCache[cacheKey])
         if (metroStationCache[cacheKey].length > 0) {
           setSelectedMetroStation(metroStationCache[cacheKey][0].StationID)
-        } else {
-          setSelectedMetroStation('')
         }
         return
       }
@@ -325,28 +331,34 @@ export function TransitInfoBoard() {
           `/v2/Rail/Metro/Station/${metroOperator}?$select=StationID,StationName`
         )
         if (active) {
-          // 排序車站以利閱讀
           const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
           metroStationCache[cacheKey] = sorted
           setMetroStations(sorted)
           if (sorted.length > 0) {
             setSelectedMetroStation(sorted[0].StationID)
-          } else {
-            setSelectedMetroStation('')
           }
         }
       } catch (e) {
         console.error('Failed to load metro stations:', e)
+        if (active) {
+          // 載入失敗時顯示錯誤（而非靜默保留舊系統車站）
+          setMetroQueryError(
+            e instanceof Error
+              ? `車站清單載入失敗：${e.message}`
+              : '車站清單載入失敗，請稍後再試'
+          )
+        }
       } finally {
         if (active) setMetroStationsLoading(false)
       }
     }
-    
+
     if (activeTab === 'metro') {
       loadStations()
     }
     return () => { active = false }
   }, [metroOperator, activeTab])
+
 
   // 查詢捷運即時看板與時刻表
   const queryMetroData = useCallback(async (operator: string, stationId: string) => {
