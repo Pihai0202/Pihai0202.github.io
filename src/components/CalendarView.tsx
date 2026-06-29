@@ -518,12 +518,12 @@ export function CalendarView({
       {/* Selected Day Info Drawer (Shown always below the calendar in grid mode) */}
       {viewMode === 'grid' && (
         <div className={`selected-day-details-drawer ${isMobileDrawerOpen ? 'open' : ''}`}>
-          <div className="drawer-header">
+          <div className="calendar-drawer-header">
             <h3>
               <CalendarIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
               {selectedDateStr} 活動清單
             </h3>
-            <div className="drawer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <div className="calendar-drawer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
               <button
                 className="drawer-add-event-btn"
                 onClick={() => onAddEventClick(selectedDateStr)}

@@ -7035,7 +7035,7 @@ body.player-open .music-bar-toggle {
   margin-top: 1rem;
 }
 
-.drawer-header {
+.calendar-drawer-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -7044,7 +7044,7 @@ body.player-open .music-bar-toggle {
   padding-bottom: 0.8rem;
 }
 
-.drawer-header h3 {
+.calendar-drawer-header h3 {
   margin: 0;
   font-size: 1.15rem;
   font-weight: 700;
