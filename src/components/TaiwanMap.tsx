@@ -107,8 +107,15 @@ export function TaiwanMap({
 
     // Calculate targets
     const targetX = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).x : 455
-    const targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
+    let targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
     const targetZoom = selectedVenue ? 1.8 : 1.1
+
+    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
+    if (selectedVenue && isMobile) {
+      // 底部抽屜在手機端佔用下半部約 45% 高度，將選取的場館中心點往上偏移以置中於上方可視區（地圖往下移 22% 視區高度）
+      const heightVal = 800 / targetZoom
+      targetY += heightVal * 0.22
+    }
 
     // Update target states in React first
     setCenter({ x: targetX, y: targetY })
