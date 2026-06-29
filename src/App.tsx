@@ -45,7 +45,9 @@ import {
   PinIcon,
   PlayIcon,
   PlusIcon,
-  TaiwanIcon
+  TaiwanIcon,
+  KeyIcon,
+  LogoutIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -2112,7 +2114,7 @@ function App() {
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">🗺️</span>
+                <span className="icon"><MapIcon /></span>
                 <span className="label">探索地圖</span>
               </button>
               <button
@@ -2123,7 +2125,7 @@ function App() {
                   openAddModal()
                 }}
               >
-                <span className="icon">➕</span>
+                <span className="icon"><PlusIcon /></span>
                 <span className="label">新增活動紀錄</span>
               </button>
               <button
@@ -2134,7 +2136,7 @@ function App() {
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">📅</span>
+                <span className="icon"><CalendarIcon /></span>
                 <span className="label">活動行事曆</span>
               </button>
               <button
@@ -2145,7 +2147,7 @@ function App() {
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">💬</span>
+                <span className="icon"><MessageIcon /></span>
                 <span className="label">社群牆</span>
               </button>
               {isLoggedIn && currentUser ? (
@@ -2157,7 +2159,7 @@ function App() {
                     setIsMobileSidebarOpen(false)
                   }}
                 >
-                  <span className="icon">👤</span>
+                  <span className="icon"><UserIcon /></span>
                   <span className="label">個人資料 ({currentUser.nickname})</span>
                 </button>
               ) : (
@@ -2169,7 +2171,7 @@ function App() {
                     setIsMobileSidebarOpen(false)
                   }}
                 >
-                  <span className="icon">🔑</span>
+                  <span className="icon"><KeyIcon /></span>
                   <span className="label">帳戶登入</span>
                 </button>
               )}
@@ -2181,7 +2183,7 @@ function App() {
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">{theme === 'dark' ? '☀️' : '🌙'}</span>
+                <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
                 <span className="label">{theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}</span>
               </button>
               <button
@@ -2192,7 +2194,7 @@ function App() {
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">🎵</span>
+                <span className="icon"><MusicIcon /></span>
                 <span className="label">{isMusicBarVisible ? '隱藏音樂播放器' : '顯示音樂播放器'}</span>
               </button>
               {isLoggedIn && currentUser && (
@@ -2205,7 +2207,7 @@ function App() {
                     setIsMobileSidebarOpen(false)
                   }}
                 >
-                  <span className="icon">🚪</span>
+                  <span className="icon"><LogoutIcon /></span>
                   <span className="label">帳戶登出</span>
                 </button>
               )}
