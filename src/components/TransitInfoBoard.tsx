@@ -146,7 +146,6 @@ const METRO_OPERATORS = [
 // 外部連結
 const TDX_OFFICIAL_QUERY_URL = 'https://tdx.transportdata.tw/maas'
 const TDX_SWAGGER_URL = 'https://tdx.transportdata.tw/api-service/swagger'
-const TAIPEI_BUS_API_DOC_URL = 'https://pto.gov.taipei/News_Content.aspx?n=A1DF07A86105B6BB&s=55E8ADD164E4F579'
 
 // TDX API 代理端點。若使用 Cloudflare Workers，可在 .env 中設定 VITE_TDX_PROXY_URL（如 https://xxxx.workers.dev，結尾不加斜線）
 const TDX_PROXY_BASE = import.meta.env.VITE_TDX_PROXY_URL || '/api/tdx'
@@ -204,6 +203,21 @@ function getHsrTrainType(trainNo: string): string {
 }
 
 
+// ─── 前端回應快取（記憶體 + TTL）──────────────────────────────────────────────
+const tdxResponseCache = new Map<string, { data: unknown; expiry: number }>()
+
+/** 根據 API 路徑決定前端快取 TTL（毫秒） */
+function getFrontendCacheTtl(path: string): number {
+  if (/\/Station\//.test(path))              return 24 * 60 * 60 * 1000 // 車站清單：24 小時
+  if (/\/DailyTimetable\//.test(path))       return 10 * 60 * 1000      // 高鐵每日時刻：10 分鐘
+  if (/\/StationTimeTable\//.test(path))     return 5 * 60 * 1000       // 捷運時刻表：5 分鐘
+  if (/\/DisplayStopOfRoute\//.test(path))   return 5 * 60 * 1000       // 公車站牌：5 分鐘
+  if (/\/Bus\/Route\//.test(path))           return 5 * 60 * 1000       // 公車路線：5 分鐘
+  if (/\/LiveBoard\//.test(path))            return 20 * 1000           // 即時到站：20 秒
+  if (/EstimatedTimeOfArrival/.test(path))   return 20 * 1000           // 公車 ETA：20 秒
+  return 2 * 60 * 1000                                                  // 預設：2 分鐘
+}
+
 /**
  * 透過 Cloudflare Worker proxy 呼叫 TDX API。
  * 路徑格式：fetchTdx('/v2/Rail/THSR/Station') → GET {TDX_PROXY_BASE}/v2/Rail/THSR/Station
@@ -211,34 +225,69 @@ function getHsrTrainType(trainNo: string): string {
  *
  * TDX API 使用 OData 格式，所有列表端點均回傳 { value: [...], Count: N }。
  * 此函式會自動偵測並解包，確保呼叫端永遠收到純陣列或原始物件。
- * 遇到 429 時會自動等待 1.2 秒後重試一次。
+ *
+ * 特性：
+ * - 前端記憶體快取（依 API 類型不同 TTL）
+ * - AbortController 12 秒超時保護
+ * - 429 自動重試 2 次（指數退避 1.5s → 3s）
  */
 async function fetchTdx<T>(path: string, retryCount = 0): Promise<T> {
+  // ── 前端快取命中檢查 ──
+  const cacheKey = path
+  const cached = tdxResponseCache.get(cacheKey)
+  if (cached && Date.now() < cached.expiry) {
+    return cached.data as T
+  }
+
   // 加入 10 秒區間的 cache buster (_t) 以繞過 Cloudflare Worker KV 快取
-  // Worker 修正後會將此 param 納入 KV key 計算，但不會轉發給 TDX（避免 TDX 500 錯誤）
   const t = Math.floor(Date.now() / 10000)
   const separator = path.includes('?') ? '&' : '?'
   const url = `${TDX_PROXY_BASE}${path}${separator}_t=${t}&$format=JSON`
-  const response = await fetch(url)
-  if (!response.ok) {
-    // 429 時前端自動等待後重試一次（Worker 也有 retry，此為雙重保險）
-    if (response.status === 429 && retryCount < 1) {
-      await new Promise((r) => setTimeout(r, 1200))
-      return fetchTdx<T>(path, retryCount + 1)
+
+  // ── AbortController 超時保護（12 秒）──
+  const controller = new AbortController()
+  const timeoutId = setTimeout(() => controller.abort(), 12000)
+
+  try {
+    const response = await fetch(url, { signal: controller.signal })
+    clearTimeout(timeoutId)
+
+    if (!response.ok) {
+      // 429 時前端自動等待後重試（最多 2 次，指數退避）
+      if (response.status === 429 && retryCount < 2) {
+        const waitMs = retryCount === 0 ? 1500 : 3000
+        await new Promise((r) => setTimeout(r, waitMs))
+        return fetchTdx<T>(path, retryCount + 1)
+      }
+      let msg = `TDX API 查詢失敗 (${response.status})`
+      try {
+        const errJson = await response.json() as { error?: string }
+        if (errJson.error) msg = errJson.error
+      } catch { /* ignore */ }
+      throw new Error(msg)
     }
-    let msg = `TDX API 查詢失敗 (${response.status})`
-    try {
-      const errJson = await response.json() as { error?: string }
-      if (errJson.error) msg = errJson.error
-    } catch { /* ignore */ }
-    throw new Error(msg)
+
+    const json = await response.json()
+    // 自動解包 OData 回應格式：{ value: [...], Count: N } → [...]
+    let result: T
+    if (json && typeof json === 'object' && !Array.isArray(json) && Array.isArray((json as Record<string, unknown>).value)) {
+      result = (json as Record<string, unknown>).value as T
+    } else {
+      result = json as T
+    }
+
+    // ── 寫入前端快取 ──
+    const ttl = getFrontendCacheTtl(path)
+    tdxResponseCache.set(cacheKey, { data: result, expiry: Date.now() + ttl })
+
+    return result
+  } catch (err) {
+    clearTimeout(timeoutId)
+    if (err instanceof DOMException && err.name === 'AbortError') {
+      throw new Error('查詢逾時，TDX 伺服器可能繁忙，請稍後再試')
+    }
+    throw err
   }
-  const json = await response.json()
-  // 自動解包 OData 回應格式：{ value: [...], Count: N } → [...]
-  if (json && typeof json === 'object' && !Array.isArray(json) && Array.isArray((json as Record<string, unknown>).value)) {
-    return (json as Record<string, unknown>).value as T
-  }
-  return json as T
 }
 
 // 直接用硬編碼對照表取得車站 ID，不呼叫 Station API
@@ -592,12 +641,14 @@ export function TransitInfoBoard() {
         .replace(/\u3000/g, ' ')
       const routeName = encodeURIComponent(cleanQuery)
 
-      // 依序查詢，避免同時打 3 個 request 在 Worker 冷啟動時競爭 token 觸發 429
-      const routes = await fetchTdx<TdxBusRoute[]>(`/v2/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`)
+      // Route + StopOfRoute 平行查詢（互不依賴），ETA 串列（需路線名稱）
+      const [routes, stopRoutes] = await Promise.all([
+        fetchTdx<TdxBusRoute[]>(`/v2/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`),
+        fetchTdx<TdxBusStopOfRoute[]>(`/v2/Bus/DisplayStopOfRoute/City/${selectedCounty}/${routeName}`)
+      ])
       const route = routes[0]
       if (!route) throw new Error('查無此公車路線，請確認路線號碼與縣市是否正確')
 
-      const stopRoutes = await fetchTdx<TdxBusStopOfRoute[]>(`/v2/Bus/DisplayStopOfRoute/City/${selectedCounty}/${routeName}`)
       const selectedStopRoute = stopRoutes.find((item) => item.Direction === targetDirection) ?? stopRoutes[0]
       const stopsToRender = selectedStopRoute?.Stops ?? []
 
@@ -822,6 +873,14 @@ export function TransitInfoBoard() {
             ) : metroQueryError ? (
               <div className="bus-stops-empty">
                 {metroQueryError}
+                <button
+                  type="button"
+                  className="transit-retry-btn"
+                  onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
+                >
+                  <RefreshIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                  重試
+                </button>
               </div>
             ) : !selectedMetroStation ? (
               <div className="bus-stops-empty">請選擇捷運系統與車站。</div>
@@ -983,7 +1042,15 @@ export function TransitInfoBoard() {
               ) : trainError ? (
                 <div className="bus-stops-empty">
                   {trainError}
-                  <div style={{ marginTop: '0.5rem' }}>
+                  <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="transit-retry-btn"
+                      onClick={handleTrainSearch}
+                    >
+                      <RefreshIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      重試
+                    </button>
                     <a href={TDX_OFFICIAL_QUERY_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
                       前往 TDX MaaS 查詢 ↗
                     </a>
@@ -1082,11 +1149,16 @@ export function TransitInfoBoard() {
               <div className="bus-stops-empty">
                 {busError}
                 <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  <button
+                    type="button"
+                    className="transit-retry-btn"
+                    onClick={() => { setBusDirection(0); handleBusSearch(0) }}
+                  >
+                    <RefreshIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                    重試
+                  </button>
                   <a href={TDX_SWAGGER_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
                     TDX API 文件 ↗
-                  </a>
-                  <a href={TAIPEI_BUS_API_DOC_URL} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
-                    台北市公車 API 文件 ↗
                   </a>
                 </div>
               </div>

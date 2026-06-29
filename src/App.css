@@ -2191,6 +2191,31 @@ body.player-open .music-bar-toggle {
   color: var(--gold);
 }
 
+.transit-retry-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.4rem 0.9rem;
+  margin-top: 0.5rem;
+  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.2) 0%, rgba(var(--teal-rgb), 0.05) 100%);
+  border: 1px solid rgba(var(--teal-rgb), 0.4);
+  color: var(--teal);
+  border-radius: 20px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.transit-retry-btn:hover {
+  border-color: var(--teal);
+  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.3) 0%, rgba(var(--teal-rgb), 0.1) 100%);
+  transform: translateY(-1px);
+}
+
 /* 場館地圖內嵌 */
 .venue-map-embed {
   width: 100%;
