@@ -6053,19 +6053,13 @@ body.player-open .music-bar-toggle {
   padding: 0.8rem;
   margin-bottom: 0.8rem;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 0.6rem;
 }
 
-@media (max-width: 576px) {
-  .bus-query-form {
-    flex-direction: column;
-    align-items: stretch;
-  }
-}
-
 .bus-county-select {
-  width: 100px;
+  width: 100%;
   background: var(--surface2);
   border: 1px solid var(--border);
   color: var(--text);
@@ -6076,12 +6070,6 @@ body.player-open .music-bar-toggle {
   outline: none;
 }
 
-@media (max-width: 576px) {
-  .bus-county-select {
-    width: 100%;
-  }
-}
-
 .bus-search-row {
   display: flex;
   flex: 1;
@@ -6090,6 +6078,7 @@ body.player-open .music-bar-toggle {
 
 .bus-search-input {
   flex: 1;
+  min-width: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   color: var(--text);
