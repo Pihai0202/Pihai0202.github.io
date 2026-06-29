@@ -66,6 +66,26 @@ export function CalendarView({
     setSelectedDateStr(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`)
   }
 
+  // Generate a dynamic list of years for selecting (current year +/- 8 years)
+  const yearsRange = useMemo(() => {
+    const currentYear = new Date().getFullYear()
+    const range: number[] = []
+    for (let y = currentYear - 8; y <= currentYear + 8; y++) {
+      range.push(y)
+    }
+    return range
+  }, [])
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newYear = parseInt(e.target.value, 10)
+    setCurrentDate(new Date(newYear, month, 1))
+  }
+
+  const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newMonth = parseInt(e.target.value, 10)
+    setCurrentDate(new Date(year, newMonth, 1))
+  }
+
   // 2. Normalize date string from events (convert YYYY/MM/DD or other to YYYY-MM-DD)
   const normalizeDate = (dStr: string | undefined): string => {
     if (!dStr) return ''
@@ -258,9 +278,28 @@ export function CalendarView({
             <button className="cal-nav-btn" onClick={handlePrevMonth} title="上個月">
               &lt;
             </button>
-            <h2 className="current-month-label">
-              {year} 年 {month + 1} 月
-            </h2>
+            <div className="current-month-selects">
+              <select 
+                value={year} 
+                onChange={handleYearChange} 
+                className="cal-select cal-select-year"
+                title="選擇年份"
+              >
+                {yearsRange.map(y => (
+                  <option key={y} value={y}>{y} 年</option>
+                ))}
+              </select>
+              <select 
+                value={month} 
+                onChange={handleMonthChange} 
+                className="cal-select cal-select-month"
+                title="選擇月份"
+              >
+                {Array.from({ length: 12 }, (_, i) => i).map(m => (
+                  <option key={m} value={m}>{m + 1} 月</option>
+                ))}
+              </select>
+            </div>
             <button className="cal-nav-btn" onClick={handleNextMonth} title="下個月">
               &gt;
             </button>
