@@ -845,8 +845,11 @@ export function TransitInfoBoard() {
                           let timeText = '列車進站中'
                           let badgeClass = 'approaching'
                           if (est !== undefined && est > 0) {
-                            timeText = `${Math.ceil(est / 60)} 分鐘`
-                            badgeClass = Math.ceil(est / 60) <= 2 ? 'soon' : 'normal'
+                            // 判斷單位：高雄捷運 (KRTC)、桃園捷運 (TYMC) 與高雄輕軌 (KLRT) 回傳的 EstimateTime 單位為「分鐘」；其餘系統為「秒」
+                            const isMinutes = metroOperator === 'KRTC' || metroOperator === 'TYMC' || metroOperator === 'KLRT'
+                            const minutes = isMinutes ? est : Math.ceil(est / 60)
+                            timeText = `${minutes} 分鐘`
+                            badgeClass = minutes <= 2 ? 'soon' : 'normal'
                           } else if (est === undefined || est < 0) {
                             timeText = '已到站/即將發車'
                             badgeClass = 'approaching'
