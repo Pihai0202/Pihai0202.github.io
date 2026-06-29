@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, MusicIcon } from './SvgIcon'
+import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, TaiwanIcon } from './SvgIcon'
 import { auth } from '../firebase'
 import {
   signInWithEmailAndPassword,
@@ -121,7 +121,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         </button>
 
         <div className="login-header">
-          <div className="login-logo"><MusicIcon size="2em" /></div>
+          <div className="login-logo"><TaiwanIcon size="2.2em" /></div>
           <h2>{isRegisterMode ? '加入台灣演唱會地圖' : '登入您的帳戶'}</h2>
           <p className="login-subtitle">
             {isRegisterMode

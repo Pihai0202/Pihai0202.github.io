@@ -44,7 +44,8 @@ import {
   CameraIcon,
   PinIcon,
   PlayIcon,
-  PlusIcon
+  PlusIcon,
+  TaiwanIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -1001,7 +1002,7 @@ function App() {
           </button>
         )}
         <div className="logo" onClick={handleHeaderClick}>
-          <div className="logo-icon"><MusicIcon /></div>
+          <div className="logo-icon"><TaiwanIcon /></div>
           <div className="logo-text">
             <h1>台灣演唱會地圖</h1>
             <span>TAIWAN CONCERT LOG</span>
