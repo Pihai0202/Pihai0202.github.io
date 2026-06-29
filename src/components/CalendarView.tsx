@@ -40,12 +40,16 @@ export function CalendarView({
     return `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
   })
 
-  // View mode: 'grid' (Month grid) or 'list' (Chronological list)
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
+  // View mode: 'grid' (Month grid) or 'list' (Chronological list) - defaults to 'list' on mobile
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>(() => {
+    return typeof window !== 'undefined' && window.innerWidth <= 768 ? 'list' : 'grid'
+  })
   // Event filter: 'all' | 'ticket' | 'record'
   const [eventFilter, setEventFilter] = useState<'all' | 'ticket' | 'record'>('all')
   // Search query
   const [searchQuery, setSearchQuery] = useState('')
+  // Mobile details drawer open state
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false)
 
   // 1. Navigate months
   const handlePrevMonth = () => {
@@ -351,7 +355,10 @@ export function CalendarView({
                   className={`calendar-day-cell ${cell.isCurrentMonth ? 'current-month' : 'adjacent-month'} ${
                     isSelected ? 'selected' : ''
                   } ${isToday ? 'today' : ''}`}
-                  onClick={() => setSelectedDateStr(cell.dateStr)}
+                  onClick={() => {
+                    setSelectedDateStr(cell.dateStr)
+                    setIsMobileDrawerOpen(true)
+                  }}
                 >
                   <div className="day-cell-header">
                     <span className="day-number">{cell.dayNum}</span>
@@ -445,20 +452,38 @@ export function CalendarView({
         </div>
       )}
 
+      {/* Selected Day Info Drawer Backdrop */}
+      {viewMode === 'grid' && isMobileDrawerOpen && (
+        <div 
+          className="calendar-drawer-backdrop" 
+          onClick={() => setIsMobileDrawerOpen(false)}
+        />
+      )}
+
       {/* Selected Day Info Drawer (Shown always below the calendar in grid mode) */}
       {viewMode === 'grid' && (
-        <div className="selected-day-details-drawer">
+        <div className={`selected-day-details-drawer ${isMobileDrawerOpen ? 'open' : ''}`}>
           <div className="drawer-header">
             <h3>
               <CalendarIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
               {selectedDateStr} 活動清單
             </h3>
-            <button
-              className="drawer-add-event-btn"
-              onClick={() => onAddEventClick(selectedDateStr)}
-            >
-              ＋ 新增此日活動
-            </button>
+            <div className="drawer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+              <button
+                className="drawer-add-event-btn"
+                onClick={() => onAddEventClick(selectedDateStr)}
+              >
+                ＋ 新增此日活動
+              </button>
+              <button
+                className="drawer-close-btn"
+                type="button"
+                onClick={() => setIsMobileDrawerOpen(false)}
+                title="關閉"
+              >
+                <CloseIcon />
+              </button>
+            </div>
           </div>
 
           <div className="drawer-events-list">
