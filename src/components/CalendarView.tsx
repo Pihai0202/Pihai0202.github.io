@@ -263,9 +263,8 @@ export function CalendarView({
     // Sort by date ascending
     return list
       .filter(item => {
-        // Filter by currently active month (year & month)
-        const targetPrefix = `${year}-${String(month + 1).padStart(2, '0')}`
-        if (!item.date.startsWith(targetPrefix)) return false
+        // Filter by currently selected date (YYYY-MM-DD)
+        if (item.date !== selectedDateStr) return false
 
         // Apply search query
         const query = searchQuery.trim().toLowerCase()
@@ -282,7 +281,7 @@ export function CalendarView({
         return true
       })
       .sort((a, b) => a.date.localeCompare(b.date))
-  }, [concerts, remoteConcerts, searchQuery, eventFilter, year, month])
+  }, [concerts, remoteConcerts, searchQuery, eventFilter, year, month, selectedDateStr])
 
   return (
     <div className="calendar-view-container">
@@ -446,8 +445,15 @@ export function CalendarView({
       {viewMode === 'list' && (
         <div className="calendar-list-view">
           {allChronologicalEvents.length === 0 ? (
-            <div className="calendar-list-empty">
-              沒有符合過濾或搜尋條件的活動。
+            <div className="calendar-list-empty" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem', padding: '2rem 1rem' }}>
+              <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>此日期目前沒有登錄任何活動。</span>
+              <button 
+                className="drawer-add-event-btn" 
+                onClick={() => onAddEventClick(selectedDateStr)}
+                style={{ fontSize: '0.75rem', padding: '0.35rem 0.9rem' }}
+              >
+                ＋ 新增此日活動
+              </button>
             </div>
           ) : (
             <div className="calendar-list-timeline">
