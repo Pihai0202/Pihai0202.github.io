@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
@@ -200,13 +200,17 @@ function getBusStopStatus(eta?: TdxBusEta) {
  *
  * TDX API 使用 OData 格式，所有列表端點均回傳 { value: [...], Count: N }。
  * 此函式會自動偵測並解包，確保呼叫端永遠收到純陣列或原始物件。
+ * 遇到 429 時會自動等待 1.2 秒後重試一次。
  */
-async function fetchTdx<T>(path: string): Promise<T> {
-  // path 開頭已含版本號，例如 /v2/Rail/THSR/... 或 /v3/Rail/TRA/...
+async function fetchTdx<T>(path: string, retryCount = 0): Promise<T> {
   const url = `${TDX_PROXY_BASE}${path}${path.includes('?') ? '&' : '?'}$format=JSON`
   const response = await fetch(url)
   if (!response.ok) {
-    // 嘗試解析後端錯誤訊息
+    // 429 時前端自動等待後重試一次（Worker 也有 retry，此為雙重保險）
+    if (response.status === 429 && retryCount < 1) {
+      await new Promise((r) => setTimeout(r, 1200))
+      return fetchTdx<T>(path, retryCount + 1)
+    }
     let msg = `TDX API 查詢失敗 (${response.status})`
     try {
       const errJson = await response.json() as { error?: string }
@@ -374,10 +378,17 @@ export function TransitInfoBoard() {
     }
   }, [])
 
+  // 捷運：選好車站後自動查詢一次（useRef 追蹤上次查詢的 stationId，避免重複觸發）
+  const lastQueriedMetroStation = useRef('')
   useEffect(() => {
-    // 捕運時刻表查詢：僅在使用者主動按下、或捕運系統改變時才開始查詢
-    // （載入車站清單後不自動發起，避免發生 429）
-    // queryMetroData 由使用者按「重新整理」按鈕主動呼叫
+    if (
+      activeTab === 'metro' &&
+      selectedMetroStation &&
+      selectedMetroStation !== lastQueriedMetroStation.current
+    ) {
+      lastQueriedMetroStation.current = selectedMetroStation
+      queryMetroData(metroOperator, selectedMetroStation)
+    }
   }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
 
   // 取得台北時區的星期幾（英文名稱對應 ServiceDay 欄位）
@@ -505,7 +516,7 @@ export function TransitInfoBoard() {
     }
   }, [originStation, destinationStation])
 
-  // 3. 公車動態查詢（透過 Firebase Function → TDX API）
+  // 3. 公車動態查詢（依序查詢：route → stops → eta，避免同時 3 個 API 觸發 429）
   const handleBusSearch = useCallback(async (directionOverride?: number) => {
     const queryStr = busSearch.trim()
     if (!queryStr) return
@@ -515,19 +526,21 @@ export function TransitInfoBoard() {
 
     try {
       const routeName = encodeURIComponent(queryStr)
-      const [routes, stopRoutes, etas] = await Promise.all([
-        fetchTdx<TdxBusRoute[]>(`/v2/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`),
-        fetchTdx<TdxBusStopOfRoute[]>(`/v2/Bus/DisplayStopOfRoute/City/${selectedCounty}/${routeName}`),
-        fetchTdx<TdxBusEta[]>(`/v2/Bus/EstimatedTimeOfArrival/City/${selectedCounty}/${routeName}`),
-      ])
 
+      // 依序查詢，避免同時打 3 個 request 在 Worker 冷啟動時競爭 token 觸發 429
+      const routes = await fetchTdx<TdxBusRoute[]>(`/v2/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`)
       const route = routes[0]
+      if (!route) throw new Error('查無此公車路線，請確認路線號碼與縣市是否正確')
+
+      const stopRoutes = await fetchTdx<TdxBusStopOfRoute[]>(`/v2/Bus/DisplayStopOfRoute/City/${selectedCounty}/${routeName}`)
       const selectedStopRoute = stopRoutes.find((item) => item.Direction === targetDirection) ?? stopRoutes[0]
       const stopsToRender = selectedStopRoute?.Stops ?? []
 
-      if (!route || stopsToRender.length === 0) {
-        throw new Error('查無此公車路線或站牌資料，請確認路線號碼與縣市是否正確')
+      if (stopsToRender.length === 0) {
+        throw new Error('查無此路線站牌資料，請確認路線號碼與縣市是否正確')
       }
+
+      const etas = await fetchTdx<TdxBusEta[]>(`/v2/Bus/EstimatedTimeOfArrival/City/${selectedCounty}/${routeName}`)
 
       const startTerminal = route.DepartureStopNameZh ?? stopsToRender[0]?.StopName?.Zh_tw ?? '起點'
       const endTerminal = route.DestinationStopNameZh ?? stopsToRender[stopsToRender.length - 1]?.StopName?.Zh_tw ?? '終點'
@@ -540,7 +553,6 @@ export function TransitInfoBoard() {
       setBusRouteDetails(routeInfo)
 
       const stops = routeInfo.stops.map((stop) => {
-        // 加入 trim() 比對避免全形空格造成 miss
         const eta = etas.find(
           (item) =>
             item.Direction === targetDirection &&
@@ -759,7 +771,11 @@ export function TransitInfoBoard() {
                   </div>
                   <div className="metro-live-list">
                     {metroLiveBoard.length === 0 ? (
-                      <div className="metro-no-data">暫無即時到站資訊（可能非營運時間或該站點不支援）</div>
+                      <div className="metro-no-data">
+                        {metroOperator === 'TRTC'
+                          ? '台北捷運不提供預估到站時間（系統限制），列車進站時才會顯示，請參考右側時刻表。'
+                          : '暫無即時到站資訊（可能非營運時間或該站點不支援）'}
+                      </div>
                     ) : (
                       [...metroLiveBoard]
                         .sort((a, b) => (a.EstimateTime ?? 9999) - (b.EstimateTime ?? 9999))
