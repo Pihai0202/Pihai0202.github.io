@@ -66,24 +66,39 @@ export function CalendarView({
     setSelectedDateStr(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`)
   }
 
-  // Generate a dynamic list of years for selecting (current year +/- 8 years)
-  const yearsRange = useMemo(() => {
-    const currentYear = new Date().getFullYear()
-    const range: number[] = []
-    for (let y = currentYear - 8; y <= currentYear + 8; y++) {
-      range.push(y)
-    }
-    return range
-  }, [])
+  // Parse the day number from the selectedDateStr
+  const selectedDayNum = useMemo(() => {
+    const parts = selectedDateStr.split('-')
+    return parts.length === 3 ? parseInt(parts[2], 10) : 1
+  }, [selectedDateStr])
 
-  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const newYear = parseInt(e.target.value, 10)
-    setCurrentDate(new Date(newYear, month, 1))
-  }
+  // Get the array of days in the currently viewed month
+  const daysInMonthArray = useMemo(() => {
+    const totalDays = new Date(year, month + 1, 0).getDate()
+    return Array.from({ length: totalDays }, (_, i) => i + 1)
+  }, [year, month])
 
   const handleMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const newMonth = parseInt(e.target.value, 10)
+    const maxDays = new Date(year, newMonth + 1, 0).getDate()
+    const clampedDay = Math.min(selectedDayNum, maxDays)
+    
+    // Update viewed month
     setCurrentDate(new Date(year, newMonth, 1))
+    // Update selected date string
+    const dateStr = `${year}-${String(newMonth + 1).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`
+    setSelectedDateStr(dateStr)
+    // Open mobile details drawer
+    setIsMobileDrawerOpen(true)
+  }
+
+  const handleDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newDay = parseInt(e.target.value, 10)
+    // Update selected date string
+    const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(newDay).padStart(2, '0')}`
+    setSelectedDateStr(dateStr)
+    // Open mobile details drawer
+    setIsMobileDrawerOpen(true)
   }
 
   // 2. Normalize date string from events (convert YYYY/MM/DD or other to YYYY-MM-DD)
@@ -279,16 +294,7 @@ export function CalendarView({
               &lt;
             </button>
             <div className="current-month-selects">
-              <select 
-                value={year} 
-                onChange={handleYearChange} 
-                className="cal-select cal-select-year"
-                title="選擇年份"
-              >
-                {yearsRange.map(y => (
-                  <option key={y} value={y}>{y} 年</option>
-                ))}
-              </select>
+              <span className="cal-year-label">{year} 年</span>
               <select 
                 value={month} 
                 onChange={handleMonthChange} 
@@ -297,6 +303,16 @@ export function CalendarView({
               >
                 {Array.from({ length: 12 }, (_, i) => i).map(m => (
                   <option key={m} value={m}>{m + 1} 月</option>
+                ))}
+              </select>
+              <select 
+                value={selectedDayNum} 
+                onChange={handleDayChange} 
+                className="cal-select cal-select-day"
+                title="選擇日期"
+              >
+                {daysInMonthArray.map(d => (
+                  <option key={d} value={d}>{d} 日</option>
                 ))}
               </select>
             </div>

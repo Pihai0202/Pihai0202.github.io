@@ -6670,6 +6670,14 @@ body.player-open .music-bar-toggle {
   justify-content: center;
 }
 
+.cal-year-label {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+  opacity: 0.85;
+  margin-right: 0.2rem;
+}
+
 .cal-select {
   background: var(--surface2);
   border: 1px solid var(--border);
