@@ -47,7 +47,8 @@ import {
   PlusIcon,
   TaiwanIcon,
   KeyIcon,
-  LogoutIcon
+  LogoutIcon,
+  ClipboardIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -1254,7 +1255,7 @@ function App() {
             </div>
 
             <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
-              📋 全部記錄
+              <ClipboardIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> 全部記錄
             </button>
 
             {/* Mobile Bottom Sheet (Sliding Drawer) */}
@@ -1280,7 +1281,10 @@ function App() {
                 }}>
                   {selectedVenue ? (
                     <div className="selected-venue-header-title">
-                      <span className="drawer-title">📍 {selectedVenue.name}</span>
+                      <span className="drawer-title">
+                        <PinIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} />
+                        {selectedVenue.name}
+                      </span>
                       <button 
                         className="clear-selected-venue-btn" 
                         type="button" 
