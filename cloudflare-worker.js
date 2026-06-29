@@ -119,13 +119,15 @@ export default {
       if (!targetPath.startsWith("/"))        targetPath = "/" + targetPath;
 
       const tdxUrl = new URL(`${TDX_API_BASE}${targetPath}`);
+      // 只將 OData 參數（$ 開頭）轉發給 TDX，其餘參數（如 _t cache buster）只用於 KV 快取鍵，不轉發
       for (const [key, value] of url.searchParams) {
-        if (key !== "cb" && key !== "$format") tdxUrl.searchParams.set(key, value);
+        if (key.startsWith("$") && key !== "$format") tdxUrl.searchParams.set(key, value);
       }
       tdxUrl.searchParams.set("$format", "JSON");
 
       // ── KV 快取讀取 ──────────────────────────────────────────────────────────
-      const kvKey = `tdx:${targetPath}:${tdxUrl.searchParams.toString()}`.substring(0, 512);
+      // 使用完整原始 params（含 _t）作為快取鍵，讓前端可以透過改變 _t 的值繞過 KV 快取
+      const kvKey = `tdx:${targetPath}:${url.searchParams.toString()}`.substring(0, 512);
       const kvTtl = getKvTtl(targetPath);
 
       if (env.TDX_CACHE && kvTtl > 0) {
