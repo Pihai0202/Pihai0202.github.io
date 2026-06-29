@@ -1373,7 +1373,8 @@ function App() {
                               type="button"
                               onClick={() => setMobileDrawerState('full')}
                             >
-                              🎵 查看此場館的演唱會記錄 ({selectedVenueConcerts.length} 次)
+                              <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} />
+                              查看此場館的演唱會記錄 ({selectedVenueConcerts.length} 次)
                             </button>
                           </div>
                         ) : (
