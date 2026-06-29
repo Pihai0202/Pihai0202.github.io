@@ -7399,6 +7399,46 @@ body.player-open .music-bar-toggle {
     padding: 1rem;
     gap: 0.8rem;
   }
+
+  .month-selector-buttons {
+    width: 100%;
+    justify-content: space-between;
+    gap: 0.3rem;
+  }
+
+  .cal-nav-btn {
+    width: 30px;
+    height: 30px;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+  }
+
+  .current-month-selects {
+    gap: 0.25rem;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .cal-year-label {
+    font-size: 0.85rem;
+    margin-right: 0.1rem;
+    white-space: nowrap;
+  }
+
+  .cal-select {
+    padding: 0.25rem 0.4rem;
+    font-size: 0.85rem;
+    border-radius: 12px;
+    flex-shrink: 1;
+    min-width: 0;
+  }
+
+  .cal-today-btn {
+    padding: 0.3rem 0.7rem;
+    font-size: 0.75rem;
+    border-radius: 15px;
+    flex-shrink: 0;
+  }
   
   .calendar-filters-row {
     padding-top: 0.8rem;
