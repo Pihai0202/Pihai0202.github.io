@@ -7049,6 +7049,14 @@ body.player-open .music-bar-toggle {
   font-size: 1.15rem;
   font-weight: 700;
   color: var(--text);
+  white-space: nowrap;
+}
+
+.calendar-drawer-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  flex-shrink: 0;
 }
 
 .drawer-add-event-btn {
@@ -7061,6 +7069,7 @@ body.player-open .music-bar-toggle {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.3s ease;
+  white-space: nowrap;
 }
 
 .drawer-add-event-btn:hover {
@@ -7579,6 +7588,10 @@ body.player-open .music-bar-toggle {
 
   .drawer-close-btn:hover {
     background: var(--border);
+  }
+
+  .calendar-drawer-header-actions {
+    gap: 0.5rem;
   }
 }
 

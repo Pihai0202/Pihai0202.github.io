@@ -527,14 +527,14 @@ export function CalendarView({
           <div className="calendar-drawer-header">
             <h3>
               <CalendarIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-              {selectedDateStr} 活動清單
+              {selectedDateStr}
             </h3>
-            <div className="calendar-drawer-header-actions" style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
+            <div className="calendar-drawer-header-actions">
               <button
                 className="drawer-add-event-btn"
                 onClick={() => onAddEventClick(selectedDateStr)}
               >
-                ＋ 新增此日活動
+                ＋ 新增活動
               </button>
               <button
                 className="drawer-close-btn"
