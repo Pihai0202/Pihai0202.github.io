@@ -6533,61 +6533,11 @@ body.player-open .music-bar-toggle {
 
   /* Custom Center Record Button Styles */
   .bottom-nav-item-record {
-    flex: 1;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    z-index: 300;
-  }
-  
-  .record-btn-inner {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--accent) 0%, var(--gold) 100%);
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.35);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    color: #ffffff;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    transform: translateY(-8px);
-    transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: var(--muted);
   }
 
-  .record-btn-inner:hover {
-    transform: translateY(-10px) scale(1.05);
-    box-shadow: 0 6px 16px rgba(var(--accent-rgb), 0.45);
-  }
-
-  .record-btn-inner:active {
-    transform: translateY(-6px) scale(0.92);
-    box-shadow: 0 3px 8px rgba(var(--accent-rgb), 0.25);
-  }
-
-  .record-btn-inner .icon {
-    font-size: 1.4rem;
-    font-weight: bold;
-    margin-bottom: -1px;
-    line-height: 1;
-    color: #ffffff;
-  }
-
-  .record-btn-inner .label {
-    font-size: 0.55rem;
-    font-weight: 700;
-    margin-top: -2px;
-    color: rgba(255, 255, 255, 0.95);
-    letter-spacing: 0.05em;
-  }
-
-  [data-theme='light'] .record-btn-inner {
-    box-shadow: 0 4px 12px rgba(var(--accent-rgb), 0.25);
+  .bottom-nav-item-record:active {
+    color: var(--teal) !important;
   }
 
   /* Mobile Bottom Sheet Modal Styles */

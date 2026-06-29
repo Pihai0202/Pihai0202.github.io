@@ -2242,17 +2242,15 @@ function App() {
               <span className="icon">📅</span>
               <span className="label">行事曆</span>
             </button>
-            <div className="bottom-nav-item-record">
-              <button
-                className="record-btn-inner"
-                type="button"
-                onClick={() => openAddModal()}
-                title="新增演唱會紀錄"
-              >
-                <span className="icon">＋</span>
-                <span className="label">紀錄</span>
-              </button>
-            </div>
+            <button
+              className="bottom-nav-item bottom-nav-item-record"
+              type="button"
+              onClick={() => openAddModal()}
+              title="新增演唱會紀錄"
+            >
+              <span className="icon">＋</span>
+              <span className="label">紀錄</span>
+            </button>
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
               type="button"
