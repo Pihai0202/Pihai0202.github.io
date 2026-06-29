@@ -7682,6 +7682,22 @@ body.player-open .music-bar-toggle {
     z-index: 10 !important;
   }
 
+  /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
+  .map-legend {
+    top: 1rem !important;
+    left: 1rem !important;
+    bottom: auto !important;
+    right: auto !important;
+    width: auto !important;
+    padding: 0.45rem 0.9rem !important;
+    gap: 0.8rem !important;
+    border-radius: 8px !important;
+    font-size: 0.7rem !important;
+    justify-content: flex-start !important;
+    flex-wrap: nowrap !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+  }
+
   /* Drawer height states */
   .mobile-bottom-drawer.collapsed {
     height: 90px;
