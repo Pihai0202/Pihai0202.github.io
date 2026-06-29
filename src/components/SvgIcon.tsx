@@ -430,7 +430,9 @@ export const TaiwanIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
     strokeLinecap="round"
     {...props}
   >
-    {Object.entries(TAIWAN_PATHS).map(([countyName, pathD]) => (
+    {Object.entries(TAIWAN_PATHS)
+      .sort(([a], [b]) => (a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0))
+      .map(([countyName, pathD]) => (
       <path key={countyName} d={pathD} />
     ))}
   </svg>

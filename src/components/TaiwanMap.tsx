@@ -347,7 +347,9 @@ export function TaiwanMap({
         </defs>
 
         <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
-        {Object.entries(TAIWAN_PATHS).map(([countyName, pathD]) => (
+        {Object.entries(TAIWAN_PATHS)
+          .sort(([a], [b]) => (a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0))
+          .map(([countyName, pathD]) => (
           <path
             key={countyName}
             d={pathD}
