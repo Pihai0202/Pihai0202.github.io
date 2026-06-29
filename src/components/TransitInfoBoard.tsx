@@ -193,6 +193,17 @@ function getBusStopStatus(eta?: TdxBusEta) {
   return { status: `${minutes} 分鐘`, className: 'status-ok' }
 }
 
+/** 依高鐵車次判定車種（直達 vs 站站停） */
+function getHsrTrainType(trainNo: string): string {
+  const cleanNo = trainNo.replace(/^0/, '') // 去除前導 0
+  // 如果是 3 位數且 1 開頭 (如 1xx) 或 4 位數且 11 開頭 (如 11xx)，則判定為直達車
+  if (/^1\d{2}$|^11\d{2}$/.test(cleanNo)) {
+    return '直達'
+  }
+  return '站站停'
+}
+
+
 /**
  * 透過 Cloudflare Worker proxy 呼叫 TDX API。
  * 路徑格式：fetchTdx('/v2/Rail/THSR/Station') → GET {TDX_PROXY_BASE}/v2/Rail/THSR/Station
@@ -523,7 +534,7 @@ export function TransitInfoBoard() {
       const today = getTodayTaipei()
       const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
 
-      const path = `/v2/Rail/THSR/DailyTimetable/OD/${originId}/to/${destinationId}/${today}?$top=20`
+      const path = `/v2/Rail/THSR/DailyTimetable/OD/${originId}/to/${destinationId}/${today}?$top=150`
       const data = await fetchTdx<TdxThsrDailyTimetableItem[]>(path)
       const results = (Array.isArray(data) ? data : [])
         .flatMap((item): TrainQueryResult[] => {
@@ -531,23 +542,28 @@ export function TransitInfoBoard() {
           const arrTime = item.DestinationStopTime?.ArrivalTime ?? item.DestinationStopTime?.DepartureTime
           if (!depTime || !arrTime) return []
           const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
-          if (depMinutes < nowMinutes) return []
+          const isDeparted = depMinutes < nowMinutes
+          const trainNo = item.DailyTrainInfo?.TrainNo ?? '--'
+          const trainType = getHsrTrainType(trainNo)
+
           return [{
-            trainType: '高鐵',
-            trainNo: item.DailyTrainInfo?.TrainNo ?? '--',
+            trainType,
+            trainNo,
             depTime: depTime.slice(0, 5),
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime),
-            isExpress: true,
-            status: '🟢',
+            isExpress: trainType === '直達',
+            status: isDeparted ? '已駛離' : '🟢',
           }]
         })
-        .slice(0, 8)
+
+      // 依出發時間排序
+      results.sort((a, b) => a.depTime.localeCompare(b.depTime))
 
       setQueryResults(results)
       setTdxActive(true)
       if (results.length === 0) {
-        setTrainError('今日班表查無此區間接下來的班次，請改查其他站點或前往官方查詢。')
+        setTrainError('今日班表查無此區間的班次，請改查其他站點或前往官方查詢。')
       }
     } catch (e) {
       console.error('Train search error:', e)
@@ -973,7 +989,13 @@ export function TransitInfoBoard() {
                     <span className="train-time-arr">{tr.arrTime}</span>
                     <div className="train-dur-info">
                       <span className="train-dur">{tr.duration}</span>
-                      <span className={`train-status-badge ${tr.status.includes('🟢') || tr.status.includes('今日') ? 'status-ontime' : 'status-delayed'}`}>
+                      <span className={`train-status-badge ${
+                        tr.status.includes('🟢')
+                          ? 'status-ontime'
+                          : tr.status === '已駛離'
+                            ? '' // 預設灰色樣式
+                            : 'status-delayed'
+                      }`}>
                         {tr.status}
                       </span>
                     </div>

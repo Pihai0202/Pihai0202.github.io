@@ -101,10 +101,13 @@ export default {
     }
 
     try {
-      const { CLIENT_ID: clientId, CLIENT_SECRET: clientSecret } = env;
+      const { CLIENT_ID, TDX_CLIENT_ID, CLIENT_SECRET, TDX_CLIENT_SECRET } = env;
+      // 同時支援兩種命名：CLIENT_ID 或 TDX_CLIENT_ID
+      const clientId     = CLIENT_ID     ?? TDX_CLIENT_ID;
+      const clientSecret = CLIENT_SECRET ?? TDX_CLIENT_SECRET;
       if (!clientId || !clientSecret) {
         return new Response(
-          JSON.stringify({ error: "環境變數 CLIENT_ID 或 CLIENT_SECRET 尚未設定。" }),
+          JSON.stringify({ error: "請在 Worker 環境變數中設定 CLIENT_ID（或 TDX_CLIENT_ID）與 CLIENT_SECRET（或 TDX_CLIENT_SECRET）。" }),
           { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
