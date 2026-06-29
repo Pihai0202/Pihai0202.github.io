@@ -214,7 +214,10 @@ function getHsrTrainType(trainNo: string): string {
  * 遇到 429 時會自動等待 1.2 秒後重試一次。
  */
 async function fetchTdx<T>(path: string, retryCount = 0): Promise<T> {
-  const url = `${TDX_PROXY_BASE}${path}${path.includes('?') ? '&' : '?'}$format=JSON`
+  // 加入 10 秒區間的 cache buster (_t) 以繞過 Cloudflare Worker 代理端長效快取（解決先前快取被空陣列或異常污染的問題）
+  const t = Math.floor(Date.now() / 10000)
+  const separator = path.includes('?') ? '&' : '?'
+  const url = `${TDX_PROXY_BASE}${path}${separator}_t=${t}&$format=JSON`
   const response = await fetch(url)
   if (!response.ok) {
     // 429 時前端自動等待後重試一次（Worker 也有 retry，此為雙重保險）
