@@ -7674,12 +7674,21 @@ body.player-open .music-bar-toggle {
 
   /* Reposition list button to top-right */
   .all-concerts-btn {
-    top: 1rem;
-    right: 1rem;
+    top: 1rem !important;
+    right: 1rem !important;
     bottom: auto !important;
     left: auto !important;
     width: auto !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 0.9rem !important;
+    font-size: 0.74rem !important;
+    font-weight: 600 !important;
+    border-radius: 8px !important;
     z-index: 10 !important;
+    box-sizing: border-box !important;
   }
 
   /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
@@ -7689,13 +7698,18 @@ body.player-open .music-bar-toggle {
     bottom: auto !important;
     right: auto !important;
     width: auto !important;
-    padding: 0.45rem 0.9rem !important;
+    height: 36px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    padding: 0 0.9rem !important;
     gap: 0.8rem !important;
     border-radius: 8px !important;
-    font-size: 0.7rem !important;
-    justify-content: flex-start !important;
+    font-size: 0.74rem !important;
     flex-wrap: nowrap !important;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
+    z-index: 10 !important;
+    box-sizing: border-box !important;
   }
 
   /* Drawer height states */
