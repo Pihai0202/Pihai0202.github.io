@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode } from 'react'
 import { marked } from 'marked'
 import './App.css'
@@ -270,8 +270,68 @@ function App() {
   })
 
   const [mobileDrawerState, setMobileDrawerState] = useState<'collapsed' | 'half' | 'full'>('collapsed')
+  const [dragHeight, setDragHeight] = useState<number | null>(null)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const dragStartHeight = useRef(0)
+  const dragMoved = useRef(false)
+
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (typeof window === 'undefined') return
+    const touch = e.touches[0]
+    dragStartY.current = touch.clientY
+    dragMoved.current = false
+    const drawerEl = document.querySelector('.mobile-bottom-drawer')
+    if (drawerEl) {
+      dragStartHeight.current = drawerEl.getBoundingClientRect().height
+      setIsDragging(true)
+    }
+  }
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (!isDragging || typeof window === 'undefined') return
+    const touch = e.touches[0]
+    const deltaY = touch.clientY - dragStartY.current
+    if (Math.abs(deltaY) > 5) {
+      dragMoved.current = true
+    }
+    const newHeight = dragStartHeight.current - deltaY
+    const minHeight = 90
+    const maxHeight = window.innerHeight - 100
+    setDragHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)))
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging || typeof window === 'undefined') return
+    setIsDragging(false)
+    if (!dragMoved.current) {
+      setDragHeight(null)
+      return
+    }
+    const height = dragHeight ?? dragStartHeight.current
+    setDragHeight(null)
+    
+    const vh = window.innerHeight
+    const collapsedVal = 90
+    const halfVal = vh * 0.45
+    const fullVal = vh - 100
+    
+    const diffCollapsed = Math.abs(height - collapsedVal)
+    const diffHalf = Math.abs(height - halfVal)
+    const diffFull = Math.abs(height - fullVal)
+    
+    const minDiff = Math.min(diffCollapsed, diffHalf, diffFull)
+    if (minDiff === diffCollapsed) {
+      setMobileDrawerState('collapsed')
+    } else if (minDiff === diffHalf) {
+      setMobileDrawerState('half')
+    } else {
+      setMobileDrawerState('full')
+    }
+  }
 
   const handleDrawerHeaderClick = () => {
+    if (dragMoved.current) return
     setMobileDrawerState((current) => {
       if (current === 'collapsed') return 'half'
       if (current === 'half') return 'full'
@@ -1194,11 +1254,19 @@ function App() {
             </button>
 
             {/* Mobile Bottom Sheet (Sliding Drawer) */}
-            <div className={`mobile-bottom-drawer ${mobileDrawerState}`}>
+            <div 
+              className={`mobile-bottom-drawer ${mobileDrawerState}${isDragging ? ' dragging' : ''}`}
+              style={{
+                height: dragHeight !== null ? `${dragHeight}px` : undefined
+              }}
+            >
               {/* Drawer Drag Handle / Header */}
               <div 
                 className="drawer-header" 
                 onClick={handleDrawerHeaderClick}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
               >
                 <div className="drawer-handle" />
                 <div className="drawer-title-row" onClick={(e) => {
