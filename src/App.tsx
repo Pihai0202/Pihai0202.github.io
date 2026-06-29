@@ -43,7 +43,8 @@ import {
   SearchIcon,
   CameraIcon,
   PinIcon,
-  PlayIcon
+  PlayIcon,
+  PlusIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -2229,7 +2230,7 @@ function App() {
                 }
               }}
             >
-              <span className="icon">🗺️</span>
+              <span className="icon"><MapIcon /></span>
               <span className="label">地圖</span>
             </button>
             <button
@@ -2239,7 +2240,7 @@ function App() {
                 setView('calendar')
               }}
             >
-              <span className="icon">📅</span>
+              <span className="icon"><CalendarIcon /></span>
               <span className="label">行事曆</span>
             </button>
             <button
@@ -2248,7 +2249,7 @@ function App() {
               onClick={() => openAddModal()}
               title="新增演唱會紀錄"
             >
-              <span className="icon">＋</span>
+              <span className="icon"><PlusIcon /></span>
               <span className="label">紀錄</span>
             </button>
             <button
@@ -2258,7 +2259,7 @@ function App() {
                 setView('board')
               }}
             >
-              <span className="icon">💬</span>
+              <span className="icon"><MessageIcon /></span>
               <span className="label">社群牆</span>
             </button>
             <button
@@ -2272,7 +2273,7 @@ function App() {
                 }
               }}
             >
-              <span className="icon">👤</span>
+              <span className="icon"><UserIcon /></span>
               <span className="label">{isLoggedIn ? '我的' : '登入'}</span>
             </button>
           </div>
