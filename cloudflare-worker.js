@@ -182,8 +182,13 @@ export default {
 
       // ── KV 快取寫入（非同步，不阻塞回應）───────────────────────────────────
       if (env.TDX_CACHE && kvTtl > 0) {
+        let finalTtl = kvTtl;
+        const trimmed = responseText.trim();
+        if (trimmed === "[]" || trimmed === "{}" || trimmed === '{"value":[]}' || trimmed === '{"value": []}') {
+          finalTtl = 10; // 僅快取 10 秒，防止因查無資料或暫時性錯誤導致快取被污染一整小時
+        }
         ctx.waitUntil(
-          env.TDX_CACHE.put(kvKey, responseText, { expirationTtl: kvTtl }).catch(() => {})
+          env.TDX_CACHE.put(kvKey, responseText, { expirationTtl: finalTtl }).catch(() => {})
         );
       }
 

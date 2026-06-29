@@ -582,7 +582,11 @@ export function TransitInfoBoard() {
     const targetDirection = directionOverride !== undefined ? directionOverride : busDirection
 
     try {
-      const routeName = encodeURIComponent(queryStr)
+      // 將全形數字/英文字母轉換為半形，避免使用者輸入全形字元導致 API 查無資料
+      const cleanQuery = queryStr
+        .replace(/[\uFF01-\uFF5E]/g, (char) => String.fromCharCode(char.charCodeAt(0) - 0xfee0))
+        .replace(/\u3000/g, ' ')
+      const routeName = encodeURIComponent(cleanQuery)
 
       // 依序查詢，避免同時打 3 個 request 在 Worker 冷啟動時競爭 token 觸發 429
       const routes = await fetchTdx<TdxBusRoute[]>(`/v2/Bus/Route/City/${selectedCounty}/${routeName}?$top=1`)
