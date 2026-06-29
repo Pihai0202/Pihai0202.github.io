@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
@@ -378,18 +378,10 @@ export function TransitInfoBoard() {
     }
   }, [])
 
-  // 捷運：選好車站後自動查詢一次（useRef 追蹤上次查詢的 stationId，避免重複觸發）
-  const lastQueriedMetroStation = useRef('')
-  useEffect(() => {
-    if (
-      activeTab === 'metro' &&
-      selectedMetroStation &&
-      selectedMetroStation !== lastQueriedMetroStation.current
-    ) {
-      lastQueriedMetroStation.current = selectedMetroStation
-      queryMetroData(metroOperator, selectedMetroStation)
-    }
-  }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
+  // 捷運時刻表查詢：僅在使用者主動按下「重新整理即時資料」按鈕時才發起
+  // 不自動觸發，避免切換 tab 時同時打多個 API 造成 429
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  useEffect(() => { /* 保留 deps 追蹤，queryMetroData 由按鈕主動呼叫 */ }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
 
   // 取得台北時區的星期幾（英文名稱對應 ServiceDay 欄位）
   const getTodayDayOfWeek = () => {
