@@ -3,86 +3,96 @@
  *
  * 功能：
  * 1. 代理前端對 TDX API 的請求，解決 CORS 跨域問題並隱藏金鑰。
- * 2. 實作記憶體 Token 快取，大幅減少對 TDX Token API 的呼叫，避免觸發 429 頻率限制。
- * 3. Token 請求序列化（singleton lock）：當多個並行請求同時到達冷啟動的 Worker，
- *    確保只有一個請求實際去取 Token，其餘等待同一個 Promise，避免重複打 Token API。
- * 4. 自動 Retry with Exponential Backoff：TDX 回傳 429 / 503 時自動等待後重試（最多 2 次）。
+ * 2. Token 記憶體快取 + Singleton Lock：防止冷啟動時多個並行請求重複打 Token API。
+ * 3. Cloudflare KV 回應快取：依照 API 類型設定不同快取時間，大幅減少對 TDX 的實際請求次數。
+ *    - 車站清單：24 小時（幾乎不會變動）
+ *    - 即時到站 / 公車 ETA：30 秒（即時資料）
+ *    - 時刻表 / 公車路線：1 小時
+ *    - 其他：5 分鐘
+ * 4. Retry with Exponential Backoff：429 / 503 時自動等待後重試。
  *
- * 設定方式：
- * 請在 Cloudflare Workers 控制台設定環境變數：
- * - CLIENT_ID: 您的 TDX Client ID
- * - CLIENT_SECRET: 您的 TDX Client Secret
+ * 環境變數（Cloudflare Workers 控制台設定）：
+ * - CLIENT_ID:     TDX Client ID
+ * - CLIENT_SECRET: TDX Client Secret
+ *
+ * KV 綁定（Cloudflare Workers → Settings → Bindings）：
+ * - Variable name: TDX_CACHE  →  綁定到你建立的 KV Namespace
+ *   （若不設定，Worker 仍可正常運作，只是沒有 KV 快取）
  */
 
-// ─── Token 快取 ───────────────────────────────────────────────────────────────
-
+// ─── Token 快取（記憶體）────────────────────────────────────────────────────────
 let cachedToken = null;
-let tokenExpiry = 0; // Unix 毫秒時間戳記
-
-// Singleton lock：防止冷啟動時多個並行請求同時打 Token API
-let tokenFetchPromise = null;
+let tokenExpiry = 0;
+let tokenFetchPromise = null; // Singleton lock，防止冷啟動時並行打 Token API
 
 const TDX_TOKEN_URL = "https://tdx.transportdata.tw/auth/realms/TDXConnect/protocol/openid-connect/token";
-const TDX_API_BASE = "https://tdx.transportdata.tw/api/basic";
+const TDX_API_BASE  = "https://tdx.transportdata.tw/api/basic";
 
-// CORS 預設回應標頭
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Origin":  "*",
   "Access-Control-Allow-Methods": "GET, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
-  "Access-Control-Max-Age": "86400",
+  "Access-Control-Max-Age":       "86400",
 };
 
-// ─── 工具函式 ─────────────────────────────────────────────────────────────────
+// ─── KV TTL 決策 ────────────────────────────────────────────────────────────────
+/**
+ * 根據 TDX API 路徑決定 KV 快取時間（秒）。
+ * 回傳 0 表示不快取（對即時性要求極高的端點）。
+ */
+function getKvTtl(pathname) {
+  // 車站清單：24 小時（極少變動）
+  if (/\/Station\//.test(pathname))               return 86400;
+  // 捷運即時到站：30 秒
+  if (/\/LiveBoard\//.test(pathname))             return 30;
+  // 公車即時 ETA：30 秒
+  if (/EstimatedTimeOfArrival/.test(pathname))    return 30;
+  // 高鐵每日時刻：1 小時
+  if (/\/DailyTimetable\//.test(pathname))        return 3600;
+  // 捷運時刻表：1 小時
+  if (/\/StationTimeTable\//.test(pathname))      return 3600;
+  // 公車路線站牌：1 小時
+  if (/\/DisplayStopOfRoute\//.test(pathname))    return 3600;
+  // 公車路線資訊：1 小時
+  if (/\/Bus\/Route\//.test(pathname))            return 3600;
+  // 預設：5 分鐘
+  return 300;
+}
 
-/** 睡眠指定毫秒 */
+// ─── 工具函式 ────────────────────────────────────────────────────────────────────
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-/**
- * 帶有 Exponential Backoff 的 fetch wrapper。
- * 遇到 429 / 503 時自動等待後重試，最多重試 maxRetries 次。
- */
+/** Fetch with Exponential Backoff（429 / 503 自動重試，最多 2 次） */
 async function fetchWithRetry(url, options, maxRetries = 2) {
   let lastError;
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       const response = await fetch(url, options);
-
-      // 需要 retry 的狀態碼
       if ((response.status === 429 || response.status === 503) && attempt < maxRetries) {
-        // 嘗試讀取 Retry-After header（秒），否則用指數退避
         const retryAfter = response.headers.get("Retry-After");
         const waitMs = retryAfter
           ? parseInt(retryAfter, 10) * 1000
           : Math.pow(2, attempt) * 1000; // 1s → 2s
-        console.log(`[Worker] TDX 回傳 ${response.status}，等待 ${waitMs}ms 後第 ${attempt + 1} 次重試...`);
         await sleep(waitMs);
         continue;
       }
-
       return response;
     } catch (err) {
       lastError = err;
-      if (attempt < maxRetries) {
-        const waitMs = Math.pow(2, attempt) * 1000;
-        await sleep(waitMs);
-      }
+      if (attempt < maxRetries) await sleep(Math.pow(2, attempt) * 1000);
     }
   }
   throw lastError ?? new Error("fetchWithRetry: 所有重試均失敗");
 }
 
-// ─── 主要 Handler ─────────────────────────────────────────────────────────────
-
+// ─── 主要 Handler ────────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env, ctx) {
-    // 處理 CORS 預檢請求 (Preflight)
     if (request.method === "OPTIONS") {
       return new Response(null, { headers: corsHeaders });
     }
-
     if (request.method !== "GET") {
       return new Response(JSON.stringify({ error: "Method Not Allowed" }), {
         status: 405,
@@ -91,17 +101,49 @@ export default {
     }
 
     try {
-      const clientId = env.CLIENT_ID;
-      const clientSecret = env.CLIENT_SECRET;
-
+      const { CLIENT_ID: clientId, CLIENT_SECRET: clientSecret } = env;
       if (!clientId || !clientSecret) {
         return new Response(
-          JSON.stringify({ error: "Cloudflare Worker 環境變數 CLIENT_ID 或 CLIENT_SECRET 尚未設定。" }),
+          JSON.stringify({ error: "環境變數 CLIENT_ID 或 CLIENT_SECRET 尚未設定。" }),
           { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
 
-      // 取得 Access Token（帶序列化快取機制，防止冷啟動時重複打 Token API）
+      // 解析請求路徑 → 建立 TDX 目標 URL
+      const url = new URL(request.url);
+      let targetPath = url.pathname;
+      if (targetPath.startsWith("/api/tdx")) targetPath = targetPath.substring(8);
+      if (!targetPath.startsWith("/"))        targetPath = "/" + targetPath;
+
+      const tdxUrl = new URL(`${TDX_API_BASE}${targetPath}`);
+      for (const [key, value] of url.searchParams) {
+        if (key !== "cb" && key !== "$format") tdxUrl.searchParams.set(key, value);
+      }
+      tdxUrl.searchParams.set("$format", "JSON");
+
+      // ── KV 快取讀取 ──────────────────────────────────────────────────────────
+      const kvKey = `tdx:${targetPath}:${tdxUrl.searchParams.toString()}`.substring(0, 512);
+      const kvTtl = getKvTtl(targetPath);
+
+      if (env.TDX_CACHE && kvTtl > 0) {
+        try {
+          const cached = await env.TDX_CACHE.get(kvKey);
+          if (cached) {
+            return new Response(cached, {
+              status: 200,
+              headers: {
+                "Content-Type": "application/json; charset=utf-8",
+                "X-Cache": "HIT",   // 可在瀏覽器 DevTools 確認是否命中快取
+                ...corsHeaders,
+              },
+            });
+          }
+        } catch (_kvErr) {
+          // KV 讀取失敗不影響主流程，繼續向 TDX 請求
+        }
+      }
+
+      // ── 取得 Token（帶 Singleton Lock）──────────────────────────────────────
       let token;
       try {
         token = await getTdxToken(clientId, clientSecret);
@@ -112,29 +154,7 @@ export default {
         );
       }
 
-      const url = new URL(request.url);
-
-      // 取得要代理的 TDX API 路徑
-      let targetPath = url.pathname;
-      if (targetPath.startsWith("/api/tdx")) {
-        targetPath = targetPath.substring(8);
-      }
-      if (!targetPath.startsWith("/")) {
-        targetPath = "/" + targetPath;
-      }
-
-      // 建立目標 TDX 請求網址
-      const tdxUrl = new URL(`${TDX_API_BASE}${targetPath}`);
-
-      // 複製所有查詢參數（排除 cb 與 $format）
-      for (const [key, value] of url.searchParams) {
-        if (key !== "cb" && key !== "$format") {
-          tdxUrl.searchParams.set(key, value);
-        }
-      }
-      tdxUrl.searchParams.set("$format", "JSON");
-
-      // 呼叫 TDX API（帶自動重試）
+      // ── 呼叫 TDX API（帶自動重試）──────────────────────────────────────────
       const tdxResponse = await fetchWithRetry(tdxUrl.toString(), {
         method: "GET",
         headers: {
@@ -144,34 +164,36 @@ export default {
         },
       });
 
-      // 處理 TDX API 回傳錯誤
       if (!tdxResponse.ok) {
         const errText = await tdxResponse.text();
-        // 對 429 提供更友善的錯誤訊息
-        const errorMsg =
-          tdxResponse.status === 429
-            ? "TDX API 請求過於頻繁（429），請稍待幾秒後再試"
-            : `TDX API 查詢失敗 (${tdxResponse.status})`;
+        const errorMsg = tdxResponse.status === 429
+          ? "TDX API 請求過於頻繁（429），請稍待幾秒後再試"
+          : `TDX API 查詢失敗 (${tdxResponse.status})`;
         return new Response(
           JSON.stringify({ error: errorMsg, detail: errText }),
-          {
-            status: tdxResponse.status,
-            headers: { "Content-Type": "application/json", ...corsHeaders },
-          }
+          { status: tdxResponse.status, headers: { "Content-Type": "application/json", ...corsHeaders } }
         );
       }
 
-      const data = await tdxResponse.json();
+      const responseText = await tdxResponse.text();
 
-      // 回傳成功結果，Cache-Control 60 秒
-      return new Response(JSON.stringify(data), {
+      // ── KV 快取寫入（非同步，不阻塞回應）───────────────────────────────────
+      if (env.TDX_CACHE && kvTtl > 0) {
+        ctx.waitUntil(
+          env.TDX_CACHE.put(kvKey, responseText, { expirationTtl: kvTtl }).catch(() => {})
+        );
+      }
+
+      return new Response(responseText, {
         status: 200,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
-          "Cache-Control": "public, max-age=60",
+          "X-Cache": "MISS",
+          "Cache-Control": `public, max-age=${Math.min(kvTtl, 60)}`,
           ...corsHeaders,
         },
       });
+
     } catch (err) {
       return new Response(
         JSON.stringify({ error: `代理伺服器內部錯誤: ${err.message}` }),
@@ -181,29 +203,12 @@ export default {
   },
 };
 
-// ─── Token 取得（序列化 + 快取）────────────────────────────────────────────────
-
-/**
- * 取得 TDX Token。
- *
- * 利用 singleton Promise（tokenFetchPromise）確保同一時間只有一個請求去打
- * Token API，其餘並行請求等待同一個 Promise 回傳結果，徹底避免冷啟動時
- * 重複打 Token API 觸發 429。
- */
+// ─── Token 取得（Singleton Lock + 記憶體快取）──────────────────────────────────
 async function getTdxToken(clientId, clientSecret) {
   const now = Date.now();
+  if (cachedToken && now < tokenExpiry) return cachedToken;
+  if (tokenFetchPromise) return tokenFetchPromise;
 
-  // 快取命中：直接回傳
-  if (cachedToken && now < tokenExpiry) {
-    return cachedToken;
-  }
-
-  // 若已有進行中的 token 請求（singleton lock），等待它完成
-  if (tokenFetchPromise) {
-    return tokenFetchPromise;
-  }
-
-  // 發起新的 token 請求，並鎖住 singleton
   tokenFetchPromise = (async () => {
     try {
       const body = new URLSearchParams({
@@ -211,31 +216,23 @@ async function getTdxToken(clientId, clientSecret) {
         client_id: clientId,
         client_secret: clientSecret,
       });
-
       const response = await fetch(TDX_TOKEN_URL, {
         method: "POST",
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
         body: body.toString(),
       });
-
       if (!response.ok) {
         const errText = await response.text();
         throw new Error(`Token 取得失敗 (${response.status}): ${errText}`);
       }
-
       const data = await response.json();
-      if (!data.access_token) {
-        throw new Error("Token 回傳格式不正確");
-      }
+      if (!data.access_token) throw new Error("Token 回傳格式不正確");
 
       cachedToken = data.access_token;
-      // 提早 3 分鐘過期，防止時間差造成的無效 Token
       const expiresIn = data.expires_in ?? 3600;
       tokenExpiry = Date.now() + Math.max(60, expiresIn - 180) * 1000;
-
       return cachedToken;
     } finally {
-      // 無論成功或失敗，釋放 lock，讓下次呼叫能重新嘗試
       tokenFetchPromise = null;
     }
   })();

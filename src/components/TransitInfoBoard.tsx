@@ -233,8 +233,38 @@ function getStationId(type: 'THSR' | 'TRA', stationName: string): string | undef
   return map[normalized]
 }
 
-// 捷運車站快取（同一個 session 內只查一次，鍵為 METRO_TRTC 等格式）
+// ─── 捷運車站快取（雙層）─────────────────────────────────────────────────────
+// Level 1：記憶體快取（同一 session 最快，無需解析 JSON）
 const metroStationCache: Record<string, TdxStation[]> = {}
+
+// Level 2：localStorage 持久快取（24 小時 TTL，重新整理頁面也不會重打 API）
+const STATION_LS_TTL_MS = 24 * 60 * 60 * 1000
+
+function getStationFromLS(operator: string): TdxStation[] | null {
+  try {
+    const raw = localStorage.getItem(`metro_stations_${operator}`)
+    if (!raw) return null
+    const { data, expiry } = JSON.parse(raw) as { data: TdxStation[]; expiry: number }
+    if (Date.now() > expiry) {
+      localStorage.removeItem(`metro_stations_${operator}`)
+      return null
+    }
+    return data
+  } catch {
+    return null
+  }
+}
+
+function setStationToLS(operator: string, stations: TdxStation[]) {
+  try {
+    localStorage.setItem(
+      `metro_stations_${operator}`,
+      JSON.stringify({ data: stations, expiry: Date.now() + STATION_LS_TTL_MS })
+    )
+  } catch {
+    // localStorage 空間不足或不可用時靜默忽略
+  }
+}
 
 
 
@@ -304,7 +334,7 @@ export function TransitInfoBoard() {
     return () => { clearTimeout(timer); clearInterval(interval) }
   }, [fetchStatus])
 
-  // 載入捷運車站清單
+  // 載入捷運車站清單（雙層快取：記憶體 → localStorage → TDX API）
   useEffect(() => {
     let active = true
     const loadStations = async () => {
@@ -317,6 +347,7 @@ export function TransitInfoBoard() {
       setMetroLiveBoard([])
       setMetroTimetables([])
 
+      // Level 1：記憶體快取（同 session 最快）
       if (metroStationCache[cacheKey]) {
         setMetroStations(metroStationCache[cacheKey])
         if (metroStationCache[cacheKey].length > 0) {
@@ -325,6 +356,16 @@ export function TransitInfoBoard() {
         return
       }
 
+      // Level 2：localStorage 快取（24h TTL，跨頁面重整有效）
+      const lsCached = getStationFromLS(metroOperator)
+      if (lsCached) {
+        metroStationCache[cacheKey] = lsCached  // 同步回記憶體
+        setMetroStations(lsCached)
+        if (lsCached.length > 0) setSelectedMetroStation(lsCached[0].StationID)
+        return
+      }
+
+      // Level 3：向 TDX API 請求（快取未命中才呼叫）
       setMetroStationsLoading(true)
       try {
         const data = await fetchTdx<TdxStation[]>(
@@ -332,16 +373,14 @@ export function TransitInfoBoard() {
         )
         if (active) {
           const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
-          metroStationCache[cacheKey] = sorted
+          metroStationCache[cacheKey] = sorted  // 寫入記憶體快取
+          setStationToLS(metroOperator, sorted)  // 寫入 localStorage 快取
           setMetroStations(sorted)
-          if (sorted.length > 0) {
-            setSelectedMetroStation(sorted[0].StationID)
-          }
+          if (sorted.length > 0) setSelectedMetroStation(sorted[0].StationID)
         }
       } catch (e) {
         console.error('Failed to load metro stations:', e)
         if (active) {
-          // 載入失敗時顯示錯誤（而非靜默保留舊系統車站）
           setMetroQueryError(
             e instanceof Error
               ? `車站清單載入失敗：${e.message}`
@@ -353,9 +392,7 @@ export function TransitInfoBoard() {
       }
     }
 
-    if (activeTab === 'metro') {
-      loadStations()
-    }
+    if (activeTab === 'metro') loadStations()
     return () => { active = false }
   }, [metroOperator, activeTab])
 
