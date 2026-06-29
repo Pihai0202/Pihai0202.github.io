@@ -108,11 +108,13 @@ export function TaiwanMap({
     // Calculate targets
     const targetX = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).x : 455
     let targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
-    const targetZoom = selectedVenue ? 1.8 : 1.1
+    // 若使用者已經手動調整過縮放比例（不等於初始的 1.1），則在選取場館時維持使用者當前的縮放比；否則使用預設特寫縮放比 1.8
+    const targetZoom = selectedVenue ? (zoom !== 1.1 ? zoom : 1.8) : 1.1
 
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
     if (selectedVenue && isMobile) {
       // 底部抽屜在手機端佔用下半部約 45% 高度，將選取的場館中心點往上偏移以置中於上方可視區（地圖往下移 22% 視區高度）
+      // 偏移量會依據選取時的 zoom 比例動態縮放，確保在任何縮放比下都能精確置中
       const heightVal = 800 / targetZoom
       targetY += heightVal * 0.22
     }
