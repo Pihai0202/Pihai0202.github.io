@@ -24,6 +24,7 @@ import { TicketDetailModal } from './components/TicketDetailModal'
 import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
+import { GuideModal } from './components/GuideModal'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
@@ -260,6 +261,7 @@ function App() {
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
+  const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -382,7 +384,8 @@ function App() {
     selectedTicket ||
     isSuspensionModalOpen ||
     isAllModalOpen ||
-    isPublishModalOpen
+    isPublishModalOpen ||
+    isGuideModalOpen
   )
 
   useEffect(() => {
@@ -1124,6 +1127,14 @@ function App() {
             onClick={() => setView('board')}
           >
             <MessageIcon style={{ marginRight: '6px' }} /> 社群分享牆
+          </button>
+          <button
+            className="nav-toggle-btn guide-trigger-btn"
+            type="button"
+            onClick={() => setIsGuideModalOpen(true)}
+            title="網站導覽"
+          >
+            <SparklesIcon style={{ marginRight: '6px' }} /> 網站導覽
           </button>
           <button
             className="theme-toggle-btn"
@@ -2149,6 +2160,10 @@ function App() {
         </Modal>
       )}
 
+      {isGuideModalOpen && (
+        <GuideModal onClose={() => setIsGuideModalOpen(false)} />
+      )}
+
       <button
         className="music-bar-toggle"
         type="button"
@@ -2245,6 +2260,17 @@ function App() {
               >
                 <span className="icon"><MessageIcon /></span>
                 <span className="label">社群牆</span>
+              </button>
+              <button
+                className="sidebar-nav-item"
+                type="button"
+                onClick={() => {
+                  setIsMobileSidebarOpen(false)
+                  setIsGuideModalOpen(true)
+                }}
+              >
+                <span className="icon"><SparklesIcon /></span>
+                <span className="label">網站導覽</span>
               </button>
               {isLoggedIn && currentUser ? (
                 <button
