@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
-import type { ChangeEvent, MouseEvent, ReactNode } from 'react'
+import type { ChangeEvent, MouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react'
 import { marked } from 'marked'
 import './App.css'
 
@@ -2752,9 +2752,77 @@ function Modal({
   className?: string
   onClose: () => void
 }) {
+  const [dragOffset, setDragOffset] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartY = useRef(0)
+  const dragMoved = useRef(false)
+
+  const handleTouchStart = (e: ReactTouchEvent) => {
+    if (typeof window === 'undefined' || window.innerWidth > 768) return
+    const touch = e.touches[0]
+    dragStartY.current = touch.clientY
+    setIsDragging(true)
+    dragMoved.current = false
+  }
+
+  const handleTouchMove = (e: ReactTouchEvent) => {
+    if (!isDragging) return
+    const touch = e.touches[0]
+    const deltaY = touch.clientY - dragStartY.current
+
+    if (deltaY > 0) {
+      setDragOffset(deltaY)
+      if (deltaY > 5) {
+        dragMoved.current = true
+      }
+    } else {
+      setDragOffset(0)
+    }
+  }
+
+  const handleTouchEnd = () => {
+    if (!isDragging) return
+    setIsDragging(false)
+
+    if (!dragMoved.current) {
+      setDragOffset(0)
+      return
+    }
+
+    if (dragOffset > 100) {
+      onClose()
+    } else {
+      setDragOffset(0)
+    }
+  }
+
+  const handleHandleClick = () => {
+    if (dragMoved.current) return
+    onClose()
+  }
+
+  const style = (dragOffset > 0 || isDragging) ? {
+    transform: `translateY(${dragOffset}px)`,
+    transition: isDragging ? 'none' : 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)'
+  } : {}
+
   return (
     <div className="modal-overlay active" onClick={onClose}>
-      <div className={`modal ${className}`} onClick={(event) => event.stopPropagation()}>
+      <div 
+        className={`modal ${className}`} 
+        onClick={(event) => event.stopPropagation()}
+        style={style}
+      >
+        <div 
+          className="modal-drag-handle-container"
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+          onTouchCancel={handleTouchEnd}
+          onClick={handleHandleClick}
+        >
+          <div className="modal-drag-handle" />
+        </div>
         <button className="modal-close" type="button" onClick={onClose}>
           ×
         </button>
