@@ -7983,7 +7983,8 @@ body.player-open .music-bar-toggle {
 
   /* Reposition list button to top-right */
   .all-concerts-btn {
-    top: 1rem !important;
+    position: fixed !important;
+    top: calc(62px + 1rem) !important;
     right: 1rem !important;
     bottom: auto !important;
     left: auto !important;
@@ -8002,7 +8003,8 @@ body.player-open .music-bar-toggle {
 
   /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
   .map-legend {
-    top: 1rem !important;
+    position: fixed !important;
+    top: calc(62px + 1rem) !important;
     left: 1rem !important;
     bottom: auto !important;
     right: auto !important;
