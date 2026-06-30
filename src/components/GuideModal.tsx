@@ -162,11 +162,52 @@ export function GuideModal({ onClose }: GuideModalProps) {
               <span>台灣演唱會地圖 ─ 功能特色指南</span>
             </div>
             <div className="guide-screenshot-frame">
-              <img 
-                src={`${import.meta.env.BASE_URL}guide_screenshot.png`} 
-                alt="台灣演唱會地圖介面導覽" 
-                className="guide-modal-image"
-              />
+              {currentStep === 0 && (
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img1.png`} 
+                  alt="互動式台灣 SVG 地圖與場館指南" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'cover' }}
+                />
+              )}
+              {currentStep === 1 && (
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img2.png`} 
+                  alt="即時大眾交通與即時路況板" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
+              )}
+              {currentStep === 2 && (
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img3.png`} 
+                  alt="場館即時天氣與 7 天預報" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
+              )}
+              {currentStep === 3 && (
+                <div className="guide-step4-images">
+                  <img 
+                    src={`${import.meta.env.BASE_URL}guide_img4.png`} 
+                    alt="售票活動探索" 
+                    className="guide-modal-image-step4"
+                  />
+                  <img 
+                    src={`${import.meta.env.BASE_URL}guide_img5.png`} 
+                    alt="音樂試聽卡片" 
+                    className="guide-modal-image-step4"
+                  />
+                </div>
+              )}
+              {currentStep > 3 && (
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_screenshot.png`} 
+                  alt="台灣演唱會地圖介面導覽" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'cover' }}
+                />
+              )}
               <div className="guide-image-overlay">
                 <span className="step-badge">STEP {currentStep + 1} / {steps.length}</span>
               </div>
