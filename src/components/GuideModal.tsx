@@ -87,15 +87,26 @@ export function GuideModal({ onClose }: GuideModalProps) {
       ]
     },
     {
-      title: '售票活動探索與音樂試聽卡片',
+      title: '售票活動探索與分類',
+      subtitle: 'Upcoming Ticket Exploration',
+      icon: <MusicIcon size="2rem" />,
+      description: '彙整各大售票平台的最新搶票與活動動態。',
+      details: [
+        '活動聚合：整合 KKTIX、拓元、年代、ibon 等平台的售票活動。',
+        '分類與過濾：支援依「演唱會」與「中華職棒」等運動賽事分類過濾。',
+        '即時更新：點選「更新」按鈕可立即重新載入最新的售票資訊清單。'
+      ]
+    },
+    {
+      title: '搶票指引與歌手精選音樂',
       subtitle: 'TicketDetailModal & Spotify Playback',
       icon: <MusicIcon size="2rem" />,
-      description: '整合各大售票平台最新活動，搭配 Spotify 音樂播放器，打造沉浸式體驗。',
+      description: '活動詳細頁面提供購票按鈕、討論留言牆與音樂播放器。',
       details: [
-        '活動聚合：匯整載入 KKTIX、拓元、年代、ibon 等平台的最新熱門售票活動。',
-        '智慧售票連結解析：自動偵測拓元等平台通用連結，並智慧修正/引導至具體活動頁面。',
-        'Spotify 音樂試聽：自動擷取活動名稱中的歌手，支援在卡片上直接免跳轉播放熱門曲目。',
-        '一鍵參戰紀錄：在探索活動時，可直接將該活動登錄至個人已參與紀錄中。'
+        '智慧連結修正：自動偵測拓元等平台通用連結，並智慧導向至具體活動搶票頁面。',
+        'Spotify 音樂試聽：自動搜尋歌手熱門曲目，支援在網頁下方播放器直接試聽。',
+        '討論留言牆：與其他正在搶票的同好在線上進行即時心得與資訊交流。',
+        '登錄參戰：一鍵將該活動登錄至個人已參與紀錄，隨時納入行事曆。'
       ]
     },
     {
@@ -187,20 +198,22 @@ export function GuideModal({ onClose }: GuideModalProps) {
                 />
               )}
               {currentStep === 3 && (
-                <div className="guide-step4-images">
-                  <img 
-                    src={`${import.meta.env.BASE_URL}guide_img4.png`} 
-                    alt="售票活動探索" 
-                    className="guide-modal-image-step4"
-                  />
-                  <img 
-                    src={`${import.meta.env.BASE_URL}guide_img5.png`} 
-                    alt="音樂試聽卡片" 
-                    className="guide-modal-image-step4"
-                  />
-                </div>
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img4.png`} 
+                  alt="售票活動探索與分類" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
               )}
-              {currentStep > 3 && (
+              {currentStep === 4 && (
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img5.png`} 
+                  alt="搶票指引與歌手精選音樂" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
+              )}
+              {currentStep > 4 && (
                 <img 
                   src={`${import.meta.env.BASE_URL}guide_screenshot.png`} 
                   alt="台灣演唱會地圖介面導覽" 
