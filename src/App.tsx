@@ -295,6 +295,7 @@ function App() {
 
   const handleTouchMove = (e: React.TouchEvent) => {
     if (!isDragging || typeof window === 'undefined') return
+    e.preventDefault() // Block browser pull-to-refresh while dragging drawer
     const touch = e.touches[0]
     const deltaY = touch.clientY - dragStartY.current
     if (Math.abs(deltaY) > 5) {
