@@ -7,7 +7,8 @@ import {
   SunIcon,
   CloseIcon,
   SparklesIcon,
-  PlusIcon
+  PlusIcon,
+  ImageIcon
 } from './SvgIcon'
 
 // Custom Train icon if not exported from SvgIcon
@@ -274,7 +275,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
               className="guide-mobile-screenshot-trigger" 
               onClick={() => setShowScreenshotMobile(true)}
             >
-              🖼️ 檢視功能畫面截圖
+              <ImageIcon size="1.2rem" /> 檢視功能畫面截圖
             </button>
 
             <p className="guide-step-desc">{step.description}</p>
