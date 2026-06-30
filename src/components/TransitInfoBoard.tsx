@@ -142,6 +142,20 @@ const METRO_OPERATORS = [
   { id: 'KRTC', name: '高雄捷運' },
 ]
 
+// TDX LiveBoard 支援的捷運系統（不含 TMRT）
+const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT'])
+// TDX StationTimeTable 支援的捷運系統（不含 TMRT）
+const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC'])
+
+// 捷運系統官方網站（用於不支援 TDX 查詢時的引導連結）
+const METRO_OFFICIAL_URLS: Record<string, string> = {
+  TRTC: 'https://www.metro.taipei/',
+  NTMC: 'https://www.ntmetro.com.tw/',
+  TYMC: 'https://www.tymetro.com.tw/',
+  TMRT: 'https://www.tmrt.com.tw/',
+  KRTC: 'https://www.krtc.com.tw/',
+}
+
 
 // 外部連結
 const TDX_OFFICIAL_QUERY_URL = 'https://tdx.transportdata.tw/maas'
@@ -466,20 +480,39 @@ export function TransitInfoBoard() {
     if (!stationId) return
     setMetroQueryLoading(true)
     setMetroQueryError('')
+
+    // 檢查此捷運系統是否被 TDX API 支援
+    const hasLiveBoard = LIVEBOARD_SUPPORTED.has(operator)
+    const hasTimetable = TIMETABLE_SUPPORTED.has(operator)
+
+    if (!hasLiveBoard && !hasTimetable) {
+      // 此系統完全不支援查詢，直接設定提示訊息
+      const opName = METRO_OPERATORS.find(o => o.id === operator)?.name ?? operator
+      setMetroLiveBoard([])
+      setMetroTimetables([])
+      setMetroQueryError(`TDX 目前不提供「${opName}」的即時到站與時刻表資料，請前往官方網站查詢。`)
+      setMetroQueryLoading(false)
+      return
+    }
+
     try {
       const [liveData, timetableData] = await Promise.all([
-        fetchTdx<TdxMetroLiveBoard[]>(
-          `/v2/Rail/Metro/LiveBoard/${operator}?$filter=StationID eq '${stationId}'`
-        ).catch((err) => {
-          console.error('LiveBoard error:', err)
-          return []
-        }),
-        fetchTdx<TdxMetroStationTimeTable[]>(
-          `/v2/Rail/Metro/StationTimeTable/${operator}?$filter=StationID eq '${stationId}'`
-        ).catch((err) => {
-          console.error('StationTimeTable error:', err)
-          return []
-        })
+        hasLiveBoard
+          ? fetchTdx<TdxMetroLiveBoard[]>(
+              `/v2/Rail/Metro/LiveBoard/${operator}?$filter=StationID eq '${stationId}'`
+            ).catch((err) => {
+              console.error('LiveBoard error:', err)
+              return []
+            })
+          : Promise.resolve([]),
+        hasTimetable
+          ? fetchTdx<TdxMetroStationTimeTable[]>(
+              `/v2/Rail/Metro/StationTimeTable/${operator}?$filter=StationID eq '${stationId}'`
+            ).catch((err) => {
+              console.error('StationTimeTable error:', err)
+              return []
+            })
+          : Promise.resolve([])
       ])
       setMetroLiveBoard(liveData)
       setMetroTimetables(timetableData)
@@ -873,14 +906,28 @@ export function TransitInfoBoard() {
             ) : metroQueryError ? (
               <div className="bus-stops-empty">
                 {metroQueryError}
-                <button
-                  type="button"
-                  className="transit-retry-btn"
-                  onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
-                >
-                  <RefreshIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                  重試
-                </button>
+                <div style={{ marginTop: '0.5rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                  {(!LIVEBOARD_SUPPORTED.has(metroOperator) && !TIMETABLE_SUPPORTED.has(metroOperator)) ? (
+                    <a
+                      href={METRO_OFFICIAL_URLS[metroOperator] || '#'}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="transit-link-btn"
+                      style={{ flex: 'unset', width: 'auto' }}
+                    >
+                      前往官方網站查詢 ↗
+                    </a>
+                  ) : (
+                    <button
+                      type="button"
+                      className="transit-retry-btn"
+                      onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
+                    >
+                      <RefreshIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                      重試
+                    </button>
+                  )}
+                </div>
               </div>
             ) : !selectedMetroStation ? (
               <div className="bus-stops-empty">請選擇捷運系統與車站。</div>
