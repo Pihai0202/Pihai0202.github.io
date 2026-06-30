@@ -6591,6 +6591,7 @@ body.player-open .music-bar-toggle {
   /* Mobile Bottom Sheet Modal Styles */
   .modal-overlay {
     align-items: flex-end !important;
+    overflow-x: hidden !important;
   }
 
   .modal {
@@ -6606,7 +6607,15 @@ body.player-open .music-bar-toggle {
     padding: 2.2rem 1.4rem calc(1.4rem + env(safe-area-inset-bottom)) 1.4rem !important;
     box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.45);
     animation: slide-up-sheet 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    overflow-x: hidden !important;
     overflow-y: auto;
+  }
+
+  /* Prevent iOS input focus zoom by forcing font-size to at least 16px */
+  .modal input,
+  .modal select,
+  .modal textarea {
+    font-size: 16px !important;
   }
 
   .modal::before {
