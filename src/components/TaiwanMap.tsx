@@ -314,6 +314,7 @@ export function TaiwanMap({
     const handleTouchMoveNative = (e: globalThis.TouchEvent) => {
       if (e.touches.length === 1) {
         if (!isDragging || !dragStartRef.current) return
+        e.preventDefault() // Block browser viewport scroll/pull-to-refresh during map panning
         const touch = e.touches[0]
 
         const dx = touch.clientX - dragStartRef.current.clientX

@@ -235,6 +235,7 @@ function App() {
   const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
   const [isRemoteRefreshing, setIsRemoteRefreshing] = useState(false)
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
+  const drawerHeaderRef = useRef<HTMLDivElement | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
   const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
@@ -295,60 +296,84 @@ function App() {
   const dragStartHeight = useRef(0)
   const dragMoved = useRef(false)
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    if (typeof window === 'undefined') return
-    const touch = e.touches[0]
-    dragStartY.current = touch.clientY
-    dragMoved.current = false
-    const drawerEl = document.querySelector('.mobile-bottom-drawer')
-    if (drawerEl) {
-      dragStartHeight.current = drawerEl.getBoundingClientRect().height
-      setIsDragging(true)
-    }
-  }
+  const dragHeightRef = useRef<number | null>(null)
+  dragHeightRef.current = dragHeight
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    if (!isDragging || typeof window === 'undefined') return
-    e.preventDefault() // Block browser pull-to-refresh while dragging drawer
-    const touch = e.touches[0]
-    const deltaY = touch.clientY - dragStartY.current
-    if (Math.abs(deltaY) > 5) {
-      dragMoved.current = true
-    }
-    const newHeight = dragStartHeight.current - deltaY
-    const minHeight = 90
-    const maxHeight = window.innerHeight - 100
-    setDragHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)))
-  }
+  const isDraggingRef = useRef(false)
+  isDraggingRef.current = isDragging
 
-  const handleTouchEnd = () => {
-    if (!isDragging || typeof window === 'undefined') return
-    setIsDragging(false)
-    if (!dragMoved.current) {
+  // Bind native touch event listeners to the bottom sheet drawer header to prevent browser pull-to-refresh
+  useEffect(() => {
+    const headerEl = drawerHeaderRef.current
+    if (!headerEl) return
+
+    const handleTouchStartNative = (e: TouchEvent) => {
+      if (typeof window === 'undefined') return
+      const touch = e.touches[0]
+      dragStartY.current = touch.clientY
+      dragMoved.current = false
+      const drawerEl = document.querySelector('.mobile-bottom-drawer')
+      if (drawerEl) {
+        dragStartHeight.current = drawerEl.getBoundingClientRect().height
+        setIsDragging(true)
+      }
+    }
+
+    const handleTouchMoveNative = (e: TouchEvent) => {
+      if (!isDraggingRef.current || typeof window === 'undefined') return
+      e.preventDefault() // Block browser viewport scroll/pull-to-refresh during drag
+      const touch = e.touches[0]
+      const deltaY = touch.clientY - dragStartY.current
+      if (Math.abs(deltaY) > 5) {
+        dragMoved.current = true
+      }
+      const newHeight = dragStartHeight.current - deltaY
+      const minHeight = 90
+      const maxHeight = window.innerHeight - 100
+      setDragHeight(Math.max(minHeight, Math.min(maxHeight, newHeight)))
+    }
+
+    const handleTouchEndNative = () => {
+      if (!isDraggingRef.current || typeof window === 'undefined') return
+      setIsDragging(false)
+      if (!dragMoved.current) {
+        setDragHeight(null)
+        return
+      }
+      const height = dragHeightRef.current ?? dragStartHeight.current
       setDragHeight(null)
-      return
+      
+      const vh = window.innerHeight
+      const collapsedVal = 90
+      const halfVal = vh * 0.45
+      const fullVal = vh - 100
+      
+      const diffCollapsed = Math.abs(height - collapsedVal)
+      const diffHalf = Math.abs(height - halfVal)
+      const diffFull = Math.abs(height - fullVal)
+      
+      const minDiff = Math.min(diffCollapsed, diffHalf, diffFull)
+      if (minDiff === diffCollapsed) {
+        setMobileDrawerState('collapsed')
+      } else if (minDiff === diffHalf) {
+        setMobileDrawerState('half')
+      } else {
+        setMobileDrawerState('full')
+      }
     }
-    const height = dragHeight ?? dragStartHeight.current
-    setDragHeight(null)
-    
-    const vh = window.innerHeight
-    const collapsedVal = 90
-    const halfVal = vh * 0.45
-    const fullVal = vh - 100
-    
-    const diffCollapsed = Math.abs(height - collapsedVal)
-    const diffHalf = Math.abs(height - halfVal)
-    const diffFull = Math.abs(height - fullVal)
-    
-    const minDiff = Math.min(diffCollapsed, diffHalf, diffFull)
-    if (minDiff === diffCollapsed) {
-      setMobileDrawerState('collapsed')
-    } else if (minDiff === diffHalf) {
-      setMobileDrawerState('half')
-    } else {
-      setMobileDrawerState('full')
+
+    headerEl.addEventListener('touchstart', handleTouchStartNative, { passive: true })
+    headerEl.addEventListener('touchmove', handleTouchMoveNative, { passive: false })
+    headerEl.addEventListener('touchend', handleTouchEndNative, { passive: true })
+    headerEl.addEventListener('touchcancel', handleTouchEndNative, { passive: true })
+
+    return () => {
+      headerEl.removeEventListener('touchstart', handleTouchStartNative)
+      headerEl.removeEventListener('touchmove', handleTouchMoveNative)
+      headerEl.removeEventListener('touchend', handleTouchEndNative)
+      headerEl.removeEventListener('touchcancel', handleTouchEndNative)
     }
-  }
+  }, [])
 
   const handleDrawerHeaderClick = () => {
     if (dragMoved.current) return
@@ -1311,12 +1336,10 @@ function App() {
               }}
             >
               {/* Drawer Drag Handle / Header */}
-              <div 
-                className="drawer-header" 
+              <div
+                className="drawer-header"
+                ref={drawerHeaderRef}
                 onClick={handleDrawerHeaderClick}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
               >
                 <div className="drawer-handle" />
                 <div className="drawer-title-row" onClick={(e) => {
