@@ -1,5 +1,5 @@
 import { useState, useRef, useMemo, useEffect } from 'react'
-import type { MouseEvent, TouchEvent } from 'react'
+import type { MouseEvent } from 'react'
 import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
@@ -89,6 +89,9 @@ export function TaiwanMap({
   const animationRef = useRef<number | null>(null)
   const centerRef = useRef(center)
   centerRef.current = center
+
+  const zoomRef = useRef(zoom)
+  zoomRef.current = zoom
 
   // Keep display states synchronized instantly when not animating
   useEffect(() => {
@@ -234,44 +237,6 @@ export function TaiwanMap({
     setIsDragging(true)
   }
 
-  const handleTouchStart = (e: TouchEvent<SVGSVGElement>) => {
-    if (e.touches.length === 1) {
-      const touch = e.touches[0]
-      didDragRef.current = false
-      setHoveredVenue(null)
-      dragStartRef.current = {
-        clientX: touch.clientX,
-        clientY: touch.clientY,
-        centerX: center.x,
-        centerY: center.y,
-      }
-      setIsDragging(true)
-      
-      pinchStartDistanceRef.current = null
-      pinchStartZoomRef.current = null
-      pinchStartMidpointRef.current = null
-      pinchStartMapCenterRef.current = null
-    } else if (e.touches.length === 2) {
-      // Two-finger pinch start
-      setIsDragging(false)
-      dragStartRef.current = null
-
-      const t1 = e.touches[0]
-      const t2 = e.touches[1]
-      const dx = t1.clientX - t2.clientX
-      const dy = t1.clientY - t2.clientY
-      const distance = Math.sqrt(dx * dx + dy * dy)
-
-      pinchStartDistanceRef.current = distance
-      pinchStartZoomRef.current = zoom
-      pinchStartMidpointRef.current = {
-        clientX: (t1.clientX + t2.clientX) / 2,
-        clientY: (t1.clientY + t2.clientY) / 2,
-      }
-      pinchStartMapCenterRef.current = { ...center }
-    }
-  }
-
   const handleMouseMove = (e: MouseEvent<SVGSVGElement>) => {
     if (!isDragging || !dragStartRef.current || !svgRef.current) return
 
@@ -293,97 +258,155 @@ export function TaiwanMap({
     })
   }
 
-  const handleTouchMove = (e: TouchEvent<SVGSVGElement>) => {
-    if (e.touches.length === 1) {
-      if (!isDragging || !dragStartRef.current || !svgRef.current) return
-      const touch = e.touches[0]
+  const handleDragEnd = () => {
+    setIsDragging(false)
+    dragStartRef.current = null
+  }
 
-      const dx = touch.clientX - dragStartRef.current.clientX
-      const dy = touch.clientY - dragStartRef.current.clientY
-      if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-        didDragRef.current = true
-      }
+  // Bind native touch event listeners non-passively to prevent browser viewport zoom
+  useEffect(() => {
+    const svgEl = svgRef.current
+    if (!svgEl) return
 
-      const svgRect = svgRef.current.getBoundingClientRect()
-      const w = 800 / zoom
-      const h = 800 / zoom
-      const scaleX = w / svgRect.width
-      const scaleY = h / svgRect.height
-
-      setCenter({
-        x: dragStartRef.current.centerX - dx * scaleX,
-        y: dragStartRef.current.centerY - dy * scaleY,
-      })
-    } else if (e.touches.length === 2) {
-      if (
-        pinchStartDistanceRef.current === null ||
-        pinchStartZoomRef.current === null ||
-        pinchStartMidpointRef.current === null ||
-        pinchStartMapCenterRef.current === null ||
-        !svgRef.current
-      ) return
-
-      const t1 = e.touches[0]
-      const t2 = e.touches[1]
+    const getTouchInfo = (touches: TouchList) => {
+      const t1 = touches[0]
+      const t2 = touches[1]
       const dx = t1.clientX - t2.clientX
       const dy = t1.clientY - t2.clientY
       const distance = Math.sqrt(dx * dx + dy * dy)
-
-      const ratio = distance / pinchStartDistanceRef.current
-      let newZoom = pinchStartZoomRef.current * ratio
-      newZoom = Math.max(0.7, Math.min(5.0, newZoom))
-
-      const svgRect = svgRef.current.getBoundingClientRect()
       const midpoint = {
         clientX: (t1.clientX + t2.clientX) / 2,
         clientY: (t1.clientY + t2.clientY) / 2,
       }
-
-      const deltaClientX = midpoint.clientX - pinchStartMidpointRef.current.clientX
-      const deltaClientY = midpoint.clientY - pinchStartMidpointRef.current.clientY
-
-      const currentW = 800 / newZoom
-      const currentH = 800 / newZoom
-      const scaleX = currentW / svgRect.width
-      const scaleY = currentH / svgRect.height
-
-      const clientX = midpoint.clientX - svgRect.left
-      const clientY = midpoint.clientY - svgRect.top
-      const pctX = clientX / svgRect.width
-      const pctY = clientY / svgRect.height
-
-      const startW = 800 / pinchStartZoomRef.current
-      const startH = 800 / pinchStartZoomRef.current
-      const startMinX = pinchStartMapCenterRef.current.x - startW / 2
-      const startMinY = pinchStartMapCenterRef.current.y - startH / 2
-      const mx = startMinX + pctX * startW
-      const my = startMinY + pctY * startH
-
-      const newWidth = 800 / newZoom
-      const newHeight = 800 / newZoom
-      const newMinX = mx - pctX * newWidth
-      const newMinY = my - pctY * newHeight
-
-      const adjustedMinX = newMinX - deltaClientX * scaleX
-      const adjustedMinY = newMinY - deltaClientY * scaleY
-
-      setCenter({
-        x: adjustedMinX + newWidth / 2,
-        y: adjustedMinY + newHeight / 2,
-      })
-
-      onZoomChange(newZoom)
+      return { distance, midpoint }
     }
-  }
 
-  const handleDragEnd = () => {
-    setIsDragging(false)
-    dragStartRef.current = null
-    pinchStartDistanceRef.current = null
-    pinchStartZoomRef.current = null
-    pinchStartMidpointRef.current = null
-    pinchStartMapCenterRef.current = null
-  }
+    const handleTouchStartNative = (e: globalThis.TouchEvent) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0]
+        didDragRef.current = false
+        setHoveredVenue(null)
+        dragStartRef.current = {
+          clientX: touch.clientX,
+          clientY: touch.clientY,
+          centerX: centerRef.current.x,
+          centerY: centerRef.current.y,
+        }
+        setIsDragging(true)
+        
+        pinchStartDistanceRef.current = null
+        pinchStartZoomRef.current = null
+        pinchStartMidpointRef.current = null
+        pinchStartMapCenterRef.current = null
+      } else if (e.touches.length === 2) {
+        e.preventDefault() // Block browser native viewport zoom
+        setIsDragging(false)
+        dragStartRef.current = null
+
+        const { distance, midpoint } = getTouchInfo(e.touches)
+        pinchStartDistanceRef.current = distance
+        pinchStartZoomRef.current = zoomRef.current
+        pinchStartMidpointRef.current = midpoint
+        pinchStartMapCenterRef.current = { ...centerRef.current }
+      }
+    }
+
+    const handleTouchMoveNative = (e: globalThis.TouchEvent) => {
+      if (e.touches.length === 1) {
+        if (!isDragging || !dragStartRef.current) return
+        const touch = e.touches[0]
+
+        const dx = touch.clientX - dragStartRef.current.clientX
+        const dy = touch.clientY - dragStartRef.current.clientY
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
+          didDragRef.current = true
+        }
+
+        const svgRect = svgEl.getBoundingClientRect()
+        const w = 800 / zoomRef.current
+        const h = 800 / zoomRef.current
+        const scaleX = w / svgRect.width
+        const scaleY = h / svgRect.height
+
+        setCenter({
+          x: dragStartRef.current.centerX - dx * scaleX,
+          y: dragStartRef.current.centerY - dy * scaleY,
+        })
+      } else if (e.touches.length === 2) {
+        e.preventDefault() // Block browser native viewport zoom
+        if (
+          pinchStartDistanceRef.current === null ||
+          pinchStartZoomRef.current === null ||
+          pinchStartMidpointRef.current === null ||
+          pinchStartMapCenterRef.current === null
+        ) return
+
+        const { distance, midpoint } = getTouchInfo(e.touches)
+
+        const ratio = distance / pinchStartDistanceRef.current
+        let newZoom = pinchStartZoomRef.current * ratio
+        newZoom = Math.max(0.7, Math.min(5.0, newZoom))
+
+        const svgRect = svgEl.getBoundingClientRect()
+
+        const deltaClientX = midpoint.clientX - pinchStartMidpointRef.current.clientX
+        const deltaClientY = midpoint.clientY - pinchStartMidpointRef.current.clientY
+
+        const currentW = 800 / newZoom
+        const currentH = 800 / newZoom
+        const scaleX = currentW / svgRect.width
+        const scaleY = currentH / svgRect.height
+
+        const clientX = midpoint.clientX - svgRect.left
+        const clientY = midpoint.clientY - svgRect.top
+        const pctX = clientX / svgRect.width
+        const pctY = clientY / svgRect.height
+
+        const startW = 800 / pinchStartZoomRef.current
+        const startH = 800 / pinchStartZoomRef.current
+        const startMinX = pinchStartMapCenterRef.current.x - startW / 2
+        const startMinY = pinchStartMapCenterRef.current.y - startH / 2
+        const mx = startMinX + pctX * startW
+        const my = startMinY + pctY * startH
+
+        const newWidth = 800 / newZoom
+        const newHeight = 800 / newZoom
+        const newMinX = mx - pctX * newWidth
+        const newMinY = my - pctY * newHeight
+
+        const adjustedMinX = newMinX - deltaClientX * scaleX
+        const adjustedMinY = newMinY - deltaClientY * scaleY
+
+        setCenter({
+          x: adjustedMinX + newWidth / 2,
+          y: adjustedMinY + newHeight / 2,
+        })
+
+        onZoomChange(newZoom)
+      }
+    }
+
+    const handleTouchEndNative = () => {
+      setIsDragging(false)
+      dragStartRef.current = null
+      pinchStartDistanceRef.current = null
+      pinchStartZoomRef.current = null
+      pinchStartMidpointRef.current = null
+      pinchStartMapCenterRef.current = null
+    }
+
+    svgEl.addEventListener('touchstart', handleTouchStartNative, { passive: false })
+    svgEl.addEventListener('touchmove', handleTouchMoveNative, { passive: false })
+    svgEl.addEventListener('touchend', handleTouchEndNative, { passive: true })
+    svgEl.addEventListener('touchcancel', handleTouchEndNative, { passive: true })
+
+    return () => {
+      svgEl.removeEventListener('touchstart', handleTouchStartNative)
+      svgEl.removeEventListener('touchmove', handleTouchMoveNative)
+      svgEl.removeEventListener('touchend', handleTouchEndNative)
+      svgEl.removeEventListener('touchcancel', handleTouchEndNative)
+    }
+  }, [isDragging, onZoomChange])
 
   const handleSvgClick = () => {
     if (!didDragRef.current) {
@@ -429,9 +452,6 @@ export function TaiwanMap({
         onMouseMove={handleMouseMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleDragEnd}
         style={{ '--map-zoom': displayZoom } as React.CSSProperties}
       >
         <defs>
