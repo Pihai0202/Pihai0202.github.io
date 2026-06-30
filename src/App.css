@@ -7788,9 +7788,15 @@ body.player-open .music-bar-toggle {
     display: none !important; /* Hide desktop weather overlay on mobile! */
   }
 
-  /* Hide zoom controls on mobile for clean map view */
+  /* Position zoom controls on mobile below the list button */
   .map-zoom-control.vertical {
-    display: none !important;
+    display: flex !important;
+    position: absolute;
+    top: 4.2rem !important;
+    right: 1rem !important;
+    left: auto !important;
+    bottom: auto !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   }
 
   /* Reposition list button to top-right */
