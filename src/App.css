@@ -2639,6 +2639,27 @@ body.player-open .music-bar-toggle {
   font-weight: 600;
 }
 
+.map-zoom-control.vertical .zoom-input {
+  width: 32px;
+  height: 20px;
+  font-family: inherit;
+  font-size: 0.65rem;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  text-align: center;
+  margin-top: 0.1rem;
+  outline: none;
+  font-weight: 600;
+  box-sizing: border-box;
+}
+
+.map-zoom-control.vertical .zoom-input:focus {
+  border-color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.05);
+}
+
 @media (max-width: 768px) {
   .map-zoom-control.vertical {
     top: auto;

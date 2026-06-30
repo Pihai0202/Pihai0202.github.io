@@ -265,6 +265,17 @@ function App() {
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isEditingZoom, setIsEditingZoom] = useState(false)
+  const [tempZoomInput, setTempZoomInput] = useState('')
+
+  const handleZoomInputSubmit = () => {
+    setIsEditingZoom(false)
+    const val = parseInt(tempZoomInput, 10)
+    if (!isNaN(val)) {
+      const clampedVal = Math.max(70, Math.min(500, val))
+      setZoom(clampedVal / 100)
+    }
+  }
 
   const [isVenuePanelExpanded, setIsVenuePanelExpanded] = useState(() => {
     return typeof window !== 'undefined' ? window.innerWidth > 768 : true
@@ -1251,7 +1262,35 @@ function App() {
               >
                 ⟲
               </button>
-              <span className="zoom-value">{Math.round(zoom * 100)}%</span>
+              {isEditingZoom ? (
+                <input
+                  type="text"
+                  className="zoom-input"
+                  value={tempZoomInput}
+                  onChange={(e) => setTempZoomInput(e.target.value.replace(/\D/g, ''))}
+                  onBlur={handleZoomInputSubmit}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleZoomInputSubmit()
+                    } else if (e.key === 'Escape') {
+                      setIsEditingZoom(false)
+                    }
+                  }}
+                  autoFocus
+                />
+              ) : (
+                <span
+                  className="zoom-value"
+                  onClick={() => {
+                    setTempZoomInput(String(Math.round(zoom * 100)))
+                    setIsEditingZoom(true)
+                  }}
+                  title="點擊輸入自訂比例"
+                  style={{ cursor: 'pointer' }}
+                >
+                  {Math.round(zoom * 100)}%
+                </span>
+              )}
             </div>
 
             <div className="map-legend">
