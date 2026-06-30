@@ -629,6 +629,8 @@ export function TransitInfoBoard() {
           if (!depTime || !arrTime) return []
           const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
           const isDeparted = depMinutes < nowMinutes
+          if (isDeparted) return [] // 排除已駛離的班次，僅保留即將進站/尚未出發的班次
+
           const trainNo = item.DailyTrainInfo?.TrainNo ?? '--'
           const trainType = getHsrTrainType(trainNo)
 
@@ -639,7 +641,7 @@ export function TransitInfoBoard() {
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime),
             isExpress: trainType === '直達',
-            status: isDeparted ? '已駛離' : '🟢',
+            status: '🟢',
           }]
         })
 
@@ -649,7 +651,7 @@ export function TransitInfoBoard() {
       setQueryResults(results)
       setTdxActive(true)
       if (results.length === 0) {
-        setTrainError('今日班表查無此區間的班次，請改查其他站點或前往官方查詢。')
+        setTrainError('今日該區間已無尚未出發的車次，請改查其他站點或前往官方查詢。')
       }
     } catch (e) {
       console.error('Train search error:', e)
