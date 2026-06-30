@@ -213,12 +213,26 @@ export function GuideModal({ onClose }: GuideModalProps) {
                   style={{ objectFit: 'contain', padding: '10px' }}
                 />
               )}
-              {currentStep > 4 && (
+              {currentStep === 5 && (
+                <div className="guide-step4-images">
+                  <img 
+                    src={`${import.meta.env.BASE_URL}guide_img6a.png`} 
+                    alt="撰寫觀後心得" 
+                    className="guide-modal-image-step4"
+                  />
+                  <img 
+                    src={`${import.meta.env.BASE_URL}guide_img6b.png`} 
+                    alt="新增演唱會紀錄" 
+                    className="guide-modal-image-step4"
+                  />
+                </div>
+              )}
+              {currentStep === 6 && (
                 <img 
-                  src={`${import.meta.env.BASE_URL}guide_screenshot.png`} 
-                  alt="台灣演唱會地圖介面導覽" 
+                  src={`${import.meta.env.BASE_URL}guide_img7.png`} 
+                  alt="活動行事曆與個人足跡" 
                   className="guide-modal-image"
-                  style={{ objectFit: 'cover' }}
+                  style={{ objectFit: 'contain', padding: '10px' }}
                 />
               )}
               <div className="guide-image-overlay">
