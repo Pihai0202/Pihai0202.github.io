@@ -9545,14 +9545,8 @@ select:focus {
 
 .metro-results-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 1fr;
   gap: 1rem;
-}
-
-@media (max-width: 768px) {
-  .metro-results-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .metro-column {
@@ -9652,6 +9646,10 @@ select:focus {
 .metro-live-destination {
   font-size: 0.78rem;
   color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.5rem;
 }
 
 .metro-live-destination strong {
@@ -9663,6 +9661,8 @@ select:focus {
   font-weight: 700;
   padding: 0.15rem 0.45rem;
   border-radius: 4px;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .metro-live-eta.eta-approaching {
