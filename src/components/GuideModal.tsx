@@ -6,7 +6,8 @@ import {
   MusicIcon,
   SunIcon,
   CloseIcon,
-  SparklesIcon
+  SparklesIcon,
+  PlusIcon
 } from './SvgIcon'
 
 // Custom Train icon if not exported from SvgIcon
@@ -121,6 +122,17 @@ export function GuideModal({ onClose }: GuideModalProps) {
       ]
     },
     {
+      title: '記錄參戰回憶與自訂活動',
+      subtitle: 'Add Concert Record',
+      icon: <PlusIcon size="2rem" />,
+      description: '在探索活動時，一鍵記錄您熱血的參戰回憶，自訂您的演唱會小本本。',
+      details: [
+        '記錄欄位：可登錄演出者、演唱會名稱、日期、座位區域與個人心得筆記。',
+        '音樂連結綁定：支援搜尋歌手、專輯或歌曲，並在首頁播放器一鍵加載 Spotify 歌曲。',
+        '雲端備份同步：登入後可隨時備份並在不同裝置間同步您的所有參戰歷史紀錄。'
+      ]
+    },
+    {
       title: '雙模式行事曆與個人足跡統計',
       subtitle: 'CalendarView & ProfilePage statistics',
       icon: <CalendarIcon size="2rem" />,
@@ -214,23 +226,25 @@ export function GuideModal({ onClose }: GuideModalProps) {
                 />
               )}
               {currentStep === 5 && (
-                <div className="guide-step4-images">
-                  <img 
-                    src={`${import.meta.env.BASE_URL}guide_img6a.png`} 
-                    alt="撰寫觀後心得" 
-                    className="guide-modal-image-step4"
-                  />
-                  <img 
-                    src={`${import.meta.env.BASE_URL}guide_img6b.png`} 
-                    alt="新增演唱會紀錄" 
-                    className="guide-modal-image-step4"
-                  />
-                </div>
+                <img 
+                  src={`${import.meta.env.BASE_URL}guide_img6a.png`} 
+                  alt="社群心得與日記分享看板" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
               )}
               {currentStep === 6 && (
                 <img 
+                  src={`${import.meta.env.BASE_URL}guide_img6b.png`} 
+                  alt="記錄參戰回憶與自訂活動" 
+                  className="guide-modal-image"
+                  style={{ objectFit: 'contain', padding: '10px' }}
+                />
+              )}
+              {currentStep === 7 && (
+                <img 
                   src={`${import.meta.env.BASE_URL}guide_img7.png`} 
-                  alt="活動行事曆與個人足跡" 
+                  alt="雙模式行事曆與個人足跡統計" 
                   className="guide-modal-image"
                   style={{ objectFit: 'contain', padding: '10px' }}
                 />
