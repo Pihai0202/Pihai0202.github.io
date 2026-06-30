@@ -50,6 +50,7 @@ interface GuideStep {
 
 export function GuideModal({ onClose }: GuideModalProps) {
   const [currentStep, setCurrentStep] = useState(0)
+  const [showScreenshotMobile, setShowScreenshotMobile] = useState(false)
 
   const steps: GuideStep[] = [
     {
@@ -178,8 +179,8 @@ export function GuideModal({ onClose }: GuideModalProps) {
         </button>
 
         <div className="guide-modal-layout">
-          {/* Left Column: Visual Showcase */}
-          <div className="guide-modal-visual">
+          {/* Left Column: Visual Showcase (desktop only) */}
+          <div className="guide-modal-visual desktop-only-visual">
             <div className="guide-visual-header">
               <span className="sparkle-spark"><SparklesIcon size="1.2rem" /></span>
               <span>台灣演唱會地圖 ─ 功能特色指南</span>
@@ -267,6 +268,15 @@ export function GuideModal({ onClose }: GuideModalProps) {
               </div>
             </div>
 
+            {/* Mobile screenshot view trigger */}
+            <button 
+              type="button" 
+              className="guide-mobile-screenshot-trigger" 
+              onClick={() => setShowScreenshotMobile(true)}
+            >
+              🖼️ 檢視功能畫面截圖
+            </button>
+
             <p className="guide-step-desc">{step.description}</p>
 
             <ul className="guide-step-details">
@@ -321,6 +331,35 @@ export function GuideModal({ onClose }: GuideModalProps) {
           </div>
         </div>
       </div>
+
+      {/* Lightbox for Mobile Screenshot Popup */}
+      {showScreenshotMobile && (
+        <div className="guide-screenshot-lightbox" onClick={() => setShowScreenshotMobile(false)}>
+          <div className="guide-lightbox-content" onClick={(e) => e.stopPropagation()}>
+            <button 
+              className="guide-lightbox-close" 
+              onClick={() => setShowScreenshotMobile(false)}
+              type="button"
+              aria-label="關閉截圖"
+            >
+              <CloseIcon size="1.2rem" />
+            </button>
+            <div className="guide-lightbox-header">
+              <span>{step.title} ─ 畫面截圖</span>
+            </div>
+            <div className="guide-lightbox-body">
+              {currentStep === 0 && <img src={`${import.meta.env.BASE_URL}guide_img1.png`} alt={step.title} />}
+              {currentStep === 1 && <img src={`${import.meta.env.BASE_URL}guide_img2.png`} alt={step.title} />}
+              {currentStep === 2 && <img src={`${import.meta.env.BASE_URL}guide_img3.png`} alt={step.title} />}
+              {currentStep === 3 && <img src={`${import.meta.env.BASE_URL}guide_img4.png`} alt={step.title} />}
+              {currentStep === 4 && <img src={`${import.meta.env.BASE_URL}guide_img5.png`} alt={step.title} />}
+              {currentStep === 5 && <img src={`${import.meta.env.BASE_URL}guide_img6a.png`} alt={step.title} />}
+              {currentStep === 6 && <img src={`${import.meta.env.BASE_URL}guide_img6b.png`} alt={step.title} />}
+              {currentStep === 7 && <img src={`${import.meta.env.BASE_URL}guide_img7.png`} alt={step.title} />}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
