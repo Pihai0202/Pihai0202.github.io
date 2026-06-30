@@ -4,6 +4,11 @@ html {
 
 body {
   margin: 0;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+button, input, select, textarea {
+  font-family: inherit;
 }
 
 #root {

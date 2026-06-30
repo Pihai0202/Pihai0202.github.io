@@ -449,7 +449,7 @@ export function ProfilePage({
             <button className="modal-close" type="button" onClick={() => setIsAvatarModalOpen(false)}>
               ✕
             </button>
-            <h2 style={{ fontFamily: '"Microsoft JhengHei", "微軟正黑體", sans-serif', fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1rem' }}>
+            <h2 style={{ fontFamily: '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif', fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1rem' }}>
               自訂個人頭像
             </h2>
             

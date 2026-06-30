@@ -85,7 +85,7 @@ html {
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   min-height: 100vh;
   overflow-x: hidden;
   line-height: 1.5;
@@ -277,7 +277,7 @@ header {
 }
 
 .logo-text span {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   color: var(--muted);
   letter-spacing: 0.2em;
@@ -296,7 +296,7 @@ header {
 }
 
 .stat-num {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.4rem;
   font-weight: 700;
   color: var(--gold);
@@ -498,7 +498,7 @@ svg#taiwan-map.dragging {
 }
 
 .venue-label {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 11px;
   fill: var(--text);
   pointer-events: auto;
@@ -613,7 +613,7 @@ svg#taiwan-map.dragging {
 }
 
 .venue-city {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   color: var(--accent);
   letter-spacing: 0.2em;
@@ -624,7 +624,7 @@ svg#taiwan-map.dragging {
   background: none;
   border: none;
   color: var(--muted);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -651,7 +651,7 @@ svg#taiwan-map.dragging {
   background: none;
   border: none;
   color: var(--muted);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   letter-spacing: 0.05em;
   cursor: pointer;
@@ -679,7 +679,7 @@ svg#taiwan-map.dragging {
 }
 
 .venue-count {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.75rem;
   padding: 0.25rem 0.6rem;
   background: rgba(var(--accent-rgb), 0.15);
@@ -749,7 +749,7 @@ svg#taiwan-map.dragging {
 }
 
 .section-title {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.65rem;
   letter-spacing: 0.25em;
   color: var(--muted);
@@ -802,7 +802,7 @@ svg#taiwan-map.dragging {
 }
 
 .concert-date {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   color: var(--gold);
   white-space: nowrap;
@@ -855,7 +855,7 @@ svg#taiwan-map.dragging {
   justify-content: center;
   font-size: 0.7rem;
   color: var(--muted);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 .delete-btn {
@@ -945,7 +945,7 @@ svg#taiwan-map.dragging {
 
 .modal-venue-name,
 .all-modal-kicker {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.75rem;
   color: var(--accent);
   margin-bottom: 1.5rem;
@@ -971,7 +971,7 @@ svg#taiwan-map.dragging {
   color: var(--muted);
   text-transform: uppercase;
   margin-bottom: 0.4rem;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 .form-group input,
@@ -1122,7 +1122,7 @@ svg#taiwan-map.dragging {
 }
 
 .detail-tag {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.7rem;
   padding: 0.2rem 0.6rem;
   border-radius: 4px;
@@ -1293,7 +1293,7 @@ svg#taiwan-map.dragging {
   margin: -0.4rem 0 0.7rem;
   padding: 0 0.5rem;
   color: var(--muted);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.66rem;
 }
 
@@ -1303,7 +1303,7 @@ svg#taiwan-map.dragging {
   border: 1px solid rgba(var(--gold-rgb), 0.28);
   border-radius: 6px;
   color: var(--gold);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.68rem;
   padding: 0.35rem 0.55rem;
   white-space: nowrap;
@@ -1365,7 +1365,7 @@ svg#taiwan-map.dragging {
   border: 1px solid rgba(var(--gold-rgb), 0.22);
   border-radius: 6px;
   color: var(--gold);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.72rem;
   font-weight: 600;
   transition: border-color 0.2s, background 0.2s, transform 0.2s;
@@ -1418,7 +1418,7 @@ svg#taiwan-map.dragging {
   justify-content: center;
   background: var(--surface);
   color: var(--gold);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.72rem;
   letter-spacing: 0.12em;
 }
@@ -1432,7 +1432,7 @@ svg#taiwan-map.dragging {
   justify-content: space-between;
   gap: 0.7rem;
   color: var(--gold);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.66rem;
   margin-bottom: 0.25rem;
 }
@@ -1467,7 +1467,7 @@ svg#taiwan-map.dragging {
   border: 1px solid rgba(var(--teal-rgb), 0.25);
   border-radius: 4px;
   color: var(--teal);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.62rem;
   padding: 0.15rem 0.35rem;
   text-decoration: none;
@@ -1518,7 +1518,7 @@ svg#taiwan-map.dragging {
   border-radius: 50px;
   padding: 0.6rem 1.1rem;
   color: #000;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.75rem;
   font-weight: 700;
   display: flex;
@@ -1627,7 +1627,7 @@ body.player-open .music-bar-toggle {
   border-radius: 8px;
   padding: 0.65rem 1.1rem;
   color: #000;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.8rem;
   font-weight: 700;
   transition: background 0.2s;
@@ -1681,7 +1681,7 @@ body.player-open .music-bar-toggle {
   border-radius: 6px;
   color: var(--muted);
   padding: 0.4rem;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.68rem;
   transition: all 0.2s;
 }
@@ -1758,7 +1758,7 @@ body.player-open .music-bar-toggle {
 }
 
 .sp-result-type {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.62rem;
   padding: 0.2rem 0.45rem;
   border-radius: 4px;
@@ -1823,7 +1823,7 @@ body.player-open .music-bar-toggle {
   background: #1db954;
   color: #000;
   border-radius: 20px;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   text-decoration: none;
@@ -2129,7 +2129,7 @@ body.player-open .music-bar-toggle {
 }
 
 .transit-badge {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.2rem 0.5rem;
@@ -2174,7 +2174,7 @@ body.player-open .music-bar-toggle {
 }
 
 .transit-updated {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.65rem;
   color: var(--muted);
   opacity: 0.8;
@@ -2662,7 +2662,7 @@ body.player-open .music-bar-toggle {
   padding: 10px 14px;
   color: var(--text);
   box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   min-width: 160px;
   pointer-events: none;
   transform: translate(0, 0);
@@ -2773,7 +2773,7 @@ body.player-open .music-bar-toggle {
 }
 
 .map-zoom-control.vertical .zoom-value {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.65rem;
   color: var(--muted);
   text-align: center;
@@ -2838,7 +2838,7 @@ body.player-open .music-bar-toggle {
   border-radius: 4px;
   cursor: pointer;
   transition: all 0.2s;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 .notes-tab-btn.active {
@@ -3016,7 +3016,7 @@ body.player-open .music-bar-toggle {
   border: 1px solid var(--border);
   padding: 0.1rem 0.3rem;
   border-radius: 4px;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.8rem;
   color: var(--accent);
 }
@@ -3150,7 +3150,7 @@ body.player-open .music-bar-toggle {
 }
 
 .share-board-title {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 2.2rem;
   font-weight: 900;
   color: var(--text);
@@ -3163,7 +3163,7 @@ body.player-open .music-bar-toggle {
 }
 
 .share-board-subtitle {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.8rem;
   color: var(--gold);
   letter-spacing: 0.25em;
@@ -3294,7 +3294,7 @@ body.player-open .music-bar-toggle {
   background: rgba(var(--accent-rgb), 0.12);
   border: 1px solid rgba(var(--accent-rgb), 0.25);
   color: var(--accent);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.72rem;
   font-weight: 700;
   padding: 0.25rem 0.65rem;
@@ -3354,13 +3354,13 @@ body.player-open .music-bar-toggle {
 }
 
 .card-like-btn .like-count {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.78rem;
   font-weight: 700;
 }
 
 .shared-card-title {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.15rem;
   font-weight: 800;
   color: var(--text);
@@ -3438,7 +3438,7 @@ body.player-open .music-bar-toggle {
 }
 
 .shared-card-footer .post-date {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   opacity: 0.8;
 }
 
@@ -3448,7 +3448,7 @@ body.player-open .music-bar-toggle {
 }
 
 .publish-modal h2 {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.3rem;
   margin-bottom: 0.8rem;
   color: var(--gold);
@@ -3683,7 +3683,7 @@ body.player-open .music-bar-toggle {
 }
 
 .login-header h2 {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.6rem;
   font-weight: 800;
   color: var(--text);
@@ -3920,7 +3920,7 @@ body.player-open .music-bar-toggle {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 1.2rem;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -4035,7 +4035,7 @@ body.player-open .music-bar-toggle {
 }
 
 .temp-val {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.8rem;
   font-weight: 700;
   color: var(--text);
@@ -4065,7 +4065,7 @@ body.player-open .music-bar-toggle {
 .detail-item .value {
   color: var(--text);
   font-weight: 600;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 /* AQI Section */
@@ -4131,7 +4131,7 @@ body.player-open .music-bar-toggle {
 
 .aqi-particles strong {
   color: var(--text);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 /* Warnings and Suggestions section */
@@ -4558,7 +4558,7 @@ body.player-open .music-bar-toggle {
   }
 
   .sidebar-nav-title {
-    font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     font-size: 0.85rem;
     font-weight: 700;
     color: var(--muted);
@@ -4634,7 +4634,7 @@ body.player-open .music-bar-toggle {
     background: var(--accent);
     color: white;
     font-size: 0.65rem;
-    font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     font-weight: 700;
     padding: 0.15rem 0.45rem;
     border-radius: 10px;
@@ -4745,7 +4745,7 @@ body.player-open .music-bar-toggle {
   font-size: 0.72rem;
   font-weight: 700;
   color: var(--text);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 /* ==========================================================================
@@ -5362,7 +5362,7 @@ body.player-open .music-bar-toggle {
 .comment-date {
   font-size: 0.68rem;
   color: var(--muted);
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 .comment-text {
@@ -5809,7 +5809,7 @@ body.player-open .music-bar-toggle {
 }
 
 .profile-concert-table td.mono-text {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.8rem;
 }
 
@@ -5890,7 +5890,7 @@ body.player-open .music-bar-toggle {
 
 .review-card-likes {
   font-size: 0.72rem;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   color: #ff5a5f;
   background: rgba(255, 90, 95, 0.08);
   padding: 0.15rem 0.4rem;
@@ -6127,11 +6127,11 @@ body.player-open .music-bar-toggle {
 .train-no {
   color: var(--text);
   font-weight: 600;
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
 .train-time-dep, .train-time-arr {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-weight: 700;
   color: var(--text);
 }
@@ -6701,7 +6701,7 @@ body.player-open .music-bar-toggle {
     background: var(--accent);
     color: white;
     font-size: 0.6rem;
-    font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
     font-weight: 700;
     padding: 0.15rem 0.35rem;
     border-radius: 8px;
@@ -7462,7 +7462,7 @@ body.player-open .music-bar-toggle {
 }
 
 .card-date-badge .date-text {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
@@ -8434,7 +8434,7 @@ body.player-open .music-bar-toggle {
 }
 
 .shuangbei-cluster-group .cluster-label {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 10px;
   font-weight: bold;
   fill: var(--map-label, #8c7869);
@@ -9071,7 +9071,7 @@ body.player-open .music-bar-toggle {
 }
 
 .detail-modal-title {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--text);
@@ -9125,7 +9125,7 @@ body.player-open .music-bar-toggle {
 }
 
 .replies-section h3 {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.15rem;
   color: var(--gold);
   margin-bottom: 1rem;
@@ -9200,7 +9200,7 @@ body.player-open .music-bar-toggle {
 }
 
 .reply-form-container h4 {
-  font-family: "Microsoft JhengHei", "微軟正黑體", sans-serif;
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 1.05rem;
   color: var(--text);
   margin-bottom: 1rem;
