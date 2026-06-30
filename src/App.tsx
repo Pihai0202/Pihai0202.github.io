@@ -48,7 +48,10 @@ import {
   TaiwanIcon,
   KeyIcon,
   LogoutIcon,
-  ClipboardIcon
+  ClipboardIcon,
+  ChevronDownIcon,
+  ChevronRightIcon,
+  ChevronLeftIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -1163,7 +1166,9 @@ function App() {
                           >
                             <span className="region-title">{region}</span>
                             <span className="region-count">{list.length}</span>
-                            <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
+                            <span className="region-arrow">
+                              {isExpanded ? <ChevronDownIcon size="1.2em" /> : <ChevronRightIcon size="1.2em" />}
+                            </span>
                           </button>
                           {isExpanded && (
                             <div className="region-group-list">
@@ -1429,7 +1434,9 @@ function App() {
                                   >
                                     <span className="region-title">{region}</span>
                                     <span className="region-count">{list.length}</span>
-                                    <span className="region-arrow">{isExpanded ? '▼' : '▶'}</span>
+                                    <span className="region-arrow">
+                                      {isExpanded ? <ChevronDownIcon size="1.2em" /> : <ChevronRightIcon size="1.2em" />}
+                                    </span>
                                   </button>
                                   {isExpanded && (
                                     <div className="region-group-list">
@@ -1491,7 +1498,7 @@ function App() {
               onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
               title={isSidebarCollapsed ? "展開側邊欄" : "收合側邊欄"}
             >
-              {isSidebarCollapsed ? '◀' : '▶'}
+              {isSidebarCollapsed ? <ChevronRightIcon size="1.2em" /> : <ChevronLeftIcon size="1.2em" />}
             </button>
           </section>
           <aside className="sidebar">
