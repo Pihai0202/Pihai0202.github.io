@@ -375,6 +375,27 @@ function App() {
     }
   }, [])
 
+  // Toggle .modal-open class on body to freeze background page scroll on mobile
+  const isAnyModalOpen = !!(
+    isAddModalOpen ||
+    detailConcertId ||
+    selectedTicket ||
+    isSuspensionModalOpen ||
+    isAllModalOpen ||
+    isPublishModalOpen
+  )
+
+  useEffect(() => {
+    if (isAnyModalOpen) {
+      document.body.classList.add('modal-open')
+    } else {
+      document.body.classList.remove('modal-open')
+    }
+    return () => {
+      document.body.classList.remove('modal-open')
+    }
+  }, [isAnyModalOpen])
+
   const handleDrawerHeaderClick = () => {
     if (dragMoved.current) return
     setMobileDrawerState((current) => {

@@ -93,6 +93,13 @@ body {
   overscroll-behavior-y: contain; /* Prevent mobile pull-to-refresh globally */
 }
 
+body.modal-open {
+  overflow: hidden !important;
+  height: 100vh !important;
+  width: 100% !important;
+  position: fixed !important;
+}
+
 body::before {
   content: '';
   position: fixed;
@@ -877,6 +884,7 @@ svg#taiwan-map.dragging {
   align-items: center;
   justify-content: center;
   backdrop-filter: blur(4px);
+  overscroll-behavior: contain; /* Prevent mobile scroll chaining */
 }
 
 .modal {
@@ -890,6 +898,7 @@ svg#taiwan-map.dragging {
   padding: 2rem;
   position: relative;
   animation: slide-up 0.3s ease;
+  overscroll-behavior: contain; /* Prevent mobile scroll chaining */
 }
 
 .all-modal {
