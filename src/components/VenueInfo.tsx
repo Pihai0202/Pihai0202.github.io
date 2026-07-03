@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import type { Venue } from '../types'
+import type { Venue, RemoteConcert } from '../types'
 import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon } from './SvgIcon'
 
@@ -8,6 +8,8 @@ interface VenueInfoProps {
   concertCount: number
   onAddConcert: () => void
   onClearVenue: () => void
+  todayConcerts?: RemoteConcert[]
+  onSelectTicket?: (ticket: RemoteConcert) => void
 }
 
 export function VenueInfo({
@@ -15,6 +17,8 @@ export function VenueInfo({
   concertCount,
   onAddConcert,
   onClearVenue,
+  todayConcerts = [],
+  onSelectTicket,
 }: VenueInfoProps) {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [showMap, setShowMap] = useState(false)
@@ -73,6 +77,50 @@ export function VenueInfo({
       {!isCollapsed && (
         <>
           <div className="venue-capacity">容量：{venue.capacity} 人</div>
+
+          {/* 今日演出 */}
+          <div className="venue-today-section">
+            <div className="venue-today-title">
+              <span className="live-pulse-dot"></span>
+              今日演出
+            </div>
+            {todayConcerts.length > 0 ? (
+              <div className="venue-today-list">
+                {todayConcerts.map((concert) => (
+                  <div
+                    key={concert.id}
+                    className="venue-today-item"
+                    style={{ cursor: 'pointer' }}
+                    onClick={() => onSelectTicket?.(concert)}
+                  >
+                    <div className="venue-today-item-header">
+                      <span className="venue-today-source">{concert.source}</span>
+                      {concert.price && <span className="venue-today-price">{concert.price}</span>}
+                    </div>
+                    <div className="venue-today-name">{concert.name}</div>
+                    {concert.ticket_links && concert.ticket_links.length > 0 && (
+                      <div className="venue-today-links">
+                        {concert.ticket_links.slice(0, 2).map((link) => (
+                          <a
+                            key={`${concert.id}-${link.platform}`}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="venue-today-link-btn"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {link.name}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="venue-today-empty">今日無演出活動</div>
+            )}
+          </div>
 
           {venue.address && (
             <div className="venue-address">

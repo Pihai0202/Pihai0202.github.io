@@ -10487,6 +10487,110 @@ select:focus {
   to { transform: scale(1); opacity: 1; }
 }
 
+/* VenueInfo Today's Performances Section */
+.venue-today-section {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(var(--surface-rgb), 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+}
+
+.venue-today-title {
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--gold);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.venue-today-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.venue-today-item {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.venue-today-item:hover {
+  background: rgba(var(--accent-rgb), 0.05);
+  border-color: rgba(var(--accent-rgb), 0.2);
+  transform: translateY(-1px);
+}
+
+.venue-today-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.35rem;
+}
+
+.venue-today-source {
+  font-size: 0.7rem;
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.1);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.venue-today-price {
+  font-size: 0.7rem;
+  color: var(--muted);
+}
+
+.venue-today-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+  margin-bottom: 0.5rem;
+}
+
+.venue-today-links {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.venue-today-link-btn {
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 0.7rem;
+  padding: 0.25rem 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--text);
+  text-decoration: none;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+}
+
+.venue-today-link-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.venue-today-empty {
+  font-size: 0.8rem;
+  color: var(--muted);
+  text-align: center;
+  padding: 0.5rem 0;
+}
+
 
 
 
