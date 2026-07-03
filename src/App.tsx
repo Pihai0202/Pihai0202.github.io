@@ -52,7 +52,9 @@ import {
   ClipboardIcon,
   ChevronDownIcon,
   ChevronRightIcon,
-  ChevronLeftIcon
+  ChevronLeftIcon,
+  TicketIcon,
+  TrainIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -270,6 +272,26 @@ function App() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isEditingZoom, setIsEditingZoom] = useState(false)
   const [tempZoomInput, setTempZoomInput] = useState('')
+
+  const [isMobile, setIsMobile] = useState(() => typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
+  const [sidebarTab, setSidebarTab] = useState<'venue' | 'tickets' | 'transit'>('tickets')
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    if (selectedVenueId) {
+      setSidebarTab('venue')
+    } else {
+      setSidebarTab('tickets')
+    }
+  }, [selectedVenueId])
 
   const handleZoomInputSubmit = () => {
     setIsEditingZoom(false)
@@ -1630,60 +1652,136 @@ function App() {
             </button>
           </section>
           <aside className="sidebar">
-            {mobileTab !== 'search' && (
-              <VenueInfo
-                key={selectedVenue?.id ?? 'empty'}
-                venue={selectedVenue}
-                concertCount={selectedVenueConcerts.length}
-                onAddConcert={openAddModal}
-                onClearVenue={() => setSelectedVenueId(null)}
-                todayConcerts={selectedVenueTodayConcerts}
-                onSelectTicket={setSelectedTicket}
-              />
-            )}
-            <div className="concert-list-area">
-              {mobileTab === 'search' && (
-                <div className="mobile-search-bar">
-                  <span className="search-icon"><SearchIcon /></span>
-                  <input
-                    type="text"
-                    placeholder="搜尋歌手、售票或場館..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
+            {isMobile ? (
+              <>
+                {mobileTab !== 'search' && (
+                  <VenueInfo
+                    key={selectedVenue?.id ?? 'empty'}
+                    venue={selectedVenue}
+                    concertCount={selectedVenueConcerts.length}
+                    onAddConcert={openAddModal}
+                    onClearVenue={() => setSelectedVenueId(null)}
+                    todayConcerts={selectedVenueTodayConcerts}
+                    onSelectTicket={setSelectedTicket}
                   />
-                  {searchQuery && (
+                )}
+                <div className="concert-list-area">
+                  {mobileTab === 'search' && (
+                    <div className="mobile-search-bar">
+                      <span className="search-icon"><SearchIcon /></span>
+                      <input
+                        type="text"
+                        placeholder="搜尋歌手、售票或場館..."
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                      />
+                      {searchQuery && (
+                        <button
+                          className="search-clear-btn"
+                          type="button"
+                          onClick={() => setSearchQuery('')}
+                        >
+                          <CloseIcon />
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {mobileTab !== 'search' && <TransitInfoBoard />}
+                  <UpcomingConcerts
+                    concerts={filteredRemoteConcerts}
+                    status={remoteStatus}
+                    updatedAt={remoteUpdatedAt}
+                    isRefreshing={isRemoteRefreshing}
+                    onRefresh={loadRemoteConcerts}
+                    searchQuery={searchQuery}
+                    hasSelectedVenue={!!selectedVenueId}
+                    onClearVenue={() => setSelectedVenueId(null)}
+                    onSelectTicket={setSelectedTicket}
+                    categoryFilter={categoryFilter}
+                    onCategoryChange={setCategoryFilter}
+                    categoryCounts={categoryCounts}
+                  />
+                  <ConcertList
+                    concerts={selectedVenueConcerts}
+                    hasSelectedVenue={Boolean(selectedVenue)}
+                    onOpenDetail={openConcertDetail}
+                    onDelete={deleteConcert}
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="sidebar-tabs">
+                  {selectedVenue && (
                     <button
-                      className="search-clear-btn"
+                      className={`sidebar-tab-btn${sidebarTab === 'venue' ? ' active' : ''}`}
                       type="button"
-                      onClick={() => setSearchQuery('')}
+                      onClick={() => setSidebarTab('venue')}
                     >
-                      <CloseIcon />
+                      <MapIcon size="1.1em" />
+                      場館資訊
                     </button>
                   )}
+                  <button
+                    className={`sidebar-tab-btn${sidebarTab === 'tickets' ? ' active' : ''}`}
+                    type="button"
+                    onClick={() => setSidebarTab('tickets')}
+                  >
+                    <TicketIcon size="1.1em" />
+                    近期售票
+                  </button>
+                  <button
+                    className={`sidebar-tab-btn${sidebarTab === 'transit' ? ' active' : ''}`}
+                    type="button"
+                    onClick={() => setSidebarTab('transit')}
+                  >
+                    <TrainIcon size="1.1em" />
+                    交通動態
+                  </button>
                 </div>
-              )}
-              {mobileTab !== 'search' && <TransitInfoBoard />}
-              <UpcomingConcerts
-                concerts={filteredRemoteConcerts}
-                status={remoteStatus}
-                updatedAt={remoteUpdatedAt}
-                isRefreshing={isRemoteRefreshing}
-                onRefresh={loadRemoteConcerts}
-                searchQuery={searchQuery}
-                hasSelectedVenue={!!selectedVenueId}
-                onClearVenue={() => setSelectedVenueId(null)}
-                onSelectTicket={setSelectedTicket}
-                categoryFilter={categoryFilter}
-                onCategoryChange={setCategoryFilter}
-                categoryCounts={categoryCounts}
-              />
-              <ConcertList
-                concerts={selectedVenueConcerts}
-                hasSelectedVenue={Boolean(selectedVenue)}
-                onOpenDetail={openConcertDetail}
-                onDelete={deleteConcert}
-              />
-            </div>
+
+                <div className="concert-list-area">
+                  {sidebarTab === 'venue' && selectedVenue && (
+                    <VenueInfo
+                      key={selectedVenue.id}
+                      venue={selectedVenue}
+                      concertCount={selectedVenueConcerts.length}
+                      onAddConcert={openAddModal}
+                      onClearVenue={() => setSelectedVenueId(null)}
+                      todayConcerts={selectedVenueTodayConcerts}
+                      onSelectTicket={setSelectedTicket}
+                    />
+                  )}
+
+                  {sidebarTab === 'transit' && <TransitInfoBoard />}
+
+                  {sidebarTab === 'tickets' && (
+                    <>
+                      <UpcomingConcerts
+                        concerts={filteredRemoteConcerts}
+                        status={remoteStatus}
+                        updatedAt={remoteUpdatedAt}
+                        isRefreshing={isRemoteRefreshing}
+                        onRefresh={loadRemoteConcerts}
+                        searchQuery={searchQuery}
+                        hasSelectedVenue={!!selectedVenueId}
+                        onClearVenue={() => setSelectedVenueId(null)}
+                        onSelectTicket={setSelectedTicket}
+                        categoryFilter={categoryFilter}
+                        onCategoryChange={setCategoryFilter}
+                        categoryCounts={categoryCounts}
+                      />
+                      <ConcertList
+                        concerts={selectedVenueConcerts}
+                        hasSelectedVenue={Boolean(selectedVenue)}
+                        onOpenDetail={openConcertDetail}
+                        onDelete={deleteConcert}
+                      />
+                    </>
+                  )}
+                </div>
+              </>
+            )}
           </aside>
         </main>
       ) : view === 'calendar' ? (
