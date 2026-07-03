@@ -1824,23 +1824,45 @@ def main():
 
     # 2. 拓元售票 & 添翼售票
     print("→ 爬取拓元售票 Tixcraft...", file=sys.stderr)
-    events = scrape_tixcraft("https://tixcraft.com")
-    print(f"  拓元得到 {len(events)} 筆", file=sys.stderr)
-    
+    tixcraft_events = []
+    try:
+        tixcraft_events = scrape_tixcraft("https://tixcraft.com")
+        print(f"  拓元得到 {len(tixcraft_events)} 筆", file=sys.stderr)
+    except Exception as e:
+        print(f"  ⚠ 爬取拓元售票失敗: {e}", file=sys.stderr)
+
+    if not tixcraft_events:
+        old_tixcraft = [
+            ev for ev in existing_events 
+            if ev.get("source") == "拓元售票" 
+            and "teamear.tixcraft.com" not in ev.get("url", "")
+            and ev.get("date", "") >= today_str()
+        ]
+        if old_tixcraft:
+            print(f"  ⚠ 拓元爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
+            tixcraft_events = old_tixcraft
+
     print("→ 爬取添翼售票 teamear.tixcraft...", file=sys.stderr)
+    teamear_events = []
     try:
         teamear_events = scrape_tixcraft("https://teamear.tixcraft.com")
         print(f"  添翼得到 {len(teamear_events)} 筆", file=sys.stderr)
-        events.extend(teamear_events)
     except Exception as e:
         print(f"  ⚠ 爬取添翼售票失敗: {e}", file=sys.stderr)
 
-    if not events:
-        old_tixcraft = [ev for ev in existing_events if ev.get("source") == "拓元售票" and ev.get("date", "") >= today_str()]
-        if old_tixcraft:
-            print(f"  ⚠ 拓元/添翼爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
-            events = old_tixcraft
-    all_events.extend(events)
+    if not teamear_events:
+        old_teamear = [
+            ev for ev in existing_events 
+            if ev.get("source") == "拓元售票" 
+            and "teamear.tixcraft.com" in ev.get("url", "")
+            and ev.get("date", "") >= today_str()
+        ]
+        if old_teamear:
+            print(f"  ⚠ 添翼爬取為 0 筆，從舊檔案恢復 {len(old_teamear)} 筆未來活動", file=sys.stderr)
+            teamear_events = old_teamear
+
+    all_events.extend(tixcraft_events)
+    all_events.extend(teamear_events)
 
     # 3. ibon 售票
     print("→ 爬取 ibon 售票...", file=sys.stderr)
