@@ -10727,6 +10727,32 @@ select:focus {
   }
 }
 
+/* Page Scroll Lock and Responsive Layout fitting viewport */
+body:has(.main-layout) {
+  overflow: hidden !important;
+}
+
+@media (min-width: 769px) {
+  body:has(.main-layout) {
+    overflow: hidden !important;
+    height: 100vh !important;
+    margin: 0;
+  }
+
+  body:has(.main-layout) #root {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  body:has(.main-layout) .main-layout {
+    flex: 1;
+    min-height: 0;
+    height: auto !important;
+  }
+}
+
 
 
 
