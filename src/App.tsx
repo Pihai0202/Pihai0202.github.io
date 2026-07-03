@@ -1710,7 +1710,7 @@ function App() {
                 </div>
               </>
             ) : (
-              <>
+              <div className="desktop-sidebar-container" style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
                 <div className="sidebar-tabs">
                   {selectedVenue && (
                     <button
@@ -1740,7 +1740,7 @@ function App() {
                   </button>
                 </div>
 
-                <div className="concert-list-area">
+                <div className="concert-list-area" style={{ flex: 1, overflowY: 'auto' }}>
                   {sidebarTab === 'venue' && selectedVenue && (
                     <VenueInfo
                       key={selectedVenue.id}
@@ -1780,7 +1780,32 @@ function App() {
                     </div>
                   )}
                 </div>
-              </>
+
+                {/* Spotify Player nested at the bottom of the right panel */}
+                {isMusicBarVisible && (
+                  <div className="right-panel-spotify-player">
+                    <div className="spotify-player-header">
+                      <span className="sp-title">🎵 音樂播放器</span>
+                      <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
+                    </div>
+                    <div className="spotify-player-body">
+                      {musicBarEmbedUrl ? (
+                        <iframe
+                          src={musicBarEmbedUrl}
+                          height="80"
+                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                          loading="lazy"
+                          title="Spotify player"
+                        />
+                      ) : (
+                        <div className="music-bar-placeholder">
+                          <span>在記錄中點擊 Spotify 連結播放</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             )}
           </aside>
         </main>
@@ -2298,36 +2323,40 @@ function App() {
         <GuideModal onClose={() => setIsGuideModalOpen(false)} />
       )}
 
-      <button
-        className="music-bar-toggle"
-        type="button"
-        onClick={() => setIsMusicBarVisible((visible) => !visible)}
-      >
-        <div className="spotify-icon" />
-        <span>{isMusicBarVisible ? '收起播放器' : '音樂播放器'}</span>
-      </button>
+      {isMobile && (
+        <>
+          <button
+            className="music-bar-toggle"
+            type="button"
+            onClick={() => setIsMusicBarVisible((visible) => !visible)}
+          >
+            <div className="spotify-icon" />
+            <span>{isMusicBarVisible ? '收起播放器' : '音樂播放器'}</span>
+          </button>
 
-      <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
-        <div className="music-bar-content">
-          {musicBarEmbedUrl ? (
-            <iframe
-              src={musicBarEmbedUrl}
-              height="90"
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-              title="Spotify player"
-            />
-          ) : (
-            <div className="music-bar-placeholder">
-              <span className="sp-logo">🎵</span>
-              <span>在演唱會記錄中加入 Spotify 連結，點擊卡片即可在此播放</span>
+          <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
+            <div className="music-bar-content">
+              {musicBarEmbedUrl ? (
+                <iframe
+                  src={musicBarEmbedUrl}
+                  height="90"
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  title="Spotify player"
+                />
+              ) : (
+                <div className="music-bar-placeholder">
+                  <span className="sp-logo">🎵</span>
+                  <span>在演唱會記錄中加入 Spotify 連結，點擊卡片即可在此播放</span>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-        <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
-          ✕
-        </button>
-      </div>
+            <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
+              ✕
+            </button>
+          </div>
+        </>
+      )}
 
       {view !== 'login' && (
         <>

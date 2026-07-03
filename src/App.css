@@ -10754,6 +10754,40 @@ body:has(.main-layout) {
 }
 
 
+/* Spotify Embedded Player Inside Right Column */
+.right-panel-spotify-player {
+  border-top: 1px solid var(--border);
+  background: rgba(10, 10, 18, 0.98);
+  padding: 10px 16px;
+  flex-shrink: 0;
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+}
+.spotify-player-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.spotify-player-header .sp-title {
+  font-size: 0.75rem;
+  color: var(--muted);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+.spotify-player-header .sp-close-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+.spotify-player-body iframe {
+  width: 100%;
+  border-radius: 6px;
+  border: none;
+}
+
+
 
 
 
