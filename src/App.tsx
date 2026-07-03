@@ -1756,7 +1756,7 @@ function App() {
                   {sidebarTab === 'transit' && <TransitInfoBoard />}
 
                   {sidebarTab === 'tickets' && (
-                    <>
+                    <div className="tickets-tab-scroll-wrapper">
                       <UpcomingConcerts
                         concerts={filteredRemoteConcerts}
                         status={remoteStatus}
@@ -1777,7 +1777,7 @@ function App() {
                         onOpenDetail={openConcertDetail}
                         onDelete={deleteConcert}
                       />
-                    </>
+                    </div>
                   )}
                 </div>
               </>

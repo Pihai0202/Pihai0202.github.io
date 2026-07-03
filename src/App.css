@@ -10637,13 +10637,88 @@ select:focus {
   color: var(--gold);
 }
 
-/* Adjust VenueInfo padding and margins when displayed inside tab area */
-.concert-list-area .venue-info {
-  margin: 0.2rem 0 1rem;
-  box-shadow: none;
-  background: transparent;
-  border: none;
-  padding: 0.5rem 0;
+@media (min-width: 769px) {
+  /* Prevent the parent container from scrolling on desktop */
+  .sidebar .concert-list-area {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100%;
+    padding: 1rem;
+    box-sizing: border-box;
+  }
+
+  /* 1. Venue Info Tab Styling */
+  .concert-list-area .venue-info {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .concert-list-area .venue-info .venue-today-section {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    padding: 0.8rem;
+  }
+
+  .concert-list-area .venue-info .venue-today-list {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  /* 2. Tickets Tab Scroll Wrapper */
+  .tickets-tab-scroll-wrapper {
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-right: 4px;
+  }
+
+  /* 3. Transit Board Tab Styling */
+  .concert-list-area .transit-board {
+    flex: 1;
+    overflow-y: auto;
+    margin: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
+    padding-right: 4px;
+  }
+
+  /* Custom thin scrollbars for inner scrollable containers */
+  .venue-today-list::-webkit-scrollbar,
+  .tickets-tab-scroll-wrapper::-webkit-scrollbar,
+  .transit-board::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .venue-today-list::-webkit-scrollbar-thumb,
+  .tickets-tab-scroll-wrapper::-webkit-scrollbar-thumb,
+  .transit-board::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+
+  .venue-today-list::-webkit-scrollbar-thumb:hover,
+  .tickets-tab-scroll-wrapper::-webkit-scrollbar-thumb:hover,
+  .transit-board::-webkit-scrollbar-thumb:hover {
+    background: var(--gold);
+  }
 }
 
 @media (max-width: 768px) {
