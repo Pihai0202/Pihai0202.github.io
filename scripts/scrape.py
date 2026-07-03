@@ -145,7 +145,7 @@ TICKET_PLATFORMS = {
     "tixcraft": {"name": "拓元售票",  "color": "#f4a261"},
     "ibon":     {"name": "ibon售票", "color": "#2ec4b6"},
     "ticket":   {"name": "年代售票",  "color": "#9b5de5"},
-    "ticketplus": {"name": "TICKET PLUS", "color": "#00a6fb"},
+    "ticketplus": {"name": "遠大售票", "color": "#00a6fb"},
     "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
     "manual": {"name": "手動補充", "color": "#06d6a0"},
     "cpbl": {"name": "中華職棒官方", "color": "#005a9c"},
@@ -156,7 +156,7 @@ PLATFORM_URLS = {
     "拓元售票": "https://tixcraft.com/",
     "ibon售票": "https://tickets.ibon.com.tw/",
     "年代售票": "https://www.ticket.com.tw/",
-    "TICKET PLUS": "https://ticketplus.com.tw/",
+    "遠大售票": "https://ticketplus.com.tw/",
     "iNDIEVOX": "https://www.indievox.com/",
     "添翼售票": "https://teamear.tixcraft.com/",
 }
@@ -1211,6 +1211,124 @@ def scrape_indievox():
     return events
 
 
+def scrape_ticketplus():
+    """Scrape Ticket Plus (遠大售票) events via their S3 config API."""
+    events = []
+
+    url = "https://apis.ticketplus.com.tw/config/api/v1/getS3?path=main/mainEvents.json"
+    print("  Fetching TicketPlus mainEvents...", file=sys.stderr)
+    main_res = fetch(url, as_json=True)
+    if not main_res:
+        print("  ⚠ Failed to fetch TicketPlus mainEvents", file=sys.stderr)
+        return []
+
+    info = main_res.get("allEventMainPageInfo", {})
+
+    active_eids = []
+    for eid, ev in info.items():
+        if ev.get("hidden"):
+            continue
+        end_date = ev.get("end_date") or ev.get("start_date") or ""
+        if end_date and end_date >= today_str():
+            # Skip "Japan" tickets
+            if "japan" in ev.get("title", "").lower():
+                continue
+            active_eids.append(eid)
+
+    print(f"  Found {len(active_eids)} active TicketPlus events. Fetching details...", file=sys.stderr)
+
+    from concurrent.futures import ThreadPoolExecutor
+
+    def get_event_data(eid):
+        # Fetch sessions
+        sessions_url = f"https://apis.ticketplus.com.tw/config/api/v1/getS3?path=event/{eid}/sessions.json"
+        sessions_res = fetch(sessions_url, as_json=True)
+        if not sessions_res:
+            return None
+
+        # Fetch products for prices
+        products_url = f"https://apis.ticketplus.com.tw/config/api/v1/getS3?path=event/{eid}/products.json"
+        products_res = fetch(products_url, as_json=True)
+        price_str = ""
+        if products_res:
+            try:
+                prices = [p.get("price") for p in products_res.get("products", []) if p.get("price") is not None]
+                if prices:
+                    min_p, max_p = min(prices), max(prices)
+                    price_str = str(min_p) if min_p == max_p else f"{min_p} - {max_p}"
+            except Exception:
+                pass
+
+        return {
+            "sessions": sessions_res.get("sessions", []),
+            "price": price_str
+        }
+
+    results = {}
+    with ThreadPoolExecutor(max_workers=10) as executor:
+        for eid, res in zip(active_eids, executor.map(get_event_data, active_eids)):
+            if res:
+                results[eid] = res
+
+    print(f"  Successfully fetched data for {len(results)} TicketPlus events", file=sys.stderr)
+
+    for eid, res in results.items():
+        main_ev = info.get(eid, {})
+        title = main_ev.get("title", "").strip()
+        image = main_ev.get("picBigHomeThumbnail") or main_ev.get("picBigBanner") or ""
+
+        # In case image is relative (though it's usually absolute)
+        if image and image.startswith("/"):
+            image = "https://static.ticketplus.com.tw" + image
+
+        ev_url = f"https://ticketplus.com.tw/activity/{eid}"
+        price = res["price"]
+
+        for s in res["sessions"]:
+            if s.get("hidden"):
+                continue
+
+            s_name = s.get("name", "").strip()
+            # If session name is empty, fall back to event title
+            name = s_name if s_name else title
+
+            s_date = s.get("date", "").strip()
+            # s_date is typically like "2026-08-15 ~ 2026-08-15"
+            date_str = ""
+            if s_date:
+                date_str = s_date.split(" ~ ")[0].strip()
+
+            if not date_str or date_str < today_str():
+                continue
+
+            s_loc = s.get("location", "").strip()
+            s_addr = s.get("address", "").strip()
+            venue_raw = f"{s_loc} {s_addr}".strip()
+
+            venue_id, venue_name = match_venue(name + " " + venue_raw)
+
+            events.append({
+                "id": f"ticketplus-{eid}-{s.get('sessionId', '')}",
+                "source": "遠大售票",
+                "name": name,
+                "venue_raw": venue_raw,
+                "venue_id": venue_id,
+                "venue_name": venue_name,
+                "city": VENUE_CITY.get(venue_id, ""),
+                "date": date_str,
+                "image": image,
+                "url": ev_url,
+                "price": price,
+                "artist": "",
+                "category": "sport" if any(x in name.lower() for x in ["中華職棒", "棒球", "cpbl", "籃球", "p. league", "t1 league"]) else "concert",
+                "ticket_links": [
+                    {"platform": "ticketplus", "name": "遠大售票", "url": ev_url}
+                ]
+            })
+
+    return events
+
+
 def load_manual_events():
     """Load manually curated events that can carry exact ticket URLs."""
     if not MANUAL_EVENTS_PATH.exists():
@@ -1757,6 +1875,21 @@ def main():
             events = old_indievox
     all_events.extend(events)
 
+    # 6. 遠大售票
+    print("→ 爬取遠大售票...", file=sys.stderr)
+    try:
+        events = scrape_ticketplus()
+    except Exception as e:
+        print(f"  ⚠ 爬取遠大售票失敗: {e}", file=sys.stderr)
+        events = []
+    print(f"  遠大得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_ticketplus = [ev for ev in existing_events if ev.get("source") == "遠大售票" and ev.get("date", "") >= today_str()]
+        if old_ticketplus:
+            print(f"  ⚠ 遠大爬取為 0 筆，從舊檔案恢復 {len(old_ticketplus)} 筆未來活動", file=sys.stderr)
+            events = old_ticketplus
+    all_events.extend(events)
+
     # 7. Manual exact links
     print("→ 合併手動補充活動...", file=sys.stderr)
     events = load_manual_events()
@@ -1787,7 +1920,7 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "手動補充", "中華職棒"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "遠大售票", "手動補充", "中華職棒"],
         "events": all_events,
     }
 
