@@ -146,7 +146,6 @@ TICKET_PLATFORMS = {
     "ibon":     {"name": "ibon售票", "color": "#2ec4b6"},
     "ticket":   {"name": "年代售票",  "color": "#9b5de5"},
     "ticketplus": {"name": "TICKET PLUS", "color": "#00a6fb"},
-    "webbboxx": {"name": "webbboxx 行事曆", "color": "#ffd166"},
     "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
     "manual": {"name": "手動補充", "color": "#06d6a0"},
     "cpbl": {"name": "中華職棒官方", "color": "#005a9c"},
@@ -530,12 +529,12 @@ def is_concert_like(text):
 
 # ── 拓元售票 Tixcraft ───────────────────────────────────────────────────────
 
-def scrape_tixcraft():
+def scrape_tixcraft(base_url="https://tixcraft.com"):
     """Scrape Tixcraft (拓元) music/concert events from public /activity catalog."""
     events = []
     seen = set()
 
-    url = "https://tixcraft.com/activity"
+    url = f"{base_url}/activity"
     print(f"  Fetching {url}", file=sys.stderr)
     html = fetch(url)
     if not html:
@@ -543,7 +542,7 @@ def scrape_tixcraft():
 
     parts = re.split(r'class=["\']eventbl', html)
     blocks = parts[1:]
-    print(f"  Found {len(blocks)} blocks in Tixcraft", file=sys.stderr)
+    print(f"  Found {len(blocks)} blocks in {base_url}", file=sys.stderr)
 
     for b in blocks:
         # Image
@@ -567,7 +566,7 @@ def scrape_tixcraft():
         venue_match = re.search(r'class=["\']text-small text-med-light["\'][^>]*>([\s\S]*?)</div>', b)
         venue_raw = unescape(re.sub(r'<[^>]*>', '', venue_match.group(1)).strip()) if venue_match else ""
         
-        ev_url = "https://tixcraft.com" + detail_path
+        ev_url = base_url + detail_path
         if ev_url in seen:
             continue
         seen.add(ev_url)
@@ -1029,61 +1028,7 @@ def detect_platform(text):
     return "售票資訊"
 
 
-def scrape_webbboxx_calendar():
-    """Fallback source for a readable Taiwan concert calendar."""
-    url = "https://webbboxx.com/calendar"
-    html = fetch(url)
-    if not html:
-        return []
 
-    blocks = re.split(r"<h3[^>]*>", html, flags=re.I)
-    events = []
-
-    for index, block in enumerate(blocks[1:], start=1):
-        title_raw, _, rest = block.partition("</h3>")
-        title = clean_text(title_raw)
-        if not title:
-            continue
-
-        chunk = rest.split("<h3", 1)[0].split("<h2", 1)[0]
-        text = clean_text(chunk)
-        dates = parse_all_dates(text)
-        if not dates:
-            continue
-
-        venue_id, venue_name = match_venue(title + " " + text)
-        platform = detect_platform(text)
-        platform_url = PLATFORM_URLS.get(platform, url)
-
-        for d in dates:
-            if d < today_str():
-                continue
-            v_id = venue_id
-            v_name = venue_name
-            # Patch for Crowd Lu concert: webbboxx lists it incorrectly as 台北小巨蛋, but Taipei station is actually at Taipei Music Center
-            if "盧廣仲" in title and "傷心早餐店" in title:
-                if d.startswith("2026-07-"):
-                    v_id = "taipei-music-center"
-                    v_name = "台北流行音樂中心"
-            events.append({
-                "id": f"webbboxx-{abs(hash(title + d)) & 0xFFFFFF}",
-                "source": "webbboxx 行事曆",
-                "name": title,
-                "venue_raw": text[:80],
-                "venue_id": v_id,
-                "venue_name": v_name,
-                "city": VENUE_CITY.get(v_id, ""),
-                "date": d,
-                "image": "",
-                "url": platform_url,
-                "price": "",
-                "ticket_links": [
-                    {"platform": "webbboxx", "name": "行事曆來源", "url": url},
-                    {"platform": platform.lower().replace(" ", "-"), "name": platform, "url": platform_url},
-                ],
-            })
-
-    return events
 
 
 def parse_indievox_cards(html, base_url):
@@ -1330,8 +1275,6 @@ def is_specific_url(url):
         "https://tickets.ibon.com.tw/activity",
         "https://www.ticket.com.tw",
         "https://ticketplus.com.tw",
-        "https://webbboxx.com",
-        "https://webbboxx.com/calendar",
         "https://www.indievox.com",
         "https://www.cpbl.com.tw",
         "https://www.cpbl.com.tw/schedule",
@@ -1481,7 +1424,7 @@ def merge_ticket_links(events):
                     existing["ticket_links"].append(lk)
 
             # Determine prioritization (official sources override webbboxx/manual/fallback sources)
-            is_existing_fallback = existing["source"] in ["webbboxx 行事曆", "手動補充"]
+            is_existing_fallback = existing["source"] == "手動補充"
             is_new_official = ev["source"] in ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "中華職棒"]
             
             if is_existing_fallback and is_new_official:
@@ -1761,14 +1704,23 @@ def main():
             events = old_kktix
     all_events.extend(events)
 
-    # 2. 拓元售票
+    # 2. 拓元售票 & 添翼售票
     print("→ 爬取拓元售票 Tixcraft...", file=sys.stderr)
-    events = scrape_tixcraft()
+    events = scrape_tixcraft("https://tixcraft.com")
     print(f"  拓元得到 {len(events)} 筆", file=sys.stderr)
+    
+    print("→ 爬取添翼售票 teamear.tixcraft...", file=sys.stderr)
+    try:
+        teamear_events = scrape_tixcraft("https://teamear.tixcraft.com")
+        print(f"  添翼得到 {len(teamear_events)} 筆", file=sys.stderr)
+        events.extend(teamear_events)
+    except Exception as e:
+        print(f"  ⚠ 爬取添翼售票失敗: {e}", file=sys.stderr)
+
     if not events:
         old_tixcraft = [ev for ev in existing_events if ev.get("source") == "拓元售票" and ev.get("date", "") >= today_str()]
         if old_tixcraft:
-            print(f"  ⚠ 拓元爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
+            print(f"  ⚠ 拓元/添翼爬取為 0 筆，從舊檔案恢復 {len(old_tixcraft)} 筆未來活動", file=sys.stderr)
             events = old_tixcraft
     all_events.extend(events)
 
@@ -1805,17 +1757,6 @@ def main():
             events = old_indievox
     all_events.extend(events)
 
-    # 6. Public calendar fallback
-    print("→ 讀取公開演唱會行事曆 fallback...", file=sys.stderr)
-    events = scrape_webbboxx_calendar()
-    print(f"  行事曆得到 {len(events)} 筆", file=sys.stderr)
-    if not events:
-        old_cal = [ev for ev in existing_events if ev.get("source") == "webbboxx 行事曆" and ev.get("date", "") >= today_str()]
-        if old_cal:
-            print(f"  ⚠ 行事曆爬取為 0 筆，從舊檔案恢復 {len(old_cal)} 筆未來活動", file=sys.stderr)
-            events = old_cal
-    all_events.extend(events)
-
     # 7. Manual exact links
     print("→ 合併手動補充活動...", file=sys.stderr)
     events = load_manual_events()
@@ -1846,7 +1787,7 @@ def main():
     output = {
         "updated_at": datetime.now(timezone.utc).isoformat(),
         "count": len(all_events),
-        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "webbboxx 行事曆", "手動補充", "中華職棒"],
+        "sources": ["KKTIX", "拓元售票", "ibon售票", "年代售票", "iNDIEVOX", "手動補充", "中華職棒"],
         "events": all_events,
     }
 
