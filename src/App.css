@@ -1,5 +1,12 @@
 /* Removed Google Fonts @import */
 
+/* View Transition API - Theme Switch Effect */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
 :root {
   --bg: #0d0b09;
   --bg-rgb: 13, 11, 9;

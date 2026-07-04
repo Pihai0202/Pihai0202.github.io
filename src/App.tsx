@@ -232,6 +232,17 @@ function App() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
+  const toggleTheme = useCallback(() => {
+    const nextTheme = theme === 'dark' ? 'light' : 'dark'
+    if ('startViewTransition' in document) {
+      (document as any).startViewTransition(() => {
+        setTheme(nextTheme)
+      })
+    } else {
+      setTheme(nextTheme)
+    }
+  }, [theme])
+
   const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
@@ -1195,7 +1206,7 @@ function App() {
           <button
             className="theme-toggle-btn"
             type="button"
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            onClick={toggleTheme}
             title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
             aria-label="切換主題"
           >
@@ -2464,7 +2475,7 @@ function App() {
                 className="sidebar-nav-item"
                 type="button"
                 onClick={() => {
-                  setTheme(theme === 'dark' ? 'light' : 'dark')
+                  toggleTheme()
                   setIsMobileSidebarOpen(false)
                 }}
               >
