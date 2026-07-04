@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
@@ -82,6 +82,8 @@ interface TdxMetroLiveBoard {
   DestinationStationName?: { Zh_tw?: string; En?: string }
   Direction?: number
   EstimateTime?: number
+  SrcUpdateTime?: string
+  UpdateTime?: string
 }
 
 // TDX 捷運時刻表：ServiceDay 欄位為布林值（非整數）
@@ -386,6 +388,34 @@ export function TransitInfoBoard() {
   const [metroQueryLoading, setMetroQueryLoading] = useState(false)
   const [metroQueryError, setMetroQueryError] = useState('')
   const [showAllMetroTimes, setShowAllMetroTimes] = useState(false)
+
+  const isLiveBoardStale = useMemo(() => {
+    if (metroLiveBoard.length === 0) return false
+    const first = metroLiveBoard[0]
+    const updateTimeStr = first.SrcUpdateTime || first.UpdateTime
+    if (!updateTimeStr) return true
+    try {
+      const updateTime = new Date(updateTimeStr).getTime()
+      const now = Date.now()
+      return Math.abs(now - updateTime) > 5 * 60 * 1000
+    } catch (e) {
+      return true
+    }
+  }, [metroLiveBoard])
+
+  const formatStaleTime = useCallback((timeStr?: string): string => {
+    if (!timeStr) return ''
+    try {
+      const date = new Date(timeStr)
+      const month = (date.getMonth() + 1).toString().padStart(2, '0')
+      const day = date.getDate().toString().padStart(2, '0')
+      const hours = date.getHours().toString().padStart(2, '0')
+      const minutes = date.getMinutes().toString().padStart(2, '0')
+      return `最後更新：${month}/${day} ${hours}:${minutes}`
+    } catch (e) {
+      return ''
+    }
+  }, [])
 
 
   // 1. 讀取營運通阻狀態（transit-status.json，由 GitHub Actions 每小時更新）
@@ -948,6 +978,18 @@ export function TransitInfoBoard() {
                         {metroOperator === 'TRTC'
                           ? '台北捷運不提供預估到站時間（系統限制），列車進站時才會顯示，請參考右側時刻表。'
                           : '暫無即時到站資訊（可能非營運時間或該站點不支援）'}
+                      </div>
+                    ) : isLiveBoardStale ? (
+                      <div className="metro-no-data warning-box" style={{ 
+                        background: 'rgba(255, 107, 0, 0.1)', 
+                        border: '1px solid rgba(255, 107, 0, 0.3)', 
+                        color: 'var(--gold)',
+                        padding: '12px',
+                        borderRadius: '6px',
+                        fontSize: '0.8rem',
+                        lineHeight: '1.4'
+                      }}>
+                        ⚠️ 即時到站資訊已中斷更新（{formatStaleTime(metroLiveBoard[0].SrcUpdateTime || metroLiveBoard[0].UpdateTime)}）。系統目前無法取得最新列車位置，請參考時刻表。
                       </div>
                     ) : (
                       [...metroLiveBoard]
