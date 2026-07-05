@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-05T11:38:49.918809+00:00",
-  "count": 517,
+  "updated_at": "2026-07-05T13:46:21.844681+00:00",
+  "count": 515,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -12,46 +12,6 @@
     "中華職棒"
   ],
   "events": [
-    {
-      "id": "kktix-org-2026parkjihoonfancon-2026-07-05",
-      "source": "KKTIX",
-      "name": "2026 PARK JI HOON FAN CONCERT [RE:FLECT] IN TAIPEI",
-      "venue_raw": "TICC台北國際會議中心",
-      "venue_id": "ticc",
-      "venue_name": "TICC",
-      "city": "台北",
-      "date": "2026-07-05",
-      "image": "https://assets.kktix.io/upload_images/500462/PARKJIHOON_1200x630_medium.jpg",
-      "url": "https://wve.kktix.cc/events/2026parkjihoonfancon",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kktix",
-          "name": "KKTIX",
-          "url": "https://wve.kktix.cc/events/2026parkjihoonfancon"
-        }
-      ]
-    },
-    {
-      "id": "kktix-org-ikdgr-2026-07-05",
-      "source": "KKTIX",
-      "name": "2026 PIZZALI－『拼一個浪漫』 首次個人專場演唱會",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-07-05",
-      "image": "https://assets.kktix.io/upload_images/318815/%E6%8B%BC%E4%B8%80%E5%80%8B%E6%B5%AA%E6%BC%AB%E5%B0%88%E5%A0%B4_%E8%A6%96%E8%A6%BA_resize_1200_x_630_medium.jpg",
-      "url": "https://kklivetw.kktix.cc/events/ikdgr",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kktix",
-          "name": "KKTIX",
-          "url": "https://kklivetw.kktix.cc/events/ikdgr"
-        }
-      ]
-    },
     {
       "id": "tixcraft-26_ffotp-2026-07-05",
       "source": "拓元售票",
