@@ -511,7 +511,7 @@ function App() {
         const user = {
           nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || '樂迷',
           email: firebaseUser.email || '',
-          avatarUrl: localAvatar
+          avatarUrl: firebaseUser.photoURL || localAvatar
         }
         setIsLoggedIn(true)
         setCurrentUser(user)
@@ -1857,7 +1857,7 @@ function App() {
               }
             }
           }}
-          onUpdateAvatar={(newAvatar) => {
+          onUpdateAvatar={async (newAvatar) => {
             const emailKey = currentUser?.email || 'guest'
             if (newAvatar) {
               localStorage.setItem(`tw-avatar-${emailKey}`, newAvatar)
@@ -1867,6 +1867,14 @@ function App() {
             const updated = { ...currentUser, avatarUrl: newAvatar || undefined }
             setCurrentUser(updated)
             localStorage.setItem('tw-user-info', JSON.stringify(updated))
+
+            if (auth.currentUser) {
+              try {
+                await updateProfile(auth.currentUser, { photoURL: newAvatar || null })
+              } catch (err) {
+                console.error('Failed to update Firebase photoURL:', err)
+              }
+            }
           }}
           onLogout={handleLogout}
           onBack={() => setView('map')}
@@ -1876,7 +1884,7 @@ function App() {
         <LoginPage
           onLoginSuccess={(user) => {
             const localAvatar = localStorage.getItem(`tw-avatar-${user.email || 'guest'}`) || undefined
-            const userWithAvatar = { ...user, avatarUrl: localAvatar }
+            const userWithAvatar = { ...user, avatarUrl: user.avatarUrl || localAvatar }
             setIsLoggedIn(true)
             setCurrentUser(userWithAvatar)
             localStorage.setItem('tw-logged-in', 'true')

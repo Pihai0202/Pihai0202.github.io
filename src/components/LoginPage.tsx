@@ -13,7 +13,7 @@ import {
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication'
 
 interface LoginPageProps {
-  onLoginSuccess: (user: { nickname: string; email: string }) => void
+  onLoginSuccess: (user: { nickname: string; email: string; avatarUrl?: string }) => void
   onCancel: () => void
 }
 
@@ -55,6 +55,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         onLoginSuccess({
           nickname: nickname.trim(),
           email: firebaseUser.email || email.trim(),
+          avatarUrl: firebaseUser.photoURL || undefined
         })
       } else {
         // Real Sign In
@@ -63,6 +64,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         onLoginSuccess({
           nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || email.split('@')[0],
           email: firebaseUser.email || email.trim(),
+          avatarUrl: firebaseUser.photoURL || undefined
         })
       }
     } catch (err: any) {
@@ -105,6 +107,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           onLoginSuccess({
             nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
             email: firebaseUser.email || '',
+            avatarUrl: firebaseUser.photoUrl || undefined
           })
         } else {
           // Fallback: exchange token manually if native user object is not present
@@ -116,6 +119,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
             onLoginSuccess({
               nickname: fUser.displayName || fUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
               email: fUser.email || '',
+              avatarUrl: fUser.photoURL || undefined
             })
           } else {
             throw new Error(lang === 'zh-TW' ? '無法取得 Google 登入憑證' : 'Failed to get Google sign-in credentials')
@@ -129,6 +133,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         onLoginSuccess({
           nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
           email: firebaseUser.email || '',
+          avatarUrl: firebaseUser.photoURL || undefined
         })
       }
     } catch (err: any) {
