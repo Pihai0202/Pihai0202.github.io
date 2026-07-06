@@ -582,51 +582,10 @@ function App() {
         .sort((a, b) => Date.parse(b.date || '0') - Date.parse(a.date || '0')),
     [concerts, selectedVenueId],
   )
-  const selectedVenueTodayConcerts = useMemo(() => {
-    if (!selectedVenueId || !selectedVenue) return []
-    
-    const today = new Date()
-    const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`
-
-    const normalizeDate = (dStr: string | undefined): string => {
-      if (!dStr) return ''
-      const clean = dStr.trim().replace(/\//g, '-')
-      const match = clean.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/)
-      if (match) {
-        const y = match[1]
-        const m = match[2].padStart(2, '0')
-        const d = match[3].padStart(2, '0')
-        return `${y}-${m}-${d}`
-      }
-      return clean.substring(0, 10)
-    }
-
-    return remoteConcerts.filter((c) => {
-      let venueMatch = false
-      if (c.venue_id === selectedVenueId) {
-        venueMatch = true
-      } else {
-        const nameMatch = c.venue_name && c.venue_name.toLowerCase().includes(selectedVenue.name.toLowerCase())
-        const rawMatch = c.venue_raw && c.venue_raw.toLowerCase().includes(selectedVenue.name.toLowerCase())
-        venueMatch = !!(nameMatch || rawMatch)
-      }
-      if (!venueMatch) return false
-
-      // Filter out accessory/non-performance events (shuttle buses, special zone sales, etc.)
-      const isAccessory = c.name && (
-        c.name.includes('專車') ||
-        c.name.includes('專區') ||
-        c.name.includes('套票') ||
-        c.name.includes('周邊') ||
-        c.name.includes('週邊') ||
-        c.name.includes('加購')
-      )
-      if (isAccessory) return false
-
-      const dateKey = normalizeDate(c.date)
-      return dateKey === todayStr
-    })
-  }, [remoteConcerts, selectedVenueId, selectedVenue])
+  // NOTE: 售票網站爬取的 date 欄位是售票頁面日期，不等於實際演出日，
+  // 用它來判斷「今日演出」會顯示錯誤資訊。暫時停用此功能，
+  // 等日後有可靠的演出日期資料來源再啟用。
+  const selectedVenueTodayConcerts: RemoteConcert[] = []
   const resolvedRemoteConcerts = useMemo(() => {
     return resolveTixcraftUrls(remoteConcerts)
   }, [remoteConcerts])
