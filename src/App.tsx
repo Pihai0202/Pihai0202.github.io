@@ -35,6 +35,7 @@ import {
   SunIcon,
   MoonIcon,
   CheckIcon,
+  WarningIcon,
   SparklesIcon,
   BaseballIcon,
   MapIcon,
@@ -297,6 +298,7 @@ function App() {
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768)
     }
+    handleResize() // 確保在組件掛載時立即取得正確的視窗寬度，避免 Mobile App 顯示成電腦版
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
   }, [])
@@ -493,6 +495,13 @@ function App() {
     const stored = localStorage.getItem('tw-user-info')
     return stored ? JSON.parse(stored) : null
   })
+  const [toast, setToast] = useState<{ message: string; type?: 'info' | 'success' | 'error' } | null>(null)
+  const showToast = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
+    setToast({ message, type })
+    setTimeout(() => {
+      setToast(null)
+    }, 3000)
+  }
 
   // Listen to Firebase Auth state changes
   useEffect(() => {
@@ -903,15 +912,15 @@ function App() {
     const artist = form.artist.trim()
 
     if (!artist) {
-      alert('請輸入演出者名稱')
+      showToast('請輸入演出者名稱', 'error')
       return
     }
     if (!formVenueId) {
-      alert('請選擇或輸入活動場館')
+      showToast('請選擇或輸入活動場館', 'error')
       return
     }
     if (formVenueId === 'custom' && !formVenueName.trim()) {
-      alert('請輸入自訂場館名稱')
+      showToast('請輸入自訂場館名稱', 'error')
       return
     }
 
@@ -986,13 +995,13 @@ function App() {
       setIsPublishModalOpen(false)
       setPublishingConcert(null)
       setTimeout(() => {
-        alert(lang === 'zh-TW' ? '🎉 發佈成功！已將您的觀後感分享至社群牆。' : '🎉 Successfully published! Your review has been shared to the community board.')
+        showToast(lang === 'zh-TW' ? '發佈成功！已將您的觀後感分享至社牆。' : 'Successfully published! Your review has been shared to the community board.', 'success')
         setView('board')
         setDetailConcertId(null)
       }, 100)
     } catch (error) {
       console.error('Firebase write error:', error)
-      alert(lang === 'zh-TW' ? '❌ 發佈失敗，請檢查網路連線或 Firebase 設定！' : '❌ Failed to publish. Please check your connection or Firebase settings.')
+      showToast(lang === 'zh-TW' ? '發佈失敗，請檢查網路連線或 Firebase 設定！' : 'Failed to publish. Please check your connection or Firebase settings.', 'error')
     }
   }
 
@@ -1007,7 +1016,7 @@ function App() {
     setIsLoggedIn(false)
     setCurrentUser(null)
     setView('map')
-    alert(lang === 'zh-TW' ? '👋 您已成功登出！' : '👋 You have successfully logged out!')
+    showToast(lang === 'zh-TW' ? '您已成功登出！' : 'You have successfully logged out.', 'success')
   }
 
   const removePendingMedia = (index: number) => {
@@ -1875,7 +1884,7 @@ function App() {
             localStorage.setItem('tw-nickname', user.nickname)
             setNickname(user.nickname)
             setView('map')
-            alert(`🎉 歡迎回來，${user.nickname}！`)
+            showToast(lang === 'zh-TW' ? `歡迎回來，${user.nickname}！` : `Welcome back, ${user.nickname}!`, 'success')
           }}
           onCancel={() => setView('map')}
         />
@@ -2644,6 +2653,14 @@ function App() {
             </button>
           </div>
         </>
+      )}
+      {toast && (
+        <div className={`app-toast ${toast.type || 'info'}`}>
+          {toast.type === 'success' && <CheckIcon size="1.15em" style={{ color: '#81c784', verticalAlign: 'middle', marginRight: '6px' }} />}
+          {toast.type === 'error' && <WarningIcon size="1.15em" style={{ color: '#e57373', verticalAlign: 'middle', marginRight: '6px' }} />}
+          {toast.type === 'info' && <SparklesIcon size="1.15em" style={{ color: 'var(--gold)', verticalAlign: 'middle', marginRight: '6px' }} />}
+          <span>{toast.message}</span>
+        </div>
       )}
     </>
   )

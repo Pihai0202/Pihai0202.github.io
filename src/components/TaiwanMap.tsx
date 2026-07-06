@@ -4,6 +4,7 @@ import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n.tsx'
+import { PinIcon, UserIcon } from './SvgIcon'
 
 const project = (lon: number, lat: number) => {
   const x = 159.787256 * lon - 18882.141068
@@ -583,7 +584,10 @@ export function TaiwanMap({
       {showShuangbeiDetail && (
         <div className="shuangbei-popover">
           <div className="popover-header">
-            <span className="popover-title">📍 {lang === 'zh-TW' ? '雙北地區場館特寫' : lang === 'ja' ? '双北（台北・新北）会場ズーム' : lang === 'ko' ? '쌍북(타이베이·신베이) 공연장 돋보기' : 'Shuangbei Venues Detail'}</span>
+            <span className="popover-title">
+              <PinIcon size="1.1em" style={{ marginRight: '6px', color: '#ef5350', verticalAlign: 'middle' }} />
+              {lang === 'zh-TW' ? '雙北地區場館特寫' : lang === 'ja' ? '双北（台北・新北）会場ズーム' : lang === 'ko' ? '쌍북(타이베이·신베이) 공연장 돋보기' : 'Shuangbei Venues Detail'}
+            </span>
             <button className="popover-close-btn" onClick={() => setShowShuangbeiDetail(false)}>×</button>
           </div>
           
@@ -642,8 +646,14 @@ export function TaiwanMap({
                     {hasVisits && <span className="visited-tick">✓</span>}
                   </div>
                   <div className="popover-venue-meta">
-                    <span>{t('capacityPeople', { capacity: venue.capacity })}</span>
-                    <span>📍 {translateCityName(venue.city, lang)}</span>
+                    <span>
+                      <UserIcon size="0.95em" style={{ marginRight: '4px', color: '#42a5f5', verticalAlign: 'middle' }} />
+                      {t('capacityPeople', { capacity: venue.capacity })}
+                    </span>
+                    <span>
+                      <PinIcon size="0.95em" style={{ marginRight: '4px', color: '#ef5350', verticalAlign: 'middle' }} />
+                      {translateCityName(venue.city, lang)}
+                    </span>
                   </div>
                 </div>
               )
@@ -665,8 +675,14 @@ export function TaiwanMap({
         >
           <div className="tooltip-title">{translateVenueName(hoveredVenue.name, lang)}</div>
           <div className="tooltip-meta">
-            <span>📍 {translateCityName(hoveredVenue.city, lang)}</span>
-            <span>{t('capacityPeople', { capacity: hoveredVenue.capacity })}</span>
+            <span>
+              <PinIcon size="0.95em" style={{ marginRight: '4px', color: '#ef5350', verticalAlign: 'middle' }} />
+              {translateCityName(hoveredVenue.city, lang)}
+            </span>
+            <span>
+              <UserIcon size="0.95em" style={{ marginRight: '4px', color: '#42a5f5', verticalAlign: 'middle' }} />
+              {t('capacityPeople', { capacity: hoveredVenue.capacity })}
+            </span>
           </div>
           {concerts.some((c) => c.venueId === hoveredVenue.id) && (
             <div className="tooltip-status visited">{t('visitedBadgeText')}</div>

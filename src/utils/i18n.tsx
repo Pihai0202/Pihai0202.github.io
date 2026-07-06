@@ -44,7 +44,7 @@ const translations: Record<Language, Record<string, string>> = {
     allLogs: '全部記錄',
     visitedBadgeText: '✓ 已拜訪過此場館',
     countyVenuesCount: '🏟️ {count} 個演唱會場館',
-    capacityPeople: '👤 {capacity} 人',
+    capacityPeople: '{capacity} 人',
     shuangbeiCluster: '雙北場館',
 
     // Calendar Panel
@@ -224,7 +224,7 @@ const translations: Record<Language, Record<string, string>> = {
     allLogs: 'All Logs',
     visitedBadgeText: '✓ Visited this venue',
     countyVenuesCount: '🏟️ {count} venues',
-    capacityPeople: '👥 {capacity} capacity',
+    capacityPeople: '{capacity} capacity',
     shuangbeiCluster: 'Shuangbei',
 
     // Calendar Panel
@@ -404,7 +404,7 @@ const translations: Record<Language, Record<string, string>> = {
     allLogs: 'すべての記録',
     visitedBadgeText: '✓ この会場を訪問しました',
     countyVenuesCount: '🏟️ {count} 個の会場',
-    capacityPeople: '👤 {capacity} 人',
+    capacityPeople: '{capacity} 人',
     shuangbeiCluster: '双北会場',
 
     // Calendar Panel
@@ -584,7 +584,7 @@ const translations: Record<Language, Record<string, string>> = {
     allLogs: '전체 기록',
     visitedBadgeText: '✓ 이 공연장을 방문했습니다',
     countyVenuesCount: '🏟️ {count}개 공연장',
-    capacityPeople: '👤 {capacity}명',
+    capacityPeople: '{capacity}명',
     shuangbeiCluster: '쌍북 공연장',
 
     // Calendar Panel
