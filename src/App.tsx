@@ -744,7 +744,7 @@ function App() {
           email,
           concerts: updatedList,
           updatedAt: new Date().toISOString()
-        })
+        }, { merge: true })
         // Also update local cache for quick loading next time
         localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(updatedList))
       } catch (error) {
@@ -774,7 +774,28 @@ function App() {
         const guestConcerts = guestCached ? (JSON.parse(guestCached) as Concert[]) : []
 
         if (docSnap.exists()) {
-          const remoteConcerts = docSnap.data().concerts as Concert[]
+          const docData = docSnap.data()
+          const remoteConcerts = (docData.concerts as Concert[]) || []
+
+          const cloudNickname = docData.nickname as string | undefined
+          const cloudAvatar = docData.avatarUrl as string | undefined
+
+          if (cloudNickname || cloudAvatar) {
+            setCurrentUser((prev) => {
+              if (!prev) return null
+              const updated = {
+                ...prev,
+                nickname: cloudNickname || prev.nickname,
+                avatarUrl: cloudAvatar || prev.avatarUrl
+              }
+              localStorage.setItem('tw-user-info', JSON.stringify(updated))
+              if (cloudNickname) {
+                localStorage.setItem('tw-nickname', cloudNickname)
+                setNickname(cloudNickname)
+              }
+              return updated
+            })
+          }
 
           // Merge guest concerts into remote concerts (deduplicated by id)
           let mergedConcerts = [...remoteConcerts]
@@ -794,7 +815,7 @@ function App() {
               email,
               concerts: mergedConcerts,
               updatedAt: new Date().toISOString()
-            }).catch((err) => console.error('Failed to merge guest concerts to Firestore:', err))
+            }, { merge: true }).catch((err) => console.error('Failed to merge guest concerts to Firestore:', err))
             // Clear guest local storage after successful merge
             localStorage.setItem(STORAGE_KEY, '[]')
           }
@@ -1905,6 +1926,15 @@ function App() {
                 console.error('Failed to update Firebase display name:', err)
               }
             }
+
+            if (currentUser?.email) {
+              try {
+                const docRef = doc(db, 'users_concerts', currentUser.email)
+                await setDoc(docRef, { nickname: newName }, { merge: true })
+              } catch (err) {
+                console.error('Failed to sync nickname to Firestore:', err)
+              }
+            }
           }}
           onUpdateAvatar={async (newAvatar) => {
             const emailKey = currentUser?.email || 'guest'
@@ -1922,6 +1952,15 @@ function App() {
                 await updateProfile(auth.currentUser, { photoURL: newAvatar || null })
               } catch (err) {
                 console.error('Failed to update Firebase photoURL:', err)
+              }
+            }
+
+            if (currentUser?.email) {
+              try {
+                const docRef = doc(db, 'users_concerts', currentUser.email)
+                await setDoc(docRef, { avatarUrl: newAvatar || null }, { merge: true })
+              } catch (err) {
+                console.error('Failed to sync avatar to Firestore:', err)
               }
             }
           }}
