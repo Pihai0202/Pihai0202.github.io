@@ -801,7 +801,11 @@ export const translateVenueName = (name: string, lang: string): string => {
     '圓滿戶外劇場': { en: 'Fulfillment Amphitheatre', ja: '円満屋外劇場', ko: '원만 야외극장' },
     '嘉義市棒球場': { en: 'Chiayi City Baseball Stadium', ja: '嘉義市棒球場 (嘉義野球場)', ko: '자이시 야구장' },
     '台南市立棒球場': { en: 'Tainan Municipal Baseball Stadium', ja: '台南市立棒球場 (台南野球場)', ko: '타이남 시립야구장' },
-    '花蓮縣立體育館': { en: 'Hualien County Stadium', ja: '花蓮県立体育館', ko: '화롄 현립체육관' },
+    '花蓮縣立體育場': { en: 'Hualien County Stadium', ja: '花蓮県立体育場', ko: '화롄 현립체육관' },
+    '後台 Backstage Live': { en: 'Backstage Live', ja: '後台 Backstage Live', ko: '백스테이지 라이브' },
+    '亞太國際棒球訓練中心成棒主球場': { en: 'Asia-Pacific International Baseball Stadium', ja: '亞太国際棒球場', ko: '아시아태평양 국제야구장' },
+    '澄清湖棒球場': { en: 'Chengqing Lake Baseball Stadium', ja: '澄清湖棒球場 (澄清湖野球場)', ko: '청칭후 야구장' },
+    '台東棒球場': { en: 'Taitung Baseball Stadium', ja: '台東棒球場 (台東野球場)', ko: '타이둥 야구장' },
   }
   return venueMap[name]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || name
 }
