@@ -281,6 +281,7 @@ header {
   letter-spacing: 0.1em;
   color: var(--text);
   line-height: 1.2;
+  white-space: nowrap;
 }
 
 .logo-text span {
@@ -299,7 +300,8 @@ header {
 
 .stat {
   text-align: center;
-  min-width: 58px;
+  min-width: 65px;
+  white-space: nowrap;
 }
 
 .stat-num {
@@ -3118,6 +3120,7 @@ body.player-open .music-bar-toggle {
   display: flex;
   align-items: center;
   gap: 0.4rem;
+  white-space: nowrap;
 }
 
 .nav-toggle-btn:hover {
@@ -10803,6 +10806,29 @@ body:has(.main-layout) {
   transform: scale(1.15) rotate(20deg);
   color: var(--gold) !important;
   filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+}
+
+/* Language Selector Modal Options Hover Styling */
+.lang-option {
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.lang-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(var(--gold-rgb), 0.5) !important;
+  box-shadow: 0 4px 12px rgba(var(--gold-rgb), 0.15);
+}
+.lang-option:not(.active):hover {
+  background: var(--surface-hover) !important;
+  color: var(--teal) !important;
+  border-color: rgba(var(--teal-rgb), 0.4) !important;
+  box-shadow: 0 4px 12px rgba(var(--teal-rgb), 0.1);
+}
+.lang-toggle-btn svg {
+  transition: transform 0.4s ease;
+}
+.lang-toggle-btn:hover svg {
+  transform: rotate(180deg);
+  color: var(--gold) !important;
 }
 
 

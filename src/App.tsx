@@ -55,7 +55,8 @@ import {
   ChevronRightIcon,
   ChevronLeftIcon,
   TicketIcon,
-  TrainIcon
+  TrainIcon,
+  GlobeIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -221,12 +222,6 @@ function extractArtistFromTitle(title: string): string {
 
 function App() {
   const { t, lang, setLang } = useTranslation()
-  const toggleLanguage = () => {
-    if (lang === 'zh-TW') setLang('en')
-    else if (lang === 'en') setLang('ja')
-    else if (lang === 'ja') setLang('ko')
-    else setLang('zh-TW')
-  }
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const storedTheme = localStorage.getItem('theme')
@@ -284,6 +279,7 @@ function App() {
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
+  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
@@ -1205,12 +1201,13 @@ function App() {
             <MessageIcon style={{ marginRight: '6px' }} /> {t('tabCommunity')}
           </button>
           <button
-            className="nav-toggle-btn lang-toggle-btn"
+            className="theme-toggle-btn lang-toggle-btn"
             type="button"
-            onClick={toggleLanguage}
+            onClick={() => setIsLanguageModalOpen(true)}
             title={t('langTitle')}
+            aria-label="Language Selector"
           >
-            🌐 {lang === 'zh-TW' ? '繁中' : lang === 'en' ? 'EN' : lang === 'ja' ? '日本語' : '한국어'}
+            <GlobeIcon size="1.2em" />
           </button>
           <button
             className="theme-toggle-btn guide-trigger-icon-btn"
@@ -2352,6 +2349,64 @@ function App() {
         <GuideModal onClose={() => setIsGuideModalOpen(false)} />
       )}
 
+      {isLanguageModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsLanguageModalOpen(false)}>
+          <div className="modal publish-modal" style={{ maxWidth: '360px', padding: '1.8rem' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setIsLanguageModalOpen(false)}>
+              <CloseIcon />
+            </button>
+            <h2 style={{ fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
+              <GlobeIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+              {lang === 'zh-TW' ? '選擇顯示語言' : lang === 'en' ? 'Select Language' : lang === 'ja' ? '言語を選択' : '언어 선택'}
+            </h2>
+            
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {[
+                { code: 'zh-TW', native: '繁體中文' },
+                { code: 'en', native: 'English' },
+                { code: 'ja', native: '日本語' },
+                { code: 'ko', native: '한국어' }
+              ].map((langItem) => {
+                const isActive = lang === langItem.code
+                return (
+                  <button
+                    key={langItem.code}
+                    type="button"
+                    onClick={() => {
+                      setLang(langItem.code as any)
+                      setIsLanguageModalOpen(false)
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'space-between',
+                      padding: '0.85rem 1.2rem',
+                      borderRadius: '12px',
+                      background: isActive 
+                        ? 'linear-gradient(135deg, rgba(var(--gold-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.1) 100%)' 
+                        : 'var(--surface-hover)',
+                      border: isActive 
+                        ? '1px solid rgba(var(--gold-rgb), 0.6)' 
+                        : '1px solid var(--border)',
+                      color: isActive ? 'var(--gold)' : 'var(--text)',
+                      fontSize: '0.92rem',
+                      fontWeight: isActive ? '700' : '500',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      textAlign: 'left'
+                    }}
+                    className={isActive ? 'lang-option active' : 'lang-option'}
+                  >
+                    <span>{langItem.native}</span>
+                    {isActive && <CheckIcon size="1.1em" style={{ color: 'var(--gold)' }} />}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
+
       {isMobile && (
         <>
           <button
@@ -2493,13 +2548,13 @@ function App() {
                 className="sidebar-nav-item"
                 type="button"
                 onClick={() => {
-                  toggleLanguage()
+                  setIsLanguageModalOpen(true)
                   setIsMobileSidebarOpen(false)
                 }}
               >
-                <span className="icon">🌐</span>
+                <span className="icon"><GlobeIcon size="1.1em" /></span>
                 <span className="label">
-                  {lang === 'zh-TW' ? '語言：繁體中文 ➔' : lang === 'en' ? 'Language: English ➔' : lang === 'ja' ? '言語：日本語 ➔' : '언어: 한국어 ➔'}
+                  {lang === 'zh-TW' ? '語言設定' : lang === 'en' ? 'Language Settings' : lang === 'ja' ? '言語設定' : '언어 설정'}
                 </span>
               </button>
               <button
