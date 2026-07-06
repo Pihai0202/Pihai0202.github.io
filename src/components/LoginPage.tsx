@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { CloseIcon, WarningIcon, CheckIcon, LockOpenIcon, KeyIcon, TaiwanIcon } from './SvgIcon'
 import { auth } from '../firebase'
+import { useTranslation } from '../utils/i18n.tsx'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -16,6 +17,7 @@ interface LoginPageProps {
 
 
 export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
+  const { t, lang } = useTranslation()
   const [isRegisterMode, setIsRegisterMode] = useState(false)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -28,15 +30,15 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     setErrorMsg('')
 
     if (!email.includes('@')) {
-      setErrorMsg('請輸入格式正確的信箱！')
+      setErrorMsg(t('emailFormatError'))
       return
     }
     if (password.length < 6) {
-      setErrorMsg('密碼長度必須至少為 6 個字元！')
+      setErrorMsg(t('passwordLengthError'))
       return
     }
     if (isRegisterMode && !nickname.trim()) {
-      setErrorMsg('請輸入暱稱！')
+      setErrorMsg(t('nicknameEmptyError'))
       return
     }
 
@@ -64,15 +66,15 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     } catch (err: any) {
       console.error('Email Auth Error:', err)
       if (err.code === 'auth/email-already-in-use') {
-        setErrorMsg('此信箱已被註冊！')
+        setErrorMsg(lang === 'zh-TW' ? '此信箱已被註冊！' : 'This email is already in use!')
       } else if (err.code === 'auth/invalid-credential' || err.code === 'auth/wrong-password' || err.code === 'auth/user-not-found') {
-        setErrorMsg('信箱或密碼錯誤！')
+        setErrorMsg(lang === 'zh-TW' ? '信箱或密碼錯誤！' : 'Invalid email or password!')
       } else if (err.code === 'auth/invalid-email') {
-        setErrorMsg('電子信箱格式不正確！')
+        setErrorMsg(lang === 'zh-TW' ? '電子信箱格式不正確！' : 'Invalid email address!')
       } else if (err.code === 'auth/weak-password') {
-        setErrorMsg('密碼強度不足，必須至少為 6 個字元！')
+        setErrorMsg(lang === 'zh-TW' ? '密碼強度不足，必須至少為 6 個字元！' : 'Password must be at least 6 characters!')
       } else {
-        setErrorMsg(err.message || '認證失敗，請稍後再試！')
+        setErrorMsg(err.message || (lang === 'zh-TW' ? '認證失敗，請稍後再試！' : 'Authentication failed, please try again!'))
       }
     } finally {
       setIsLoading(false)
@@ -82,7 +84,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
 
   const handleGuestLogin = () => {
     onLoginSuccess({
-      nickname: '訪客樂迷',
+      nickname: lang === 'zh-TW' ? '訪客樂迷' : 'Guest Fan',
       email: 'guest@example.com',
     })
   }
@@ -96,17 +98,17 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
       const userCredential = await signInWithPopup(auth, provider)
       const firebaseUser = userCredential.user
       onLoginSuccess({
-        nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || 'Google樂迷',
+        nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
         email: firebaseUser.email || '',
       })
     } catch (err: any) {
       console.error('Google Sign-In Error:', err)
       if (err.code === 'auth/popup-closed-by-user') {
-        setErrorMsg('登入視窗已關閉！')
+        setErrorMsg(lang === 'zh-TW' ? '登入視窗已關閉！' : 'Login popup closed!')
       } else if (err.code === 'auth/cancelled-popup-request') {
-        setErrorMsg('登入請求已被取消！')
+        setErrorMsg(lang === 'zh-TW' ? '登入請求已被取消！' : 'Login request cancelled!')
       } else {
-        setErrorMsg(err.message || 'Google 登入失敗！')
+        setErrorMsg(err.message || (lang === 'zh-TW' ? 'Google 登入失敗！' : 'Google Sign-In failed!'))
       }
     } finally {
       setIsLoading(false)
@@ -122,11 +124,11 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
 
         <div className="login-header">
           <div className="login-logo"><TaiwanIcon size="2.2em" /></div>
-          <h2>{isRegisterMode ? '加入台灣演唱會地圖' : '登入您的帳戶'}</h2>
+          <h2>{isRegisterMode ? t('joinApp') : t('loginApp')}</h2>
           <p className="login-subtitle">
             {isRegisterMode
-              ? '註冊以開啟發佈功能，分享專屬樂迷心得！'
-              : '登入帳戶，記錄與分享你的音樂現場足跡'}
+              ? t('signUpSubtitle')
+              : t('signInSubtitle')}
           </p>
         </div>
 
@@ -140,20 +142,20 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
         <form className="login-form" onSubmit={handleEmailAuthSubmit}>
           {isRegisterMode && (
             <div className="form-group">
-              <label htmlFor="login-nickname">暱稱</label>
+              <label htmlFor="login-nickname">{t('nicknameForm')}</label>
               <input
                 id="login-nickname"
                 type="text"
                 value={nickname}
                 onChange={(e) => setNickname(e.target.value)}
-                placeholder="e.g. 搖滾區小精靈"
+                placeholder={lang === 'zh-TW' ? 'e.g. 搖滾區小精靈' : 'e.g. Rock精靈'}
                 required
               />
             </div>
           )}
 
           <div className="form-group">
-            <label htmlFor="login-email">電子信箱</label>
+            <label htmlFor="login-email">{t('emailForm')}</label>
             <input
               id="login-email"
               type="email"
@@ -165,34 +167,34 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           </div>
 
           <div className="form-group">
-            <label htmlFor="login-password">密碼</label>
+            <label htmlFor="login-password">{t('passwordForm')}</label>
             <input
               id="login-password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              placeholder="至少 6 位密碼"
+              placeholder={t('passwordPlaceholder')}
               required
             />
           </div>
 
           <button className="login-submit-btn" type="submit" disabled={isLoading}>
             {isLoading ? (
-              '處理中...'
+              lang === 'zh-TW' ? '處理中...' : 'Processing...'
             ) : isRegisterMode ? (
               <>
-                註冊帳戶 <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+                {lang === 'zh-TW' ? '註冊帳戶' : 'Sign Up'} <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
               </>
             ) : (
               <>
-                信箱登入 <LockOpenIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+                {lang === 'zh-TW' ? '信箱登入' : 'Sign In'} <LockOpenIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
               </>
             )}
           </button>
         </form>
 
         <div className="login-divider">
-          <span>或使用以下方式快捷登入</span>
+          <span>{lang === 'zh-TW' ? '或使用以下方式快捷登入' : 'Or quick sign in with'}</span>
         </div>
 
         <div className="login-oauth-group">
@@ -204,7 +206,7 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
             style={{ width: '100%' }}
           >
             <span className="oauth-icon g-icon" />
-            使用 Google 帳戶登入
+            {t('googleSignIn')}
           </button>
         </div>
 
@@ -215,22 +217,22 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
           disabled={isLoading}
         >
           <KeyIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-          快速免登入體驗 (訪客模式)
+          {lang === 'zh-TW' ? '快速免登入體驗 (訪客模式)' : 'Guest Mode (No Sign In)'}
         </button>
 
         <div className="login-footer">
           {isRegisterMode ? (
             <p>
-              已經有帳戶了？{' '}
+              {lang === 'zh-TW' ? '已經有帳戶了？ ' : 'Already have an account? '}
               <button type="button" onClick={() => setIsRegisterMode(false)}>
-                立即登入
+                {lang === 'zh-TW' ? '立即登入' : 'Log In'}
               </button>
             </p>
           ) : (
             <p>
-              還沒有帳戶？{' '}
+              {lang === 'zh-TW' ? '還沒有帳戶？ ' : "Don't have an account? "}
               <button type="button" onClick={() => setIsRegisterMode(true)}>
-                立即註冊
+                {lang === 'zh-TW' ? '立即註冊' : 'Sign Up'}
               </button>
             </p>
           )}

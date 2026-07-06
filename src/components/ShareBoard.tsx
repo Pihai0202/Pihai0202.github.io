@@ -1,6 +1,7 @@
 import { useState, useMemo, useEffect } from 'react'
 import { marked } from 'marked'
 import type { SharedNote } from '../types'
+import { useTranslation } from '../utils/i18n.tsx'
 import {
   MicIcon,
   EditIcon,
@@ -21,6 +22,7 @@ import { db, logCustomEvent } from '../firebase'
 const LIKED_STORAGE_KEY = 'tw-liked-notes'
 
 export function ShareBoard() {
+  const { t, lang } = useTranslation()
   const [notes, setNotes] = useState<SharedNote[]>([])
   const [likedIds, setLikedIds] = useState<Record<string, boolean>>({})
   const [searchQuery, setSearchQuery] = useState('')
@@ -49,13 +51,13 @@ export function ShareBoard() {
   const [isPublishingReply, setIsPublishingReply] = useState(false)
 
   const notesPreviewHtml = useMemo(() => {
-    if (!form.notes) return '<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">（輸入心得後可在此預覽 Markdown 效果）</p>'
+    if (!form.notes) return `<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">${lang === 'zh-TW' ? '（輸入心得後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing reviews)'}</p>`
     try {
       return marked.parse(form.notes) as string
     } catch {
       return form.notes
     }
-  }, [form.notes])
+  }, [form.notes, lang])
 
   // Load notes and liked status
   useEffect(() => {
@@ -163,11 +165,11 @@ export function ShareBoard() {
   const handleAddReply = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedNote) return
-    const author = replyForm.author.trim() || '匿名樂迷'
+    const author = replyForm.author.trim() || t('anonymousAuthor')
     const content = replyForm.content.trim()
 
     if (!content) {
-      alert('請輸入回覆內容')
+      alert(lang === 'zh-TW' ? '請輸入回覆內容' : 'Please enter reply content')
       return
     }
 
@@ -188,7 +190,7 @@ export function ShareBoard() {
       })
     } catch (err) {
       console.error('Failed to add reply:', err)
-      alert('發表回覆失敗，請檢查連線並重試！')
+      alert(lang === 'zh-TW' ? '發表回覆失敗，請檢查連線並重試！' : 'Failed to post reply. Please check your connection and try again!')
     } finally {
       setIsPublishingReply(false)
     }
@@ -240,15 +242,15 @@ export function ShareBoard() {
     const concertName = form.concertName.trim()
     const venueName = form.venueName.trim()
     const venueCity = form.venueCity.trim()
-    const author = form.author.trim() || '匿名樂迷'
+    const author = form.author.trim() || t('anonymousAuthor')
     const notesContent = form.notes.trim()
 
     if (!artist) {
-      alert('請輸入演出者名稱')
+      alert(lang === 'zh-TW' ? '請輸入演出者名稱' : 'Please enter artist name')
       return
     }
     if (!notesContent) {
-      alert('請輸入心得內容')
+      alert(lang === 'zh-TW' ? '請輸入心得內容' : 'Please enter review content')
       return
     }
 
@@ -257,8 +259,8 @@ export function ShareBoard() {
     try {
       const docRef = await addDoc(collection(db, 'reviews'), {
         artist,
-        concertName: concertName || '未命名演唱會',
-        venueName: venueName || '未指定場館',
+        concertName: concertName || (lang === 'zh-TW' ? '未命名演唱會' : 'Unnamed Concert'),
+        venueName: venueName || (lang === 'zh-TW' ? '未指定場館' : 'Unspecified Venue'),
         venueCity: venueCity || '其他',
         date: form.date,
         author,
@@ -292,16 +294,16 @@ export function ShareBoard() {
       })
       setIsModalOpen(false)
       setTimeout(() => {
-        alert('發佈成功！您的心得已更新至分享牆。')
+        alert(lang === 'zh-TW' ? '發佈成功！您的心得已更新至分享牆。' : 'Published successfully! Your review has been updated on the board.')
       }, 100)
     } catch (err) {
       console.error('Firebase write error:', err)
-      alert('發佈失敗，請檢查網路連線或 Firebase 設定！')
+      alert(lang === 'zh-TW' ? '發佈失敗，請檢查網路連線或 Firebase 設定！' : 'Failed to publish. Check your connection or Firebase settings!')
     }
   }
 
   const handleNoteDelete = async (noteId: string) => {
-    if (!confirm('確定要刪除這筆分享記錄嗎？')) return
+    if (!confirm(lang === 'zh-TW' ? '確定要刪除這筆分享記錄嗎？' : 'Are you sure you want to delete this shared review?')) return
     try {
       await deleteDoc(doc(db, 'reviews', noteId))
       logCustomEvent('delete_community_note', {
@@ -309,7 +311,7 @@ export function ShareBoard() {
       })
     } catch (err) {
       console.error("Firestore delete error:", err)
-      alert('刪除失敗，請檢查網路連線！')
+      alert(lang === 'zh-TW' ? '刪除失敗，請檢查網路連線！' : 'Delete failed. Check your network connection!')
     }
   }
 
@@ -347,7 +349,7 @@ export function ShareBoard() {
               toggleExpand(note.id)
             }}
           >
-            {isExpanded ? '收起全文 ▴' : '展開全文 ▾'}
+            {isExpanded ? (lang === 'zh-TW' ? '收起全文 ▴' : 'Collapse ▴') : (lang === 'zh-TW' ? '展開全文 ▾' : 'Expand ▾')}
           </button>
         )}
       </div>
@@ -359,11 +361,11 @@ export function ShareBoard() {
       <div className="share-board-header">
         <h2 className="share-board-title">
           <MicIcon size="1.2em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-          演唱會觀後感分享牆
+          {t('socialWallTitle')}
         </h2>
-        <div className="share-board-subtitle">COMMUNITY CONCERT REVIEWS</div>
+        <div className="share-board-subtitle">{t('socialWallSubtitle')}</div>
         <p className="share-board-description">
-          在這裡閱讀全台熱血歌迷分享的現場真實感受，感受音樂的感動與現場震撼！
+          {lang === 'zh-TW' ? '在這裡閱讀全台熱血歌迷分享的現場真實感受，感受音樂的感動與現場震撼！' : 'Read genuine concert experiences shared by music fans across Taiwan and relive the magic!'}
         </p>
         <button
           className="board-publish-trigger"
@@ -374,7 +376,7 @@ export function ShareBoard() {
           }}
         >
           <EditIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-          撰寫並分享我的心得
+          {t('shareLogBtn')}
         </button>
       </div>
 
@@ -384,7 +386,7 @@ export function ShareBoard() {
           type="text"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          placeholder="搜尋歌手、演唱會名稱、場館或分享者..."
+          placeholder={lang === 'zh-TW' ? '搜尋歌手、演唱會名稱、場館或分享者...' : 'Search artist, concert, venue or author...'}
         />
         {searchQuery && (
           <button className="clear-search" type="button" onClick={() => setSearchQuery('')}>
@@ -395,13 +397,13 @@ export function ShareBoard() {
 
       {filteredNotes.length === 0 ? (
         <div className="board-empty-state">
-          沒有符合的分享記錄，試試搜尋其他歌手或場館！
+          {lang === 'zh-TW' ? '沒有符合的分享記錄，試試搜尋其他歌手或場館！' : 'No reviews match your search. Try another artist or venue!'}
         </div>
       ) : (
         <div className="board-grid">
           {filteredNotes.map((note) => {
             const isLiked = likedIds[note.id]
-            const formattedDate = new Date(note.createdAt).toLocaleDateString('zh-TW', {
+            const formattedDate = new Date(note.createdAt).toLocaleDateString(lang === 'zh-TW' ? 'zh-TW' : 'en-US', {
               year: 'numeric',
               month: 'long',
               day: 'numeric',
@@ -420,7 +422,7 @@ export function ShareBoard() {
                           e.stopPropagation()
                           handleNoteDelete(note.id)
                         }}
-                        title="刪除此分享"
+                        title={lang === 'zh-TW' ? '刪除此分享' : 'Delete this post'}
                       >
                         <TrashIcon size="1em" style={{ verticalAlign: 'middle' }} />
                       </button>
@@ -432,7 +434,7 @@ export function ShareBoard() {
                         e.stopPropagation()
                         handleLikeToggle(note.id)
                       }}
-                      title={isLiked ? '取消按讚' : '點擊按讚'}
+                      title={isLiked ? (lang === 'zh-TW' ? '取消按讚' : 'Unlike') : (lang === 'zh-TW' ? '點擊按讚' : 'Like')}
                     >
                       <span className="heart-icon">
                         {isLiked ? (
@@ -455,7 +457,7 @@ export function ShareBoard() {
                   </span>
                   <span>
                     <CalendarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                    {note.date || '日期未定'}
+                    {note.date || (lang === 'zh-TW' ? '日期未定' : 'Date TBD')}
                   </span>
                 </div>
 
@@ -466,7 +468,7 @@ export function ShareBoard() {
                     <UserIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
                     {note.author}
                   </span>
-                  <span className="post-date">發佈於 {formattedDate}</span>
+                  <span className="post-date">{lang === 'zh-TW' ? '發佈於' : 'Published on'} {formattedDate}</span>
                 </div>
               </div>
             )
@@ -482,23 +484,23 @@ export function ShareBoard() {
             </button>
             <h2>
               <EditIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-              撰寫觀後心得分享
+              {lang === 'zh-TW' ? '撰寫觀後心得分享' : 'Write and Share Review'}
             </h2>
             <form onSubmit={handlePublish}>
               <div className="form-group">
-                <label htmlFor="input-board-author">您的暱稱</label>
+                <label htmlFor="input-board-author">{t('nicknameForm')}</label>
                 <input
                   id="input-board-author"
                   type="text"
                   value={form.author}
                   onChange={(e) => setForm({ ...form, author: e.target.value })}
-                  placeholder="e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)"
+                  placeholder={t('shareNicknamePlaceholder')}
                   maxLength={20}
                 />
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.8rem', marginBottom: '0.8rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="input-board-artist">演出者 / 團體 *</label>
+                  <label htmlFor="input-board-artist">{t('artistLabel')} *</label>
                   <input
                     id="input-board-artist"
                     type="text"
@@ -509,19 +511,19 @@ export function ShareBoard() {
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="input-board-concert">演唱會名稱</label>
+                  <label htmlFor="input-board-concert">{t('concertNameLabel')}</label>
                   <input
                     id="input-board-concert"
                     type="text"
                     value={form.concertName}
                     onChange={(e) => setForm({ ...form, concertName: e.target.value })}
-                    placeholder="e.g. 亞洲巡迴演唱會"
+                    placeholder="e.g. YOASOBI Asia Tour"
                   />
                 </div>
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: '80px 1fr 1.2fr', gap: '0.8rem', marginBottom: '0.8rem' }}>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="input-board-city">縣市 *</label>
+                  <label htmlFor="input-board-city">{t('customCityLabel')} *</label>
                   <select
                     id="input-board-city"
                     value={form.venueCity}
@@ -538,22 +540,22 @@ export function ShareBoard() {
                     }}
                   >
                     {['台北', '新北', '桃園', '台中', '台南', '高雄', '宜蘭', '花蓮', '台東', '屏東', '其他'].map((c) => (
-                      <option key={c} value={c}>{c}</option>
+                      <option key={c} value={c}>{c === '其他' ? (lang === 'zh-TW' ? '其他' : 'Other') : c}</option>
                     ))}
                   </select>
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="input-board-venue">場館名稱</label>
+                  <label htmlFor="input-board-venue">{t('formVenue')}</label>
                   <input
                     id="input-board-venue"
                     type="text"
                     value={form.venueName}
                     onChange={(e) => setForm({ ...form, venueName: e.target.value })}
-                    placeholder="e.g. 台北流行音樂中心"
+                    placeholder="e.g. Zepp New Taipei"
                   />
                 </div>
                 <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label htmlFor="input-board-date">演出日期</label>
+                  <label htmlFor="input-board-date">{t('dateLabel')}</label>
                   <input
                     id="input-board-date"
                     type="date"
@@ -565,21 +567,21 @@ export function ShareBoard() {
               </div>
               <div className="form-group">
                 <div className="notes-label-row">
-                  <label htmlFor="input-board-notes">心得內容 * (支援 Markdown)</label>
+                  <label htmlFor="input-board-notes">{lang === 'zh-TW' ? '心得內容 * (支援 Markdown)' : 'Review Content * (Markdown)'}</label>
                   <div className="notes-tabs">
                     <button
                       type="button"
                       className={`notes-tab-btn${notesActiveTab === 'edit' ? ' active' : ''}`}
                       onClick={() => setNotesActiveTab('edit')}
                     >
-                      編輯
+                      {lang === 'zh-TW' ? '編輯' : 'Edit'}
                     </button>
                     <button
                       type="button"
                       className={`notes-tab-btn${notesActiveTab === 'preview' ? ' active' : ''}`}
                       onClick={() => setNotesActiveTab('preview')}
                     >
-                      預覽
+                      {lang === 'zh-TW' ? '預覽' : 'Preview'}
                     </button>
                   </div>
                 </div>
@@ -588,7 +590,7 @@ export function ShareBoard() {
                     id="input-board-notes"
                     value={form.notes}
                     required
-                    placeholder="在此寫下您的心得... (支援 Markdown 語法)"
+                    placeholder={lang === 'zh-TW' ? '在此寫下您的心得... (支援 Markdown 語法)' : 'Write your review here... (Supports Markdown)'}
                     onChange={(e) => setForm({ ...form, notes: e.target.value })}
                     style={{
                       width: '100%',
@@ -614,14 +616,14 @@ export function ShareBoard() {
               </div>
               <div className="publish-actions">
                 <button className="publish-submit-btn" type="submit">
-                  發佈心得 <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+                  {lang === 'zh-TW' ? '發佈心得' : 'Publish Review'} <CheckIcon size="1.1em" style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
                 </button>
                 <button
                   className="publish-cancel-btn"
                   type="button"
                   onClick={() => setIsModalOpen(false)}
                 >
-                  取消
+                  {lang === 'zh-TW' ? '取消' : 'Cancel'}
                 </button>
               </div>
             </form>
@@ -646,7 +648,7 @@ export function ShareBoard() {
                 </span>
                 <span>
                   <CalendarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                  {activeNote.date || '日期未定'}
+                  {activeNote.date || (lang === 'zh-TW' ? '日期未定' : 'Date TBD')}
                 </span>
               </div>
             </div>
@@ -660,7 +662,7 @@ export function ShareBoard() {
                     {activeNote.author}
                   </span>
                   <span className="post-date">
-                    發佈於 {new Date(activeNote.createdAt).toLocaleDateString('zh-TW', {
+                    {lang === 'zh-TW' ? '發佈於' : 'Published on'} {new Date(activeNote.createdAt).toLocaleDateString(lang === 'zh-TW' ? 'zh-TW' : 'en-US', {
                       year: 'numeric',
                       month: 'long',
                       day: 'numeric'
@@ -689,7 +691,7 @@ export function ShareBoard() {
                       e.stopPropagation()
                       handleLikeToggle(activeNote.id)
                     }}
-                    title={likedIds[activeNote.id] ? '取消按讚' : '點擊按讚'}
+                    title={likedIds[activeNote.id] ? (lang === 'zh-TW' ? '取消按讚' : 'Unlike') : (lang === 'zh-TW' ? '點擊按讚' : 'Like')}
                   >
                     <span className="heart-icon">
                       {likedIds[activeNote.id] ? (
@@ -698,23 +700,23 @@ export function ShareBoard() {
                         <HeartOutlineIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
                       )}
                     </span>
-                    <span className="like-count">{activeNote.likes} 人按讚</span>
+                    <span className="like-count">{activeNote.likes} {lang === 'zh-TW' ? '人按讚' : 'likes'}</span>
                   </button>
                 </div>
               </div>
 
               {/* Replies Section */}
               <div className="replies-section">
-                <h3>💬 樂迷回覆 ({replies.length})</h3>
+                <h3>💬 {lang === 'zh-TW' ? '樂迷回覆' : 'Replies'} ({replies.length})</h3>
                 
                 <div className="replies-list">
                   {replies.length === 0 ? (
                     <div className="replies-empty">
-                      目前尚無回覆，快來跟大家交流吧！
+                      {lang === 'zh-TW' ? '目前尚無回覆，快來跟大家交流吧！' : 'No replies yet. Be the first to comment!'}
                     </div>
                   ) : (
                     replies.map((reply) => {
-                      const replyDate = new Date(reply.createdAt).toLocaleString('zh-TW', {
+                      const replyDate = new Date(reply.createdAt).toLocaleString(lang === 'zh-TW' ? 'zh-TW' : 'en-US', {
                         month: 'short',
                         day: 'numeric',
                         hour: '2-digit',
@@ -750,36 +752,36 @@ export function ShareBoard() {
 
               {/* Reply Form */}
               <div className="reply-form-container">
-                <h4>✍️ 發表回覆</h4>
+                <h4>✍️ {lang === 'zh-TW' ? '發表回覆' : 'Post Reply'}</h4>
                 <form onSubmit={handleAddReply}>
                   <div className="form-group">
-                    <label htmlFor="reply-author">您的暱稱</label>
+                    <label htmlFor="reply-author">{t('nicknameForm')}</label>
                     <input
                       id="reply-author"
                       type="text"
                       value={replyForm.author}
                       onChange={(e) => setReplyForm({ ...replyForm, author: e.target.value })}
-                      placeholder="e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)"
+                      placeholder={t('shareNicknamePlaceholder')}
                       maxLength={20}
                     />
                   </div>
                   <div className="form-group">
                     <div className="notes-label-row">
-                      <label htmlFor="reply-content">回覆內容 * (支援 Markdown)</label>
+                      <label htmlFor="reply-content">{lang === 'zh-TW' ? '回覆內容 * (支援 Markdown)' : 'Reply Content * (Markdown)'}</label>
                       <div className="notes-tabs">
                         <button
                           type="button"
                           className={`notes-tab-btn${replyActiveTab === 'edit' ? ' active' : ''}`}
                           onClick={() => setReplyActiveTab('edit')}
                         >
-                          編輯
+                          {lang === 'zh-TW' ? '編輯' : 'Edit'}
                         </button>
                         <button
                           type="button"
                           className={`notes-tab-btn${replyActiveTab === 'preview' ? ' active' : ''}`}
                           onClick={() => setReplyActiveTab('preview')}
                         >
-                          預覽
+                          {lang === 'zh-TW' ? '預覽' : 'Preview'}
                         </button>
                       </div>
                     </div>
@@ -788,7 +790,7 @@ export function ShareBoard() {
                         id="reply-content"
                         value={replyForm.content}
                         required
-                        placeholder="寫下您的回覆... (支援 Markdown 語法)"
+                        placeholder={lang === 'zh-TW' ? '寫下您的回覆... (支援 Markdown 語法)' : 'Write your reply... (Supports Markdown)'}
                         onChange={(e) => setReplyForm({ ...replyForm, content: e.target.value })}
                         style={{
                           width: '100%',
@@ -811,13 +813,13 @@ export function ShareBoard() {
                         dangerouslySetInnerHTML={{ 
                           __html: replyForm.content.trim() 
                             ? (marked.parse(replyForm.content) as string) 
-                            : '<p style="color: var(--muted); font-style: italic; font-size: 0.8rem;">（輸入內容後可在此預覽 Markdown 效果）</p>' 
+                            : `<p style="color: var(--muted); font-style: italic; font-size: 0.8rem;">${lang === 'zh-TW' ? '（輸入內容後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing)'}</p>` 
                         }}
                       />
                     )}
                   </div>
                   <button className="reply-submit-btn" type="submit" disabled={isPublishingReply}>
-                    {isPublishingReply ? '發表中...' : '發表回覆'}
+                    {isPublishingReply ? (lang === 'zh-TW' ? '發表中...' : 'Posting...') : (lang === 'zh-TW' ? '發表回覆' : 'Post Reply')}
                   </button>
                 </form>
               </div>

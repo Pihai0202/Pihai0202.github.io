@@ -3,6 +3,7 @@ import type { MouseEvent } from 'react'
 import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
+import { useTranslation } from '../utils/i18n.tsx'
 
 const project = (lon: number, lat: number) => {
   const x = 159.787256 * lon - 18882.141068
@@ -61,6 +62,7 @@ export function TaiwanMap({
   activeVenueIds,
   categoryFilter = 'all',
 }: TaiwanMapProps) {
+  const { t, lang } = useTranslation()
   const [center, setCenter] = useState({ x: 455, y: 500 })
   const [isDragging, setIsDragging] = useState(false)
   const [showShuangbeiDetail, setShowShuangbeiDetail] = useState(false)
@@ -477,13 +479,13 @@ export function TaiwanMap({
           />
         ))}
         <text x="213" y="585" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          澎湖
+          {lang === 'zh-TW' ? '澎湖' : 'Penghu'}
         </text>
         <text x="25" y="375" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          金門
+          {lang === 'zh-TW' ? '金門' : 'Kinmen'}
         </text>
         <text x="324" y="115" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          馬祖
+          {lang === 'zh-TW' ? '馬祖' : 'Matsu'}
         </text>
 
         {displayZoom < 1.5 && (
@@ -504,7 +506,7 @@ export function TaiwanMap({
               9
             </text>
             <text x="0" y="27" textAnchor="middle" className="cluster-label">
-              雙北場館
+              {t('shuangbeiCluster')}
             </text>
           </g>
         )}
@@ -581,7 +583,7 @@ export function TaiwanMap({
       {showShuangbeiDetail && (
         <div className="shuangbei-popover">
           <div className="popover-header">
-            <span className="popover-title">📍 雙北地區場館特寫</span>
+            <span className="popover-title">📍 {lang === 'zh-TW' ? '雙北地區場館特寫' : 'Shuangbei Venues Detail'}</span>
             <button className="popover-close-btn" onClick={() => setShowShuangbeiDetail(false)}>×</button>
           </div>
           
@@ -640,8 +642,8 @@ export function TaiwanMap({
                     {hasVisits && <span className="visited-tick">✓</span>}
                   </div>
                   <div className="popover-venue-meta">
-                    <span>👥 {venue.capacity} 人</span>
-                    <span>📍 {venue.city}</span>
+                    <span>{t('capacityPeople', { capacity: venue.capacity })}</span>
+                    <span>📍 {venue.city === '台北' ? (lang === 'zh-TW' ? '台北' : 'Taipei') : (lang === 'zh-TW' ? '新北' : 'New Taipei')}</span>
                   </div>
                 </div>
               )
@@ -663,11 +665,11 @@ export function TaiwanMap({
         >
           <div className="tooltip-title">{hoveredVenue.name}</div>
           <div className="tooltip-meta">
-            <span>📍 {hoveredVenue.city}</span>
-            <span>👥 {hoveredVenue.capacity} 人</span>
+            <span>📍 {hoveredVenue.city === '台北' ? (lang === 'zh-TW' ? '台北' : 'Taipei') : hoveredVenue.city === '新北' ? (lang === 'zh-TW' ? '新北' : 'New Taipei') : hoveredVenue.city}</span>
+            <span>{t('capacityPeople', { capacity: hoveredVenue.capacity })}</span>
           </div>
           {concerts.some((c) => c.venueId === hoveredVenue.id) && (
-            <div className="tooltip-status visited">✓ 已拜訪過此場館</div>
+            <div className="tooltip-status visited">{t('visitedBadgeText')}</div>
           )}
         </div>
       )}

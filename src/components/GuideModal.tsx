@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { useTranslation } from '../utils/i18n.tsx'
 import {
   MapIcon,
   CalendarIcon,
@@ -53,7 +54,9 @@ export function GuideModal({ onClose }: GuideModalProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [showScreenshotMobile, setShowScreenshotMobile] = useState(false)
 
-  const steps: GuideStep[] = [
+  const { lang } = useTranslation()
+
+  const zhSteps: GuideStep[] = [
     {
       title: '互動式台灣 SVG 地圖與場館指南',
       subtitle: 'TaiwanMap Venue Explorer',
@@ -147,6 +150,103 @@ export function GuideModal({ onClose }: GuideModalProps) {
       ]
     }
   ]
+
+  const enSteps: GuideStep[] = [
+    {
+      title: 'Interactive Taiwan Venue Map',
+      subtitle: 'TaiwanMap Venue Explorer',
+      icon: <MapIcon size="2rem" />,
+      description: 'An interactive exploration map of 26+ iconic music and sports venues in Taiwan.',
+      details: [
+        'Zoom controls: Supports mouse dragging and pinch-to-zoom (70% to 500%).',
+        'Responsive layout: Adaptive bottom sheet drawer for mobile screens.',
+        'Concert footprints: Checkmarks (✓) for venues you have visited.',
+        'Category filters: Filter venues by "Concerts" or "Sports Events".'
+      ]
+    },
+    {
+      title: 'Real-time Transport & Commute Info',
+      subtitle: 'TransitInfoBoard Traffic Assistant',
+      icon: <TrainIcon size="2rem" />,
+      description: 'Integrates Ministry of Transportation API to provide real-time updates and departure timetables.',
+      details: [
+        'MRT integration: Timely status updates for Taipei MRT, New Taipei MRT, Taoyuan MRT, Taichung MRT, and Kaohsiung MRT.',
+        'Real-time boards: Subway counts and countdown departures.',
+        'TRA & HSR timetables: Search schedules and live status of TRA train and High Speed Rail.',
+        'Bus dynamic (ETA): Real-time bus search and estimated time of arrivals.'
+      ]
+    },
+    {
+      title: 'Real-time Weather & 7-Day Forecast',
+      subtitle: 'VenueWeather Environmental Monitor',
+      icon: <SunIcon size="2rem" />,
+      description: 'Accurate weather and air quality forecast around the venue.',
+      details: [
+        'Localized weather: Precise temperature, feels-like, humidity, and wind based on venue coordinates.',
+        'Air Quality (AQI): Monitors PM2.5 and PM10 index with outdoor recommendations.',
+        '7-day forecast: Weekly weather change forecast with 5-minute caching mechanism.'
+      ]
+    },
+    {
+      title: 'Upcoming Ticketing Information',
+      subtitle: 'Upcoming Ticket Exploration',
+      icon: <MusicIcon size="2rem" />,
+      description: 'Aggregates upcoming tickets and ticketing status across platforms.',
+      details: [
+        'Ticket feeds: Aggregates ticketing events from KKTIX, tixCraft, ERA, ibon, etc.',
+        'Category filters: Sort and filter by "Concerts" and "CPBL Sports".',
+        'Manual refresh: Click refresh to immediately load the latest listings.'
+      ]
+    },
+    {
+      title: 'Ticket Details & Spotify Playback',
+      subtitle: 'TicketDetailModal & Spotify Playback',
+      icon: <MusicIcon size="2rem" />,
+      description: 'Detail views with ticket URLs, discussion board, and music playback.',
+      details: [
+        'Smart link correction: Directs generic platform links to specific concert booking pages.',
+        'Spotify audition: Searches hot tracks and listens on the web player.',
+        'Discussion board: Exchange reviews and live concert information with fellow fans.',
+        'Save log: Add ticket event directly into personal calendar list.'
+      ]
+    },
+    {
+      title: 'Fan Review Community Board',
+      subtitle: 'ShareBoard Review Diary',
+      icon: <MessageIcon size="2rem" />,
+      description: 'Concert reviews and music diary wall for the fan community.',
+      details: [
+        'Publish reviews: Write concert reviews stored in Firebase Firestore instantly.',
+        'Markdown support: Dual panels supporting Markdown edit and live preview.',
+        'Likes and replies: Interact with reviews by liking and commenting.'
+      ]
+    },
+    {
+      title: 'Add Concert Footprints',
+      subtitle: 'Add Concert Record',
+      icon: <PlusIcon size="2rem" />,
+      description: 'Record your live music footprint and build your custom concert log.',
+      details: [
+        'Log fields: Fill out artist, concert name, date, seat section, and reviews.',
+        'Attach music: Search Spotify tracks and bind them to your logs.',
+        'Cloud backup: Sync all your concert logs across devices using Firebase Auth.'
+      ]
+    },
+    {
+      title: 'Calendar and Footprint Statistics',
+      subtitle: 'CalendarView & ProfilePage statistics',
+      icon: <CalendarIcon size="2rem" />,
+      description: 'Complete concert calendar and statistics of your music footprint.',
+      details: [
+        'Dual modes: Toggle between monthly grid view and chronological list timeline.',
+        'Stats dashboard: Visually tracks your total concerts, cities, venues, and media.',
+        'Customize profile: Change nickname and select random avatars.',
+        'Typhoon alerts: Automatic weather/work/class suspension alerts during typhoons.'
+      ]
+    }
+  ]
+
+  const steps = lang === 'zh-TW' ? zhSteps : enSteps
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -275,19 +375,19 @@ export function GuideModal({ onClose }: GuideModalProps) {
               className="guide-mobile-screenshot-trigger" 
               onClick={() => setShowScreenshotMobile(true)}
             >
-              <ImageIcon size="1.2rem" /> 檢視功能畫面截圖
+              <ImageIcon size="1.2rem" /> {lang === 'zh-TW' ? '檢視功能畫面截圖' : 'View Feature Screenshot'}
             </button>
 
             <p className="guide-step-desc">{step.description}</p>
 
             <ul className="guide-step-details">
               {step.details.map((detail, index) => {
-                const parts = detail.split('：')
+                const parts = detail.split(/：|:/)
                 if (parts.length > 1) {
                   return (
                     <li key={index}>
-                      <strong>{parts[0]}：</strong>
-                      {parts.slice(1).join('：')}
+                      <strong>{parts[0]}{lang === 'zh-TW' ? '：' : ': '}</strong>
+                      {parts.slice(1).join(lang === 'zh-TW' ? '：' : ': ')}
                     </li>
                   )
                 }
@@ -304,7 +404,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
                     type="button"
                     className={`guide-nav-dot${idx === currentStep ? ' active' : ''}`}
                     onClick={() => setCurrentStep(idx)}
-                    title={`第 ${idx + 1} 步`}
+                    title={lang === 'zh-TW' ? `第 ${idx + 1} 步` : `Step ${idx + 1}`}
                   />
                 ))}
               </div>
@@ -316,7 +416,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
                     type="button" 
                     onClick={handlePrev}
                   >
-                    上一步
+                    {lang === 'zh-TW' ? '上一步' : 'Prev'}
                   </button>
                 )}
                 
@@ -325,7 +425,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
                   type="button" 
                   onClick={handleNext}
                 >
-                  {currentStep === steps.length - 1 ? '開始探索' : '下一步'}
+                  {currentStep === steps.length - 1 ? (lang === 'zh-TW' ? '開始探索' : 'Get Started') : (lang === 'zh-TW' ? '下一步' : 'Next')}
                 </button>
               </div>
             </div>
@@ -341,12 +441,12 @@ export function GuideModal({ onClose }: GuideModalProps) {
               className="guide-lightbox-close" 
               onClick={() => setShowScreenshotMobile(false)}
               type="button"
-              aria-label="關閉截圖"
+              aria-label={lang === 'zh-TW' ? '關閉截圖' : 'Close Screenshot'}
             >
               <CloseIcon size="1.2rem" />
             </button>
             <div className="guide-lightbox-header">
-              <span>{step.title} ─ 畫面截圖</span>
+              <span>{step.title} ─ {lang === 'zh-TW' ? '畫面截圖' : 'Screenshot'}</span>
             </div>
             <div className="guide-lightbox-body">
               {currentStep === 0 && <img src={`${import.meta.env.BASE_URL}guide_img1.png`} alt={step.title} />}

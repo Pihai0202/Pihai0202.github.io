@@ -25,6 +25,7 @@ import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
+import { useTranslation } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
@@ -219,6 +220,14 @@ function extractArtistFromTitle(title: string): string {
 }
 
 function App() {
+  const { t, lang, setLang } = useTranslation()
+  const toggleLanguage = () => {
+    if (lang === 'zh-TW') setLang('en')
+    else if (lang === 'en') setLang('ja')
+    else if (lang === 'ja') setLang('ko')
+    else setLang('zh-TW')
+  }
+
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const storedTheme = localStorage.getItem('theme')
     if (storedTheme === 'light' || storedTheme === 'dark') {
@@ -972,22 +981,22 @@ function App() {
 
   const deleteConcert = (id: string, event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
-    if (!confirm('確定要刪除這筆記錄嗎？')) return
+    if (!confirm(t('confirmDelete'))) return
     const updatedList = concerts.filter((c) => c.id !== id)
     updateConcertsList(updatedList)
   }
 
   const handlePublishToBoard = async (authorName: string) => {
     if (!publishingConcert) return
-    const author = authorName.trim() || '匿名樂迷'
+    const author = authorName.trim() || t('anonymousAuthor')
     localStorage.setItem('tw-nickname', author)
     setNickname(author)
 
     try {
       const docRef = await addDoc(collection(db, 'reviews'), {
         artist: publishingConcert.artist,
-        concertName: publishingConcert.concertName || '未命名演唱會',
-        venueName: publishingConcert.venueName || '未指定場館',
+        concertName: publishingConcert.concertName || (lang === 'zh-TW' ? '未命名演唱會' : 'Unnamed Concert'),
+        venueName: publishingConcert.venueName || (lang === 'zh-TW' ? '未指定場館' : 'Unspecified Venue'),
         venueCity: publishingConcert.venueCity || '其他',
         date: publishingConcert.date || '',
         author: author,
@@ -1011,13 +1020,13 @@ function App() {
       setIsPublishModalOpen(false)
       setPublishingConcert(null)
       setTimeout(() => {
-        alert('🎉 發佈成功！已將您的觀後感分享至社群牆。')
+        alert(lang === 'zh-TW' ? '🎉 發佈成功！已將您的觀後感分享至社群牆。' : '🎉 Successfully published! Your review has been shared to the community board.')
         setView('board')
         setDetailConcertId(null)
       }, 100)
     } catch (error) {
       console.error('Firebase write error:', error)
-      alert('❌ 發佈失敗，請檢查網路連線或 Firebase 設定！')
+      alert(lang === 'zh-TW' ? '❌ 發佈失敗，請檢查網路連線或 Firebase 設定！' : '❌ Failed to publish. Please check your connection or Firebase settings.')
     }
   }
 
@@ -1032,7 +1041,7 @@ function App() {
     setIsLoggedIn(false)
     setCurrentUser(null)
     setView('map')
-    alert('👋 您已成功登出！')
+    alert(lang === 'zh-TW' ? '👋 您已成功登出！' : '👋 You have successfully logged out!')
   }
 
   const removePendingMedia = (index: number) => {
@@ -1138,8 +1147,8 @@ function App() {
         <div className="logo" onClick={handleHeaderClick}>
           <div className="logo-icon"><TaiwanIcon /></div>
           <div className="logo-text">
-            <h1>台灣演唱會地圖</h1>
-            <span>TAIWAN CONCERT LOG</span>
+            <h1>{t('title')}</h1>
+            <span>{t('subtitle')}</span>
           </div>
         </div>
 
@@ -1147,7 +1156,7 @@ function App() {
           <span className="search-icon"><SearchIcon /></span>
           <input
             type="text"
-            placeholder="搜尋歌手、售票或場館..."
+            placeholder={t('searchPlaceholder')}
             value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value)
@@ -1169,45 +1178,54 @@ function App() {
 
         <div className="header-right">
           <div className="stats-bar">
-            <Stat number={concerts.length} label="演唱會" />
-            <Stat number={visitedVenueCount} label="場館" />
-            <Stat number={remoteConcerts.length} label="售票" />
-            <Stat number={totalMedia} label="照片/影片" />
+            <Stat number={concerts.length} label={t('statConcerts')} />
+            <Stat number={visitedVenueCount} label={t('statVenues')} />
+            <Stat number={remoteConcerts.length} label={t('statTickets')} />
+            <Stat number={totalMedia} label={t('statMedia')} />
           </div>
           <button
             className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('map')}
           >
-            <MapIcon style={{ marginRight: '6px' }} /> 場館地圖
+            <MapIcon style={{ marginRight: '6px' }} /> {t('tabMap')}
           </button>
           <button
             className={`nav-toggle-btn${view === 'calendar' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('calendar')}
           >
-            <CalendarIcon style={{ marginRight: '6px' }} /> 活動行事曆
+            <CalendarIcon style={{ marginRight: '6px' }} /> {t('tabCalendar')}
           </button>
           <button
             className={`nav-toggle-btn${view === 'board' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('board')}
           >
-            <MessageIcon style={{ marginRight: '6px' }} /> 社群分享牆
+            <MessageIcon style={{ marginRight: '6px' }} /> {t('tabCommunity')}
           </button>
           <button
-            className="nav-toggle-btn guide-trigger-btn"
+            className="nav-toggle-btn lang-toggle-btn"
+            type="button"
+            onClick={toggleLanguage}
+            title={t('langTitle')}
+          >
+            🌐 {lang === 'zh-TW' ? '繁中' : lang === 'en' ? 'EN' : lang === 'ja' ? '日本語' : '한국어'}
+          </button>
+          <button
+            className="theme-toggle-btn guide-trigger-icon-btn"
             type="button"
             onClick={() => setIsGuideModalOpen(true)}
-            title="網站導覽"
+            title={t('siteTour')}
+            aria-label="網站導覽"
           >
-            <SparklesIcon style={{ marginRight: '6px' }} /> 網站導覽
+            <SparklesIcon />
           </button>
           <button
             className="theme-toggle-btn"
             type="button"
             onClick={toggleTheme}
-            title={theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}
+            title={theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : 'Switch to Dark Mode')}
             aria-label="切換主題"
           >
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
@@ -1223,10 +1241,10 @@ function App() {
                   color: view === 'profile' ? 'var(--gold)' : 'var(--text)'
                 }}
               >
-                <UserIcon style={{ marginRight: '6px' }} /> 個人資料
+                <UserIcon style={{ marginRight: '6px' }} /> {t('profile')}
               </button>
               <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
-                登出
+                {t('logout')}
               </button>
             </div>
           ) : (
@@ -1235,7 +1253,7 @@ function App() {
               type="button"
               onClick={() => setView('login')}
             >
-              🔑 登入
+              🔑 {t('login')}
             </button>
           )}
         </div>
@@ -1409,7 +1427,7 @@ function App() {
                     setTempZoomInput(String(Math.round(zoom * 100)))
                     setIsEditingZoom(true)
                   }}
-                  title="點擊輸入自訂比例"
+                  title={lang === 'zh-TW' ? '點擊輸入自訂比例' : 'Click to enter custom zoom'}
                   style={{ cursor: 'pointer' }}
                 >
                   {Math.round(zoom * 100)}%
@@ -1418,13 +1436,13 @@ function App() {
             </div>
 
             <div className="map-legend">
-              <LegendItem color="var(--accent)" label="尚未造訪" />
-              <LegendItem color="var(--teal)" label="已去過" />
-              <LegendItem color="var(--gold)" label="選取中" />
+              <LegendItem color="var(--accent)" label={t('unvisited')} />
+              <LegendItem color="var(--teal)" label={t('visited')} />
+              <LegendItem color="var(--gold)" label={t('selected')} />
             </div>
 
             <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
-              <ClipboardIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> 全部記錄
+              <ClipboardIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> {t('allLogs')}
             </button>
 
             {/* Mobile Bottom Sheet (Sliding Drawer) */}
@@ -1796,7 +1814,7 @@ function App() {
                 {isMusicBarVisible && (
                   <div className="right-panel-spotify-player">
                     <div className="spotify-player-header">
-                      <span className="sp-title">🎵 音樂播放器</span>
+                      <span className="sp-title">🎵 {t('spotifyPlayerTitle')}</span>
                       <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
                     </div>
                     <div className="spotify-player-body">
@@ -1810,7 +1828,7 @@ function App() {
                         />
                       ) : (
                         <div className="music-bar-placeholder">
-                          <span>在記錄中點擊 Spotify 連結播放</span>
+                          <span>{t('spotifyPlayerPlaceholder')}</span>
                         </div>
                       )}
                     </div>
@@ -1887,10 +1905,10 @@ function App() {
 
       {isAddModalOpen && (
         <Modal onClose={closeAddModal}>
-          <h2>新增演唱會 / 自訂活動</h2>
+          <h2>{t('addConcertTitle')}</h2>
 
           <div className="form-group">
-            <label htmlFor="input-venue-select">活動場館</label>
+            <label htmlFor="input-venue-select">{t('formVenue')}</label>
             <select
               id="input-venue-select"
               value={formVenueId}
@@ -1910,30 +1928,30 @@ function App() {
                 }
               }}
             >
-              <option value="" disabled>-- 請選擇場館 --</option>
+              <option value="" disabled>{t('selectVenuePlaceholder')}</option>
               {VENUES.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.name} ({v.city})
                 </option>
               ))}
-              <option value="custom">其他 / 自訂場館</option>
+              <option value="custom">{t('customVenueOpt')}</option>
             </select>
           </div>
 
           {formVenueId === 'custom' && (
             <div className="form-row custom-venue-row" style={{ display: 'flex', gap: '0.8rem', marginTop: '0.4rem', marginBottom: '1rem' }}>
               <div className="form-group" style={{ flex: 2, marginBottom: 0 }}>
-                <label htmlFor="input-custom-venue">自訂場館名稱</label>
+                <label htmlFor="input-custom-venue">{t('customVenueLabel')}</label>
                 <input
                   id="input-custom-venue"
                   type="text"
                   value={formVenueName}
-                  placeholder="e.g. 國家音樂廳、Legacy Mini..."
+                  placeholder={t('customVenuePlaceholder')}
                   onChange={(event) => setFormVenueName(event.target.value)}
                 />
               </div>
               <div className="form-group" style={{ flex: 1, marginBottom: 0 }}>
-                <label htmlFor="input-custom-city">縣市</label>
+                <label htmlFor="input-custom-city">{t('customCityLabel')}</label>
                 <select
                   id="input-custom-city"
                   value={formVenueCity}
@@ -1950,27 +1968,27 @@ function App() {
           )}
 
           <div className="form-group">
-            <label htmlFor="input-artist">演出者 / 團體</label>
+            <label htmlFor="input-artist">{t('artistLabel')}</label>
             <input
               id="input-artist"
               type="text"
               value={form.artist}
-              placeholder="e.g. 周杰倫、五月天..."
+              placeholder={t('artistPlaceholder')}
               onChange={(event) => updateForm('artist', event.target.value)}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="input-concert-name">演唱會名稱</label>
+            <label htmlFor="input-concert-name">{t('concertNameLabel')}</label>
             <input
               id="input-concert-name"
               type="text"
               value={form.concertName}
-              placeholder="e.g. 魔天倫世界巡迴演唱會"
+              placeholder={t('concertNamePlaceholder')}
               onChange={(event) => updateForm('concertName', event.target.value)}
             />
           </div>
           <div className="form-group">
-            <label htmlFor="input-date">日期</label>
+            <label htmlFor="input-date">{t('dateLabel')}</label>
             <input
               id="input-date"
               type="date"
@@ -1979,32 +1997,32 @@ function App() {
             />
           </div>
           <div className="form-group">
-            <label htmlFor="input-seat">座位 / 區域</label>
+            <label htmlFor="input-seat">{t('seatLabel')}</label>
             <input
               id="input-seat"
               type="text"
               value={form.seat}
-              placeholder="e.g. 搖滾區 A3 排"
+              placeholder={t('seatPlaceholder')}
               onChange={(event) => updateForm('seat', event.target.value)}
             />
           </div>
           <div className="form-group">
             <div className="notes-label-row">
-              <label htmlFor="input-notes">心得筆記 (支援 Markdown)</label>
+              <label htmlFor="input-notes">{t('notesLabel')}</label>
               <div className="notes-tabs">
                 <button
                   type="button"
                   className={`notes-tab-btn${notesActiveTab === 'edit' ? ' active' : ''}`}
                   onClick={() => setNotesActiveTab('edit')}
                 >
-                  編輯
+                  {lang === 'zh-TW' ? '編輯' : 'Edit'}
                 </button>
                 <button
                   type="button"
                   className={`notes-tab-btn${notesActiveTab === 'preview' ? ' active' : ''}`}
                   onClick={() => setNotesActiveTab('preview')}
                 >
-                  預覽
+                  {lang === 'zh-TW' ? '預覽' : 'Preview'}
                 </button>
               </div>
             </div>
@@ -2012,7 +2030,7 @@ function App() {
               <textarea
                 id="input-notes"
                 value={form.notes}
-                placeholder="記下難忘的時刻... (支援 Markdown 語法如 # 標題, **粗體**, - 清單)"
+                placeholder={t('notesPlaceholder')}
                 onChange={(event) => updateForm('notes', event.target.value)}
               />
             ) : (
@@ -2023,14 +2041,14 @@ function App() {
             )}
           </div>
           <div className="form-group">
-            <label htmlFor="input-spotify-query">Spotify 音樂連結</label>
+            <label htmlFor="input-spotify-query">{t('spotifySearchLabel')}</label>
             <div className="spotify-search-box">
               <div className="spotify-search-row">
                 <input
                   id="input-spotify-query"
                   type="text"
                   value={spotifyQuery}
-                  placeholder="搜尋歌手、專輯或歌曲..."
+                  placeholder={t('spotifySearchPlaceholder')}
                   onChange={(event) => setSpotifyQuery(event.target.value)}
                   onKeyDown={(event) => {
                     if (event.key === 'Enter') {
@@ -2045,7 +2063,7 @@ function App() {
                   disabled={isSpotifySearching}
                   onClick={() => searchSpotify()}
                 >
-                  搜尋
+                  {t('spotifySearchBtn')}
                 </button>
               </div>
               <input
@@ -2055,7 +2073,7 @@ function App() {
                 onChange={(event) => updateForm('spotifyUrl', event.target.value)}
               />
               <div className="spotify-hint">
-                搜尋後選擇一個 Spotify 項目，之後點擊演唱會卡片即可載入播放器。
+                {lang === 'zh-TW' ? '搜尋後選擇一個 Spotify 項目，之後點擊演唱會卡片即可載入播放器。' : 'Select a Spotify item to load into the player upon clicking a card.'}
               </div>
               {selectedSpotify && (
                 <div className="spotify-selected-preview">
@@ -2069,7 +2087,7 @@ function App() {
                   <div className="sp-selected-info">
                     <div className="sp-selected-name">{selectedSpotify.name}</div>
                     <div className="sp-selected-sub">
-                      已選擇 · {SPOTIFY_TYPE_LABELS[selectedSpotify.type]}
+                      {lang === 'zh-TW' ? '已選擇' : 'Selected'} · {selectedSpotify.type === 'artist' ? t('spotifyTypeArtist') : selectedSpotify.type === 'album' ? t('spotifyTypeAlbum') : t('spotifyTypeTrack')}
                     </div>
                   </div>
                   <button className="sp-selected-clear" type="button" onClick={clearSpotifySelection}>
@@ -2089,11 +2107,11 @@ function App() {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="input-media">照片 / 影片</label>
+            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片 / 影片' : 'Photos / Videos'}</label>
             <div className="media-upload-area">
               <div className="upload-icon"><CameraIcon /></div>
-              <div className="upload-text">點擊或拖曳上傳</div>
-              <div className="upload-sub">支援 JPG, PNG, MP4, MOV</div>
+              <div className="upload-text">{lang === 'zh-TW' ? '點擊或拖曳上傳' : 'Click or drag files to upload'}</div>
+              <div className="upload-sub">{lang === 'zh-TW' ? '支援 JPG, PNG, MP4, MOV' : 'Supports JPG, PNG, MP4, MOV'}</div>
               <input
                 id="input-media"
                 type="file"
@@ -2106,7 +2124,7 @@ function App() {
           </div>
 
           <button className="modal-submit" type="button" onClick={saveConcert}>
-            儲存記錄 <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+            {lang === 'zh-TW' ? '儲存記錄' : 'Save Log'} <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
           </button>
         </Modal>
       )}
@@ -2342,7 +2360,7 @@ function App() {
             onClick={() => setIsMusicBarVisible((visible) => !visible)}
           >
             <div className="spotify-icon" />
-            <span>{isMusicBarVisible ? '收起播放器' : '音樂播放器'}</span>
+            <span>{isMusicBarVisible ? t('spotifyPlayerCollapse') : t('spotifyPlayerTitle')}</span>
           </button>
 
           <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
@@ -2358,7 +2376,7 @@ function App() {
               ) : (
                 <div className="music-bar-placeholder">
                   <span className="sp-logo">🎵</span>
-                  <span>在演唱會記錄中加入 Spotify 連結，點擊卡片即可在此播放</span>
+                  <span>{t('spotifyPlayerPlaceholder')}</span>
                 </div>
               )}
             </div>
@@ -2400,7 +2418,7 @@ function App() {
                 }}
               >
                 <span className="icon"><MapIcon /></span>
-                <span className="label">探索地圖</span>
+                <span className="label">{t('tabMap')}</span>
               </button>
               <button
                 className="sidebar-nav-item"
@@ -2411,7 +2429,7 @@ function App() {
                 }}
               >
                 <span className="icon"><PlusIcon /></span>
-                <span className="label">新增活動紀錄</span>
+                <span className="label">{lang === 'zh-TW' ? '新增活動紀錄' : 'Add Event Log'}</span>
               </button>
               <button
                 className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -2422,7 +2440,7 @@ function App() {
                 }}
               >
                 <span className="icon"><CalendarIcon /></span>
-                <span className="label">活動行事曆</span>
+                <span className="label">{t('tabCalendar')}</span>
               </button>
               <button
                 className={`sidebar-nav-item${view === 'board' ? ' active' : ''}`}
@@ -2433,7 +2451,7 @@ function App() {
                 }}
               >
                 <span className="icon"><MessageIcon /></span>
-                <span className="label">社群牆</span>
+                <span className="label">{t('tabCommunity')}</span>
               </button>
               <button
                 className="sidebar-nav-item"
@@ -2444,7 +2462,7 @@ function App() {
                 }}
               >
                 <span className="icon"><SparklesIcon /></span>
-                <span className="label">網站導覽</span>
+                <span className="label">{t('siteTour')}</span>
               </button>
               {isLoggedIn && currentUser ? (
                 <button
@@ -2456,7 +2474,7 @@ function App() {
                   }}
                 >
                   <span className="icon"><UserIcon /></span>
-                  <span className="label">個人資料 ({currentUser.nickname})</span>
+                  <span className="label">{t('profile')} ({currentUser.nickname})</span>
                 </button>
               ) : (
                 <button
@@ -2468,9 +2486,22 @@ function App() {
                   }}
                 >
                   <span className="icon"><KeyIcon /></span>
-                  <span className="label">帳戶登入</span>
+                  <span className="label">{t('login')}</span>
                 </button>
               )}
+              <button
+                className="sidebar-nav-item"
+                type="button"
+                onClick={() => {
+                  toggleLanguage()
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon">🌐</span>
+                <span className="label">
+                  {lang === 'zh-TW' ? '語言：繁體中文 ➔' : lang === 'en' ? 'Language: English ➔' : lang === 'ja' ? '言語：日本語 ➔' : '언어: 한국어 ➔'}
+                </span>
+              </button>
               <button
                 className="sidebar-nav-item"
                 type="button"
@@ -2480,7 +2511,7 @@ function App() {
                 }}
               >
                 <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
-                <span className="label">{theme === 'dark' ? '切換為淺色模式' : '切換為深色模式'}</span>
+                <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : 'Switch to Dark Mode')}</span>
               </button>
               <button
                 className="sidebar-nav-item"
@@ -2491,7 +2522,7 @@ function App() {
                 }}
               >
                 <span className="icon"><MusicIcon /></span>
-                <span className="label">{isMusicBarVisible ? '隱藏音樂播放器' : '顯示音樂播放器'}</span>
+                <span className="label">{isMusicBarVisible ? (lang === 'zh-TW' ? '隱藏音樂播放器' : 'Hide Player') : (lang === 'zh-TW' ? '顯示音樂播放器' : 'Show Player')}</span>
               </button>
               {isLoggedIn && currentUser && (
                 <button
@@ -2504,7 +2535,7 @@ function App() {
                   }}
                 >
                   <span className="icon"><LogoutIcon /></span>
-                  <span className="label">帳戶登出</span>
+                  <span className="label">{t('logout')}</span>
                 </button>
               )}
             </div>
@@ -2540,16 +2571,16 @@ function App() {
               }}
             >
               <span className="icon"><CalendarIcon /></span>
-              <span className="label">行事曆</span>
+              <span className="label">{t('tabCalendar')}</span>
             </button>
             <button
               className="bottom-nav-item bottom-nav-item-record"
               type="button"
               onClick={() => openAddModal()}
-              title="新增演唱會紀錄"
+              title={lang === 'zh-TW' ? '新增演唱會紀錄' : 'Add Event Log'}
             >
               <span className="icon"><PlusIcon /></span>
-              <span className="label">紀錄</span>
+              <span className="label">{lang === 'zh-TW' ? '紀錄' : 'Add Log'}</span>
             </button>
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
@@ -2559,7 +2590,7 @@ function App() {
               }}
             >
               <span className="icon"><MessageIcon /></span>
-              <span className="label">社群牆</span>
+              <span className="label">{t('tabCommunity')}</span>
             </button>
             <button
               className={`bottom-nav-item${view === 'profile' ? ' active' : ''}`}
@@ -2573,7 +2604,7 @@ function App() {
               }}
             >
               <span className="icon"><UserIcon /></span>
-              <span className="label">{isLoggedIn ? '我的' : '登入'}</span>
+              <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : 'Profile') : t('login')}</span>
             </button>
           </div>
         </>
@@ -2609,6 +2640,7 @@ function UpcomingConcerts({
   onCategoryChange: (category: 'all' | 'concert' | 'sport') => void
   categoryCounts: { all: number; sport: number; concert: number }
 }) {
+  const { t, lang } = useTranslation()
   const [isExpanded, setIsExpanded] = useState(false)
   const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
 
@@ -2616,11 +2648,11 @@ function UpcomingConcerts({
     <section className="upcoming-section" aria-label="售票資訊">
       <div className="section-row">
         <div>
-          <div className="section-title">— 售票資訊 —</div>
-          {updatedAt && <div className="remote-updated">更新：{formatRemoteDate(updatedAt)}</div>}
+          <div className="section-title">— {t('upcomingTickets')} —</div>
+          {updatedAt && <div className="remote-updated">{t('ticketUpdate', { time: formatRemoteDate(updatedAt) })}</div>}
         </div>
         <button className="refresh-events-btn" type="button" onClick={onRefresh} disabled={isRefreshing}>
-          {isRefreshing ? '更新中' : '更新'}
+          {isRefreshing ? (lang === 'zh-TW' ? '更新中' : 'Updating...') : (lang === 'zh-TW' ? '更新' : 'Refresh')}
         </button>
       </div>
 
@@ -2630,27 +2662,27 @@ function UpcomingConcerts({
           className={`filter-tab-btn${categoryFilter === 'all' ? ' active' : ''}`}
           onClick={() => onCategoryChange('all')}
         >
-          <SparklesIcon style={{ marginRight: '4px' }} /> 全部 ({categoryCounts.all})
+          <SparklesIcon style={{ marginRight: '4px' }} /> {t('all')} ({categoryCounts.all})
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'concert' ? ' active' : ''}`}
           onClick={() => onCategoryChange('concert')}
         >
-          <MusicIcon style={{ marginRight: '4px' }} /> 演唱會 ({categoryCounts.concert})
+          <MusicIcon style={{ marginRight: '4px' }} /> {t('statConcerts')} ({categoryCounts.concert})
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'sport' ? ' active' : ''}`}
           onClick={() => onCategoryChange('sport')}
         >
-          <BaseballIcon style={{ marginRight: '4px' }} /> 中華職棒 ({categoryCounts.sport})
+          <BaseballIcon style={{ marginRight: '4px' }} /> {lang === 'zh-TW' ? '中華職棒' : 'CPBL'} ({categoryCounts.sport})
         </button>
       </div>
 
       {searchQuery && searchQuery.trim() && (
         <div className="search-info-tip">
-          <SearchIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> 搜尋「{searchQuery}」：共 {concerts.length} 筆
+          <SearchIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {lang === 'zh-TW' ? `搜尋「${searchQuery}」：共 ${concerts.length} 筆` : `Search "${searchQuery}": ${concerts.length} found`}
           {hasSelectedVenue && onClearVenue && (
             <button
               type="button"
@@ -2667,7 +2699,7 @@ function UpcomingConcerts({
                 padding: 0
               }}
             >
-              (清除場館看全台)
+              {t('clearVenueFilter')}
             </button>
           )}
         </div>
@@ -2676,7 +2708,7 @@ function UpcomingConcerts({
       {status && <div className="empty-state compact">{status}</div>}
       {!status && concerts.length === 0 && (
         <div className="empty-state compact">
-          {searchQuery ? `找不到符合「${searchQuery}」的售票資料` : '目前沒有近期售票資料'}
+          {searchQuery ? (lang === 'zh-TW' ? `找不到符合「${searchQuery}」的售票資料` : `No tickets found matching "${searchQuery}"`) : t('noTicketsFound')}
         </div>
       )}
       {displayedConcerts.map((concert) => (
@@ -2697,12 +2729,12 @@ function UpcomingConcerts({
           {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
           <div className="remote-card-body">
             <div className="remote-card-top">
-              <span>{concert.source || '售票資訊'}</span>
-              <span>{concert.date || '日期未定'}</span>
+              <span>{concert.source || t('statTickets')}</span>
+              <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : 'Date TBD')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
             <div className="remote-card-meta">
-              {concert.venue_raw || concert.venue_name || concert.city || '地點待確認'}
+              {concert.venue_raw || concert.venue_name || concert.city || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}
               {concert.price ? ` · ${concert.price}` : ''}
             </div>
             {concert.ticket_links?.length > 0 && (
@@ -2732,7 +2764,7 @@ function UpcomingConcerts({
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
         >
-          {isExpanded ? '收起售票資訊 ▴' : `顯示所有售票資訊 (還有 ${concerts.length - 8} 筆) ▾`}
+          {isExpanded ? t('hideAllTickets') : t('showAllTickets', { count: concerts.length - 8 })}
         </button>
       )}
     </section>
@@ -2752,17 +2784,18 @@ function ConcertList({
   onOpenDetail: (concertId: string) => void
   onDelete: (concertId: string, event: MouseEvent<HTMLButtonElement>) => void
 }) {
+  const { t, lang } = useTranslation()
   if (!hasSelectedVenue) {
-    return <div className="empty-state">選擇場館後顯示演唱會記錄</div>
+    return <div className="empty-state">{lang === 'zh-TW' ? '選擇場館後顯示演唱會記錄' : 'Select a venue to display concert records'}</div>
   }
 
   if (concerts.length === 0) {
-    return <div className="empty-state">這個場館還沒有記錄，快去新增吧！</div>
+    return <div className="empty-state">{lang === 'zh-TW' ? '這個場館還沒有記錄，快去新增吧！' : 'No records at this venue yet. Go ahead and add one!'}</div>
   }
 
   return (
     <>
-      <div className="section-title">— 演唱會記錄 —</div>
+      <div className="section-title">— {t('myRecords')} —</div>
       {concerts.map((concert) => (
         <ConcertCard
           key={concert.id}
@@ -2786,13 +2819,14 @@ function ConcertCard({
   onOpenDetail: (concertId: string) => void
   onDelete?: (concertId: string, event: MouseEvent<HTMLButtonElement>) => void
 }) {
+  const { t, lang } = useTranslation()
   return (
     <div className="concert-card" onClick={() => onOpenDetail(concert.id)}>
       {onDelete && (
         <button
           className="delete-btn"
           type="button"
-          title="刪除"
+          title={t('deleteBtn')}
           onClick={(event) => onDelete(concert.id, event)}
         >
           <CloseIcon />
@@ -2800,7 +2834,7 @@ function ConcertCard({
       )}
       <div className="concert-card-header">
         <div className="concert-artist">{concert.artist}</div>
-        <div className="concert-date">{concert.date || '日期未知'}</div>
+        <div className="concert-date">{concert.date || (lang === 'zh-TW' ? '日期未知' : 'Date TBD')}</div>
       </div>
       {showVenue && (
         <div className="concert-venue-tag">
@@ -2808,7 +2842,7 @@ function ConcertCard({
         </div>
       )}
       {concert.concertName && <div className="concert-venue-tag">{concert.concertName}</div>}
-      {concert.seat && <div className="concert-venue-tag seat-tag">座位：{concert.seat}</div>}
+      {concert.seat && <div className="concert-venue-tag seat-tag">{lang === 'zh-TW' ? `座位：${concert.seat}` : `Seat: ${concert.seat}`}</div>}
       <MediaStrip media={concert.media} />
     </div>
   )

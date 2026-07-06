@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import type { Concert, RemoteConcert } from '../types'
+import { useTranslation } from '../utils/i18n.tsx'
 import {
   CloseIcon,
   SearchIcon,
@@ -29,6 +30,7 @@ export function CalendarView({
   onOpenTicketDetail,
   onDeleteConcert,
 }: CalendarViewProps) {
+  const { t, lang } = useTranslation()
   // Current view month/year
   const [currentDate, setCurrentDate] = useState(() => new Date())
   const year = currentDate.getFullYear()
@@ -253,8 +255,8 @@ export function CalendarView({
         id: c.id,
         date: normalizeDate(c.date),
         title: c.name,
-        subtitle: c.source ? `售票來源：${c.source}` : '',
-        venue: c.venue_name || c.venue_raw || '地點待確認',
+        subtitle: c.source ? `${lang === 'zh-TW' ? '售票來源' : 'Ticket Source'}: ${c.source}` : '',
+        venue: c.venue_name || c.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD'),
         city: c.city,
         rawObject: c
       })
@@ -281,7 +283,7 @@ export function CalendarView({
         return true
       })
       .sort((a, b) => a.date.localeCompare(b.date))
-  }, [concerts, remoteConcerts, searchQuery, eventFilter, year, month, selectedDateStr])
+  }, [concerts, remoteConcerts, searchQuery, eventFilter, year, month, selectedDateStr, lang])
 
   return (
     <div className="calendar-view-container">
@@ -289,37 +291,37 @@ export function CalendarView({
       <div className="calendar-header-panel">
         <div className="calendar-title-nav">
           <div className="month-selector-buttons">
-            <button className="cal-nav-btn" onClick={handlePrevMonth} title="上個月">
+            <button className="cal-nav-btn" onClick={handlePrevMonth} title={lang === 'zh-TW' ? '上個月' : 'Prev Month'}>
               &lt;
             </button>
             <div className="current-month-selects">
-              <span className="cal-year-label">{year} 年</span>
+              <span className="cal-year-label">{lang === 'zh-TW' ? `${year} 年` : year}</span>
               <select 
                 value={month} 
                 onChange={handleMonthChange} 
                 className="cal-select cal-select-month"
-                title="選擇月份"
+                title={lang === 'zh-TW' ? '選擇月份' : 'Select Month'}
               >
                 {Array.from({ length: 12 }, (_, i) => i).map(m => (
-                  <option key={m} value={m}>{m + 1} 月</option>
+                  <option key={m} value={m}>{lang === 'zh-TW' ? `${m + 1} 月` : new Date(year, m).toLocaleString('en', { month: 'short' })}</option>
                 ))}
               </select>
               <select 
                 value={selectedDayNum} 
                 onChange={handleDayChange} 
                 className="cal-select cal-select-day"
-                title="選擇日期"
+                title={lang === 'zh-TW' ? '選擇日期' : 'Select Day'}
               >
                 {daysInMonthArray.map(d => (
-                  <option key={d} value={d}>{d} 日</option>
+                  <option key={d} value={d}>{lang === 'zh-TW' ? `${d} 日` : d}</option>
                 ))}
               </select>
             </div>
-            <button className="cal-nav-btn" onClick={handleNextMonth} title="下個月">
+            <button className="cal-nav-btn" onClick={handleNextMonth} title={lang === 'zh-TW' ? '下個月' : 'Next Month'}>
               &gt;
             </button>
             <button className="cal-today-btn" onClick={handleGoToday}>
-              今天
+              {lang === 'zh-TW' ? '今天' : 'Today'}
             </button>
           </div>
 
@@ -328,13 +330,13 @@ export function CalendarView({
               className={`view-mode-tab ${viewMode === 'grid' ? 'active' : ''}`}
               onClick={() => setViewMode('grid')}
             >
-              <CalendarIcon style={{ marginRight: '6px' }} /> 月曆視圖
+              <CalendarIcon style={{ marginRight: '6px' }} /> {t('gridMode')}
             </button>
             <button
               className={`view-mode-tab ${viewMode === 'list' ? 'active' : ''}`}
               onClick={() => setViewMode('list')}
             >
-              <ClipboardIcon style={{ marginRight: '6px' }} /> 清單視圖
+              <ClipboardIcon style={{ marginRight: '6px' }} /> {t('listMode')}
             </button>
           </div>
         </div>
@@ -344,7 +346,7 @@ export function CalendarView({
             <span className="icon"><SearchIcon /></span>
             <input
               type="text"
-              placeholder="搜尋行事曆中的活動、歌手、場館..."
+              placeholder={t('searchCalendar')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -360,19 +362,19 @@ export function CalendarView({
               className={`filter-btn ${eventFilter === 'all' ? 'active' : ''}`}
               onClick={() => setEventFilter('all')}
             >
-              全活動
+              {lang === 'zh-TW' ? '全活動' : 'All'}
             </button>
             <button
               className={`filter-btn filter-ticket ${eventFilter === 'ticket' ? 'active' : ''}`}
               onClick={() => setEventFilter('ticket')}
             >
-              <TicketIcon style={{ marginRight: '6px' }} /> 售票活動
+              <TicketIcon style={{ marginRight: '6px' }} /> {lang === 'zh-TW' ? '售票活動' : 'Tickets'}
             </button>
             <button
               className={`filter-btn filter-record ${eventFilter === 'record' ? 'active' : ''}`}
               onClick={() => setEventFilter('record')}
             >
-              <StarIcon style={{ marginRight: '6px' }} /> 我的記錄
+              <StarIcon style={{ marginRight: '6px' }} /> {t('myRecords')}
             </button>
           </div>
         </div>
@@ -383,7 +385,10 @@ export function CalendarView({
         <div className="calendar-grid-layout">
           {/* Weekday Headers */}
           <div className="calendar-week-headers">
-            {['週日', '週一', '週二', '週三', '週四', '週五', '週六'].map((day) => (
+            {(lang === 'zh-TW'
+              ? ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+              : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+            ).map((day) => (
               <div key={day} className="week-header-cell">
                 {day}
               </div>
@@ -423,7 +428,7 @@ export function CalendarView({
                         setSelectedDateStr(cell.dateStr)
                         onAddEventClick(cell.dateStr)
                       }}
-                      title="在此日期新增活動"
+                      title={t('addEventTitle')}
                     >
                       ＋
                     </button>
@@ -446,13 +451,13 @@ export function CalendarView({
         <div className="calendar-list-view">
           {allChronologicalEvents.length === 0 ? (
             <div className="calendar-list-empty" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.8rem', padding: '2rem 1rem' }}>
-              <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>此日期目前沒有登錄任何活動。</span>
+              <span style={{ fontSize: '0.9rem', color: 'var(--muted)' }}>{t('noEventsDate')}</span>
               <button 
                 className="drawer-add-event-btn" 
                 onClick={() => onAddEventClick(selectedDateStr)}
                 style={{ fontSize: '0.75rem', padding: '0.35rem 0.9rem' }}
               >
-                ＋ 新增此日活動
+                {t('addEventBtn')}
               </button>
             </div>
           ) : (
@@ -473,7 +478,7 @@ export function CalendarView({
                   >
                     <div className="card-date-badge">
                       <span className="date-text">{event.date}</span>
-                      <span className="status-badge">{isPast ? '已結束' : '即將到來'}</span>
+                      <span className="status-badge">{isPast ? (lang === 'zh-TW' ? '已結束' : 'Ended') : (lang === 'zh-TW' ? '即將到來' : 'Upcoming')}</span>
                     </div>
 
                     <div className="card-main-content">
@@ -494,12 +499,12 @@ export function CalendarView({
                     </div>
 
                     <div className="card-action-arrow">
-                      <span>查看詳情</span>
+                      <span>{lang === 'zh-TW' ? '查看詳情' : 'Details'}</span>
                       {event.type === 'personal' && (
                         <button
                           className="delete-card-btn"
                           onClick={(e) => onDeleteConcert(event.id, e)}
-                          title="刪除此記錄"
+                          title={t('deleteBtn')}
                         >
                           <TrashIcon size="1em" style={{ verticalAlign: 'middle' }} />
                         </button>
@@ -534,13 +539,13 @@ export function CalendarView({
                 className="drawer-add-event-btn"
                 onClick={() => onAddEventClick(selectedDateStr)}
               >
-                ＋ 新增活動
+                ＋ {lang === 'zh-TW' ? '新增活動' : 'Add Event'}
               </button>
               <button
                 className="drawer-close-btn"
                 type="button"
                 onClick={() => setIsMobileDrawerOpen(false)}
-                title="關閉"
+                title={lang === 'zh-TW' ? '關閉' : 'Close'}
               >
                 <CloseIcon />
               </button>
@@ -550,7 +555,7 @@ export function CalendarView({
           <div className="drawer-events-list">
             {selectedDateEvents.personal.length === 0 && selectedDateEvents.remote.length === 0 ? (
               <div className="drawer-empty-state">
-                此日期目前沒有登錄任何活動。點擊「新增此日活動」來規劃你的行程吧！
+                {lang === 'zh-TW' ? '此日期目前沒有登錄任何活動。點擊「新增此日活動」來規劃你的行程吧！' : 'No events for this date. Click "Add Event" to plan your schedule!'}
               </div>
             ) : (
               <div className="drawer-cards-grid">
@@ -562,7 +567,7 @@ export function CalendarView({
                   >
                     <div className="card-badge">
                       <StarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      我的自訂記錄
+                      {lang === 'zh-TW' ? '我的自訂記錄' : 'My Custom Log'}
                     </div>
                     <h4 className="event-title">{event.artist}</h4>
                     {event.concertName && <p className="event-name">{event.concertName}</p>}
@@ -573,18 +578,18 @@ export function CalendarView({
                     {event.seat && (
                       <p className="event-seat">
                         <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                        位置：{event.seat}
+                        {lang === 'zh-TW' ? `位置：${event.seat}` : `Seat: ${event.seat}`}
                       </p>
                     )}
                     
                     <div className="card-footer">
-                      <span className="card-more-action">查看心得筆記 &gt;</span>
+                      <span className="card-more-action">{lang === 'zh-TW' ? '查看心得筆記 >' : 'View Notes >'}</span>
                       <button
                         className="delete-card-btn"
                         onClick={(e) => onDeleteConcert(event.id, e)}
-                        title="刪除此記錄"
+                        title={t('deleteBtn')}
                       >
-                        <TrashIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} /> 刪除
+                        <TrashIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {t('deleteBtn')}
                       </button>
                     </div>
                   </div>
@@ -598,22 +603,22 @@ export function CalendarView({
                   >
                     <div className="card-badge">
                       <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      公開售票活動 ({event.source})
+                      {lang === 'zh-TW' ? `公開售票活動 (${event.source})` : `Ticketing (${event.source})`}
                     </div>
                     <h4 className="event-title">{event.name}</h4>
                     <p className="event-venue">
                       <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {event.city} · {event.venue_name || event.venue_raw || '地點待確認'}
+                      {event.city} · {event.venue_name || event.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}
                     </p>
                     {event.price && (
                       <p className="event-price">
                         <DollarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                        票價：{event.price}
+                        {lang === 'zh-TW' ? `票價：${event.price}` : `Price: ${event.price}`}
                       </p>
                     )}
                     
                     <div className="card-footer">
-                      <span className="card-more-action">查看售票詳情 &gt;</span>
+                      <span className="card-more-action">{lang === 'zh-TW' ? '查看售票詳情 >' : 'View Tickets >'}</span>
                     </div>
                   </div>
                 ))}

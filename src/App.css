@@ -10794,6 +10794,17 @@ body:has(.main-layout) {
   border: none;
 }
 
+/* Guide Trigger Icon Button Animation */
+.guide-trigger-icon-btn svg {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.guide-trigger-icon-btn:hover svg {
+  transform: scale(1.15) rotate(20deg);
+  color: var(--gold) !important;
+  filter: drop-shadow(0 0 5px rgba(251, 191, 36, 0.6));
+}
+
 
 
 
