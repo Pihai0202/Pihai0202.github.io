@@ -1464,10 +1464,10 @@ function App() {
                   }
                 }}>
                   {selectedVenue ? (
-                    <div className="selected-venue-header-title">
-                      <span className="drawer-title">
+                    <div className="drawer-header-left">
+                      <span className="drawer-venue-title">
                         <PinIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} />
-                        {selectedVenue.name}
+                        {translateVenueName(selectedVenue.name, lang)}
                       </span>
                       <button 
                         className="clear-selected-venue-btn" 
@@ -1486,7 +1486,7 @@ function App() {
                       <span className="search-icon"><SearchIcon /></span>
                       <input
                         type="text"
-                        placeholder="搜尋場館或城市..."
+                        placeholder={t('searchVenue')}
                         value={venueSearchQuery}
                         onChange={(e) => setVenueSearchQuery(e.target.value)}
                         onFocus={(e) => {
@@ -1511,7 +1511,9 @@ function App() {
                     </div>
                   )}
                   <span className="drawer-state-indicator">
-                    {mobileDrawerState === 'collapsed' ? '▲' : mobileDrawerState === 'half' ? '展開 ▴' : '收起 ▾'}
+                    {mobileDrawerState === 'collapsed' ? '▲' : mobileDrawerState === 'half' 
+                      ? (lang === 'zh-TW' ? '展開 ▴' : lang === 'ja' ? '展開 ▴' : lang === 'ko' ? '펼치기 ▴' : 'Expand ▴') 
+                      : (lang === 'zh-TW' ? '收起 ▾' : lang === 'ja' ? '折りたたむ ▾' : lang === 'ko' ? '접기 ▾' : 'Collapse ▾')}
                   </span>
                 </div>
               </div>
@@ -1523,7 +1525,9 @@ function App() {
                   <div className="drawer-collapsed-preview" onClick={() => setMobileDrawerState('half')}>
                     <div className="venue-preview-info">
                       <span className="city-tag">{selectedVenue.city}</span>
-                      <span className="preview-capacity">👤 {selectedVenue.capacity} 人</span>
+                      <span className="preview-capacity">
+                        👤 {selectedVenue.capacity} {lang === 'zh-TW' ? '人' : lang === 'ja' ? '人' : lang === 'ko' ? '명' : 'ppl'}
+                      </span>
                     </div>
                   </div>
                 )}
@@ -1558,7 +1562,10 @@ function App() {
                               onClick={() => setMobileDrawerState('full')}
                             >
                               <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} />
-                              查看此場館的演唱會記錄 ({selectedVenueConcerts.length} 次)
+                              {lang === 'zh-TW' ? `查看此場館的演唱會記錄 (${selectedVenueConcerts.length} 次)` :
+                               lang === 'ja' ? `この会場のコンサート履歴を表示 (${selectedVenueConcerts.length} 回)` :
+                               lang === 'ko' ? `이 공연장의 콘서트 기록 보기 (${selectedVenueConcerts.length}회)` :
+                               `View Concert History for this Venue (${selectedVenueConcerts.length} times)`}
                             </button>
                           </div>
                         ) : (
@@ -1593,7 +1600,9 @@ function App() {
                       <div className="drawer-explore-mode">
                         <div className="drawer-region-accordion">
                           {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
-                            <div className="no-venues-found">找不到符合的場館</div>
+                            <div className="no-venues-found">
+                              {lang === 'zh-TW' ? '找不到符合的場館' : lang === 'en' ? 'No venues found' : lang === 'ja' ? '該当する会場が見つかりません' : '일치하는 공연장이 없습니다'}
+                            </div>
                           ) : (
                             Object.entries(groupedVenues).map(([region, list]) => {
                               if (list.length === 0) return null
@@ -1610,7 +1619,7 @@ function App() {
                                       }))
                                     }
                                   >
-                                    <span className="region-title">{region}</span>
+                                    <span className="region-title">{t(region as any)}</span>
                                     <span className="region-count">{list.length}</span>
                                     <span className="region-arrow">
                                       {isExpanded ? <ChevronDownIcon size="1.2em" /> : <ChevronRightIcon size="1.2em" />}
@@ -1632,7 +1641,7 @@ function App() {
                                             }}
                                           >
                                             <span className="dot" />
-                                            <span className="name">{v.name}</span>
+                                            <span className="name">{translateVenueName(v.name, lang)}</span>
                                             {hasVisits && <span className="visited-badge">✓</span>}
                                           </button>
                                         )
@@ -2452,7 +2461,7 @@ function App() {
           />
           <div className={`mobile-sidebar-nav${isMobileSidebarOpen ? ' open' : ''}`}>
             <div className="sidebar-nav-header">
-              <span className="sidebar-nav-title">選單 MENU</span>
+              <span className="sidebar-nav-title">{lang === 'zh-TW' ? '選單 MENU' : lang === 'ja' ? 'メニュー MENU' : lang === 'ko' ? '메뉴 MENU' : 'MENU'}</span>
               <button
                 className="sidebar-nav-close"
                 type="button"
@@ -2486,7 +2495,7 @@ function App() {
                 }}
               >
                 <span className="icon"><PlusIcon /></span>
-                <span className="label">{lang === 'zh-TW' ? '新增活動紀錄' : 'Add Event Log'}</span>
+                <span className="label">{lang === 'zh-TW' ? '新增活動紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}</span>
               </button>
               <button
                 className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -2568,7 +2577,7 @@ function App() {
                 }}
               >
                 <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
-                <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : 'Switch to Dark Mode')}</span>
+                <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : lang === 'ja' ? 'ライトモードに切替' : lang === 'ko' ? '라이트 모드로 전환' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : lang === 'ja' ? 'ダークモードに切替' : lang === 'ko' ? '다크 모드로 전환' : 'Switch to Dark Mode')}</span>
               </button>
               <button
                 className="sidebar-nav-item"
@@ -2579,7 +2588,7 @@ function App() {
                 }}
               >
                 <span className="icon"><MusicIcon /></span>
-                <span className="label">{isMusicBarVisible ? (lang === 'zh-TW' ? '隱藏音樂播放器' : 'Hide Player') : (lang === 'zh-TW' ? '顯示音樂播放器' : 'Show Player')}</span>
+                <span className="label">{isMusicBarVisible ? (lang === 'zh-TW' ? '隱藏音樂播放器' : lang === 'ja' ? 'プレイヤーを非表示' : lang === 'ko' ? '플레이어 숨기기' : 'Hide Player') : (lang === 'zh-TW' ? '顯示音樂播放器' : lang === 'ja' ? 'プレイヤーを表示' : lang === 'ko' ? '플레이어 표시' : 'Show Player')}</span>
               </button>
               {isLoggedIn && currentUser && (
                 <button
@@ -2618,7 +2627,7 @@ function App() {
               }}
             >
               <span className="icon"><MapIcon /></span>
-              <span className="label">地圖</span>
+              <span className="label">{lang === 'zh-TW' ? '地圖' : lang === 'en' ? 'Map' : lang === 'ja' ? 'マップ' : '지도'}</span>
             </button>
             <button
               className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
@@ -2634,10 +2643,10 @@ function App() {
               className="bottom-nav-item bottom-nav-item-record"
               type="button"
               onClick={() => openAddModal()}
-              title={lang === 'zh-TW' ? '新增演唱會紀錄' : 'Add Event Log'}
+              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}
             >
               <span className="icon"><PlusIcon /></span>
-              <span className="label">{lang === 'zh-TW' ? '紀錄' : 'Add Log'}</span>
+              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
             </button>
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
@@ -2661,7 +2670,7 @@ function App() {
               }}
             >
               <span className="icon"><UserIcon /></span>
-              <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : 'Profile') : t('login')}</span>
+              <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
             </button>
           </div>
         </>
