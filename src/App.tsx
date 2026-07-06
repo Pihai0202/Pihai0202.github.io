@@ -892,15 +892,64 @@ function App() {
     setForm((current) => ({ ...current, [field]: value }))
   }
 
+  const compressConcertImage = (base64Str: string): Promise<string> => {
+    return new Promise((resolve) => {
+      const img = new Image()
+      img.src = base64Str
+      img.onload = () => {
+        const canvas = document.createElement('canvas')
+        const MAX_WIDTH = 800
+        const MAX_HEIGHT = 800
+        let width = img.width
+        let height = img.height
+
+        if (width > height) {
+          if (width > MAX_WIDTH) {
+            height *= MAX_WIDTH / width
+            width = MAX_WIDTH
+          }
+        } else {
+          if (height > MAX_HEIGHT) {
+            width *= MAX_HEIGHT / height
+            height = MAX_HEIGHT
+          }
+        }
+
+        canvas.width = width
+        canvas.height = height
+        const ctx = canvas.getContext('2d')
+        if (ctx) {
+          ctx.drawImage(img, 0, 0, width, height)
+          resolve(canvas.toDataURL('image/jpeg', 0.75))
+        } else {
+          resolve(base64Str)
+        }
+      }
+      img.onerror = () => {
+        resolve(base64Str)
+      }
+    })
+  }
+
   const handleMediaUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     files.forEach((file) => {
       const reader = new FileReader()
-      reader.onload = () => {
+      reader.onload = async () => {
         if (typeof reader.result !== 'string') return
+        
+        let finalDataUrl = reader.result
+        if (file.type.startsWith('image/')) {
+          try {
+            finalDataUrl = await compressConcertImage(reader.result)
+          } catch (err) {
+            console.warn('Failed to compress image:', err)
+          }
+        }
+
         setPendingMedia((current) => [
           ...current,
-          { name: file.name, dataUrl: reader.result as string, type: file.type },
+          { name: file.name, dataUrl: finalDataUrl, type: 'image/jpeg' },
         ])
       }
       reader.readAsDataURL(file)
