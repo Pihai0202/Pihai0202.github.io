@@ -612,6 +612,17 @@ function App() {
       }
       if (!venueMatch) return false
 
+      // Filter out accessory/non-performance events (shuttle buses, special zone sales, etc.)
+      const isAccessory = c.name && (
+        c.name.includes('專車') ||
+        c.name.includes('專區') ||
+        c.name.includes('套票') ||
+        c.name.includes('周邊') ||
+        c.name.includes('週邊') ||
+        c.name.includes('加購')
+      )
+      if (isAccessory) return false
+
       const dateKey = normalizeDate(c.date)
       return dateKey === todayStr
     })
