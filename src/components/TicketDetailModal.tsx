@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import type { RemoteConcert, SpotifyItem } from '../types'
+import { useTranslation, translateVenueName } from '../utils/i18n.tsx'
 import { db } from '../firebase'
 import { collection, query, where, orderBy, onSnapshot, addDoc } from 'firebase/firestore'
 import {
@@ -75,6 +76,7 @@ export function TicketDetailModal({
   onPlayMusicBar,
   onLogAsPersonal
 }: TicketDetailModalProps) {
+  const { lang } = useTranslation()
   const [comments, setComments] = useState<TicketComment[]>([])
   const [newComment, setNewComment] = useState('')
   const [authorName, setAuthorName] = useState(() => localStorage.getItem('tw-nickname') || '')
@@ -231,32 +233,73 @@ export function TicketDetailModal({
       setNewComment('')
     } catch (err) {
       console.error('Failed to add comment:', err)
-      alert('無法發佈留言，請檢查網路連線！')
+      alert(lang === 'zh-TW' ? '無法發佈留言，請檢查網路連線！' : lang === 'ja' ? 'コメントの投稿に失敗しました。接続を確認してください！' : lang === 'ko' ? '댓글을 게시할 수 없습니다. 네트워크 연결을 확인하세요!' : 'Failed to post comment, please check your connection!')
     } finally {
       setIsSubmitting(false)
     }
   }
 
 
+  const translateSource = (src: string): string => {
+    if (lang === 'zh-TW') return src
+    const srcMap: Record<string, Record<string, string>> = {
+      '中華職棒': { en: 'CPBL', ja: '中華職棒 (台湾プロ野球)', ko: '대만 프로야구 (CPBL)' },
+      '拓元售票': { en: 'tixCraft', ja: 'tixCraft', ko: '티스 크래프트 (tixCraft)' },
+      '寬宏售票': { en: 'Kham Ticketing', ja: 'Kham售票', ko: '캄 티케팅 (Kham)' },
+      '年代售票': { en: 'Era Ticket', ja: 'Era售票', ko: '에라 티켓 (Era)' },
+      'ibon售票': { en: 'ibon Ticketing', ja: 'ibon售票', ko: '이본 티케팅 (ibon)' },
+      'FamiTicket': { en: 'FamiTicket', ja: 'FamiTicket', ko: '패미티켓 (FamiTicket)' },
+      'KKTIX': { en: 'KKTIX', ja: 'KKTIX', ko: 'KKTIX' },
+      '遠大售票': { en: 'Ticket Plus', ja: 'Ticket Plus', ko: '티켓 플러스 (Ticket Plus)' },
+      '主辦官網': { en: 'Official Site', ja: '主催者公式サイト', ko: '공식 웹사이트' },
+    }
+    return srcMap[src]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || src
+  }
+
+  const translatePrice = (price: string): string => {
+    if (!price) return ''
+    if (price === '依官網/主辦公告為準') {
+      return lang === 'zh-TW' 
+        ? '依官網/主辦公告為準' 
+        : lang === 'ja' 
+          ? '公式サイトまたは主催者の発表に準ずる' 
+          : lang === 'ko' 
+            ? '공식 홈페이지/주최측 공지 기준' 
+            : 'Subject to official website/organizer announcement'
+    }
+    return price
+  }
+
   return (
     <div className="ticket-detail-container">
       {/* 頂部售票資訊介紹 */}
       <div className="ticket-info-header">
-        <div className="ticket-source-badge">{ticket.source || '售票資訊'}</div>
+        <div className="ticket-source-badge">
+          {ticket.source ? translateSource(ticket.source) : (lang === 'zh-TW' ? '售票資訊' : lang === 'en' ? 'Ticketing Info' : lang === 'ja' ? 'チケット情報' : '티켓팅 정보')}
+        </div>
         <h2 className="ticket-title">{ticket.name}</h2>
         <div className="ticket-meta-grid">
           <div className="meta-item">
             <span className="icon" style={{ color: '#64b5f6' }}><CalendarIcon /></span>
-            <span className="text">演出日期：<strong>{ticket.date || '日期未定'}</strong></span>
+            <span className="text">
+              {lang === 'zh-TW' ? '演出日期：' : lang === 'en' ? 'Event Date: ' : lang === 'ja' ? '公演日：' : '공연 날짜: '}
+              <strong>{ticket.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</strong>
+            </span>
           </div>
           <div className="meta-item">
             <span className="icon" style={{ color: 'var(--accent)' }}><MapPinIcon /></span>
-            <span className="text">演出場館：<strong>{ticket.venue_raw || ticket.venue_name || '地點待確認'}</strong></span>
+            <span className="text">
+              {lang === 'zh-TW' ? '演出場館：' : lang === 'en' ? 'Venue: ' : lang === 'ja' ? '会場：' : '공연장: '}
+              <strong>{translateVenueName(ticket.venue_raw || ticket.venue_name || '', lang) || (lang === 'zh-TW' ? '地點待確認' : lang === 'en' ? 'Location TBA' : lang === 'ja' ? '開催地未定' : '장소 미정')}</strong>
+            </span>
           </div>
           {ticket.price && (
             <div className="meta-item">
               <span className="icon" style={{ color: 'var(--teal)' }}><BanknoteIcon /></span>
-              <span className="text">票價估計：<strong>{ticket.price}</strong></span>
+              <span className="text">
+                {lang === 'zh-TW' ? '票價估計：' : lang === 'en' ? 'Price Estimate: ' : lang === 'ja' ? '予想料金：' : '예상 티켓가: '}
+                <strong>{translatePrice(ticket.price)}</strong>
+              </span>
             </div>
           )}
         </div>
@@ -271,7 +314,12 @@ export function TicketDetailModal({
                 rel="noopener noreferrer"
                 className="ticket-buy-btn"
               >
-                <TicketIcon /> 前往 {link.name} 購票 ↗
+                <TicketIcon /> {
+                  lang === 'zh-TW' ? `前往 ${link.name} 購票 ↗` :
+                  lang === 'en' ? `Buy on ${translateSource(link.name)} ↗` :
+                  lang === 'ja' ? `${translateSource(link.name)}でチケット購入 ↗` :
+                  `${translateSource(link.name)}에서 예매하기 ↗`
+                }
               </a>
             ))}
           </div>
@@ -283,7 +331,12 @@ export function TicketDetailModal({
             className="ticket-log-personal-btn"
             onClick={() => onLogAsPersonal(ticket)}
           >
-            <StarIcon /> 登錄為我的演唱會記錄 / 自訂活動
+            <StarIcon /> {
+              lang === 'zh-TW' ? '登錄為我的演唱會記錄 / 自訂活動' :
+              lang === 'en' ? 'Register as My Concert Record / Custom Event' :
+              lang === 'ja' ? 'コンサート履歴 / カスタムイベントに登録' :
+              '내 콘서트 기록 / 맞춤 이벤트로 등록'
+            }
           </button>
         )}
       </div>
@@ -291,7 +344,12 @@ export function TicketDetailModal({
       {/* 音樂播放與選項整合區 */}
       <div className="ticket-music-section">
         <div className="section-title-row">
-          <h3><MusicIcon style={{ color: '#ba68c8', marginRight: '0.4rem' }} /> 演出歌手精選音樂</h3>
+          <h3><MusicIcon style={{ color: '#ba68c8', marginRight: '0.4rem' }} /> {
+            lang === 'zh-TW' ? '演出歌手精選音樂' :
+            lang === 'en' ? 'Featured Artist Music' :
+            lang === 'ja' ? '出演アーティストの厳選音楽' :
+            '출연 아티스트 추천 음악'
+          }</h3>
           <div className="autoplay-control">
             <label className="toggle-switch">
               <input
@@ -301,15 +359,30 @@ export function TicketDetailModal({
               />
               <span className="slider" />
             </label>
-            <span className="toggle-label">自動播放音樂</span>
+            <span className="toggle-label">{
+              lang === 'zh-TW' ? '自動播放音樂' :
+              lang === 'en' ? 'Auto-play Music' :
+              lang === 'ja' ? '自動再生' :
+              '자동 재생'
+            }</span>
           </div>
         </div>
 
-        {spotifyLoading && <div className="spotify-loader">正在尋找 Spotify 歌手曲目...</div>}
+        {spotifyLoading && <div className="spotify-loader">{
+          lang === 'zh-TW' ? '正在尋找 Spotify 歌手曲目...' :
+          lang === 'en' ? 'Searching Spotify artist tracks...' :
+          lang === 'ja' ? 'Spotifyでアーティストの曲を検索中...' :
+          'Spotify에서 아티스트 곡을 검색 중...'
+        }</div>}
 
         {!spotifyLoading && spotifyTracks.length === 0 && (
           <div className="spotify-no-tracks">
-            找不到與演出者相關的 Spotify 曲目。
+            {
+              lang === 'zh-TW' ? '找不到與演出者相關的 Spotify 曲目。' :
+              lang === 'en' ? 'No Spotify tracks found for this artist.' :
+              lang === 'ja' ? 'アーティストに関連するSpotifyの曲が見つかりませんでした。' :
+              '아티스트와 관련된 Spotify 곡을 찾을 수 없습니다.'
+            }
           </div>
         )}
 
@@ -317,7 +390,12 @@ export function TicketDetailModal({
           <div className="music-player-grid">
             {/* Tracks Options Select */}
             <div className="music-selector-panel">
-              <span className="selector-title">選擇播放曲目：</span>
+              <span className="selector-title">{
+                lang === 'zh-TW' ? '選擇播放曲目：' :
+                lang === 'en' ? 'Select track to play:' :
+                lang === 'ja' ? '再生曲を選択：' :
+                '재생할 곡 선택:'
+              }</span>
               <div className="track-options-list">
                 {spotifyTracks.map((track) => (
                   <button
@@ -351,7 +429,12 @@ export function TicketDetailModal({
                     <span className="wave-bar bar3" />
                     <span className="wave-bar bar4" />
                   </div>
-                  <span className="playing-label">正在播放 (頁面下方)</span>
+                  <span className="playing-label">{
+                    lang === 'zh-TW' ? '正在播放 (頁面下方)' :
+                    lang === 'en' ? 'Now Playing (Bottom of page)' :
+                    lang === 'ja' ? '再生中 (ページ下部)' :
+                    '재생 중 (페이지 하단)'
+                  }</span>
                 </div>
                 <div className="playing-track-card">
                   {selectedTrack.img && <img src={selectedTrack.img} alt="" className="playing-track-thumb" />}
@@ -364,14 +447,19 @@ export function TicketDetailModal({
                     target="_blank"
                     rel="noopener noreferrer"
                     className="track-spotify-link-btn"
-                    title="在 Spotify 開啟"
+                    title={lang === 'zh-TW' ? '在 Spotify 開啟' : lang === 'en' ? 'Open in Spotify' : lang === 'ja' ? 'Spotifyで開く' : 'Spotify에서 열기'}
                   >
                     ↗
                   </a>
                 </div>
                 <div className="player-instructions" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.3rem' }}>
                   <LightbulbIcon style={{ color: 'var(--gold)', flexShrink: 0 }} />
-                  <span>音樂已在下方主播放器啟動，關閉此彈窗可繼續聆聽。</span>
+                  <span>{
+                    lang === 'zh-TW' ? '音樂已在下方主播放器啟動，關閉此彈窗可繼續聆聽。' :
+                    lang === 'en' ? 'Music has started in the main player below. Close this popup to continue listening.' :
+                    lang === 'ja' ? '音楽は下部のメインプレイヤーで再生されています。このポップアップを閉じても聴き続けられます。' :
+                    '음악이 하단의 메인 플레이어에서 재생되었습니다. 이 팝업을 닫아도 계속 들으실 수 있습니다.'
+                  }</span>
                 </div>
               </div>
             )}
@@ -379,7 +467,12 @@ export function TicketDetailModal({
             {!autoPlay && (
               <div className="embedded-player-placeholder">
                 <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <PauseIcon style={{ color: 'var(--muted)' }} /> 已暫停自動播放
+                  <PauseIcon style={{ color: 'var(--muted)' }} /> {
+                    lang === 'zh-TW' ? '已暫停自動播放' :
+                    lang === 'en' ? 'Auto-play paused' :
+                    lang === 'ja' ? '自動再生一時停止中' :
+                    '자동 재생 일시 정지됨'
+                  }
                 </span>
                 <button
                   type="button"
@@ -387,7 +480,7 @@ export function TicketDetailModal({
                   onClick={() => handleAutoPlayToggle(true)}
                   style={{ display: 'inline-flex', alignItems: 'center', gap: '0.3rem' }}
                 >
-                  立即播放 <PlayIcon />
+                  {lang === 'zh-TW' ? '立即播放' : lang === 'en' ? 'Play Now' : lang === 'ja' ? '今すぐ再生' : '지금 재생'} <PlayIcon />
                 </button>
               </div>
             )}
@@ -397,15 +490,30 @@ export function TicketDetailModal({
 
       {/* 售票資訊留言牆 */}
       <div className="ticket-comments-section">
-        <h3><CommentIcon style={{ color: 'var(--teal)', marginRight: '0.4rem' }} /> 售票討論留言牆</h3>
+        <h3><CommentIcon style={{ color: 'var(--teal)', marginRight: '0.4rem' }} /> {
+          lang === 'zh-TW' ? '售票討論留言牆' :
+          lang === 'en' ? 'Ticketing Discussion Board' :
+          lang === 'ja' ? 'チケット販売ディスカッションボード' :
+          '티켓팅 토론 게시판'
+        }</h3>
         
         {/* Comments List */}
         <div className="comments-scroll-area">
           {commentsLoading ? (
-            <div className="comments-status-msg">讀取留言中...</div>
+            <div className="comments-status-msg">{
+              lang === 'zh-TW' ? '讀取留言中...' :
+              lang === 'en' ? 'Loading comments...' :
+              lang === 'ja' ? 'コメントを読み込み中...' :
+              '댓글을 불러오는 중...'
+            }</div>
           ) : comments.length === 0 ? (
             <div className="comments-empty-state">
-              目前還沒有留言，快來搶頭香，一起討論買票攻略吧！
+              {
+                lang === 'zh-TW' ? '目前還沒有留言，快來搶頭香，一起討論買票攻略吧！' :
+                lang === 'en' ? 'No comments yet. Be the first to share your ticketing strategy!' :
+                lang === 'ja' ? 'コメントはまだありません。チケット購入の攻略法について最初にコメントしましょう！' :
+                '아직 댓글이 없습니다. 첫 댓글을 남겨서 티켓팅 팁을 공유해 보세요!'
+              }
             </div>
           ) : (
             <div className="comments-list">
@@ -421,7 +529,7 @@ export function TicketDetailModal({
                     <div className="comment-bubble-header">
                       <span className="comment-author">{comment.author}</span>
                       <span className="comment-date">
-                        {new Date(comment.createdAt).toLocaleString('zh-TW', {
+                        {new Date(comment.createdAt).toLocaleString(lang === 'zh-TW' ? 'zh-TW' : lang === 'ja' ? 'ja-JP' : lang === 'ko' ? 'ko-KR' : 'en-US', {
                           month: '2-digit',
                           day: '2-digit',
                           hour: '2-digit',
@@ -443,7 +551,12 @@ export function TicketDetailModal({
             <input
               type="text"
               className="comment-nickname-input"
-              placeholder="您的暱稱 (預設: 匿名樂迷)"
+              placeholder={
+                lang === 'zh-TW' ? '您的暱稱 (預設: 匿名樂迷)' :
+                lang === 'en' ? 'Your Nickname (Default: Anonymous Fan)' :
+                lang === 'ja' ? 'ニックネーム (デフォルト: 匿名のファン)' :
+                '닉네임 (기본값: 익명 팬)'
+              }
               value={authorName}
               onChange={(e) => setAuthorName(e.target.value)}
               maxLength={15}
@@ -452,7 +565,12 @@ export function TicketDetailModal({
           <div className="comment-textarea-row">
             <textarea
               className="comment-textarea"
-              placeholder="分享關於此活動的售票資訊、討論排隊策略或求讓票討論..."
+              placeholder={
+                lang === 'zh-TW' ? '分享關於此活動的售票資訊、討論排隊策略或求讓票討論...' :
+                lang === 'en' ? 'Share ticketing info, queuing strategy or ticket exchange discussions for this event...' :
+                lang === 'ja' ? 'このイベントのチケット情報、並び方の攻略、またはチケット譲渡について共有してください...' :
+                '이 이벤트의 티켓팅 정보, 대기 전략 또는 티켓 양도에 대한 의견을 나누어 보세요...'
+              }
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
               maxLength={250}
@@ -464,8 +582,8 @@ export function TicketDetailModal({
               disabled={isSubmitting}
               style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
             >
-              {isSubmitting ? '傳送中' : (
-                <>發佈留言 <RocketIcon /></>
+              {isSubmitting ? (lang === 'zh-TW' ? '傳送中' : lang === 'en' ? 'Sending...' : lang === 'ja' ? '送信中...' : '전송 중...') : (
+                <>{lang === 'zh-TW' ? '發佈留言' : lang === 'en' ? 'Post Comment' : lang === 'ja' ? 'コメント投稿' : '댓글 게시'} <RocketIcon /></>
               )}
             </button>
           </div>
@@ -490,7 +608,7 @@ export function TicketDetailModal({
             transition: 'all 0.2s'
           }}
         >
-          關閉視窗 ×
+          {lang === 'zh-TW' ? '關閉視窗 ×' : lang === 'en' ? 'Close Window ×' : lang === 'ja' ? '閉じる ×' : '닫기 ×'}
         </button>
       </div>
     </div>
