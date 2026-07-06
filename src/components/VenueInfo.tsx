@@ -96,11 +96,11 @@ export function VenueInfo({
                   : `Capacity: ${venue.capacity}`}
           </div>
 
-          {/* 今日演出 */}
+          {/* 今日售票 */}
           <div className="venue-today-section">
             <div className="venue-today-title">
               <span className="live-pulse-dot"></span>
-              {lang === 'zh-TW' ? '今日演出' : lang === 'en' ? "Today's Show" : lang === 'ja' ? '本日開催の公演' : '오늘의 공연'}
+              {lang === 'zh-TW' ? '今日售票' : lang === 'en' ? "Today's Ticket Sales" : lang === 'ja' ? '本日発売のチケット' : '오늘 예정된 예매 티켓'}
             </div>
             {todayConcerts.length > 0 ? (
               <div className="venue-today-list">
@@ -137,7 +137,7 @@ export function VenueInfo({
               </div>
             ) : (
               <div className="venue-today-empty">
-                {lang === 'zh-TW' ? '今日無演出活動' : lang === 'en' ? 'No performance today' : lang === 'ja' ? '本日の公演はありません' : '오늘 예정된 공연이 없습니다'}
+                {lang === 'zh-TW' ? '今日無售票活動' : lang === 'en' ? 'No ticket sales today' : lang === 'ja' ? '本日のチケット発売はありません' : '오늘 예정된 예매 일정이 없습니다'}
               </div>
             )}
           </div>
