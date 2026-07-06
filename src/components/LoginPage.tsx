@@ -7,8 +7,10 @@ import {
   createUserWithEmailAndPassword,
   updateProfile,
   signInWithPopup,
+  signInWithCredential,
   GoogleAuthProvider
 } from 'firebase/auth'
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication'
 
 interface LoginPageProps {
   onLoginSuccess: (user: { nickname: string; email: string }) => void
@@ -91,27 +93,39 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
 
 
   const handleGoogleSignInPopup = async () => {
-    if (typeof (window as any).Capacitor !== 'undefined') {
-      setErrorMsg(lang === 'zh-TW' 
-        ? 'App 內目前不支援 Google 快捷登入。請使用上方「信箱登入/註冊」或下方的「訪客模式」！' 
-        : 'Google Sign-In is not supported inside the App. Please use Email Sign-In or Guest Mode above!');
-      return
-    }
     setIsLoading(true)
     setErrorMsg('')
     try {
-      const provider = new GoogleAuthProvider()
-      const userCredential = await signInWithPopup(auth, provider)
-      const firebaseUser = userCredential.user
-      onLoginSuccess({
-        nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
-        email: firebaseUser.email || '',
-      })
+      if (typeof (window as any).Capacitor !== 'undefined') {
+        // Native App (Capacitor) Google Sign-in
+        const result = await FirebaseAuthentication.signInWithGoogle()
+        const idToken = (result.credential as any)?.idToken
+        if (idToken) {
+          const credential = GoogleAuthProvider.credential(idToken)
+          const userCredential = await signInWithCredential(auth, credential)
+          const firebaseUser = userCredential.user
+          onLoginSuccess({
+            nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+            email: firebaseUser.email || '',
+          })
+        } else {
+          throw new Error('No ID Token received from Google native sign-in.')
+        }
+      } else {
+        // Web Browser Google Sign-in
+        const provider = new GoogleAuthProvider()
+        const userCredential = await signInWithPopup(auth, provider)
+        const firebaseUser = userCredential.user
+        onLoginSuccess({
+          nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+          email: firebaseUser.email || '',
+        })
+      }
     } catch (err: any) {
       console.error('Google Sign-In Error:', err)
-      if (err.code === 'auth/popup-closed-by-user') {
+      if (err.code === 'auth/popup-closed-by-user' || err.message?.includes('closed')) {
         setErrorMsg(lang === 'zh-TW' ? '登入視窗已關閉！' : 'Login popup closed!')
-      } else if (err.code === 'auth/cancelled-popup-request') {
+      } else if (err.code === 'auth/cancelled-popup-request' || err.message?.includes('cancel')) {
         setErrorMsg(lang === 'zh-TW' ? '登入請求已被取消！' : 'Login request cancelled!')
       } else {
         setErrorMsg(err.message || (lang === 'zh-TW' ? 'Google 登入失敗！' : 'Google Sign-In failed!'))

@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1033610614230",
+    "project_id": "concert-c399d",
+    "storage_bucket": "concert-c399d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1033610614230:android:5e7ee31144ae6c0cdd0077",
+        "android_client_info": {
+          "package_name": "com.pihai.concertmap"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1033610614230-9m5m1fir25g906eom467q1vkovkg0e7k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.pihai.concertmap",
+            "certificate_hash": "11f167a1e0291eec0846ed1805337735ffcf3be7"
+          }
+        },
+        {
+          "client_id": "1033610614230-brtq7ut8mddegnov5i90ojac1492mt6k.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB5ho15I2d5lgEXu4la3DJXIrqNdfAH1M0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1033610614230-brtq7ut8mddegnov5i90ojac1492mt6k.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
