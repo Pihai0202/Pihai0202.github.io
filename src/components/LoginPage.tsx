@@ -97,30 +97,29 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     setErrorMsg('')
     try {
       if (typeof (window as any).Capacitor !== 'undefined') {
-        // Native App (Capacitor) Google Sign-in with skipNativeAuth: true
-        const result = await FirebaseAuthentication.signInWithGoogle()
+        // Native App (Capacitor) Google Sign-in with Credential Manager disabled
+        const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false })
         
-        // Try to get idToken from credential
-        const idToken = (result.credential as any)?.idToken
-        
-        if (idToken) {
-          // Exchange the native Google idToken for a Firebase credential
-          const credential = GoogleAuthProvider.credential(idToken)
-          const userCredential = await signInWithCredential(auth, credential)
-          const firebaseUser = userCredential.user
+        const firebaseUser = result.user
+        if (firebaseUser) {
           onLoginSuccess({
             nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
             email: firebaseUser.email || '',
           })
-        } else if (result.user) {
-          // Fallback: use the user info directly from the plugin result
-          const u = result.user
-          onLoginSuccess({
-            nickname: u.displayName || (u.email ? u.email.split('@')[0] : '') || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
-            email: u.email || '',
-          })
         } else {
-          throw new Error(lang === 'zh-TW' ? '無法取得 Google 登入憑證' : 'Failed to get Google sign-in credentials')
+          // Fallback: exchange token manually if native user object is not present
+          const idToken = (result.credential as any)?.idToken
+          if (idToken) {
+            const credential = GoogleAuthProvider.credential(idToken)
+            const userCredential = await signInWithCredential(auth, credential)
+            const fUser = userCredential.user
+            onLoginSuccess({
+              nickname: fUser.displayName || fUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+              email: fUser.email || '',
+            })
+          } else {
+            throw new Error(lang === 'zh-TW' ? '無法取得 Google 登入憑證' : 'Failed to get Google sign-in credentials')
+          }
         }
       } else {
         // Web Browser Google Sign-in
