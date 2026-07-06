@@ -7993,13 +7993,13 @@ body.player-open .music-bar-toggle {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3) !important;
   }
 
-  /* Reposition list button to top-right */
+  /* Reposition list button to top-left (below legend) */
   .all-concerts-btn {
     position: fixed !important;
-    top: calc(62px + 1rem) !important;
-    right: 1rem !important;
+    top: calc(62px + 1rem + 44px) !important;
+    left: 1rem !important;
+    right: auto !important;
     bottom: auto !important;
-    left: auto !important;
     width: auto !important;
     height: 36px !important;
     display: flex !important;
@@ -8011,12 +8011,13 @@ body.player-open .music-bar-toggle {
     border-radius: 8px !important;
     z-index: 10 !important;
     box-sizing: border-box !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
   }
 
   /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
   .map-legend {
     position: fixed !important;
-    top: calc(62px + 1rem + 44px) !important;
+    top: calc(62px + 1rem) !important;
     left: 1rem !important;
     bottom: auto !important;
     right: auto !important;
