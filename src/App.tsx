@@ -2701,6 +2701,42 @@ function UpcomingConcerts({
   const [isExpanded, setIsExpanded] = useState(false)
   const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
 
+  const translateSource = (src: string): string => {
+    if (lang === 'zh-TW') return src
+    const srcMap: Record<string, Record<string, string>> = {
+      '中華職棒': { en: 'CPBL', ja: '中華職棒 (台湾プロ野球)', ko: '대만 프로야구 (CPBL)' },
+      '拓元售票': { en: 'tixCraft', ja: 'tixCraft', ko: '티스 크래프트 (tixCraft)' },
+      '寬宏售票': { en: 'Kham Ticketing', ja: 'Kham售票', ko: '캄 티케팅 (Kham)' },
+      '年代售票': { en: 'Era Ticket', ja: 'Era售票', ko: '에라 티켓 (Era)' },
+      'ibon售票': { en: 'ibon Ticketing', ja: 'ibon售票', ko: '이본 티케팅 (ibon)' },
+      'FamiTicket': { en: 'FamiTicket', ja: 'FamiTicket', ko: '패미티켓 (FamiTicket)' },
+      'KKTIX': { en: 'KKTIX', ja: 'KKTIX', ko: 'KKTIX' },
+      '遠大售票': { en: 'Ticket Plus', ja: 'Ticket Plus', ko: '티켓 플러스 (Ticket Plus)' },
+      '主辦官網': { en: 'Official Site', ja: '主催者公式サイト', ko: '공식 웹사이트' },
+    }
+    return srcMap[src]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || src
+  }
+
+  const translatePrice = (price: string): string => {
+    if (!price) return ''
+    if (price === '依官網/主辦公告為準') {
+      return lang === 'zh-TW' 
+        ? '依官網/主辦公告為準' 
+        : lang === 'ja' 
+          ? '公式サイトまたは主催者の発表に準ずる' 
+          : lang === 'ko' 
+            ? '공식 홈페이지/주최측 공지 기준' 
+            : 'Subject to official website/organizer announcement'
+    }
+    return price
+  }
+
+  const getVenueMetaText = (c: RemoteConcert): string => {
+    const rawVal = c.venue_raw || c.venue_name || c.city
+    if (!rawVal) return lang === 'zh-TW' ? '地點待確認' : lang === 'en' ? 'Location TBA' : lang === 'ja' ? '開催地未定' : '장소 미정'
+    return translateVenueName(rawVal, lang)
+  }
+
   return (
     <section className="upcoming-section" aria-label="售票資訊">
       <div className="section-row">
@@ -2786,13 +2822,13 @@ function UpcomingConcerts({
           {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
           <div className="remote-card-body">
             <div className="remote-card-top">
-              <span>{concert.source || t('statTickets')}</span>
-              <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : 'Date TBD')}</span>
+              <span>{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
+              <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
             <div className="remote-card-meta">
-              {concert.venue_raw || concert.venue_name || concert.city || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}
-              {concert.price ? ` · ${concert.price}` : ''}
+              {getVenueMetaText(concert)}
+              {concert.price ? ` · ${translatePrice(concert.price)}` : ''}
             </div>
             {concert.ticket_links?.length > 0 && (
               <div className="ticket-links">
@@ -2807,7 +2843,7 @@ function UpcomingConcerts({
                       e.stopPropagation()
                     }}
                   >
-                    {link.name}
+                    {translateSource(link.name)}
                   </a>
                 ))}
               </div>
