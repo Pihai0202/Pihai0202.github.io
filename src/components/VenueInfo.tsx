@@ -96,7 +96,7 @@ export function VenueInfo({
                   : `Capacity: ${venue.capacity}`}
           </div>
 
-          {/* 今日演出 */}
+          {/* 今日演出 — 有演出才顯示，沒有就隱藏整個區塊 */}
           {todayConcerts.length > 0 && (
             <div className="venue-today-section">
               <div className="venue-today-title">
