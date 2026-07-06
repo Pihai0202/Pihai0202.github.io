@@ -161,7 +161,8 @@ header {
   align-items: center;
   flex: 1;
   max-width: 320px;
-  margin: 0 2rem;
+  min-width: 160px;
+  margin: 0 1rem;
   background: var(--search-bg);
   border: 1px solid var(--search-border);
   border-radius: 20px;
@@ -1860,6 +1861,7 @@ body.player-open .music-bar-toggle {
   .header-search {
     margin: 0 0.5rem;
     max-width: 150px;
+    min-width: 0;
     padding: 0.35rem 0.7rem;
   }
 
