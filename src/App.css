@@ -294,8 +294,8 @@ header {
 
 .stats-bar {
   display: flex;
-  gap: clamp(0.8rem, 2vw, 2rem);
-  flex-wrap: wrap;
+  gap: clamp(0.5rem, 1.5vw, 2rem);
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
 
