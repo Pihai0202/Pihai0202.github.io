@@ -241,14 +241,21 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
       const dayAfter = new Date()
       dayAfter.setDate(today.getDate() + 2)
 
+      const isZh = lang === 'zh-TW'
       if (date.toDateString() === today.toDateString()) {
-        return '今天'
+        return isZh ? '今天' : lang === 'ja' ? '今日' : lang === 'ko' ? '오늘' : 'Today'
       } else if (date.toDateString() === tomorrow.toDateString()) {
-        return '明天'
+        return isZh ? '明天' : lang === 'ja' ? '明日' : lang === 'ko' ? '내일' : 'Tomorrow'
       } else if (date.toDateString() === dayAfter.toDateString()) {
-        return '後天'
+        return isZh ? '後天' : lang === 'ja' ? '明後日' : lang === 'ko' ? '모레' : 'Day After'
       } else {
-        const days = ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+        const days = isZh 
+          ? ['週日', '週一', '週二', '週三', '週四', '週五', '週六']
+          : lang === 'ja'
+            ? ['日曜日', '月曜日', '火曜日', '水曜日', '木曜日', '金曜日', '土曜日']
+            : lang === 'ko'
+              ? ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일']
+              : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
         return days[date.getDay()]
       }
     } catch {
