@@ -10,8 +10,9 @@ permissions:
   contents: read
   pages: write
   id-token: write
+  actions: write
 
-# Allow only one concurrent deployment
+# Allow only one concurrent deployment, cancel any in-progress
 concurrency:
   group: "pages"
   cancel-in-progress: true
@@ -37,7 +38,28 @@ jobs:
         
       - name: Build
         run: npm run build
-        
+
+      - name: Delete old github-pages artifacts
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const artifacts = await github.rest.actions.listArtifactsForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'github-pages',
+              per_page: 100
+            });
+            for (const artifact of artifacts.data.artifacts) {
+              if (!artifact.expired) {
+                console.log(`Deleting artifact ${artifact.id} from run ${artifact.workflow_run.id}`);
+                await github.rest.actions.deleteArtifact({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  artifact_id: artifact.id
+                });
+              }
+            }
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
