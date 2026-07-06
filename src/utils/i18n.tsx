@@ -777,3 +777,58 @@ export const useTranslation = () => {
   }
   return context
 }
+
+export const translateVenueName = (name: string, lang: string): string => {
+  if (lang === 'zh-TW') return name
+  const venueMap: Record<string, Record<string, string>> = {
+    '台北大巨蛋': { en: 'Taipei Dome', ja: '台北大巨蛋 (台北ドーム)', ko: '타이베이 돔' },
+    '台北小巨蛋': { en: 'Taipei Arena', ja: '台北小巨蛋 (台北アリーナ)', ko: '타이베이 아레나' },
+    '南港展覽館': { en: 'Nangang Exhibition Center', ja: '南港展覧館', ko: '난강 전람관' },
+    '台北流行音樂中心': { en: 'Taipei Music Center', ja: '台北流行音楽センター', ko: '타이베이 뮤직 센터' },
+    'Zepp New Taipei': { en: 'Zepp New Taipei', ja: 'Zepp New Taipei', ko: 'Zepp New Taipei' },
+    'Legacy Taipei': { en: 'Legacy Taipei', ja: 'Legacy Taipei', ko: 'Legacy Taipei' },
+    'The Wall Live House': { en: 'The Wall Live House', ja: 'The Wall Live House', ko: 'The Wall Live House' },
+    '桃園國際棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '桃園国際棒球場 (桃園野球場)', ko: '타오위안 국제야구장' },
+    '新竹棒球場': { en: 'Hsinchu Baseball Stadium', ja: '新竹棒球場 (新竹野球場)', ko: '신주 야구장' },
+    '天母棒球場': { en: 'Tianmu Baseball Stadium', ja: '天母棒球場 (天母野球場)', ko: '티엔무 야구장' },
+    '新莊棒球場': { en: 'Xinzhuang Baseball Stadium', ja: '新庄棒球場 (新庄野球場)', ko: '신좡 야구장' },
+    '高雄國家體育場': { en: 'Kaohsiung National Stadium', ja: '高雄国家体育場 (高雄スタジアム)', ko: '가오슝 국가체육장' },
+    '高雄巨蛋': { en: 'Kaohsiung Arena', ja: '高雄巨蛋 (高雄アリーナ)', ko: '가오슝 아레나' },
+    '高雄流行音樂中心': { en: 'Kaohsiung Music Center', ja: '高雄流行音楽センター', ko: '가오슝 뮤직 센터' },
+    '駁二 Live Warehouse': { en: 'Pier-2 LIVE WAREHOUSE', ja: '駁二 LIVE WAREHOUSE', ko: '피어-2 라이브 웨어하우스' },
+    '台中國際展覽館': { en: 'Taichung International Exhibition Center', ja: '台中国際展覧館', ko: '타이중 국제전시장' },
+    'Legacy Taichung': { en: 'Legacy Taichung', ja: 'Legacy Taichung', ko: 'Legacy Taichung' },
+    '圓滿戶外劇場': { en: 'Fulfillment Amphitheatre', ja: '円満屋外劇場', ko: '원만 야외극장' },
+    '嘉義市棒球場': { en: 'Chiayi City Baseball Stadium', ja: '嘉義市棒球場 (嘉義野球場)', ko: '자이시 야구장' },
+    '台南市立棒球場': { en: 'Tainan Municipal Baseball Stadium', ja: '台南市立棒球場 (台南野球場)', ko: '타이남 시립야구장' },
+    '花蓮縣立體育館': { en: 'Hualien County Stadium', ja: '花蓮県立体育館', ko: '화롄 현립체육관' },
+  }
+  return venueMap[name]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || name
+}
+
+export const translateCityName = (city: string, lang: string): string => {
+  if (lang === 'zh-TW') return city
+  const cityMap: Record<string, Record<string, string>> = {
+    '台北': { en: 'Taipei', ja: '台北', ko: '타이베이' },
+    '新北': { en: 'New Taipei', ja: '新北', ko: '신베이' },
+    '基隆': { en: 'Keelung', ja: '基隆', ko: '지룽' },
+    '桃園': { en: 'Taoyuan', ja: '桃園', ko: '타오위안' },
+    '新竹': { en: 'Hsinchu', ja: '新竹', ko: '신주' },
+    '苗栗': { en: 'Miaoli', ja: '苗栗', ko: '먀오리' },
+    '台中': { en: 'Taichung', ja: '台中', ko: '타이중' },
+    '彰化': { en: 'Changhua', ja: '彰化', ko: '창화' },
+    '南投': { en: 'Nantou', ja: '南投', ko: '남토' },
+    '雲林': { en: 'Yunlin', ja: '雲林', ko: '윈린' },
+    '嘉義': { en: 'Chiayi', ja: '嘉義', ko: '자이' },
+    '台南': { en: 'Tainan', ja: '台南', ko: '타이난' },
+    '高雄': { en: 'Kaohsiung', ja: '高雄', ko: '가오슝' },
+    '屏東': { en: 'Pingtung', ja: '屏東', ko: '핑둥' },
+    '宜蘭': { en: 'Yilan', ja: '宜蘭', ko: '이란' },
+    '花蓮': { en: 'Hualien', ja: '花蓮', ko: '화롄' },
+    '台東': { en: 'Taitung', ja: '台東', ko: '타이동' },
+    '澎湖': { en: 'Penghu', ja: '澎湖', ko: '펑후' },
+    '金門': { en: 'Kinmen', ja: '金門', ko: '진먼' },
+    '連江': { en: 'Lienchiang', ja: '連江', ko: '롄장' },
+  }
+  return cityMap[city]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || city
+}

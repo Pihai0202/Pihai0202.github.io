@@ -25,7 +25,7 @@ import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
-import { useTranslation } from './utils/i18n.tsx'
+import { useTranslation, translateVenueName } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
@@ -1267,7 +1267,7 @@ function App() {
                   <span className="search-icon"><SearchIcon /></span>
                   <input
                     type="text"
-                    placeholder="搜尋場館..."
+                    placeholder={t('searchVenue')}
                     value={venueSearchQuery}
                     onChange={(e) => setVenueSearchQuery(e.target.value)}
                     onClick={() => {
@@ -1288,7 +1288,7 @@ function App() {
                   className="panel-toggle-btn"
                   type="button"
                   onClick={() => setIsVenuePanelExpanded(!isVenuePanelExpanded)}
-                  title={isVenuePanelExpanded ? "收合面版" : "展開面版"}
+                  title={isVenuePanelExpanded ? (lang === 'zh-TW' ? '收合面板' : lang === 'ja' ? 'パネルを閉じる' : lang === 'ko' ? '패널 접기' : 'Collapse Panel') : (lang === 'zh-TW' ? '展開面板' : lang === 'ja' ? 'パネルを開く' : lang === 'ko' ? '패널 열기' : 'Expand Panel')}
                 >
                   {isVenuePanelExpanded ? <CloseIcon /> : <MapIcon />}
                 </button>
@@ -1297,7 +1297,9 @@ function App() {
               {isVenuePanelExpanded && (
                 <div className="venue-panel-content">
                   {Object.entries(groupedVenues).every(([_, list]) => list.length === 0) ? (
-                    <div className="no-venues-found">找不到符合的場館</div>
+                    <div className="no-venues-found">
+                      {lang === 'zh-TW' ? '找不到符合的場館' : lang === 'en' ? 'No venues found' : lang === 'ja' ? '該当する会場が見つかりません' : '일치하는 공연장이 없습니다'}
+                    </div>
                   ) : (
                     Object.entries(groupedVenues).map(([region, list]) => {
                       if (list.length === 0) return null
@@ -1314,7 +1316,7 @@ function App() {
                               }))
                             }
                           >
-                            <span className="region-title">{region}</span>
+                            <span className="region-title">{t(region as any)}</span>
                             <span className="region-count">{list.length}</span>
                             <span className="region-arrow">
                               {isExpanded ? <ChevronDownIcon size="1.2em" /> : <ChevronRightIcon size="1.2em" />}
@@ -1338,7 +1340,7 @@ function App() {
                                     }}
                                   >
                                     <span className="dot" />
-                                    <span className="name">{v.name}</span>
+                                    <span className="name">{translateVenueName(v.name, lang)}</span>
                                     {hasVisits && <span className="visited-badge">✓</span>}
                                   </button>
                                 )
@@ -1745,7 +1747,7 @@ function App() {
                       onClick={() => setSidebarTab('venue')}
                     >
                       <MapIcon size="1.1em" />
-                      場館資訊
+                      {lang === 'zh-TW' ? '場館資訊' : lang === 'en' ? 'Venue Info' : lang === 'ja' ? '会場情報' : '공연장 정보'}
                     </button>
                   )}
                   <button
@@ -1754,7 +1756,7 @@ function App() {
                     onClick={() => setSidebarTab('tickets')}
                   >
                     <TicketIcon size="1.1em" />
-                    近期售票
+                    {lang === 'zh-TW' ? '近期售票' : lang === 'en' ? 'Upcoming Tickets' : lang === 'ja' ? '近日発売チケット' : '최근 티켓 예매'}
                   </button>
                   <button
                     className={`sidebar-tab-btn${sidebarTab === 'transit' ? ' active' : ''}`}
@@ -1762,7 +1764,7 @@ function App() {
                     onClick={() => setSidebarTab('transit')}
                   >
                     <TrainIcon size="1.1em" />
-                    交通動態
+                    {lang === 'zh-TW' ? '交通動態' : lang === 'en' ? 'Transit Info' : lang === 'ja' ? '交通情報' : '교통 상황'}
                   </button>
                 </div>
 

@@ -3,7 +3,7 @@ import type { MouseEvent } from 'react'
 import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
-import { useTranslation } from '../utils/i18n.tsx'
+import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n.tsx'
 
 const project = (lon: number, lat: number) => {
   const x = 159.787256 * lon - 18882.141068
@@ -583,7 +583,7 @@ export function TaiwanMap({
       {showShuangbeiDetail && (
         <div className="shuangbei-popover">
           <div className="popover-header">
-            <span className="popover-title">📍 {lang === 'zh-TW' ? '雙北地區場館特寫' : 'Shuangbei Venues Detail'}</span>
+            <span className="popover-title">📍 {lang === 'zh-TW' ? '雙北地區場館特寫' : lang === 'ja' ? '双北（台北・新北）会場ズーム' : lang === 'ko' ? '쌍북(타이베이·신베이) 공연장 돋보기' : 'Shuangbei Venues Detail'}</span>
             <button className="popover-close-btn" onClick={() => setShowShuangbeiDetail(false)}>×</button>
           </div>
           
@@ -604,15 +604,15 @@ export function TaiwanMap({
                 
                 return (
                   <g
-                    key={venue.id}
-                    className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-                    transform={`translate(${x},${y})`}
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onSelectVenue(venue.id)
-                      setShowShuangbeiDetail(false)
-                    }}
-                    style={{ cursor: 'pointer' }}
+                     key={venue.id}
+                     className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                     transform={`translate(${x},${y})`}
+                     onClick={(e) => {
+                       e.stopPropagation()
+                       onSelectVenue(venue.id)
+                       setShowShuangbeiDetail(false)
+                     }}
+                     style={{ cursor: 'pointer' }}
                   >
                     <circle className="mini-click-target" r="6" cx="0" cy="0" fill="transparent" />
                     <circle className="mini-pulse-ring" r="4.5" cx="0" cy="0" />
@@ -638,12 +638,12 @@ export function TaiwanMap({
                   }}
                 >
                   <div className="popover-venue-name-row">
-                    <span className="popover-venue-name">{venue.name}</span>
+                    <span className="popover-venue-name">{translateVenueName(venue.name, lang)}</span>
                     {hasVisits && <span className="visited-tick">✓</span>}
                   </div>
                   <div className="popover-venue-meta">
                     <span>{t('capacityPeople', { capacity: venue.capacity })}</span>
-                    <span>📍 {venue.city === '台北' ? (lang === 'zh-TW' ? '台北' : 'Taipei') : (lang === 'zh-TW' ? '新北' : 'New Taipei')}</span>
+                    <span>📍 {translateCityName(venue.city, lang)}</span>
                   </div>
                 </div>
               )
@@ -663,9 +663,9 @@ export function TaiwanMap({
             zIndex: 1000,
           }}
         >
-          <div className="tooltip-title">{hoveredVenue.name}</div>
+          <div className="tooltip-title">{translateVenueName(hoveredVenue.name, lang)}</div>
           <div className="tooltip-meta">
-            <span>📍 {hoveredVenue.city === '台北' ? (lang === 'zh-TW' ? '台北' : 'Taipei') : hoveredVenue.city === '新北' ? (lang === 'zh-TW' ? '新北' : 'New Taipei') : hoveredVenue.city}</span>
+            <span>📍 {translateCityName(hoveredVenue.city, lang)}</span>
             <span>{t('capacityPeople', { capacity: hoveredVenue.capacity })}</span>
           </div>
           {concerts.some((c) => c.venueId === hoveredVenue.id) && (

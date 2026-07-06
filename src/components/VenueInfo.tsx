@@ -2,6 +2,7 @@ import { useState } from 'react'
 import type { Venue, RemoteConcert } from '../types'
 import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon } from './SvgIcon'
+import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -20,6 +21,7 @@ export function VenueInfo({
   todayConcerts = [],
   onSelectTicket,
 }: VenueInfoProps) {
+  const { lang } = useTranslation()
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [showMap, setShowMap] = useState(false)
 
@@ -29,9 +31,15 @@ export function VenueInfo({
         <div className="empty-hint">
           <div className="icon"><MapIcon size="2.5em" /></div>
           <p>
-            點擊地圖上的場館
-            <br />
-            查看詳情並記錄演唱會
+            {lang === 'zh-TW' ? (
+              <>點擊地圖上的場館<br />查看詳情並記錄演唱會</>
+            ) : lang === 'ja' ? (
+              <>地図上の会場をクリックして<br />詳細を表示し、記録を追加します</>
+            ) : lang === 'ko' ? (
+              <>지도에서 공연장을 선택하여<br />상세 정보를 확인하고 후기를 남겨보세요</>
+            ) : (
+              <>Click a venue on the map<br />to view details and add records</>
+            )}
           </p>
         </div>
       </div>
@@ -41,18 +49,20 @@ export function VenueInfo({
   return (
     <div className={`venue-info${isCollapsed ? ' collapsed' : ''}`}>
       <div className="venue-top">
-        <div className="venue-city">{venue.city}</div>
+        <div className="venue-city">{translateCityName(venue.city, lang)}</div>
         <div className="venue-top-actions">
           <button
             className="toggle-collapse-btn"
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
-            {isCollapsed ? '▼ 展開' : '▲ 收起'}
+            {isCollapsed 
+              ? (lang === 'zh-TW' ? '▼ 展開' : lang === 'ja' ? '▼ 展開' : lang === 'ko' ? '▼ 펼치기' : '▼ Expand') 
+              : (lang === 'zh-TW' ? '▲ 收起' : lang === 'ja' ? '▲ 折りたたむ' : lang === 'ko' ? '▲ 접기' : '▲ Collapse')}
           </button>
           <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
             <CloseIcon size="0.85em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-            清除選取
+            {lang === 'zh-TW' ? '清除選取' : lang === 'en' ? 'Clear Selected' : lang === 'ja' ? '選択解除' : '선택 해제'}
           </button>
         </div>
       </div>
@@ -61,28 +71,36 @@ export function VenueInfo({
         onClick={() => setIsCollapsed(!isCollapsed)}
         style={{ cursor: 'pointer', userSelect: 'none' }}
       >
-        <div className="venue-name">{venue.name}</div>
+        <div className="venue-name">{translateVenueName(venue.name, lang)}</div>
         <div className={`venue-count${concertCount > 0 ? ' has-visits' : ''}`}>
           {concertCount > 0 ? (
             <>
               <CheckIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-              {concertCount} 場
+              {concertCount} {lang === 'zh-TW' ? '場' : lang === 'ja' ? '回' : lang === 'ko' ? '회' : 'visits'}
             </>
           ) : (
-            '未造訪'
+            lang === 'zh-TW' ? '未造訪' : lang === 'en' ? 'Unvisited' : lang === 'ja' ? '未訪問' : '미방문'
           )}
         </div>
       </div>
 
       {!isCollapsed && (
         <>
-          <div className="venue-capacity">容量：{venue.capacity} 人</div>
+          <div className="venue-capacity">
+            {lang === 'zh-TW' 
+              ? `容量：${venue.capacity} 人` 
+              : lang === 'ja' 
+                ? `キャパシティ：${venue.capacity} 人` 
+                : lang === 'ko' 
+                  ? `수용인원: ${venue.capacity}명` 
+                  : `Capacity: ${venue.capacity}`}
+          </div>
 
           {/* 今日演出 */}
           <div className="venue-today-section">
             <div className="venue-today-title">
               <span className="live-pulse-dot"></span>
-              今日演出
+              {lang === 'zh-TW' ? '今日演出' : lang === 'en' ? "Today's Show" : lang === 'ja' ? '本日開催の公演' : '오늘의 공연'}
             </div>
             {todayConcerts.length > 0 ? (
               <div className="venue-today-list">
@@ -118,7 +136,9 @@ export function VenueInfo({
                 ))}
               </div>
             ) : (
-              <div className="venue-today-empty">今日無演出活動</div>
+              <div className="venue-today-empty">
+                {lang === 'zh-TW' ? '今日無演出活動' : lang === 'en' ? 'No performance today' : lang === 'ja' ? '本日の公演はありません' : '오늘 예정된 공연이 없습니다'}
+              </div>
             )}
           </div>
 
@@ -143,7 +163,7 @@ export function VenueInfo({
                 }}
               >
                 <CompassIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                導航
+                {lang === 'zh-TW' ? '導航' : lang === 'en' ? 'Navigate' : lang === 'ja' ? '道案内' : '길찾기'}
               </button>
             </div>
           )}
@@ -168,7 +188,7 @@ export function VenueInfo({
 
           <div className="venue-actions">
             <button className="add-concert-btn" type="button" onClick={onAddConcert}>
-              ＋ 新增演唱會記錄
+              {lang === 'zh-TW' ? '＋ 新增演唱會記錄' : lang === 'en' ? '＋ Add Concert Record' : lang === 'ja' ? '＋ コンサート記録を追加' : '＋ 콘서트 기록 추가'}
             </button>
             {showMap && (
               <a
@@ -184,7 +204,7 @@ export function VenueInfo({
                 }}
               >
                 <CompassIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                Google 地圖導航
+                {lang === 'zh-TW' ? 'Google 地圖導航' : lang === 'en' ? 'Google Maps Navigation' : lang === 'ja' ? 'Googleマップで開く' : 'Google 지도 길찾기'}
               </a>
             )}
           </div>
