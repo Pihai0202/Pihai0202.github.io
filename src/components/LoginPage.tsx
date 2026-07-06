@@ -97,10 +97,14 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     setErrorMsg('')
     try {
       if (typeof (window as any).Capacitor !== 'undefined') {
-        // Native App (Capacitor) Google Sign-in
+        // Native App (Capacitor) Google Sign-in with skipNativeAuth: true
         const result = await FirebaseAuthentication.signInWithGoogle()
+        
+        // Try to get idToken from credential
         const idToken = (result.credential as any)?.idToken
+        
         if (idToken) {
+          // Exchange the native Google idToken for a Firebase credential
           const credential = GoogleAuthProvider.credential(idToken)
           const userCredential = await signInWithCredential(auth, credential)
           const firebaseUser = userCredential.user
@@ -108,8 +112,15 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
             nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
             email: firebaseUser.email || '',
           })
+        } else if (result.user) {
+          // Fallback: use the user info directly from the plugin result
+          const u = result.user
+          onLoginSuccess({
+            nickname: u.displayName || (u.email ? u.email.split('@')[0] : '') || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+            email: u.email || '',
+          })
         } else {
-          throw new Error('No ID Token received from Google native sign-in.')
+          throw new Error(lang === 'zh-TW' ? '無法取得 Google 登入憑證' : 'Failed to get Google sign-in credentials')
         }
       } else {
         // Web Browser Google Sign-in
