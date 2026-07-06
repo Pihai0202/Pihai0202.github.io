@@ -91,6 +91,12 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
 
 
   const handleGoogleSignInPopup = async () => {
+    if (typeof (window as any).Capacitor !== 'undefined') {
+      setErrorMsg(lang === 'zh-TW' 
+        ? 'App 內目前不支援 Google 快捷登入。請使用上方「信箱登入/註冊」或下方的「訪客模式」！' 
+        : 'Google Sign-In is not supported inside the App. Please use Email Sign-In or Guest Mode above!');
+      return
+    }
     setIsLoading(true)
     setErrorMsg('')
     try {
