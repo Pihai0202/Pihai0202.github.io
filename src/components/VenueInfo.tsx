@@ -97,12 +97,12 @@ export function VenueInfo({
           </div>
 
           {/* 今日演出 */}
-          <div className="venue-today-section">
-            <div className="venue-today-title">
-              <span className="live-pulse-dot"></span>
-              {lang === 'zh-TW' ? '今日演出' : lang === 'en' ? "Today's Show" : lang === 'ja' ? '本日開催の公演' : '오늘의 공연'}
-            </div>
-            {todayConcerts.length > 0 ? (
+          {todayConcerts.length > 0 && (
+            <div className="venue-today-section">
+              <div className="venue-today-title">
+                <span className="live-pulse-dot"></span>
+                {lang === 'zh-TW' ? '今日演出' : lang === 'en' ? "Today's Show" : lang === 'ja' ? '本日開催の公演' : '오늘의 공연'}
+              </div>
               <div className="venue-today-list">
                 {todayConcerts.map((concert) => (
                   <div
@@ -135,12 +135,8 @@ export function VenueInfo({
                   </div>
                 ))}
               </div>
-            ) : (
-              <div className="venue-today-empty">
-                {lang === 'zh-TW' ? '今日無演出活動' : lang === 'en' ? 'No performance today' : lang === 'ja' ? '本日の公演はありません' : '오늘 예정된 공연이 없습니다'}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {venue.address && (
             <div className="venue-address">
