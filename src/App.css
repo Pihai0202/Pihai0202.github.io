@@ -8016,7 +8016,7 @@ body.player-open .music-bar-toggle {
   /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
   .map-legend {
     position: fixed !important;
-    top: calc(62px + 1rem) !important;
+    top: calc(62px + 1rem + 44px) !important;
     left: 1rem !important;
     bottom: auto !important;
     right: auto !important;
