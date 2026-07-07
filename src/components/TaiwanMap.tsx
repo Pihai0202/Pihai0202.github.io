@@ -91,10 +91,47 @@ export function TaiwanMap({
   const isAnimatingRef = useRef(false)
   const animationRef = useRef<number | null>(null)
   const centerRef = useRef(center)
-  centerRef.current = center
-
   const zoomRef = useRef(zoom)
-  zoomRef.current = zoom
+
+  useEffect(() => {
+    centerRef.current = center
+  }, [center])
+
+  useEffect(() => {
+    zoomRef.current = zoom
+  }, [zoom])
+
+  const rafPendingRef = useRef<{ center: { x: number; y: number } | null; zoom: number | null }>({ center: null, zoom: null })
+  const rafIdRef = useRef<number | null>(null)
+  const wheelTimeoutRef = useRef<any>(null)
+
+  const scheduleRafUpdate = () => {
+    if (rafIdRef.current !== null) return
+
+    rafIdRef.current = requestAnimationFrame(() => {
+      rafIdRef.current = null
+      const { center: nextCenter, zoom: nextZoom } = rafPendingRef.current
+
+      if (nextCenter !== null) {
+        setDisplayCenter(nextCenter)
+        centerRef.current = nextCenter
+      }
+
+      if (nextZoom !== null) {
+        setDisplayZoom(nextZoom)
+        zoomRef.current = nextZoom
+      }
+
+      rafPendingRef.current = { center: null, zoom: null }
+    })
+  }
+
+  useEffect(() => {
+    return () => {
+      if (rafIdRef.current !== null) cancelAnimationFrame(rafIdRef.current)
+      if (wheelTimeoutRef.current !== null) clearTimeout(wheelTimeoutRef.current)
+    }
+  }, [])
 
   // Keep display states synchronized instantly when not animating
   useEffect(() => {
@@ -189,21 +226,24 @@ export function TaiwanMap({
       const pctX = clientX / rect.width
       const pctY = clientY / rect.height
 
-      const w = 800 / zoom
-      const h = 800 / zoom
+      const currentZoom = zoomRef.current
+      const currentCenter = centerRef.current
 
-      const minX = center.x - w / 2
-      const minY = center.y - h / 2
+      const w = 800 / currentZoom
+      const h = 800 / currentZoom
+
+      const minX = currentCenter.x - w / 2
+      const minY = currentCenter.y - h / 2
 
       const mx = minX + pctX * w
       const my = minY + pctY * h
 
       const zoomFactor = 1.08
-      let newZoom = zoom
+      let newZoom = currentZoom
       if (e.deltaY < 0) {
-        newZoom = Math.min(5.0, zoom * zoomFactor)
+        newZoom = Math.min(5.0, currentZoom * zoomFactor)
       } else {
-        newZoom = Math.max(0.7, zoom / zoomFactor)
+        newZoom = Math.max(0.7, currentZoom / zoomFactor)
       }
 
       const newWidth = 800 / newZoom
@@ -212,19 +252,27 @@ export function TaiwanMap({
       const newMinX = mx - pctX * newWidth
       const newMinY = my - pctY * newHeight
 
-      setCenter({
+      const nextCenter = {
         x: newMinX + newWidth / 2,
         y: newMinY + newHeight / 2,
-      })
+      }
 
-      onZoomChange(newZoom)
+      rafPendingRef.current.center = nextCenter
+      rafPendingRef.current.zoom = newZoom
+      scheduleRafUpdate()
+
+      if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current)
+      wheelTimeoutRef.current = setTimeout(() => {
+        setCenter(centerRef.current)
+        onZoomChange(zoomRef.current)
+      }, 100)
     }
 
     svgEl.addEventListener('wheel', handleWheel, { passive: false })
     return () => {
       svgEl.removeEventListener('wheel', handleWheel)
     }
-  }, [zoom, center, onZoomChange])
+  }, [onZoomChange])
 
   const handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
     if (e.button !== 0) return
@@ -234,8 +282,8 @@ export function TaiwanMap({
     dragStartRef.current = {
       clientX: e.clientX,
       clientY: e.clientY,
-      centerX: center.x,
-      centerY: center.y,
+      centerX: centerRef.current.x,
+      centerY: centerRef.current.y,
     }
     setIsDragging(true)
   }
@@ -250,20 +298,24 @@ export function TaiwanMap({
     }
 
     const svgRect = svgRef.current.getBoundingClientRect()
-    const w = 800 / zoom
-    const h = 800 / zoom
+    const currentZoom = zoomRef.current
+    const w = 800 / currentZoom
+    const h = 800 / currentZoom
     const scaleX = w / svgRect.width
     const scaleY = h / svgRect.height
 
-    setCenter({
+    const nextCenter = {
       x: dragStartRef.current.centerX - dx * scaleX,
       y: dragStartRef.current.centerY - dy * scaleY,
-    })
+    }
+    rafPendingRef.current.center = nextCenter
+    scheduleRafUpdate()
   }
 
   const handleDragEnd = () => {
     setIsDragging(false)
     dragStartRef.current = null
+    setCenter(centerRef.current)
   }
 
   // Bind native touch event listeners non-passively to prevent browser viewport zoom
@@ -327,15 +379,19 @@ export function TaiwanMap({
         }
 
         const svgRect = svgEl.getBoundingClientRect()
-        const w = 800 / zoomRef.current
-        const h = 800 / zoomRef.current
+        const currentZoom = zoomRef.current
+        const w = 800 / currentZoom
+        const h = 800 / currentZoom
         const scaleX = w / svgRect.width
         const scaleY = h / svgRect.height
 
-        setCenter({
+        const nextCenter = {
           x: dragStartRef.current.centerX - dx * scaleX,
           y: dragStartRef.current.centerY - dy * scaleY,
-        })
+        }
+
+        rafPendingRef.current.center = nextCenter
+        scheduleRafUpdate()
       } else if (e.touches.length === 2) {
         e.preventDefault() // Block browser native viewport zoom
         if (
@@ -381,12 +437,14 @@ export function TaiwanMap({
         const adjustedMinX = newMinX - deltaClientX * scaleX
         const adjustedMinY = newMinY - deltaClientY * scaleY
 
-        setCenter({
+        const nextCenter = {
           x: adjustedMinX + newWidth / 2,
           y: adjustedMinY + newHeight / 2,
-        })
+        }
 
-        onZoomChange(newZoom)
+        rafPendingRef.current.center = nextCenter
+        rafPendingRef.current.zoom = newZoom
+        scheduleRafUpdate()
       }
     }
 
@@ -397,6 +455,9 @@ export function TaiwanMap({
       pinchStartZoomRef.current = null
       pinchStartMidpointRef.current = null
       pinchStartMapCenterRef.current = null
+
+      setCenter(centerRef.current)
+      onZoomChange(zoomRef.current)
     }
 
     svgEl.addEventListener('touchstart', handleTouchStartNative, { passive: false })
