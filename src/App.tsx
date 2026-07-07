@@ -221,8 +221,11 @@ function extractArtistFromTitle(title: string): string {
   return clean.replace(/202\d/g, '').trim()
 }
 
+const APP_VERSION = '1.0.1'
+
 function App() {
   const { t, lang, setLang } = useTranslation()
+  const [updateInfo, setUpdateInfo] = useState<{ version: string; url: string; notes: string } | null>(null)
 
   const [theme, setTheme] = useState<'dark' | 'light'>(() => {
     const storedTheme = localStorage.getItem('theme')
@@ -301,6 +304,35 @@ function App() {
     handleResize() // 確保在組件掛載時立即取得正確的視窗寬度，避免 Mobile App 顯示成電腦版
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetch('https://pihai0202.github.io/version.json?t=' + Date.now())
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.version && data.version !== APP_VERSION) {
+            const curParts = APP_VERSION.split('.').map(Number)
+            const newParts = data.version.split('.').map(Number)
+            let isNewer = false
+            for (let i = 0; i < Math.max(curParts.length, newParts.length); i++) {
+              const curPart = curParts[i] || 0
+              const newPart = newParts[i] || 0
+              if (newPart > curPart) {
+                isNewer = true
+                break
+              } else if (newPart < curPart) {
+                break
+              }
+            }
+            if (isNewer) {
+              setUpdateInfo(data)
+            }
+          }
+        })
+        .catch((err) => console.log('Update check failed:', err))
+    }, 3000)
+    return () => clearTimeout(timer)
   }, [])
 
   useEffect(() => {
@@ -425,7 +457,8 @@ function App() {
     isSuspensionModalOpen ||
     isAllModalOpen ||
     isPublishModalOpen ||
-    isGuideModalOpen
+    isGuideModalOpen ||
+    !!updateInfo
   )
 
   useEffect(() => {
@@ -2513,6 +2546,53 @@ function App() {
                   </button>
                 )
               })}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {updateInfo && (
+        <div className="modal-overlay active" onClick={() => setUpdateInfo(null)}>
+          <div className="modal publish-modal" style={{ maxWidth: '400px', padding: '2rem', borderRadius: '20px' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setUpdateInfo(null)}>
+              <CloseIcon />
+            </button>
+            <h2 style={{ fontSize: '1.35rem', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
+              🚀 {lang === 'zh-TW' ? '發現新版本！' : 'New Version Available!'}
+            </h2>
+            <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: '1.4' }}>
+              {lang === 'zh-TW' ? `從 v${APP_VERSION} 升級至 v${updateInfo.version}` : `Upgrade from v${APP_VERSION} to v${updateInfo.version}`}
+            </div>
+            {updateInfo.notes && (
+              <div style={{ background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border)', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem' }}>
+                <div style={{ color: 'var(--text)', fontWeight: 'bold', fontSize: '0.88rem', marginBottom: '0.5rem' }}>
+                  {lang === 'zh-TW' ? '更新內容：' : 'Changelog:'}
+                </div>
+                <div style={{ color: 'var(--muted)', fontSize: '0.82rem', whiteSpace: 'pre-wrap', lineHeight: '1.5' }}>
+                  {updateInfo.notes}
+                </div>
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button
+                type="button"
+                className="login-submit-btn"
+                style={{ flex: 1, padding: '0.75rem', borderRadius: '24px', background: 'var(--gold)', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
+                onClick={() => {
+                  window.open(updateInfo.url, '_system');
+                  setUpdateInfo(null);
+                }}
+              >
+                {lang === 'zh-TW' ? '立即下載更新' : 'Download Now'}
+              </button>
+              <button
+                type="button"
+                className="cancel-publish-btn"
+                style={{ flex: 1, padding: '0.75rem', borderRadius: '24px', background: 'transparent', color: 'var(--muted)', border: '1px solid var(--border)', cursor: 'pointer' }}
+                onClick={() => setUpdateInfo(null)}
+              >
+                {lang === 'zh-TW' ? '稍後再說' : 'Later'}
+              </button>
             </div>
           </div>
         </div>
