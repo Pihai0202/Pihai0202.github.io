@@ -1307,6 +1307,31 @@ function App() {
 
       {view === 'map' ? (
         <main className={`main-layout mobile-tab-${mobileTab}${isSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
+          {isMobile && (
+            <div className="mobile-view-selector-tabs">
+              <button
+                className={`mobile-view-tab-btn ${mobileTab === 'map' ? 'active' : ''}`}
+                type="button"
+                onClick={() => setMobileTab('map')}
+              >
+                🗺️ {t('tabMap')}
+              </button>
+              <button
+                className={`mobile-view-tab-btn ${mobileTab === 'list' ? 'active' : ''}`}
+                type="button"
+                onClick={() => setMobileTab('list')}
+              >
+                📅 {t('tabList')}
+              </button>
+              <button
+                className={`mobile-view-tab-btn ${mobileTab === 'search' ? 'active' : ''}`}
+                type="button"
+                onClick={() => setMobileTab('search')}
+              >
+                🔍 {t('tabSearch')}
+              </button>
+            </div>
+          )}
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
@@ -2692,7 +2717,11 @@ function App() {
                   setMobileTab('map')
                   setMobileDrawerState('collapsed')
                 } else {
-                  if (selectedVenueId) {
+                  if (mobileTab !== 'map') {
+                    setMobileTab('map')
+                    setSelectedVenueId(null)
+                    setMobileDrawerState('collapsed')
+                  } else if (selectedVenueId) {
                     setSelectedVenueId(null)
                     setMobileDrawerState('collapsed')
                   } else {

@@ -320,7 +320,7 @@ header {
 
 .main-layout {
   display: grid;
-  grid-template-columns: 1fr 450px;
+  grid-template-columns: 1fr minmax(360px, 420px);
   height: calc(100vh - 91px);
   min-height: 560px;
 }
@@ -4385,6 +4385,58 @@ body.player-open .music-bar-toggle {
   .login-trigger-btn,
   .logout-btn {
     display: none !important;
+  }
+
+  /* Mobile View Selector Tabs */
+  .mobile-view-selector-tabs {
+    display: flex !important;
+    position: absolute !important;
+    bottom: calc(var(--bottom-offset) + 16px) !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    z-index: 99 !important;
+    background: rgba(14, 14, 24, 0.85) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 24px !important;
+    padding: 4px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+    backdrop-filter: blur(15px) !important;
+    -webkit-backdrop-filter: blur(15px) !important;
+    width: max-content !important;
+    max-width: 90% !important;
+    transition: bottom 0.3s ease !important;
+  }
+
+  .mobile-view-tab-btn {
+    background: none !important;
+    border: none !important;
+    color: var(--muted) !important;
+    padding: 6px 14px !important;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    border-radius: 18px !important;
+    cursor: pointer !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+    white-space: nowrap !important;
+  }
+
+  .mobile-view-tab-btn.active {
+    background: var(--gold) !important;
+    color: #000 !important;
+    font-weight: 700 !important;
+    box-shadow: 0 2px 8px rgba(var(--gold-rgb), 0.4) !important;
+  }
+
+  .mobile-view-tab-btn:active {
+    transform: scale(0.95) !important;
+  }
+
+  .concert-list-area {
+    padding-bottom: calc(var(--bottom-offset) + 80px) !important;
   }
 
   /* Full Screen Tab Layout */
