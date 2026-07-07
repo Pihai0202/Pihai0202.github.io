@@ -179,7 +179,7 @@ const translations: Record<Language, Record<string, string>> = {
     todayConcertsTitle: '🔥 今日在此場館演出：',
 
     // Share Board
-    socialWallTitle: '📢 樂迷分享牆',
+    socialWallTitle: '樂迷分享牆',
     socialWallSubtitle: 'FAN COMMUNITY BOARD',
     postCountTip: '共 {count} 則樂迷分享',
     likeBtn: '讚 {count}',
@@ -361,7 +361,7 @@ const translations: Record<Language, Record<string, string>> = {
     todayConcertsTitle: '🔥 Performing here today:',
 
     // Share Board
-    socialWallTitle: '📢 Fan Community Board',
+    socialWallTitle: 'Fan Community Board',
     socialWallSubtitle: 'FAN COMMUNITY BOARD',
     postCountTip: '{count} fan posts in total',
     likeBtn: 'Like {count}',
@@ -543,7 +543,7 @@ const translations: Record<Language, Record<string, string>> = {
     todayConcertsTitle: '🔥 本日この会場で開催される公演：',
 
     // Share Board
-    socialWallTitle: '📢 ファン共有掲示板',
+    socialWallTitle: 'ファン共有掲示板',
     socialWallSubtitle: 'FAN COMMUNITY BOARD',
     postCountTip: '合計 {count} 件の投稿',
     likeBtn: 'いいね {count}',
@@ -725,7 +725,7 @@ const translations: Record<Language, Record<string, string>> = {
     todayConcertsTitle: '🔥 오늘 이 공연장에서 열리는 공연:',
 
     // Share Board
-    socialWallTitle: '📢 팬 공유판',
+    socialWallTitle: '팬 공유판',
     socialWallSubtitle: 'FAN COMMUNITY BOARD',
     postCountTip: '총 {count}개의 게시물',
     likeBtn: '좋아요 {count}',

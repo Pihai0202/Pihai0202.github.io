@@ -3,7 +3,7 @@ import { marked } from 'marked'
 import type { SharedNote } from '../types'
 import { useTranslation } from '../utils/i18n.tsx'
 import {
-  MicIcon,
+  MegaphoneIcon,
   EditIcon,
   SearchIcon,
   CloseIcon,
@@ -360,7 +360,7 @@ export function ShareBoard() {
     <div className="share-board-container">
       <div className="share-board-header">
         <h2 className="share-board-title">
-          <MicIcon size="1.2em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          <MegaphoneIcon size="1.2em" style={{ marginRight: '8px', verticalAlign: 'middle', color: 'var(--gold)' }} />
           {t('socialWallTitle')}
         </h2>
         <div className="share-board-subtitle">{t('socialWallSubtitle')}</div>
