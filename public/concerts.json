@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-07T22:39:55.336520+00:00",
-  "count": 500,
+  "updated_at": "2026-07-08T00:01:33.773562+00:00",
+  "count": 498,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -109,56 +109,6 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_maydaytp_p"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-190",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：樂天桃猿 vs 富邦悍將",
-      "venue_raw": "新莊",
-      "venue_id": "xinzhuang",
-      "venue_name": "新莊棒球場",
-      "city": "新北",
-      "date": "2026-07-07",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021495969510091777/logo_fubon.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "富邦悍將售票網",
-          "url": "https://guardians.fami.life/UTK0101_"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-191",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：中信兄弟 vs 統一7-ELEVEn獅",
-      "venue_raw": "亞太主",
-      "venue_id": "asia-pacific-main",
-      "venue_name": "亞太國際棒球訓練中心成棒主球場",
-      "city": "台南",
-      "date": "2026-07-07",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021496162893869773/logo_lions.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "統一獅售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
         }
       ]
     },
