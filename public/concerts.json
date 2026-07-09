@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-09T07:05:55.611184+00:00",
+  "updated_at": "2026-07-09T10:45:34.464809+00:00",
   "count": 488,
   "sources": [
     "KKTIX",
@@ -353,26 +353,6 @@
           "platform": "manual",
           "name": "中華職棒官方賽程",
           "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
-    {
-      "id": "kktix-org-ofkewr-2026-07-11",
-      "source": "KKTIX",
-      "name": "2026 PIZZALI－『拼一個浪漫』 首次個人專場演唱會－台中加場",
-      "venue_raw": "Legacy Taichung",
-      "venue_id": "legacy-taichung",
-      "venue_name": "Legacy Taichung",
-      "city": "台中",
-      "date": "2026-07-11",
-      "image": "https://assets.kktix.io/upload_images/433048/%E6%8B%BC%E4%B8%80%E5%80%8B%E6%B5%AA%E6%BC%AB%E5%B0%88%E5%A0%B4_%E8%A6%96%E8%A6%BA_resize_1200_x_630_medium.jpg",
-      "url": "https://kklivetw.kktix.cc/events/ofkewr",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kktix",
-          "name": "KKTIX",
-          "url": "https://kklivetw.kktix.cc/events/ofkewr"
         }
       ]
     },
@@ -1837,6 +1817,26 @@
           "platform": "manual",
           "name": "中華職棒官方賽程",
           "url": "https://www.cpbl.com.tw/schedule"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-ofkewr-2026-07-22",
+      "source": "KKTIX",
+      "name": "2026 PIZZALI－『拼一個浪漫』 首次個人專場演唱會－台中加場",
+      "venue_raw": "Legacy Taichung",
+      "venue_id": "legacy-taichung",
+      "venue_name": "Legacy Taichung",
+      "city": "台中",
+      "date": "2026-07-22",
+      "image": "https://assets.kktix.io/upload_images/433048/%E6%8B%BC%E4%B8%80%E5%80%8B%E6%B5%AA%E6%BC%AB%E5%B0%88%E5%A0%B4_%E8%A6%96%E8%A6%BA_resize_1200_x_630_medium.jpg",
+      "url": "https://kklivetw.kktix.cc/events/ofkewr",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://kklivetw.kktix.cc/events/ofkewr"
         }
       ]
     },
