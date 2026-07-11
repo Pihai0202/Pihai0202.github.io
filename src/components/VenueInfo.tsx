@@ -1,8 +1,9 @@
 import { useState } from 'react'
-import type { Venue, RemoteConcert } from '../types'
+import type { Venue, RemoteConcert, SuspensionItem } from '../types'
 import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
+import { getCitySuspensionStatus } from '../utils/suspensionHelper'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -11,6 +12,7 @@ interface VenueInfoProps {
   onClearVenue: () => void
   todayConcerts?: RemoteConcert[]
   onSelectTicket?: (ticket: RemoteConcert) => void
+  suspensionItems?: SuspensionItem[]
 }
 
 export function VenueInfo({
@@ -20,6 +22,7 @@ export function VenueInfo({
   onClearVenue,
   todayConcerts = [],
   onSelectTicket,
+  suspensionItems = [],
 }: VenueInfoProps) {
   const { lang } = useTranslation()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -115,7 +118,14 @@ export function VenueInfo({
                       <span className="venue-today-source">{concert.source}</span>
                       {concert.price && <span className="venue-today-price">{concert.price}</span>}
                     </div>
-                    <div className="venue-today-name">{concert.name}</div>
+                    <div className="venue-today-name">
+                      {concert.name}
+                      {getCitySuspensionStatus(venue.city, suspensionItems) && (
+                        <span className="venue-today-postponed-msg" style={{ color: '#ff4d4f', marginLeft: '6px', fontSize: '0.85em', fontWeight: 'bold' }}>
+                          （因颱風停班停課，演出可能延期/取消）
+                        </span>
+                      )}
+                    </div>
                     {concert.ticket_links && concert.ticket_links.length > 0 && (
                       <div className="venue-today-links">
                         {concert.ticket_links.slice(0, 2).map((link) => (
