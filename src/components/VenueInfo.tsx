@@ -118,14 +118,13 @@ export function VenueInfo({
                       <span className="venue-today-source">{concert.source}</span>
                       {concert.price && <span className="venue-today-price">{concert.price}</span>}
                     </div>
-                    <div className="venue-today-name">
-                      {concert.name}
-                      {getCitySuspensionStatus(venue.city, suspensionItems) && (
-                        <span className="venue-today-postponed-msg" style={{ color: '#ff4d4f', marginLeft: '6px', fontSize: '0.85em', fontWeight: 'bold' }}>
-                          （因颱風停班停課，演出可能延期/取消）
-                        </span>
-                      )}
-                    </div>
+                    <div className="venue-today-name">{concert.name}</div>
+                    {getCitySuspensionStatus(venue.city, suspensionItems) && (
+                      <div className="typhoon-warning-badge">
+                        <span className="warning-icon">⚠️</span>
+                        {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+                      </div>
+                    )}
                     {concert.ticket_links && concert.ticket_links.length > 0 && (
                       <div className="venue-today-links">
                         {concert.ticket_links.slice(0, 2).map((link) => (

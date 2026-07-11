@@ -3076,27 +3076,26 @@ function UpcomingConcerts({
               <span>{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
               <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
-            <div className="remote-card-name">
-              {concert.name}
-              {(() => {
-                const d = new Date()
-                const utc = d.getTime() + d.getTimezoneOffset() * 60000
-                const taipeiTime = new Date(utc + 3600000 * 8)
-                const yyyy = taipeiTime.getFullYear()
-                const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
-                const dd = String(taipeiTime.getDate()).padStart(2, '0')
-                const todayStr = `${yyyy}-${mm}-${dd}`
-                
-                const isToday = concert.date && concert.date.trim() === todayStr
-                if (!isToday) return null
-                
-                return getCitySuspensionStatus(concert.city, suspensionItems) ? (
-                  <span className="concert-postponed-msg" style={{ color: '#ff4d4f', marginLeft: '6px', fontSize: '0.82em', fontWeight: 'bold' }}>
-                    （因颱風停班停課，演出可能延期/取消）
-                  </span>
-                ) : null
-              })()}
-            </div>
+            <div className="remote-card-name">{concert.name}</div>
+            {(() => {
+              const d = new Date()
+              const utc = d.getTime() + d.getTimezoneOffset() * 60000
+              const taipeiTime = new Date(utc + 3600000 * 8)
+              const yyyy = taipeiTime.getFullYear()
+              const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+              const dd = String(taipeiTime.getDate()).padStart(2, '0')
+              const todayStr = `${yyyy}-${mm}-${dd}`
+              
+              const isToday = concert.date && concert.date.trim() === todayStr
+              if (!isToday) return null
+              
+              return getCitySuspensionStatus(concert.city, suspensionItems) ? (
+                <div className="typhoon-warning-badge">
+                  <span className="warning-icon">⚠️</span>
+                  {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+                </div>
+              ) : null
+            })()}
             <div className="remote-card-meta">
               {getVenueMetaText(concert)}
               {concert.price ? ` · ${translatePrice(concert.price)}` : ''}
