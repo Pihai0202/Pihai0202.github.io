@@ -167,7 +167,7 @@ export const suspension = onRequest(
       const updateTime = updateTimeMatch ? updateTimeMatch[1].trim() : "";
 
       // 提取表格列
-      const rowRegex = /<tr[^>]*>\s*<td[^>]*headers=['"]?city_Name['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<td[^>]*headers=['"]?StopWorkSchool_Info['"]?[^>]*>\s*<font[^>]*>([\s\S]*?)<\/font>\s*<\/td>\s*<\/tr>/gi;
+      const rowRegex = /<td[^>]*headers=['"]?city_Name[^>]*>([\s\S]*?)<\/td>\s*<td[^>]*>([\s\S]*?)<\/td>/gi;
 
       let match;
       const items: { city: string; status: string }[] = [];

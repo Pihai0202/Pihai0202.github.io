@@ -463,8 +463,10 @@ export function TransitInfoBoard() {
   const fetchStatus = useCallback(async () => {
     setLoading(true)
     try {
+      const isNative = typeof (window as any).Capacitor !== 'undefined'
+      const baseUrl = isNative ? 'https://pihai0202.github.io/' : import.meta.env.BASE_URL
       const response = await fetch(
-        `${import.meta.env.BASE_URL}transit-status.json?t=${Date.now()}`,
+        `${baseUrl}transit-status.json?t=${Date.now()}`,
         { cache: 'no-store' }
       )
       if (!response.ok) throw new Error('transit-status.json not found')

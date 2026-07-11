@@ -54,8 +54,8 @@ def main():
 
     # Parse rows
     row_regex = re.compile(
-        r"<tr[^>]*>\s*<td[^>]*headers=['\"]?city_Name['\"]?[^>]*>\s*<font[^>]*>([\s\S]*?)</font>\s*</td>\s*"
-        r"<td[^>]*headers=['\"]?StopWorkSchool_Info['\"]?[^>]*>\s*<font[^>]*>([\s\S]*?)</font>\s*</td>\s*</tr>",
+        r"<td[^>]*headers=['\"]?city_Name[^>]*>([\s\S]*?)</td>\s*"
+        r"<td[^>]*>([\s\S]*?)</td>",
         re.IGNORECASE
     )
 
