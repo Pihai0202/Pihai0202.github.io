@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Venue, RemoteConcert, SuspensionItem } from '../types'
 import { logCustomEvent } from '../firebase'
-import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon } from './SvgIcon'
+import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
 
@@ -121,7 +121,7 @@ export function VenueInfo({
                     <div className="venue-today-name">{concert.name}</div>
                     {getCitySuspensionStatus(venue.city, suspensionItems) && (
                       <div className="typhoon-warning-badge">
-                        <span className="warning-icon">⚠️</span>
+                        <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
                         {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
                       </div>
                     )}
