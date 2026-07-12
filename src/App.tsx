@@ -59,7 +59,8 @@ import {
   ChevronLeftIcon,
   TicketIcon,
   TrainIcon,
-  GlobeIcon
+  GlobeIcon,
+  VolumeXIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -223,7 +224,7 @@ function extractArtistFromTitle(title: string): string {
   return clean.replace(/202\d/g, '').trim()
 }
 
-const APP_VERSION = '1.0.1'
+const APP_VERSION = '1.0.2'
 
 function App() {
   const { t, lang, setLang } = useTranslation()
@@ -2382,7 +2383,7 @@ function App() {
       {isSuspensionModalOpen && suspensionData && (
         <Modal className="suspension-modal" onClose={() => setIsSuspensionModalOpen(false)}>
           <div className="suspension-header">
-            <span className="suspension-icon">⚠️</span>
+            <WarningIcon className="suspension-icon" style={{ color: '#faad14' }} />
             <div>
               <h2 className="suspension-title">天然災害停班停課公告</h2>
               <div className="suspension-subtitle">
@@ -2409,7 +2410,10 @@ function App() {
                 <>
                   {warningItems.length > 0 && (
                     <div className="suspension-section warning-section">
-                      <div className="section-title">⚠️ 停止上班上課縣市</div>
+                      <div className="section-title">
+                        <WarningIcon size="1.2em" style={{ color: '#ff4d4f', marginRight: '6px', verticalAlign: 'middle' }} />
+                        停止上班上課縣市
+                      </div>
                       <div className="warning-list">
                         {warningItems.map((item, idx) => (
                           <div key={idx} className="suspension-card warning-card">
@@ -2424,7 +2428,8 @@ function App() {
                   {normalItems.length > 0 && (
                     <details className="suspension-section normal-section" open>
                       <summary className="section-title collapsible-title">
-                        ✅ 照常上班上課縣市 ({normalItems.length})
+                        <CheckIcon size="1.2em" style={{ color: '#52c41a', marginRight: '6px', verticalAlign: 'middle' }} />
+                        照常上班上課縣市 ({normalItems.length})
                       </summary>
                       <div className="normal-list">
                         {normalItems.map((item, idx) => (
@@ -2447,7 +2452,8 @@ function App() {
               type="button"
               onClick={handleDismissSuspensionToday}
             >
-              本日不再顯示 🔇
+              本日不再顯示
+              <VolumeXIcon size="1.1em" style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
             </button>
             <button
               className="suspension-btn close-btn"
