@@ -1,5 +1,5 @@
 {
-  "version": "1.0.2",
+  "version": "1.0.3",
   "url": "https://github.com/Pihai0202/Pihai0202.github.io/raw/apk/concert-map-release.apk",
-  "notes": "此版本包含停班課爬蟲解析修正、優化手機 App 即時資料讀取，並重構停班課彈窗之 UI 圖示與今日演出延期警示標籤排版！"
+  "notes": "此版本解決了 App 啟動時讀取停班課與近期售票資訊的快取競態問題，確保每次開啟都自動讀取最新線上資料，並將所有圖示改為 SVG！"
 }

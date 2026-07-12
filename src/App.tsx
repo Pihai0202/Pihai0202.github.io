@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react'
 import { marked } from 'marked'
+import { Capacitor } from '@capacitor/core'
 import './App.css'
 
 import type {
@@ -224,7 +225,7 @@ function extractArtistFromTitle(title: string): string {
   return clean.replace(/202\d/g, '').trim()
 }
 
-const APP_VERSION = '1.0.2'
+const APP_VERSION = '1.0.3'
 
 function App() {
   const { t, lang, setLang } = useTranslation()
@@ -576,7 +577,7 @@ function App() {
   useEffect(() => {
     const fetchSuspension = async () => {
       try {
-        const isNative = typeof (window as any).Capacitor !== 'undefined'
+        const isNative = Capacitor.isNativePlatform()
         const baseUrl = isNative ? 'https://pihai0202.github.io/' : import.meta.env.BASE_URL
         const response = await fetch(
           `${baseUrl}suspension.json?t=${Date.now()}`,
@@ -790,7 +791,7 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
-      const isNative = typeof (window as any).Capacitor !== 'undefined'
+      const isNative = Capacitor.isNativePlatform()
       const baseUrl = isNative ? 'https://pihai0202.github.io/' : import.meta.env.BASE_URL
       const response = await fetch(`${baseUrl}concerts.json?t=${Date.now()}`, {
         cache: 'no-store',
