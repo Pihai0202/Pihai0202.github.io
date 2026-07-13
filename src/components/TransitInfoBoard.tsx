@@ -419,6 +419,30 @@ const getLineInfo = (operator: string, stationId: string) => {
   return { name: '捷運路線', order: 1 }
 }
 
+const convertTmrtStationId = (stationId: string): string => {
+  const mapping: Record<string, string> = {
+    'G0': '103a',
+    'G3': '103',
+    'G4': '104',
+    'G5': '105',
+    'G6': '106',
+    'G7': '107',
+    'G8': '108',
+    'G8a': '109',
+    'G9': '110',
+    'G10': '111',
+    'G10a': '112',
+    'G11': '113',
+    'G12': '114',
+    'G13': '115',
+    'G14': '116',
+    'G15': '117',
+    'G16': '118',
+    'G17': '119'
+  }
+  return mapping[stationId] || stationId
+}
+
 export function TransitInfoBoard() {
   const { t, lang } = useTranslation()
   const [tdxActive, setTdxActive] = useState(false)
@@ -629,11 +653,13 @@ export function TransitInfoBoard() {
       return
     }
 
+    const queryStationId = operator === 'TMRT' ? convertTmrtStationId(stationId) : stationId
+
     try {
       const [liveData, timetableData] = await Promise.all([
         hasLiveBoard
           ? fetchTdx<TdxMetroLiveBoard[]>(
-              `/v2/Rail/Metro/LiveBoard/${operator}?$filter=StationID eq '${stationId}'`
+              `/v2/Rail/Metro/LiveBoard/${operator}?$filter=StationID eq '${queryStationId}'`
             ).catch((err) => {
               console.error('LiveBoard error:', err)
               return []
@@ -641,7 +667,7 @@ export function TransitInfoBoard() {
           : Promise.resolve([]),
         hasTimetable
           ? fetchTdx<TdxMetroStationTimeTable[]>(
-              `/v2/Rail/Metro/StationTimeTable/${operator}?$filter=StationID eq '${stationId}'`
+              `/v2/Rail/Metro/StationTimeTable/${operator}?$filter=StationID eq '${queryStationId}'`
             ).catch((err) => {
               console.error('StationTimeTable error:', err)
               return []
