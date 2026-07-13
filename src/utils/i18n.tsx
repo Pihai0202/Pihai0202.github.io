@@ -192,6 +192,14 @@ const translations: Record<Language, Record<string, string>> = {
     shareNicknameLabel: '請輸入您的暱稱 (將公開顯示)',
     shareNicknamePlaceholder: 'e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)',
     shareSubmitBtn: '確認發佈 🚀',
+
+    // Suspension
+    suspensionTitle: '天然災害停班停課公告',
+    suspensionSource: '行政院人事行政總處 (更新時間：{time})',
+    suspensionStop: '停止上班上課縣市',
+    suspensionNormal: '照常上班上課縣市 ({count})',
+    suspensionDismiss: '本日不再顯示',
+    suspensionClose: '關閉',
   },
   en: {
     // Header
@@ -374,6 +382,14 @@ const translations: Record<Language, Record<string, string>> = {
     shareNicknameLabel: 'Please enter your nickname (publicly displayed)',
     shareNicknamePlaceholder: 'e.g. Rock精靈 (Leave empty to publish anonymously)',
     shareSubmitBtn: 'Confirm & Publish 🚀',
+
+    // Suspension
+    suspensionTitle: 'Natural Disaster Work & School Suspension Announcement',
+    suspensionSource: 'Directorate-General of Personnel Administration, Executive Yuan (Updated: {time})',
+    suspensionStop: 'Work and Class Suspended',
+    suspensionNormal: 'Work and Class as Usual ({count})',
+    suspensionDismiss: "Don't show again today",
+    suspensionClose: 'Close',
   },
   'ja': {
     // Header
@@ -556,6 +572,14 @@ const translations: Record<Language, Record<string, string>> = {
     shareNicknameLabel: 'ニックネームを入力してください (公開されます)',
     shareNicknamePlaceholder: 'e.g. Rock精靈 (空欄の場合は「匿名ファン」として投稿されます)',
     shareSubmitBtn: '投稿する 🚀',
+
+    // Suspension
+    suspensionTitle: '自然災害に伴う出勤・登校の停止公告',
+    suspensionSource: '行政院人事行政総処 (更新時間：{time})',
+    suspensionStop: '出勤・登校停止の自治体',
+    suspensionNormal: '通常通り出勤・登校の自治体 ({count})',
+    suspensionDismiss: '本日は再表示しない',
+    suspensionClose: '閉じる',
   },
   'ko': {
     // Header
@@ -738,7 +762,15 @@ const translations: Record<Language, Record<string, string>> = {
     shareNicknameLabel: '닉네임을 입력하세요 (공개 표시됨)',
     shareNicknamePlaceholder: '예: 搖滾區小精靈 (비워두면 익명 팬으로 게시)',
     shareSubmitBtn: '게시하기 🚀',
-  }
+
+    // Suspension
+    suspensionTitle: '자연재해로 인한 휴업 및 휴교 안내',
+    suspensionSource: '행정원 인사행정총처 (업데이트 시간: {time})',
+    suspensionStop: '휴업 및 휴교 지역',
+    suspensionNormal: '정상 근무 및 등교 지역 ({count})',
+    suspensionDismiss: '오늘 하루 동안 보지 않기',
+    suspensionClose: '닫기',
+  },
 }
 
 export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -849,3 +881,67 @@ export const translateCityName = (city: string, lang: string): string => {
   }
   return cityMap[city]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || city
 }
+
+export const translateSuspensionStatus = (status: string, lang: string): string => {
+  if (lang === 'zh-TW') return status
+  
+  // Exact matches
+  const exactMap: Record<string, Record<string, string>> = {
+    '照常上班、照常上課。': {
+      en: 'Work and classes as usual.',
+      ja: '通常通り出勤・登校。',
+      ko: '정상 근무 및 등교.'
+    },
+    '今天停止上班、停止上課。': {
+      en: 'Work and classes suspended today.',
+      ja: '本日出勤・登校停止。',
+      ko: '오늘 휴업 및 휴교.'
+    },
+    '明天停止上班、停止上課。': {
+      en: 'Work and classes suspended tomorrow.',
+      ja: '明日出勤・登校停止。',
+      ko: '내일 휴업 및 휴교.'
+    }
+  }
+
+  const langKey = lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'
+  if (exactMap[status]?.[langKey]) {
+    return exactMap[status][langKey]
+  }
+
+  // Substring replacement or just return as is (with some key terms translated if possible)
+  let result = status
+  if (lang === 'en') {
+    result = result
+      .replace(/今天/g, 'Today ')
+      .replace(/明天/g, 'Tomorrow ')
+      .replace(/停止上班、停止上課。/g, 'Work and classes suspended. ')
+      .replace(/照常上班、照常上課。/g, 'Work and classes as usual. ')
+      .replace(/停止上班/g, 'Work suspended')
+      .replace(/停止上課/g, 'Classes suspended')
+      .replace(/照常上班/g, 'Work as usual')
+      .replace(/照常上課/g, 'Classes as usual')
+  } else if (lang === 'ja') {
+    result = result
+      .replace(/今天/g, '本日 ')
+      .replace(/明天/g, '明日 ')
+      .replace(/停止上班、停止上課。/g, '出勤・登校停止。')
+      .replace(/照常上班、照常上課。/g, '通常通り出勤・登校。')
+      .replace(/停止上班/g, '出勤停止')
+      .replace(/停止上課/g, '登校停止')
+      .replace(/照常上班/g, '通常通り出勤')
+      .replace(/照常上課/g, '通常通り登校')
+  } else if (lang === 'ko') {
+    result = result
+      .replace(/今天/g, '오늘 ')
+      .replace(/明天/g, '내일 ')
+      .replace(/停止上班、停止上課。/g, '휴업 및 휴교.')
+      .replace(/照常上班、照常上課。/g, '정상 근무 및 등교.')
+      .replace(/停止上班/g, '휴업')
+      .replace(/停止上課/g, '휴교')
+      .replace(/照常上班/g, '정상 근무')
+      .replace(/照常上課/g, '정상 등교')
+  }
+  return result
+}
+

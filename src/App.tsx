@@ -28,7 +28,7 @@ import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
-import { useTranslation, translateVenueName } from './utils/i18n.tsx'
+import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
@@ -2386,9 +2386,9 @@ function App() {
           <div className="suspension-header">
             <WarningIcon className="suspension-icon" style={{ color: '#faad14' }} />
             <div>
-              <h2 className="suspension-title">天然災害停班停課公告</h2>
+              <h2 className="suspension-title">{t('suspensionTitle')}</h2>
               <div className="suspension-subtitle">
-                行政院人事行政總處 (更新時間：{suspensionData.updateTime})
+                {t('suspensionSource', { time: suspensionData.updateTime })}
               </div>
             </div>
           </div>
@@ -2413,13 +2413,13 @@ function App() {
                     <div className="suspension-section warning-section">
                       <div className="section-title">
                         <WarningIcon size="1.2em" style={{ color: '#ff4d4f', marginRight: '6px', verticalAlign: 'middle' }} />
-                        停止上班上課縣市
+                        {t('suspensionStop')}
                       </div>
                       <div className="warning-list">
                         {warningItems.map((item, idx) => (
                           <div key={idx} className="suspension-card warning-card">
-                            <div className="county-name">{item.city}</div>
-                            <div className="county-status">{item.status}</div>
+                            <div className="county-name">{lang === 'zh-TW' ? item.city : translateCityName(item.city.replace(/[市縣]/g, ''), lang)}</div>
+                            <div className="county-status">{translateSuspensionStatus(item.status, lang)}</div>
                           </div>
                         ))}
                       </div>
@@ -2430,13 +2430,13 @@ function App() {
                     <details className="suspension-section normal-section" open>
                       <summary className="section-title collapsible-title">
                         <CheckIcon size="1.2em" style={{ color: '#52c41a', marginRight: '6px', verticalAlign: 'middle' }} />
-                        照常上班上課縣市 ({normalItems.length})
+                        {t('suspensionNormal', { count: normalItems.length })}
                       </summary>
                       <div className="normal-list">
                         {normalItems.map((item, idx) => (
                           <div key={idx} className="suspension-card normal-card">
-                            <span className="normal-county">{item.city}</span>
-                            <span className="normal-status">{item.status}</span>
+                            <span className="normal-county">{lang === 'zh-TW' ? item.city : translateCityName(item.city.replace(/[市縣]/g, ''), lang)}</span>
+                            <span className="normal-status">{translateSuspensionStatus(item.status, lang)}</span>
                           </div>
                         ))}
                       </div>
@@ -2453,7 +2453,7 @@ function App() {
               type="button"
               onClick={handleDismissSuspensionToday}
             >
-              本日不再顯示
+              {t('suspensionDismiss')}
               <VolumeXIcon size="1.1em" style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
             </button>
             <button
@@ -2461,7 +2461,7 @@ function App() {
               type="button"
               onClick={() => setIsSuspensionModalOpen(false)}
             >
-              關閉
+              {t('suspensionClose')}
             </button>
           </div>
         </Modal>

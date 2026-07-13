@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useTranslation } from '../utils/i18n.tsx'
+import { useTranslation, translateCityName } from '../utils/i18n.tsx'
 import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
@@ -1010,12 +1010,90 @@ export function TransitInfoBoard() {
   // 取得當前服務的顯示資訊
   const getStatusDetails = () => {
     const serviceMap: Record<string, { name: string; icon: React.ReactNode; url: string }> = {
-      trtc: { name: '台北捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.metro.taipei/' },
-      krtc: { name: '高雄捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.krtc.com.tw/' },
-      tmrt: { name: '台中捷運', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.tmrt.com.tw/' },
-      thsr: { name: '台灣高鐵', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://www.thsrc.com.tw/' },
-      tra:  { name: '台灣鐵路', icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />, url: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList' },
+      trtc: {
+        name: lang === 'zh-TW' ? '台北捷運' : lang === 'en' ? 'Taipei MRT' : lang === 'ja' ? '台北メトロ' : '타이베이 지하철',
+        icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />,
+        url: 'https://www.metro.taipei/'
+      },
+      krtc: {
+        name: lang === 'zh-TW' ? '高雄捷運' : lang === 'en' ? 'Kaohsiung MRT' : lang === 'ja' ? '高雄メトロ' : '가오슝 지하철',
+        icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />,
+        url: 'https://www.krtc.com.tw/'
+      },
+      tmrt: {
+        name: lang === 'zh-TW' ? '台中捷運' : lang === 'en' ? 'Taichung MRT' : lang === 'ja' ? '台中メトロ' : '타이중 지하철',
+        icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />,
+        url: 'https://www.tmrt.com.tw/'
+      },
+      thsr: {
+        name: lang === 'zh-TW' ? '台灣高鐵' : lang === 'en' ? 'Taiwan HSR' : lang === 'ja' ? '台湾高鉄' : '대만 고속철도',
+        icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />,
+        url: 'https://www.thsrc.com.tw/'
+      },
+      tra: {
+        name: lang === 'zh-TW' ? '台灣鐵路' : lang === 'en' ? 'Taiwan Railway' : lang === 'ja' ? '台灣鉄道' : '대만 철도',
+        icon: <TrainIcon size="1.2em" style={{ verticalAlign: 'middle' }} />,
+        url: 'https://tip.railway.gov.tw/tra-tip-web/tip/tip007/tip711/blockList'
+      },
     }
+
+    const translateStatus = (s: string) => {
+      const clean = s.replace(/[\uD800-\uDFFF\u2600-\u27BF🟢🔴🟡]/g, '').trim()
+      if (lang === 'zh-TW') return clean
+      const map: Record<string, Record<string, string>> = {
+        '營運正常': { en: 'Normal Operation', ja: '運行正常', ko: '정상 운행' },
+        '營運調整中': { en: 'Service Adjusted', ja: 'ダイヤ調整中', ko: '운행 조정 중' }
+      }
+      return map[clean]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || clean
+    }
+
+    const translateDetail = (d: string) => {
+      if (lang === 'zh-TW') return d
+      const map: Record<string, Record<string, string>> = {
+        '全線正常營運。': {
+          en: 'All lines are operating normally.',
+          ja: '全線正常に運行しています。',
+          ko: '전 노선 정상 운행 중입니다.'
+        },
+        '目前全線營運正常。': {
+          en: 'Currently, all lines are operating normally.',
+          ja: '現在、全線で正常に運行しています。',
+          ko: '현재 전 선로 정상 운행 중입니다.'
+        },
+        '目前全線正常營運。': {
+          en: 'Currently, all lines are operating normally.',
+          ja: '現在、全線で正常に運行しています。',
+          ko: '현재 전 선로 정상 운행 중입니다.'
+        },
+        '全線正常營運': {
+          en: 'All lines are operating normally.',
+          ja: '全線正常に運行しています。',
+          ko: '전 노선 정상 운행 중입니다.'
+        },
+        '目前各線列車正常運行。': {
+          en: 'Currently, trains on all lines are operating normally.',
+          ja: '現在、各路線の列車は正常に運行しています。',
+          ko: '현재 모든 선로의 열차가 정상 운행 중입니다.'
+        },
+        '無法連接即時伺服器取得資訊，請點擊下方按鈕前往官方網站查看最新營運通阻。': {
+          en: 'Failed to connect to the live server. Please click the button below to check the official website.',
+          ja: 'リアルタイムサーバーに接続できませんでした。公式ウェブサイトで運行状況をご確認ください。',
+          ko: '실시간 서버에 연결할 수 없습니다. 아래 버튼을 클릭하여 공식 홈페이지에서 최신 정보를 확인하세요.'
+        },
+        '偵測到班距調整或運行受阻，詳情請至高鐵官網查詢。': {
+          en: 'Service adjustment or disruption detected. Please check the official website for details.',
+          ja: 'ダイヤの乱れや運転見合わせが検出されました。詳細は台湾高鉄の公式サイトをご確認ください。',
+          ko: '열차 간격 조정 또는 운행 장애가 감지되었습니다. 자세한 내용은 고속철도 공식 홈페이지를 확인하세요.'
+        },
+        '偵測到部分列車延誤或路線受阻，請點擊下方按鈕前往台鐵官網查看詳細通阻公告。': {
+          en: 'Some train delays or route disruptions detected. Please click the button below to check details.',
+          ja: '一部列車の遅延や運転見合わせが検出されました。詳細は台湾鉄道의公式サイトをご確認ください。',
+          ko: '일부 열차 지연 또는 선로 장애가 감지되었습니다. 아래 버튼을 눌러 대만 철도 공식 홈페이지에서 상세 안내를 확인하세요.'
+        }
+      }
+      return map[d]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || d
+    }
+
     const info = serviceMap[selectedService] ?? serviceMap.trtc
     const current = statuses[selectedService] ?? {
       name: info.name,
@@ -1024,7 +1102,14 @@ export function TransitInfoBoard() {
       isNormal: true,
       updatedAt: '',
     }
-    return { info, current }
+    return {
+      info,
+      current: {
+        ...current,
+        status: translateStatus(current.status),
+        detail: translateDetail(current.detail),
+      }
+    }
   }
 
   const { info, current } = getStatusDetails()
@@ -1623,13 +1708,19 @@ export function TransitInfoBoard() {
                           ? times 
                           : times.filter(t => t >= nowTime)
 
+                        const displayDest = dest === '去程'
+                          ? (lang === 'zh-TW' ? '去程' : lang === 'en' ? 'Outbound' : lang === 'ja' ? '下り' : '하행')
+                          : dest === '回程'
+                            ? (lang === 'zh-TW' ? '回程' : lang === 'en' ? 'Inbound' : lang === 'ja' ? '上り' : '상행')
+                            : dest
+
                         return (
                           <div className="metro-timetable-group" key={dest}>
                             <div className="metro-timetable-dest-header">
                               {lang === 'ja' ? (
-                                <><strong>{dest}</strong> 行き</>
+                                <><strong>{displayDest}</strong> 行き</>
                               ) : (
-                                <>{lang === 'zh-TW' ? '往' : lang === 'en' ? 'To' : lang === 'ko' ? '행' : 'To'} <strong>{dest}</strong>{lang === 'ko' ? ' ' : ''}</>
+                                <>{lang === 'zh-TW' ? '往' : lang === 'en' ? 'To' : lang === 'ko' ? '행' : 'To'} <strong>{displayDest}</strong>{lang === 'ko' ? ' ' : ''}</>
                               )}
                               <span className="metro-dest-count">({displayedTimes.length} {lang === 'zh-TW' ? '班次' : lang === 'en' ? 'trains' : lang === 'ja' ? '便' : '회'})</span>
                             </div>
@@ -1755,15 +1846,23 @@ export function TransitInfoBoard() {
                       onChange={(e) => setTraOriginStationID(e.target.value)}
                       className="transit-select"
                     >
-                      {groupedTraStations.map((group) => (
-                        <optgroup key={group.city} label={group.city}>
-                          {group.stations.map((st) => (
-                            <option key={st.StationID} value={st.StationID}>
-                              {st.StationName.Zh_tw}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
+                      {groupedTraStations.map((group) => {
+                        const displayCity = lang === 'zh-TW' ? group.city : translateCityName(group.city.replace(/[市縣]/g, ''), lang)
+                        return (
+                          <optgroup key={group.city} label={displayCity}>
+                            {group.stations.map((st) => {
+                              const cleanName = st.StationName.Zh_tw.replace(/^臺/, '台')
+                              const translated = translateTraStation(cleanName, lang)
+                              const finalName = (translated === cleanName && lang !== 'zh-TW') ? (st.StationName.En || st.StationName.Zh_tw) : translated
+                              return (
+                                <option key={st.StationID} value={st.StationID}>
+                                  {finalName}
+                                </option>
+                              )
+                            })}
+                          </optgroup>
+                        )
+                      })}
                     </select>
                   )}
                 </div>
@@ -1777,15 +1876,23 @@ export function TransitInfoBoard() {
                       onChange={(e) => setTraDestinationStationID(e.target.value)}
                       className="transit-select"
                     >
-                      {groupedTraStations.map((group) => (
-                        <optgroup key={group.city} label={group.city}>
-                          {group.stations.map((st) => (
-                            <option key={st.StationID} value={st.StationID}>
-                              {st.StationName.Zh_tw}
-                            </option>
-                          ))}
-                        </optgroup>
-                      ))}
+                      {groupedTraStations.map((group) => {
+                        const displayCity = lang === 'zh-TW' ? group.city : translateCityName(group.city.replace(/[市縣]/g, ''), lang)
+                        return (
+                          <optgroup key={group.city} label={displayCity}>
+                            {group.stations.map((st) => {
+                              const cleanName = st.StationName.Zh_tw.replace(/^臺/, '台')
+                              const translated = translateTraStation(cleanName, lang)
+                              const finalName = (translated === cleanName && lang !== 'zh-TW') ? (st.StationName.En || st.StationName.Zh_tw) : translated
+                              return (
+                                <option key={st.StationID} value={st.StationID}>
+                                  {finalName}
+                                </option>
+                              )
+                            })}
+                          </optgroup>
+                        )
+                      })}
                     </select>
                   )}
                 </div>
