@@ -1065,7 +1065,7 @@ export function TransitInfoBoard() {
           const nowMinutes = new Date().getHours() * 60 + new Date().getMinutes()
 
           const results = (Array.isArray(timetableData) ? timetableData : [])
-            .map((item): TrainQueryResult => {
+            .flatMap((item): TrainQueryResult[] => {
               const depTime = item.OriginStopTime?.DepartureTime ? item.OriginStopTime.DepartureTime.slice(0, 5) : '--:--'
               const arrTime = item.DestinationStopTime?.ArrivalTime ? item.DestinationStopTime.ArrivalTime.slice(0, 5) : '--:--'
               const trainNo = item.DailyTrainInfo?.TrainNo ?? '--'
@@ -1076,10 +1076,10 @@ export function TransitInfoBoard() {
               const depMinutes = depHour * 60 + depMin
               const isDeparted = depMinutes < nowMinutes
 
+              if (isDeparted) return [] // 排除已駛離的車次
+
               let status = ''
-              if (isDeparted) {
-                status = lang === 'zh-TW' ? '已駛離' : 'Departed'
-              } else if (delayMap[trainNo] !== undefined) {
+              if (delayMap[trainNo] !== undefined) {
                 const delayMin = delayMap[trainNo]
                 status = delayMin === 0
                   ? (lang === 'zh-TW' ? '🟢 準點' : lang === 'en' ? '🟢 On time' : lang === 'ja' ? '🟢 定刻' : '🟢 정시')
@@ -1088,7 +1088,7 @@ export function TransitInfoBoard() {
                 status = '🟢'
               }
 
-              return {
+              return [{
                 trainType,
                 trainNo,
                 depTime,
@@ -1096,7 +1096,7 @@ export function TransitInfoBoard() {
                 duration: formatDuration(depTime, arrTime, lang),
                 isExpress: trainType.includes('自強') || trainType.includes('普悠瑪') || trainType.includes('太魯閣') || trainType.includes('普優瑪'),
                 status
-              }
+              }]
             })
 
           results.sort((a, b) => a.depTime.localeCompare(b.depTime))
@@ -1180,13 +1180,10 @@ export function TransitInfoBoard() {
           const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
           const isDeparted = depMinutes < nowMinutes
 
+          if (isDeparted) return [] // 排除已駛離的班次，僅保留即將進站/尚未出發的班次
+
           const trainNo = item.DailyTrainInfo?.TrainNo ?? '--'
           const trainType = getHsrTrainType(trainNo)
-
-          let status = '🟢'
-          if (isDeparted) {
-            status = lang === 'zh-TW' ? '已駛離' : 'Departed'
-          }
 
           return [{
             trainType,
@@ -1195,7 +1192,7 @@ export function TransitInfoBoard() {
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime, lang),
             isExpress: trainType === '直達',
-            status,
+            status: '🟢',
           }]
         })
 
@@ -1226,12 +1223,13 @@ export function TransitInfoBoard() {
               ? 'Failed to query train timetable, please try again later.' 
               : lang === 'ja' 
                 ? '列車の時刻表検索に失敗しました。後ほどもう一度お試しください。' 
-                : '열차時間표 조회에 실패했습니다. 잠시 후 다시 시度해 주세요.')
+                : '열차時間표 조회에失敗했습니다. 잠시 후 다시 시度해 주세요.')
       )
     } finally {
       setIsTrainSearching(false)
     }
   }, [trainMode, originStation, destinationStation, traStation, traQueryMode, traOriginStationID, traDestinationStationID, lang])
+
   // 3. 公車動態查詢（依序查詢：route → stops → eta，避免同時 3 個 API 觸發 429）
   const handleBusSearch = useCallback(async (directionOverride?: number) => {
     const queryStr = busSearch.trim()
