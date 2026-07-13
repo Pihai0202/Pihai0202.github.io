@@ -1,5 +1,5 @@
 {
-  "version": "1.1.1",
+  "version": "1.1.2",
   "url": "https://github.com/Pihai0202/Pihai0202.github.io/raw/apk/concert-map-release.apk",
-  "notes": "此版本修正了瀏覽器 localStorage 快取站點資料所導致的舊排序殘留 Bug，確保更新後的高雄輕軌等站點排序即刻生效！"
+  "notes": "此版本優化了環狀線與高雄輕軌等環狀環狀路線的即時看板，自動加上「順行方向/逆行方向」的方向標示，更方便乘客分辨方向！"
 }

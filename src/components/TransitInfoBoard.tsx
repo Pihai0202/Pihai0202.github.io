@@ -85,6 +85,7 @@ interface TdxMetroLiveBoard {
   EstimateTime?: number
   SrcUpdateTime?: string
   UpdateTime?: string
+  TripHeadSign?: string
 }
 
 // TDX 捷運時刻表：ServiceDay 欄位為布林值（非整數）
@@ -1243,9 +1244,10 @@ export function TransitInfoBoard() {
                             badgeClass = 'approaching'
                           }
 
-                          const destName = lang === 'zh-TW' 
+                          const destName = (lang === 'zh-TW' 
                             ? (train.DestinationStationName?.Zh_tw ?? '終點站') 
-                            : (train.DestinationStationName?.En ?? train.DestinationStationName?.Zh_tw ?? 'Terminal')
+                            : (train.DestinationStationName?.En ?? train.DestinationStationName?.Zh_tw ?? 'Terminal'))
+                            + (train.TripHeadSign ? ` (${train.TripHeadSign})` : '')
 
                           return (
                             <div className="metro-live-item" key={idx}>
