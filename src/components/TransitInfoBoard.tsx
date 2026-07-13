@@ -116,6 +116,21 @@ interface TdxMetroStationTimeTable {
 }
 
 
+interface TdxTraLiveBoardItem {
+  TrainNo: string
+  Direction: number
+  TrainTypeName: {
+    Zh_tw: string
+    En?: string
+  }
+  EndingStationName: {
+    Zh_tw: string
+    En?: string
+  }
+  ScheduledDepartureTime: string
+  DelayTime: number
+}
+
 // ─── 靜態資料 ────────────────────────────────────────────────────────────────
 
 
@@ -140,6 +155,50 @@ const translateHsrStation = (st: string, lang: string) => {
   return hsrMap[st]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || st;
 }
 
+const TRA_STATIONS = [
+  '基隆', '七堵', '汐止', '南港', '松山', '台北', '板橋', '樹林', '鶯歌', '桃園',
+  '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義',
+  '新營', '台南', '岡山', '新左營', '高雄', '屏東', '潮州', '宜蘭', '羅東', '花蓮', '台東'
+]
+
+const translateTraStation = (st: string, lang: string) => {
+  if (lang === 'zh-TW') return st;
+  const traMap: Record<string, Record<string, string>> = {
+    '基隆': { en: 'Keelung', ja: '基隆', ko: '지룽' },
+    '七堵': { en: 'Qidu', ja: '七堵', ko: '치두' },
+    '汐止': { en: 'Xizhi', ja: '汐止', ko: '시즈' },
+    '南港': { en: 'Nangang', ja: 'Nangang', ko: '난강' },
+    '松山': { en: 'Songshan', ja: '松山', ko: '송산' },
+    '台北': { en: 'Taipei', ja: '台北', ko: '타이베이' },
+    '板橋': { en: 'Banqiao', ja: '板橋', ko: '반차오' },
+    '樹林': { en: 'Shulin', ja: '樹林', ko: '수린' },
+    '鶯歌': { en: 'Yingge', ja: '鶯歌', ko: '잉거' },
+    '桃園': { en: 'Taoyuan', ja: '桃園', ko: '타오위안' },
+    '中壢': { en: 'Zhongli', ja: '中壢', ko: '중리' },
+    '新竹': { en: 'Hsinchu', ja: '新竹', ko: '신주' },
+    '竹南': { en: 'Zhunan', ja: '竹南', ko: '주난' },
+    '苗栗': { en: 'Miaoli', ja: '苗栗', ko: '묘리' },
+    '豐原': { en: 'Fengyuan', ja: '豊原', ko: '풍위안' },
+    '台中': { en: 'Taichung', ja: '台中', ko: '타이중' },
+    '彰化': { en: 'Changhua', ja: '彰化', ko: '창화' },
+    '員林': { en: 'Yuanlin', ja: '員林', ko: '위안린' },
+    '斗六': { en: 'Douliu', ja: '斗六', ko: '두류' },
+    '嘉義': { en: 'Chiayi', ja: '嘉義', ko: '자이' },
+    '新營': { en: 'Xinying', ja: '新営', ko: '신잉' },
+    '台南': { en: 'Tainan', ja: '台南', ko: '타이난' },
+    '岡山': { en: 'Gangshan', ja: '岡山', ko: '강산' },
+    '新左營': { en: 'Xinzuoying', ja: '新左営', ko: '신쭤잉' },
+    '高雄': { en: 'Kaohsiung', ja: '高雄', ko: '가오슝' },
+    '屏東': { en: 'Pingtung', ja: '屏東', ko: '핑둥' },
+    '潮州': { en: 'Chaozhou', ja: '潮州', ko: '차오저우' },
+    '宜蘭': { en: 'Yilan', ja: '宜蘭', ko: '이란' },
+    '羅東': { en: 'Luodong', ja: '羅東', ko: '뤄둥' },
+    '花蓮': { en: 'Hualien', ja: '花蓮', ko: '화롄' },
+    '台東': { en: 'Taitung', ja: '台東', ko: '타이둥' }
+  };
+  return traMap[st]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || st;
+}
+
 // 高鐵車站 ID 對照（直接硬編碼，省去 Station API 呼叫）
 const THSR_STATION_IDS: Record<string, string> = {
   '南港': '0990', '台北': '1000', '板橋': '1010', '桃園': '1020',
@@ -147,7 +206,14 @@ const THSR_STATION_IDS: Record<string, string> = {
   '雲林': '1047', '嘉義': '1050', '台南': '1060', '左營': '1070',
 }
 
-const TRA_STATION_IDS: Record<string, string> = {}
+const TRA_STATION_IDS: Record<string, string> = {
+  '基隆': '0900', '七堵': '0930', '汐止': '0960', '南港': '0980', '松山': '0990',
+  '台北': '1000', '板橋': '1020', '樹林': '1040', '鶯歌': '1060', '桃園': '1080',
+  '中壢': '1100', '新竹': '1210', '竹南': '1250', '苗栗': '1300', '豐原': '1400',
+  '台中': '1450', '彰化': '1120', '員林': '1150', '斗六': '1210', '嘉義': '1228',
+  '新營': '1238', '台南': '1278', '岡山': '1308', '新左營': '1318', '高雄': '1408',
+  '屏東': '1418', '潮州': '1428', '宜蘭': '1810', '羅東': '1820', '花蓮': '2300', '台東': '6000'
+}
 
 const COUNTIES = [
   { id: 'Taipei', name: '台北市' },
@@ -395,6 +461,16 @@ function setStationToLS(operator: string, stations: TdxStation[]) {
   }
 }
 
+const getTraBadgeClass = (type: string) => {
+  if (type.includes('自強')) return '自強'
+  if (type.includes('普悠瑪')) return '普悠瑪'
+  if (type.includes('太魯閣')) return '太魯閣'
+  if (type.includes('莒光')) return '莒光'
+  if (type.includes('區間快')) return '區間快'
+  if (type.includes('區間')) return '區間'
+  return '站站停'
+}
+
 const compareStationIds = (aId: string, bId: string) => {
   const regex = /^([a-zA-Z]*?)(\d+)([a-zA-Z]*)$/
   const matchA = aId.match(regex)
@@ -499,6 +575,8 @@ export function TransitInfoBoard() {
   const [queryResults, setQueryResults] = useState<TrainQueryResult[]>([])
   const [isTrainSearching, setIsTrainSearching] = useState(false)
   const [trainError, setTrainError] = useState('')
+  const [trainMode, setTrainMode] = useState<'thsr' | 'tra'>('thsr')
+  const [traStation, setTraStation] = useState('台北')
 
   // 公車動態
   const [selectedCounty, setSelectedCounty] = useState('Taipei')
@@ -825,13 +903,60 @@ export function TransitInfoBoard() {
 
   const { info, current } = getStatusDetails()
 
-  // 高鐵時刻查詢
+  // 鐵路時刻查詢 (高鐵/台鐵雙鐵模式)
   const handleTrainSearch = useCallback(async () => {
     setIsTrainSearching(true)
     setTdxActive(false)
     setTrainError('')
     setQueryResults([])
     try {
+      if (trainMode === 'tra') {
+        const stationId = TRA_STATION_IDS[traStation]
+        if (!stationId) throw new Error(lang === 'zh-TW' ? '找不到車站代碼' : 'Station code not found')
+
+        const path = `/v2/Rail/TRA/LiveBoard/Station/${stationId}?$top=150`
+        const data = await fetchTdx<TdxTraLiveBoardItem[]>(path)
+        const results = (Array.isArray(data) ? data : [])
+          .map((item): TrainQueryResult => {
+            const depTime = item.ScheduledDepartureTime ? item.ScheduledDepartureTime.slice(0, 5) : '--:--'
+            const trainNo = item.TrainNo ?? '--'
+            const trainType = item.TrainTypeName?.Zh_tw ?? '區間'
+            const endingStation = item.EndingStationName?.Zh_tw ?? '終點站'
+
+            const delayMin = item.DelayTime ?? 0
+            const delayStatus = delayMin === 0
+              ? (lang === 'zh-TW' ? '🟢 準點' : lang === 'en' ? '🟢 On time' : lang === 'ja' ? '🟢 定刻' : '🟢 정시')
+              : (lang === 'zh-TW' ? `🔴 晚 ${delayMin} 分` : lang === 'en' ? `🔴 Delay ${delayMin}m` : lang === 'ja' ? `🔴 遅れ ${delayMin} 分` : `🔴 ${delayMin}분 지연`)
+
+            return {
+              trainType,
+              trainNo,
+              depTime,
+              arrTime: endingStation,
+              duration: '',
+              isExpress: trainType.includes('自強') || trainType.includes('普悠瑪') || trainType.includes('太魯閣'),
+              status: delayStatus
+            }
+          })
+
+        results.sort((a, b) => a.depTime.localeCompare(b.depTime))
+        setQueryResults(results)
+        setTdxActive(true)
+        if (results.length === 0) {
+          setTrainError(
+            lang === 'zh-TW'
+              ? '目前無列車發車資訊。'
+              : lang === 'en'
+                ? 'No train departure information at the moment.'
+                : lang === 'ja'
+                  ? '現在、列車の出発情報はありません。'
+                  : '현재 열차 출발 정보가 없습니다.'
+          )
+        }
+        return
+      }
+
+      // 高鐵時刻查詢
       const originId = getStationId('THSR', originStation)
       const destinationId = getStationId('THSR', destinationStation)
       if (!originId || !destinationId) throw new Error('找不到對應車站代碼，請換一個站名試試')
@@ -886,17 +1011,17 @@ export function TransitInfoBoard() {
         e instanceof Error 
           ? e.message 
           : (lang === 'zh-TW' 
-            ? '高鐵時刻查詢失敗，請稍後再試' 
+            ? '鐵路時刻查詢失敗，請稍後再試' 
             : lang === 'en' 
-              ? 'Failed to query HSR timetable, please try again later.' 
+              ? 'Failed to query train timetable, please try again later.' 
               : lang === 'ja' 
-                ? '新幹線の時刻表検索に失敗しました。後ほどもう一度お試しください。' 
-                : '고속철도 시간표 조회에 실패했습니다. 잠시 후 다시 시도해 주세요.')
+                ? '列車の時刻表検索に失敗しました。後ほどもう一度お試しください。' 
+                : '열차時間표 조회에 실패했습니다. 잠시 후 다시 시도해 주세요.')
       )
     } finally {
       setIsTrainSearching(false)
     }
-  }, [originStation, destinationStation])
+  }, [trainMode, originStation, destinationStation, traStation, lang])
 
   // 3. 公車動態查詢（依序查詢：route → stops → eta，避免同時 3 個 API 觸發 429）
   const handleBusSearch = useCallback(async (directionOverride?: number) => {
@@ -1332,52 +1457,111 @@ export function TransitInfoBoard() {
         </div>
       )}
 
-      {/* ── Tab 3：高鐵動態 ── */}
+      {/* ── Tab 3：鐵路時刻 ── */}
       {activeTab === 'train' && (
         <div className="transit-tab-content">
+          <div className="train-type-row" style={{ marginBottom: '0.6rem' }}>
+            <button
+              type="button"
+              className={`train-type-btn${trainMode === 'thsr' ? ' active' : ''}`}
+              onClick={() => {
+                setTrainMode('thsr')
+                setQueryResults([])
+                setTrainError('')
+              }}
+            >
+              {lang === 'zh-TW' ? '台灣高鐵 (THSR)' : 'Taiwan High Speed Rail'}
+            </button>
+            <button
+              type="button"
+              className={`train-type-btn${trainMode === 'tra' ? ' active' : ''}`}
+              onClick={() => {
+                setTrainMode('tra')
+                setQueryResults([])
+                setTrainError('')
+              }}
+            >
+              {lang === 'zh-TW' ? '台灣鐵路 (TRA)' : 'Taiwan Railways'}
+            </button>
+          </div>
+
           <div className="train-query-form">
-            <div className="train-station-selects">
-              <div className="station-select-group">
-                <label>{lang === 'zh-TW' ? '起程站' : lang === 'en' ? 'Origin' : lang === 'ja' ? '乗車駅' : '출발역'}</label>
-                <select value={originStation} onChange={(e) => setOriginStation(e.target.value)} className="transit-select">
-                  {THSR_STATIONS.map((st) => (
-                    <option key={st} value={st}>{translateHsrStation(st, lang)}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="station-select-group">
-                <label>{lang === 'zh-TW' ? '到達站' : lang === 'en' ? 'Destination' : lang === 'ja' ? '降車駅' : '도착역'}</label>
-                <select value={destinationStation} onChange={(e) => setDestinationStation(e.target.value)} className="transit-select">
-                  {THSR_STATIONS
-                    .filter((st) => st !== originStation)
-                    .map((st) => (
+            {trainMode === 'thsr' ? (
+              <div className="train-station-selects">
+                <div className="station-select-group">
+                  <label>{lang === 'zh-TW' ? '起程站' : lang === 'en' ? 'Origin' : lang === 'ja' ? '乗車駅' : '출발역'}</label>
+                  <select value={originStation} onChange={(e) => setOriginStation(e.target.value)} className="transit-select">
+                    {THSR_STATIONS.map((st) => (
                       <option key={st} value={st}>{translateHsrStation(st, lang)}</option>
                     ))}
-                </select>
+                  </select>
+                </div>
+                <div className="station-select-group">
+                  <label>{lang === 'zh-TW' ? '到達站' : lang === 'en' ? 'Destination' : lang === 'ja' ? '降車駅' : '도착역'}</label>
+                  <select value={destinationStation} onChange={(e) => setDestinationStation(e.target.value)} className="transit-select">
+                    {THSR_STATIONS
+                      .filter((st) => st !== originStation)
+                      .map((st) => (
+                        <option key={st} value={st}>{translateHsrStation(st, lang)}</option>
+                      ))}
+                  </select>
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="train-station-selects">
+                <div className="station-select-group" style={{ width: '100%' }}>
+                  <label>{lang === 'zh-TW' ? '選擇車站' : lang === 'en' ? 'Select Station' : lang === 'ja' ? '駅を選択' : '역 선택'}</label>
+                  <select value={traStation} onChange={(e) => setTraStation(e.target.value)} className="transit-select" style={{ width: '100%' }}>
+                    {TRA_STATIONS.map((st) => (
+                      <option key={st} value={st}>{translateTraStation(st, lang)}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            )}
             <button
               type="button"
               className="bus-search-btn"
               onClick={handleTrainSearch}
               disabled={isTrainSearching}
             >
-              {isTrainSearching ? (lang === 'zh-TW' ? '查詢中...' : lang === 'en' ? 'Searching...' : lang === 'ja' ? '検索中...' : '검색 중...') : (lang === 'zh-TW' ? '查詢今日班表' : lang === 'en' ? 'Search Schedule' : lang === 'ja' ? '本日の時刻表を検索' : '오늘 시간표 검색')}
+              {isTrainSearching 
+                ? (lang === 'zh-TW' ? '查詢中...' : lang === 'en' ? 'Searching...' : lang === 'ja' ? '検索中...' : '검색 중...') 
+                : (trainMode === 'thsr' 
+                  ? (lang === 'zh-TW' ? '查詢今日班表' : lang === 'en' ? 'Search Schedule' : lang === 'ja' ? '本日の時刻表を検索' : '오늘 시간표 검색')
+                  : (lang === 'zh-TW' ? '查詢即時看板' : lang === 'en' ? 'Search Live Board' : lang === 'ja' ? '即時運行ボードを検索' : '실시간 안내판 검색')
+                )
+              }
             </button>
           </div>
 
-          {/* 雙鐵班表結果 */}
+          {/* 鐵路班表與看板結果 */}
           <div className="train-results-board">
             <div className="train-board-header">
               <span>{lang === 'zh-TW' ? '車種' : lang === 'en' ? 'Type' : lang === 'ja' ? '列車種別' : '열차 종류'}</span>
               <span>{lang === 'zh-TW' ? '車次' : lang === 'en' ? 'Train No.' : lang === 'ja' ? '列車番号' : '열차 번호'}</span>
-              <span>{lang === 'zh-TW' ? '出發' : lang === 'en' ? 'Departure' : lang === 'ja' ? '出発' : '출발'}</span>
-              <span>{lang === 'zh-TW' ? '抵達' : lang === 'en' ? 'Arrival' : lang === 'ja' ? '到着' : '도착'}</span>
-              <span>{lang === 'zh-TW' ? '行車時間 / 狀態' : lang === 'en' ? 'Duration / Status' : lang === 'ja' ? '所要時間 / 運行状況' : '소요 시간 / 상태'}</span>
+              {trainMode === 'thsr' ? (
+                <>
+                  <span>{lang === 'zh-TW' ? '出發' : lang === 'en' ? 'Departure' : lang === 'ja' ? '出発' : '출발'}</span>
+                  <span>{lang === 'zh-TW' ? '抵達' : lang === 'en' ? 'Arrival' : lang === 'ja' ? '到着' : '도착'}</span>
+                  <span>{lang === 'zh-TW' ? '行車時間 / 狀態' : lang === 'en' ? 'Duration / Status' : lang === 'ja' ? '所要時間 / 運行状況' : '소요時間 / 狀態'}</span>
+                </>
+              ) : (
+                <>
+                  <span>{lang === 'zh-TW' ? '時間' : lang === 'en' ? 'Time' : lang === 'ja' ? '時刻' : '時間'}</span>
+                  <span>{lang === 'zh-TW' ? '終點' : lang === 'en' ? 'Destination' : lang === 'ja' ? '終点' : '종착역'}</span>
+                  <span>{lang === 'zh-TW' ? '狀態 / 誤點' : lang === 'en' ? 'Status / Delay' : lang === 'ja' ? '運行状況 / 遅れ' : '상태 / 지연'}</span>
+                </>
+              )}
             </div>
             <div className="train-board-rows">
               {isTrainSearching ? (
-                <div className="bus-stops-loading">{lang === 'zh-TW' ? '正在向 TDX 查詢高鐵時刻...' : lang === 'en' ? 'Querying HSR timetables from TDX...' : lang === 'ja' ? 'TDXから新幹線の時刻表を照会中...' : 'TDX에서 고속철도 시간표 조회 중...'}</div>
+                <div className="bus-stops-loading">
+                  {trainMode === 'thsr' 
+                    ? (lang === 'zh-TW' ? '正在向 TDX 查詢高鐵時刻...' : lang === 'en' ? 'Querying HSR timetables from TDX...' : lang === 'ja' ? 'TDXから新幹線の時刻表を照会中...' : 'TDX에서 고속철도 시간표 조회 중...')
+                    : (lang === 'zh-TW' ? '正在向 TDX 查詢台鐵即時看板...' : lang === 'en' ? 'Querying TRA live board...' : lang === 'ja' ? '台鉄の即時運行情報を照会中...' : '대만철도 실시간 안내판 조회 중...')
+                  }
+                </div>
               ) : trainError ? (
                 <div className="bus-stops-empty">
                   {trainError}
@@ -1396,20 +1580,31 @@ export function TransitInfoBoard() {
                   </div>
                 </div>
               ) : queryResults.length === 0 ? (
-                <div className="bus-stops-empty">{lang === 'zh-TW' ? '請選擇起訖站後按「查詢今日班表」。' : lang === 'en' ? 'Please select origin/destination and search.' : lang === 'ja' ? '乗車駅と降車駅を選択し、検索してください。' : '출발지와 도착지를 선택한 후 검색해 주세요.'}</div>
+                <div className="bus-stops-empty">
+                  {trainMode === 'thsr' 
+                    ? (lang === 'zh-TW' ? '請選擇起訖站後按「查詢今日班表」。' : lang === 'en' ? 'Please select origin/destination and search.' : lang === 'ja' ? '乗車駅と降車駅を選択し、検索してください。' : '출발지와 도착지를 선택한 후 검색해 주세요.')
+                    : (lang === 'zh-TW' ? '請選擇車站後按「查詢即時看板」。' : lang === 'en' ? 'Please select station and search.' : lang === 'ja' ? '駅を選択し、検索してください。' : '역을 선택한 후 검색해 주세요.')
+                  }
+                </div>
               ) : (
                 queryResults.map((tr, idx) => (
                   <div className={`train-board-row${tr.isExpress ? ' express' : ''}`} key={idx}>
-                    <span className={`train-type-badge type-${tr.trainType}`}>
-                      {tr.trainType === '直達' 
-                        ? (lang === 'zh-TW' ? '直達' : lang === 'en' ? 'Express' : lang === 'ja' ? '直行' : '직통') 
-                        : (lang === 'zh-TW' ? '站站停' : lang === 'en' ? 'Local' : lang === 'ja' ? '各停' : '완행')}
-                    </span>
+                    {trainMode === 'thsr' ? (
+                      <span className={`train-type-badge type-${tr.trainType}`}>
+                        {tr.trainType === '直達' 
+                          ? (lang === 'zh-TW' ? '直達' : lang === 'en' ? 'Express' : lang === 'ja' ? '直行' : '직통') 
+                          : (lang === 'zh-TW' ? '站站停' : lang === 'en' ? 'Local' : lang === 'ja' ? '各停' : '완행')}
+                      </span>
+                    ) : (
+                      <span className={`train-type-badge type-${getTraBadgeClass(tr.trainType)}`}>
+                        {tr.trainType}
+                      </span>
+                    )}
                     <span className="train-no">{tr.trainNo}</span>
                     <span className="train-time-dep">{tr.depTime}</span>
                     <span className="train-time-arr">{tr.arrTime}</span>
                     <div className="train-dur-info">
-                      <span className="train-dur">{tr.duration}</span>
+                      {trainMode === 'thsr' && <span className="train-dur">{tr.duration}</span>}
                       <span className={`train-status-badge ${
                         tr.status.includes('🟢')
                           ? 'status-ontime'
@@ -1429,7 +1624,6 @@ export function TransitInfoBoard() {
           </div>
         </div>
       )}
-
       {/* ── Tab 4：公車動態 ── */}
       {activeTab === 'bus' && (
         <div className="transit-tab-content">
