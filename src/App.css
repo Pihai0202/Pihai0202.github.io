@@ -6253,8 +6253,10 @@ body.player-open .music-bar-toggle {
   text-align: center;
   display: inline-block;
   width: fit-content;
-  max-width: 65px;
+  max-width: 80px;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .train-type-badge.type-直達 {

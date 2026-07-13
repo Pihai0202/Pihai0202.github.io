@@ -471,6 +471,19 @@ const getTraBadgeClass = (type: string) => {
   return '站站停'
 }
 
+/** 將 TDX API 回傳的冗長車種名稱（如 '自強(推拉式自強號)'）精簡為簡短顯示名稱 */
+const shortenTraType = (type: string) => {
+  if (type.includes('普悠瑪')) return '普悠瑪'
+  if (type.includes('太魯閣')) return '太魯閣'
+  if (type.includes('自強')) return '自強'
+  if (type.includes('莒光')) return '莒光'
+  if (type.includes('區間快')) return '區間快'
+  if (type.includes('區間')) return '區間'
+  if (type.includes('復興')) return '復興'
+  if (type.includes('電車')) return '電車'
+  return type.replace(/\(.*\)/, '').trim() || type
+}
+
 const compareStationIds = (aId: string, bId: string) => {
   const regex = /^([a-zA-Z]*?)(\d+)([a-zA-Z]*)$/
   const matchA = aId.match(regex)
@@ -1597,7 +1610,7 @@ export function TransitInfoBoard() {
                       </span>
                     ) : (
                       <span className={`train-type-badge type-${getTraBadgeClass(tr.trainType)}`}>
-                        {tr.trainType}
+                        {shortenTraType(tr.trainType)}
                       </span>
                     )}
                     <span className="train-no">{tr.trainNo}</span>
