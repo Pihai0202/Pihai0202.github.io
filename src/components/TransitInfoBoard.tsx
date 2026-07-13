@@ -430,6 +430,20 @@ export function TransitInfoBoard() {
   const [metroQueryError, setMetroQueryError] = useState('')
   const [showAllMetroTimes, setShowAllMetroTimes] = useState(false)
 
+  // 判斷是否為捷運非營運時間 (台北時間 01:15 ~ 05:45)
+  const isMetroOffHours = useMemo(() => {
+    try {
+      const date = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }))
+      const hours = date.getHours()
+      const minutes = date.getMinutes()
+      const timeInMinutes = hours * 60 + minutes
+      // 01:15 (75分鐘) 到 05:45 (345分鐘) 為收班休班時間
+      return timeInMinutes >= 75 && timeInMinutes <= 345
+    } catch {
+      return false
+    }
+  }, [])
+
   const isLiveBoardStale = useMemo(() => {
     if (metroLiveBoard.length === 0) return false
     const first = metroLiveBoard[0]
@@ -437,6 +451,7 @@ export function TransitInfoBoard() {
     if (!updateTimeStr) return true
     try {
       const updateTime = new Date(updateTimeStr).getTime()
+      if (isNaN(updateTime)) return true
       const now = Date.now()
       return Math.abs(now - updateTime) > 5 * 60 * 1000
     } catch (e) {
@@ -448,6 +463,7 @@ export function TransitInfoBoard() {
     if (!timeStr) return ''
     try {
       const date = new Date(timeStr)
+      if (isNaN(date.getTime())) return ''
       const month = (date.getMonth() + 1).toString().padStart(2, '0')
       const day = date.getDate().toString().padStart(2, '0')
       const hours = date.getHours().toString().padStart(2, '0')
@@ -1043,7 +1059,11 @@ export function TransitInfoBoard() {
                     {lang === 'zh-TW' ? '即時到站看板' : lang === 'en' ? 'Live Board' : lang === 'ja' ? '発車案内板' : '실시간 열차 정보'}
                   </div>
                   <div className="metro-live-list">
-                    {metroLiveBoard.length === 0 ? (
+                    {isMetroOffHours ? (
+                      <div className="metro-no-data">
+                        {lang === 'zh-TW' ? '目前為非營運時間（捷運已收班）' : lang === 'en' ? 'Outside operating hours (Metro closed)' : lang === 'ja' ? '営業時間外（運行終了）' : '비영업 시간 (지하철 운행 종료)'}
+                      </div>
+                    ) : metroLiveBoard.length === 0 ? (
                       <div className="metro-no-data">
                         {metroOperator === 'TRTC'
                           ? (lang === 'zh-TW' ? '台北捷運不提供預估到站時間（系統限制），列車進站時才會顯示，請參考右側時刻表。' : lang === 'en' ? 'Taipei MRT does not support estimated arrival times due to API limitations. Please refer to the timetable on the right.' : lang === 'ja' ? '台北メトロはシステムの制限により到着予想時間を提供していません。右側の時刻表をご参照ください。' : '타이베이 지하철은 시스템 제한으로 인해 도착 예정 시간을 제공하지 않습니다. 오른쪽 시간표를 참고하세요.')

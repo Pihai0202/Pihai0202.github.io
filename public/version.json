@@ -1,5 +1,5 @@
 {
-  "version": "1.0.3",
+  "version": "1.0.4",
   "url": "https://github.com/Pihai0202/Pihai0202.github.io/raw/apk/concert-map-release.apk",
-  "notes": "此版本解決了 App 啟動時讀取停班課與近期售票資訊的快取競態問題，確保每次開啟都自動讀取最新線上資料，並將所有圖示改為 SVG！"
+  "notes": "此版本修復了捷運收班非營運時間仍顯示「即將進站」的異常，並修正了即時到站更新時間解析的潛在錯誤！"
 }
