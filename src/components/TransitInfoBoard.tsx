@@ -1348,7 +1348,7 @@ export function TransitInfoBoard() {
             train: (
               <>
                 <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '高鐵動態' : lang === 'en' ? 'HSR' : lang === 'ja' ? '新幹線' : '고속철도'}
+                {lang === 'zh-TW' ? '鐵路動態' : lang === 'en' ? 'Railway' : lang === 'ja' ? '鉄道運行' : '철도 안내'}
               </>
             ),
             bus: (
