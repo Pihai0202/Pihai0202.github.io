@@ -158,24 +158,32 @@ const COUNTIES = [
 
 const METRO_OPERATORS = [
   { id: 'TRTC', name: '台北捷運' },
-  { id: 'NTMC', name: '新北捷運 (環狀線/輕軌)' },
+  { id: 'NTMC', name: '新北捷運 (環狀線)' },
+  { id: 'NTDLRT', name: '淡海輕軌' },
+  { id: 'NTALRT', name: '安坑輕軌' },
+  { id: 'NTSY', name: '三鶯線 (試營運/尚未開放 API)' },
   { id: 'TYMC', name: '桃園捷運' },
   { id: 'TMRT', name: '台中捷運' },
   { id: 'KRTC', name: '高雄捷運' },
+  { id: 'KLRT', name: '高雄輕軌' },
 ]
 
-// TDX LiveBoard 支援的捷運系統（不含 TMRT，因交通部 TDX 未開放 TMRT 介接且會報 400 錯誤）
+// TDX LiveBoard 支援的捷運系統（不含 TMRT/NTSY，因交通部 TDX 未開放且會報 400 錯誤）
 const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT'])
-// TDX StationTimeTable 支援的捷運系統（不含 TMRT）
+// TDX StationTimeTable 支援的捷運系統（不含 TMRT/NTSY）
 const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC'])
 
 // 捷運系統官方網站（用於不支援 TDX 查詢時的引導連結）
 const METRO_OFFICIAL_URLS: Record<string, string> = {
   TRTC: 'https://www.metro.taipei/',
   NTMC: 'https://www.ntmetro.com.tw/',
+  NTDLRT: 'https://www.ntmetro.com.tw/',
+  NTALRT: 'https://www.ntmetro.com.tw/',
+  NTSY: 'https://www.ntmetro.com.tw/',
   TYMC: 'https://www.tymetro.com.tw/',
   TMRT: 'https://www.tmrt.com.tw/',
   KRTC: 'https://www.krtc.com.tw/',
+  KLRT: 'https://www.krtc.com.tw/',
 }
 
 
@@ -415,6 +423,18 @@ const getLineInfo = (operator: string, stationId: string) => {
   }
   if (operator === 'TMRT') {
     return { name: '綠線 (Green Line)', order: 1 }
+  }
+  if (operator === 'NTMC') {
+    return { name: '環狀線 (Loop Line)', order: 1 }
+  }
+  if (operator === 'NTDLRT') {
+    return { name: '淡海輕軌 (Danhai LRT)', order: 1 }
+  }
+  if (operator === 'NTALRT') {
+    return { name: '安坑輕軌 (Ankeng LRT)', order: 1 }
+  }
+  if (operator === 'KLRT') {
+    return { name: '環狀輕軌 (Circular LRT)', order: 1 }
   }
   return { name: '捷運路線', order: 1 }
 }
@@ -1062,7 +1082,10 @@ export function TransitInfoBoard() {
                       else if (op.id === 'KRTC') opName = lang === 'en' ? 'Kaohsiung MRT' : lang === 'ja' ? '高雄メトロ' : '가오슝 지하철'
                       else if (op.id === 'TYMC') opName = lang === 'en' ? 'Taoyuan MRT' : lang === 'ja' ? '桃園メトロ' : '타오위안 지하철'
                       else if (op.id === 'TMRT') opName = lang === 'en' ? 'Taichung MRT' : lang === 'ja' ? '台中メトロ' : '타이중 지하철'
-                      else if (op.id === 'NTMC') opName = lang === 'en' ? 'LRT (Danhai/Ankeng)' : lang === 'ja' ? '淡海・安坑LRT' : '단하이/안컹 LRT'
+                      else if (op.id === 'NTMC') opName = lang === 'en' ? 'New Taipei Metro (Loop Line)' : lang === 'ja' ? '新北メトロ (環状線)' : '신베이 지하철 (순환선)'
+                      else if (op.id === 'NTDLRT') opName = lang === 'en' ? 'Danhai LRT' : lang === 'ja' ? '淡海LRT' : '단하이 LRT'
+                      else if (op.id === 'NTALRT') opName = lang === 'en' ? 'Ankeng LRT' : lang === 'ja' ? '安坑LRT' : '안컹 LRT'
+                      else if (op.id === 'NTSY') opName = lang === 'en' ? 'Sanying Line (Trial/No API)' : lang === 'ja' ? '三鶯線 (試運転/API未対応)' : '산잉선 (시운전/API 미지원)'
                       else if (op.id === 'KLRT') opName = lang === 'en' ? 'Kaohsiung LRT' : lang === 'ja' ? '高雄LRT' : '가오슝 LRT'
                     }
                     return <option key={op.id} value={op.id}>{opName}</option>
