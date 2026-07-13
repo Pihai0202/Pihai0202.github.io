@@ -164,10 +164,10 @@ const METRO_OPERATORS = [
   { id: 'KRTC', name: '高雄捷運' },
 ]
 
-// TDX LiveBoard 支援的捷運系統
-const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'TMRT'])
-// TDX StationTimeTable 支援的捷運系統
-const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC', 'TMRT'])
+// TDX LiveBoard 支援的捷運系統（不含 TMRT，因交通部 TDX 未開放 TMRT 介接且會報 400 錯誤）
+const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT'])
+// TDX StationTimeTable 支援的捷運系統（不含 TMRT）
+const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC'])
 
 // 捷運系統官方網站（用於不支援 TDX 查詢時的引導連結）
 const METRO_OFFICIAL_URLS: Record<string, string> = {
@@ -630,6 +630,22 @@ export function TransitInfoBoard() {
 
     if (activeTab === 'metro') loadStations()
     return () => { active = false }
+  }, [metroOperator, activeTab])
+
+  // 當切換捷運系統時，若該系統完全不支援，立即顯示引導訊息，避免無用查詢
+  useEffect(() => {
+    if (activeTab !== 'metro') return
+    const hasLiveBoard = LIVEBOARD_SUPPORTED.has(metroOperator)
+    const hasTimetable = TIMETABLE_SUPPORTED.has(metroOperator)
+    
+    if (!hasLiveBoard && !hasTimetable) {
+      const opName = METRO_OPERATORS.find(o => o.id === metroOperator)?.name ?? metroOperator
+      setMetroLiveBoard([])
+      setMetroTimetables([])
+      setMetroQueryError(`交通部 TDX 平台目前尚未開放「${opName}」的即時到站與時刻表 API 介接，建議您前往官方網站查詢。`)
+    } else {
+      setMetroQueryError('')
+    }
   }, [metroOperator, activeTab])
 
 

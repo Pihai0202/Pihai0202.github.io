@@ -225,7 +225,7 @@ function extractArtistFromTitle(title: string): string {
   return clean.replace(/202\d/g, '').trim()
 }
 
-const APP_VERSION = '1.0.7'
+const APP_VERSION = '1.0.8'
 
 function App() {
   const { t, lang, setLang } = useTranslation()
