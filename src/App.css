@@ -6184,6 +6184,10 @@ body.player-open .music-bar-toggle {
   background: rgba(255, 255, 255, 0.015);
 }
 
+.train-board-row.train-departed {
+  opacity: 0.45;
+}
+
 .train-board-row.express .train-no {
   color: #ff5a5f;
   font-weight: 700;
