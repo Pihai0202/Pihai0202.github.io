@@ -155,11 +155,7 @@ const translateHsrStation = (st: string, lang: string) => {
   return hsrMap[st]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || st;
 }
 
-const TRA_STATIONS = [
-  '基隆', '七堵', '汐止', '南港', '松山', '台北', '板橋', '樹林', '鶯歌', '桃園',
-  '中壢', '新竹', '竹南', '苗栗', '豐原', '台中', '彰化', '員林', '斗六', '嘉義',
-  '新營', '台南', '岡山', '新左營', '高雄', '屏東', '潮州', '宜蘭', '羅東', '花蓮', '台東'
-]
+
 
 const translateTraStation = (st: string, lang: string) => {
   if (lang === 'zh-TW') return st;
@@ -170,6 +166,7 @@ const translateTraStation = (st: string, lang: string) => {
     '南港': { en: 'Nangang', ja: 'Nangang', ko: '난강' },
     '松山': { en: 'Songshan', ja: '松山', ko: '송산' },
     '台北': { en: 'Taipei', ja: '台北', ko: '타이베이' },
+    '萬華': { en: 'Wanhua', ja: '万華', ko: '완화' },
     '板橋': { en: 'Banqiao', ja: '板橋', ko: '반차오' },
     '樹林': { en: 'Shulin', ja: '樹林', ko: '수린' },
     '鶯歌': { en: 'Yingge', ja: '鶯歌', ko: '잉거' },
@@ -208,7 +205,7 @@ const THSR_STATION_IDS: Record<string, string> = {
 
 const TRA_STATION_IDS: Record<string, string> = {
   '基隆': '0900', '七堵': '0930', '汐止': '0960', '南港': '0980', '松山': '0990',
-  '台北': '1000', '板橋': '1020', '樹林': '1040', '鶯歌': '1060', '桃園': '1080',
+  '台北': '1000', '萬華': '1010', '板橋': '1020', '樹林': '1040', '鶯歌': '1060', '桃園': '1080',
   '中壢': '1100', '新竹': '1210', '竹南': '1250', '苗栗': '1300', '豐原': '1400',
   '台中': '1450', '彰化': '1120', '員林': '1150', '斗六': '1210', '嘉義': '1228',
   '新營': '1238', '台南': '1278', '岡山': '1308', '新左營': '1318', '高雄': '1408',
@@ -1521,14 +1518,61 @@ export function TransitInfoBoard() {
                 </div>
               </div>
             ) : (
-              <div className="train-station-selects">
-                <div className="station-select-group" style={{ width: '100%' }}>
-                  <label>{lang === 'zh-TW' ? '選擇車站' : lang === 'en' ? 'Select Station' : lang === 'ja' ? '駅を選択' : '역 선택'}</label>
-                  <select value={traStation} onChange={(e) => setTraStation(e.target.value)} className="transit-select" style={{ width: '100%' }}>
-                    {TRA_STATIONS.map((st) => (
-                      <option key={st} value={st}>{translateTraStation(st, lang)}</option>
+              <div className="tra-station-grid">
+                <div className="tra-region-group">
+                  <span className="tra-region-label">{lang === 'zh-TW' ? '北部 ▸' : 'North ▸'}</span>
+                  <div className="tra-station-pills">
+                    {['基隆','七堵','汐止','南港','松山','台北','萬華','板橋','樹林','鶯歌'].map(st => (
+                      <button key={st} type="button"
+                        className={`tra-pill${traStation === st ? ' active' : ''}`}
+                        onClick={() => setTraStation(st)}
+                      >{translateTraStation(st, lang)}</button>
                     ))}
-                  </select>
+                  </div>
+                </div>
+                <div className="tra-region-group">
+                  <span className="tra-region-label">{lang === 'zh-TW' ? '桃竹苗 ▸' : 'Taoyuan ▸'}</span>
+                  <div className="tra-station-pills">
+                    {['桃園','中壢','新竹','竹南','苗栗'].map(st => (
+                      <button key={st} type="button"
+                        className={`tra-pill${traStation === st ? ' active' : ''}`}
+                        onClick={() => setTraStation(st)}
+                      >{translateTraStation(st, lang)}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="tra-region-group">
+                  <span className="tra-region-label">{lang === 'zh-TW' ? '中部 ▸' : 'Central ▸'}</span>
+                  <div className="tra-station-pills">
+                    {['豐原','台中','彰化','員林','斗六'].map(st => (
+                      <button key={st} type="button"
+                        className={`tra-pill${traStation === st ? ' active' : ''}`}
+                        onClick={() => setTraStation(st)}
+                      >{translateTraStation(st, lang)}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="tra-region-group">
+                  <span className="tra-region-label">{lang === 'zh-TW' ? '南部 ▸' : 'South ▸'}</span>
+                  <div className="tra-station-pills">
+                    {['嘉義','新營','台南','岡山','新左營','高雄','屏東','潮州'].map(st => (
+                      <button key={st} type="button"
+                        className={`tra-pill${traStation === st ? ' active' : ''}`}
+                        onClick={() => setTraStation(st)}
+                      >{translateTraStation(st, lang)}</button>
+                    ))}
+                  </div>
+                </div>
+                <div className="tra-region-group">
+                  <span className="tra-region-label">{lang === 'zh-TW' ? '東部 ▸' : 'East ▸'}</span>
+                  <div className="tra-station-pills">
+                    {['宜蘭','羅東','花蓮','台東'].map(st => (
+                      <button key={st} type="button"
+                        className={`tra-pill${traStation === st ? ' active' : ''}`}
+                        onClick={() => setTraStation(st)}
+                      >{translateTraStation(st, lang)}</button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

@@ -6302,6 +6302,63 @@ body.player-open .music-bar-toggle {
   border: 1px solid rgba(17, 138, 178, 0.3);
 }
 
+/* TRA station grid (inspired by TRA official site) */
+.tra-station-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  padding: 0.6rem 0;
+}
+
+.tra-region-group {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.tra-region-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--teal);
+  min-width: 52px;
+  padding-top: 0.3rem;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.tra-station-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.tra-pill {
+  font-size: 0.68rem;
+  padding: 0.22rem 0.5rem;
+  border-radius: 5px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.tra-pill:hover {
+  background: rgba(var(--teal-rgb), 0.1);
+  border-color: rgba(var(--teal-rgb), 0.4);
+  color: var(--teal);
+}
+
+.tra-pill.active {
+  background: rgba(var(--teal-rgb), 0.2);
+  border-color: var(--teal);
+  color: var(--teal);
+  font-weight: 700;
+  box-shadow: 0 0 6px rgba(var(--teal-rgb), 0.25);
+}
+
 /* Bus dynamic search */
 .bus-query-form {
   background: rgba(255, 255, 255, 0.02);
