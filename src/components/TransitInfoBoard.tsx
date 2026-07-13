@@ -388,6 +388,37 @@ function setStationToLS(operator: string, stations: TdxStation[]) {
 
 
 
+const getLineInfo = (operator: string, stationId: string) => {
+  const match = stationId.match(/^([a-zA-Z]+)/)
+  const prefix = match ? match[1].toUpperCase() : ''
+  
+  if (operator === 'TRTC') {
+    switch (prefix) {
+      case 'BR': return { name: '文湖線 (Brown Line)', order: 1 }
+      case 'R': return { name: '淡水信義線 (Red Line)', order: 2 }
+      case 'G': return { name: '松山新店線 (Green Line)', order: 3 }
+      case 'O': return { name: '中和新蘆線 (Orange Line)', order: 4 }
+      case 'BL': return { name: '板南線 (Blue Line)', order: 5 }
+      case 'Y': return { name: '環狀線 (Yellow Line)', order: 6 }
+      default: return { name: '其他路線', order: 99 }
+    }
+  }
+  if (operator === 'KRTC') {
+    switch (prefix) {
+      case 'R': return { name: '紅線 (Red Line)', order: 1 }
+      case 'O': return { name: '橘線 (Orange Line)', order: 2 }
+      default: return { name: '其他路線', order: 99 }
+    }
+  }
+  if (operator === 'TYMC') {
+    return { name: '機場捷運 (Airport MRT)', order: 1 }
+  }
+  if (operator === 'TMRT') {
+    return { name: '綠線 (Green Line)', order: 1 }
+  }
+  return { name: '捷運路線', order: 1 }
+}
+
 export function TransitInfoBoard() {
   const { t, lang } = useTranslation()
   const [tdxActive, setTdxActive] = useState(false)
@@ -443,6 +474,20 @@ export function TransitInfoBoard() {
       return false
     }
   }, [])
+
+  const groupedMetroStations = useMemo(() => {
+    const groups: Record<string, { name: string; order: number; stations: TdxStation[] }> = {}
+    
+    metroStations.forEach((st) => {
+      const { name, order } = getLineInfo(metroOperator, st.StationID)
+      if (!groups[name]) {
+        groups[name] = { name, order, stations: [] }
+      }
+      groups[name].stations.push(st)
+    })
+    
+    return Object.values(groups).sort((a, b) => a.order - b.order)
+  }, [metroStations, metroOperator])
 
   const isLiveBoardStale = useMemo(() => {
     if (metroLiveBoard.length === 0) return false
@@ -995,10 +1040,14 @@ export function TransitInfoBoard() {
                   ) : metroStations.length === 0 ? (
                     <option>{lang === 'zh-TW' ? '無車站資料' : lang === 'en' ? 'No station data' : lang === 'ja' ? '駅データなし' : '역 데이터 없음'}</option>
                   ) : (
-                    metroStations.map((st) => (
-                      <option key={st.StationID} value={st.StationID}>
-                        {st.StationID} - {lang === 'zh-TW' ? st.StationName.Zh_tw : (st.StationName.En || st.StationName.Zh_tw)}
-                      </option>
+                    groupedMetroStations.map((group) => (
+                      <optgroup key={group.name} label={group.name}>
+                        {group.stations.map((st) => (
+                          <option key={st.StationID} value={st.StationID}>
+                            {st.StationID} - {lang === 'zh-TW' ? st.StationName.Zh_tw : (st.StationName.En || st.StationName.Zh_tw)}
+                          </option>
+                        ))}
+                      </optgroup>
                     ))
                   )}
                 </select>
