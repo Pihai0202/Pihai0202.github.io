@@ -549,7 +549,10 @@ export function TransitInfoBoard() {
       groups[name].stations.push(st)
     })
     
-    return Object.values(groups).sort((a, b) => a.order - b.order)
+    return Object.values(groups).map((group) => ({
+      ...group,
+      stations: [...group.stations].sort((a, b) => compareStationIds(a.StationID, b.StationID))
+    })).sort((a, b) => a.order - b.order)
   }, [metroStations, metroOperator])
 
   const isLiveBoardStale = useMemo(() => {

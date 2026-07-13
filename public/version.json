@@ -1,5 +1,5 @@
 {
-  "version": "1.1.0",
+  "version": "1.1.1",
   "url": "https://github.com/Pihai0202/Pihai0202.github.io/raw/apk/concert-map-release.apk",
-  "notes": "此版本修復了捷運車站字母與數字混和排序問題（例如 C10 出現在 C2 之前），引進自然數值排序演算法，確保高雄輕軌與其他捷運站點皆依路線順序完美排列！"
+  "notes": "此版本修正了瀏覽器 localStorage 快取站點資料所導致的舊排序殘留 Bug，確保更新後的高雄輕軌等站點排序即刻生效！"
 }
