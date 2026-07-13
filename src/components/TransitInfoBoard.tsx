@@ -164,10 +164,10 @@ const METRO_OPERATORS = [
   { id: 'KRTC', name: '高雄捷運' },
 ]
 
-// TDX LiveBoard 支援的捷運系統（不含 TMRT）
-const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT'])
-// TDX StationTimeTable 支援的捷運系統（不含 TMRT）
-const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC'])
+// TDX LiveBoard 支援的捷運系統
+const LIVEBOARD_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'TMRT'])
+// TDX StationTimeTable 支援的捷運系統
+const TIMETABLE_SUPPORTED = new Set(['TRTC', 'KRTC', 'TYMC', 'KLRT', 'NTDLRT', 'NTALRT', 'NTMC', 'TMRT'])
 
 // 捷運系統官方網站（用於不支援 TDX 查詢時的引導連結）
 const METRO_OFFICIAL_URLS: Record<string, string> = {
