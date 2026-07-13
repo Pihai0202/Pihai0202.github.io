@@ -394,7 +394,26 @@ function setStationToLS(operator: string, stations: TdxStation[]) {
   }
 }
 
-
+const compareStationIds = (aId: string, bId: string) => {
+  const regex = /^([a-zA-Z]*?)(\d+)([a-zA-Z]*)$/
+  const matchA = aId.match(regex)
+  const matchB = bId.match(regex)
+  
+  if (matchA && matchB) {
+    const prefixA = matchA[1].toUpperCase()
+    const prefixB = matchB[1].toUpperCase()
+    if (prefixA !== prefixB) {
+      return prefixA.localeCompare(prefixB)
+    }
+    const numA = parseInt(matchA[2], 10)
+    const numB = parseInt(matchB[2], 10)
+    if (numA !== numB) {
+      return numA - numB
+    }
+    return matchA[3].localeCompare(matchB[3])
+  }
+  return aId.localeCompare(bId)
+}
 
 const getLineInfo = (operator: string, stationId: string) => {
   const match = stationId.match(/^([a-zA-Z]+)/)
@@ -628,7 +647,7 @@ export function TransitInfoBoard() {
           `/v2/Rail/Metro/Station/${metroOperator}?$select=StationID,StationName`
         )
         if (active) {
-          const sorted = [...data].sort((a, b) => a.StationID.localeCompare(b.StationID))
+          const sorted = [...data].sort((a, b) => compareStationIds(a.StationID, b.StationID))
           metroStationCache[cacheKey] = sorted  // 寫入記憶體快取
           setStationToLS(metroOperator, sorted)  // 寫入 localStorage 快取
           setMetroStations(sorted)
