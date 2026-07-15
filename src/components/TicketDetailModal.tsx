@@ -315,10 +315,10 @@ export function TicketDetailModal({
                 className="ticket-buy-btn"
               >
                 <TicketIcon /> {
-                  lang === 'zh-TW' ? `前往 ${link.name} 購票 ↗` :
-                  lang === 'en' ? `Buy on ${translateSource(link.name)} ↗` :
-                  lang === 'ja' ? `${translateSource(link.name)}でチケット購入 ↗` :
-                  `${translateSource(link.name)}에서 예매하기 ↗`
+                  lang === 'zh-TW' ? (link.name.includes('賽程') ? `前往 ${link.name} ↗` : `前往 ${link.name} 購票 ↗`) :
+                  lang === 'en' ? (link.name.includes('賽程') || link.name.toLowerCase().includes('schedule') ? `Go to ${translateSource(link.name)} ↗` : `Buy on ${translateSource(link.name)} ↗`) :
+                  lang === 'ja' ? (link.name.includes('賽程') ? `${translateSource(link.name)}へ ↗` : `${translateSource(link.name)}でチケット購入 ↗`) :
+                  (link.name.includes('賽程') ? `${translateSource(link.name)} 바로가기 ↗` : `${translateSource(link.name)}에서 예매하기 ↗`)
                 }
               </a>
             ))}
