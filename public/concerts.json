@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-14T23:00:48.458379+00:00",
-  "count": 462,
+  "updated_at": "2026-07-15T00:02:37.135243+00:00",
+  "count": 459,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -12,76 +12,6 @@
     "中華職棒"
   ],
   "events": [
-    {
-      "id": "tixcraft-26_crowdtpkh-2026-07-14",
-      "source": "拓元售票",
-      "name": "盧廣仲 HeartBreakFast 傷心早餐店演唱會 2026 ver. 北高雙刀流",
-      "venue_raw": "多個表演場地",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-07-14",
-      "image": "https://static.tixcraft.com/images/activity/26_crowdtpkh_4ab11281c8295364ec3f55aa002de0c8.jpg",
-      "url": "https://teamear.tixcraft.com/activity/detail/26_crowdtpkh",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://teamear.tixcraft.com/activity/detail/26_crowdtpkh"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-205",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：味全龍 vs 中信兄弟",
-      "venue_raw": "嘉義市",
-      "venue_id": "chiayi",
-      "venue_name": "嘉義市棒球場",
-      "city": "嘉義",
-      "date": "2026-07-14",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "中信兄弟售票網",
-          "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-206",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：富邦悍將 vs 台鋼雄鷹",
-      "venue_raw": "台東",
-      "venue_id": "taitung",
-      "venue_name": "台東棒球場",
-      "city": "台東",
-      "date": "2026-07-14",
-      "image": "https://www.cpbl.com.tw/files/atts/0M259522048557486065/單色T-100x100.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "台鋼雄鷹售票網",
-          "url": "https://ticket.tsghawks.com/"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
     {
       "id": "tixcraft-26_diivtp-2026-07-15",
       "source": "拓元售票",
