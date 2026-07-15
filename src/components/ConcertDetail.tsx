@@ -3,6 +3,7 @@ import { marked } from 'marked'
 import type { Concert, ConcertMedia } from '../types'
 import { ShareMenu } from './ShareMenu'
 import { parseSpotifyEmbedUrl } from '../App'
+import { CalendarIcon, PinIcon, TicketIcon } from './SvgIcon'
 
 interface SpotifyEmbedProps {
   url: string
@@ -58,9 +59,9 @@ export function ConcertDetail({
       <div className="concert-detail-header">
         <div className="detail-artist">{concert.artist}</div>
         <div className="detail-meta">
-          {concert.date && <span className="detail-tag tag-date">📅 {concert.date}</span>}
-          <span className="detail-tag tag-venue">📍 {concert.venueName}</span>
-          {concert.seat && <span className="detail-tag tag-seat">🎫 {concert.seat}</span>}
+          {concert.date && <span className="detail-tag tag-date"><CalendarIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.date}</span>}
+          <span className="detail-tag tag-venue"><PinIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.venueName}</span>
+          {concert.seat && <span className="detail-tag tag-seat"><TicketIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.seat}</span>}
         </div>
         {concert.concertName && <div className="detail-concert-name">{concert.concertName}</div>}
       </div>

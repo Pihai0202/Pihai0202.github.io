@@ -99,17 +99,17 @@ const translations: Record<Language, Record<string, string>> = {
     spotifySearchEmpty: '找不到相關音樂，請嘗試其他關鍵字',
     uploadPhotoLabel: '上傳活動照片 / 影片 (選填，最多 3 張，限制每張 5MB)',
     uploadPhotoHint: '支援 jpg, png, gif, mp4。相片可加在社群分享牆中！',
-    saveBtn: '儲存紀錄 💾',
+    saveBtn: '儲存紀錄',
     cancelBtn: '取消',
 
     // Ticket Details Modal
     ticketDetailTitle: '售票活動詳情',
-    buyTicketBtn: '立即購票 🎫',
+    buyTicketBtn: '立即購票',
     activitySource: '活動來源',
     priceInfo: '票價資訊',
     activityDate: '活動時間',
     activityVenue: '活動場館',
-    logThisConcert: '✍️ 將此活動加入我的演唱會紀錄',
+    logThisConcert: '將此活動加入我的演唱會紀錄',
 
     // Profile Page
     myProfile: '我的個人資料',
@@ -135,8 +135,8 @@ const translations: Record<Language, Record<string, string>> = {
     emailForm: '電子信箱',
     passwordForm: '密碼',
     passwordPlaceholder: '至少 6 位密碼',
-    signInBtn: '登入 🔑',
-    signUpBtn: '註冊 🚀',
+    signInBtn: '登入',
+    signUpBtn: '註冊',
     googleSignIn: '使用 Google 帳戶登入',
     toSignUpPrompt: '還沒有帳戶？立即註冊',
     toSignInPrompt: '已經有帳戶了？立即登入',
@@ -187,11 +187,11 @@ const translations: Record<Language, Record<string, string>> = {
     postAuthor: '樂迷 {author}',
     anonymousAuthor: '匿名樂迷',
     postConcertDetail: '關於 {artist} - {concert}',
-    shareConfirmTitle: '📢 分享觀後感至社群牆',
+    shareConfirmTitle: '分享觀後感至社群牆',
     shareConfirmPrompt: '您即將把關於 {artist} - {concert} 的觀後心得發佈至公開分享牆！',
     shareNicknameLabel: '請輸入您的暱稱 (將公開顯示)',
     shareNicknamePlaceholder: 'e.g. 搖滾區小精靈 (留空則以「匿名樂迷」發佈)',
-    shareSubmitBtn: '確認發佈 🚀',
+    shareSubmitBtn: '確認發佈',
 
     // Suspension
     suspensionTitle: '天然災害停班停課公告',
@@ -289,17 +289,17 @@ const translations: Record<Language, Record<string, string>> = {
     spotifySearchEmpty: 'No results found. Try other keywords.',
     uploadPhotoLabel: 'Upload Photo / Video (Optional, max 3, 5MB each)',
     uploadPhotoHint: 'Supports jpg, png, gif, mp4. Photos can be shared to Community!',
-    saveBtn: 'Save Log 💾',
+    saveBtn: 'Save Log',
     cancelBtn: 'Cancel',
 
     // Ticket Details Modal
     ticketDetailTitle: 'Ticket Details',
-    buyTicketBtn: 'Buy Ticket 🎫',
+    buyTicketBtn: 'Buy Ticket',
     activitySource: 'Source',
     priceInfo: 'Price Info',
     activityDate: 'Event Date',
     activityVenue: 'Event Venue',
-    logThisConcert: '✍️ Add this to my concert logs',
+    logThisConcert: 'Add this to my concert logs',
 
     // Profile Page
     myProfile: 'My Profile',
@@ -325,8 +325,8 @@ const translations: Record<Language, Record<string, string>> = {
     emailForm: 'Email',
     passwordForm: 'Password',
     passwordPlaceholder: 'At least 6 characters',
-    signInBtn: 'Sign In 🔑',
-    signUpBtn: 'Sign Up 🚀',
+    signInBtn: 'Sign In',
+    signUpBtn: 'Sign Up',
     googleSignIn: 'Sign In with Google',
     toSignUpPrompt: "Don't have an account? Sign Up",
     toSignInPrompt: 'Already have an account? Sign In',
@@ -377,11 +377,11 @@ const translations: Record<Language, Record<string, string>> = {
     postAuthor: 'Fan {author}',
     anonymousAuthor: 'Anonymous Fan',
     postConcertDetail: 'On {artist} - {concert}',
-    shareConfirmTitle: '📢 Share Review to Community',
+    shareConfirmTitle: 'Share Review to Community',
     shareConfirmPrompt: 'You are going to publish your review of {artist} - {concert} to the community board!',
     shareNicknameLabel: 'Please enter your nickname (publicly displayed)',
     shareNicknamePlaceholder: 'e.g. Rock精靈 (Leave empty to publish anonymously)',
-    shareSubmitBtn: 'Confirm & Publish 🚀',
+    shareSubmitBtn: 'Confirm & Publish',
 
     // Suspension
     suspensionTitle: 'Natural Disaster Work & School Suspension Announcement',
@@ -479,17 +479,17 @@ const translations: Record<Language, Record<string, string>> = {
     spotifySearchEmpty: '関連する音楽が見つかりません。他のキーワードを試してください。',
     uploadPhotoLabel: 'イベント写真 / 動画のアップロード (任意、最大3枚、各5MB制限)',
     uploadPhotoHint: 'jpg, png, gif, mp4に対応。写真はコミュニティ掲示板で共有されます！',
-    saveBtn: '記録を保存 💾',
+    saveBtn: '記録を保存',
     cancelBtn: 'キャンセル',
 
     // Ticket Details Modal
     ticketDetailTitle: 'チケット詳細',
-    buyTicketBtn: 'チケットを購入 🎫',
+    buyTicketBtn: 'チケットを購入',
     activitySource: 'イベントソース',
     priceInfo: '料金情報',
     activityDate: '開催日時',
     activityVenue: 'イベント会場',
-    logThisConcert: '✍️ このイベントをマイログに追加する',
+    logThisConcert: 'このイベントをマイログに追加する',
 
     // Profile Page
     myProfile: 'マイプロフィール',
@@ -515,8 +515,8 @@ const translations: Record<Language, Record<string, string>> = {
     emailForm: 'メールアドレス',
     passwordForm: 'パスワード',
     passwordPlaceholder: '6文字以上のパスワード',
-    signInBtn: 'ログイン 🔑',
-    signUpBtn: '登録 🚀',
+    signInBtn: 'ログイン',
+    signUpBtn: '登録',
     googleSignIn: 'Googleアカウントでログイン',
     toSignUpPrompt: 'アカウントをお持ちでないですか？今すぐ登録',
     toSignInPrompt: '既にアカウントをお持ちですか？ログイン',
@@ -567,11 +567,11 @@ const translations: Record<Language, Record<string, string>> = {
     postAuthor: 'ファン {author}',
     anonymousAuthor: '匿名ファン',
     postConcertDetail: '{artist} - {concert} について',
-    shareConfirmTitle: '📢 掲示板に感想を共有',
+    shareConfirmTitle: '掲示板に感想を共有',
     shareConfirmPrompt: '{artist} - {concert} の感想を共有掲示板に公開しますか？',
     shareNicknameLabel: 'ニックネームを入力してください (公開されます)',
     shareNicknamePlaceholder: 'e.g. Rock精靈 (空欄の場合は「匿名ファン」として投稿されます)',
-    shareSubmitBtn: '投稿する 🚀',
+    shareSubmitBtn: '投稿する',
 
     // Suspension
     suspensionTitle: '自然災害に伴う出勤・登校の停止公告',
@@ -669,17 +669,17 @@ const translations: Record<Language, Record<string, string>> = {
     spotifySearchEmpty: '관련 음악을 찾을 수 없습니다. 다른 키워드로 검색해 보세요.',
     uploadPhotoLabel: '사진 / 동영상 업로드 (선택, 최대 3장, 장당 5MB 제한)',
     uploadPhotoHint: 'jpg, png, gif, mp4 지원. 업로드한 사진은 공유판에 노출될 수 있습니다!',
-    saveBtn: '기록 저장 💾',
+    saveBtn: '기록 저장',
     cancelBtn: '취소',
 
     // Ticket Details Modal
     ticketDetailTitle: '티켓 세부 정보',
-    buyTicketBtn: '예매하러 가기 🎫',
+    buyTicketBtn: '예매하러 가기',
     activitySource: '출처',
     priceInfo: '티켓 가격 정보',
     activityDate: '이벤트 시간',
     activityVenue: '이벤트 공연장',
-    logThisConcert: '✍️ 이 이벤트를 내 콘서트 기록에 추가',
+    logThisConcert: '이 이벤트를 내 콘서트 기록에 추가',
 
     // Profile Page
     myProfile: '내 프로필',
@@ -705,8 +705,8 @@ const translations: Record<Language, Record<string, string>> = {
     emailForm: '이메일 주소',
     passwordForm: '비밀번호',
     passwordPlaceholder: '최소 6자리 비밀번호',
-    signInBtn: '로그인 🔑',
-    signUpBtn: '회원가입 🚀',
+    signInBtn: '로그인',
+    signUpBtn: '회원가입',
     googleSignIn: 'Google 계정으로 로그인',
     toSignUpPrompt: '계정이 없으신가요? 회원가입',
     toSignInPrompt: '이미 계정이 있으신가요? 로그인',
@@ -757,11 +757,11 @@ const translations: Record<Language, Record<string, string>> = {
     postAuthor: '팬 {author}',
     anonymousAuthor: '익명 팬',
     postConcertDetail: '{artist} - {concert}에 관한 후기',
-    shareConfirmTitle: '📢 공유판에 후기 공유',
+    shareConfirmTitle: '공유판에 후기 공유',
     shareConfirmPrompt: '{artist} - {concert}에 대한 후기를 공개 공유판에 게시하시겠습니까?',
     shareNicknameLabel: '닉네임을 입력하세요 (공개 표시됨)',
     shareNicknamePlaceholder: '예: 搖滾區小精靈 (비워두면 익명 팬으로 게시)',
-    shareSubmitBtn: '게시하기 🚀',
+    shareSubmitBtn: '게시하기',
 
     // Suspension
     suspensionTitle: '자연재해로 인한 휴업 및 휴교 안내',

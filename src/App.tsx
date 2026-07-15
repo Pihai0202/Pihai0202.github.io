@@ -61,7 +61,9 @@ import {
   TicketIcon,
   TrainIcon,
   GlobeIcon,
-  VolumeXIcon
+  VolumeXIcon,
+  MegaphoneIcon,
+  RocketIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -1255,7 +1257,7 @@ function App() {
 
   return (
     <>
-      <header>
+      <header className={view !== 'map' || isSidebarCollapsed ? 'full-width-header' : ''}>
         {view !== 'login' && (
           <button
             className="mobile-menu-toggle-btn"
@@ -1376,7 +1378,7 @@ function App() {
               type="button"
               onClick={() => setView('login')}
             >
-              🔑 {t('login')}
+              <KeyIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('login')}
             </button>
           )}
         </div>
@@ -1391,21 +1393,21 @@ function App() {
                 type="button"
                 onClick={() => setMobileTab('map')}
               >
-                🗺️ {t('tabMap')}
+                <MapIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabMap')}
               </button>
               <button
                 className={`mobile-view-tab-btn ${mobileTab === 'list' ? 'active' : ''}`}
                 type="button"
                 onClick={() => setMobileTab('list')}
               >
-                📅 {t('tabList')}
+                <CalendarIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabList')}
               </button>
               <button
                 className={`mobile-view-tab-btn ${mobileTab === 'search' ? 'active' : ''}`}
                 type="button"
                 onClick={() => setMobileTab('search')}
               >
-                🔍 {t('tabSearch')}
+                <SearchIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabSearch')}
               </button>
             </div>
           )}
@@ -1677,7 +1679,7 @@ function App() {
                     <div className="venue-preview-info">
                       <span className="city-tag">{selectedVenue.city}</span>
                       <span className="preview-capacity">
-                        👤 {selectedVenue.capacity} {lang === 'zh-TW' ? '人' : lang === 'ja' ? '人' : lang === 'ko' ? '명' : 'ppl'}
+                        <UserIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />{selectedVenue.capacity} {lang === 'zh-TW' ? '人' : lang === 'ja' ? '人' : lang === 'ko' ? '명' : 'ppl'}
                       </span>
                     </div>
                   </div>
@@ -1979,7 +1981,7 @@ function App() {
                 {isMusicBarVisible && (
                   <div className="right-panel-spotify-player">
                     <div className="spotify-player-header">
-                      <span className="sp-title">🎵 {t('spotifyPlayerTitle')}</span>
+                      <span className="sp-title"><MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />{t('spotifyPlayerTitle')}</span>
                       <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
                     </div>
                     <div className="spotify-player-body">
@@ -2505,7 +2507,7 @@ function App() {
           setDetailConcertId(publishingConcert.id) // Restore detail modal
           setPublishingConcert(null)
         }}>
-          <h2>📢 分享觀後感至社群牆</h2>
+          <h2><MegaphoneIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />分享觀後感至社群牆</h2>
           <p className="publish-prompt">
             您即將把關於 <strong>{publishingConcert.artist} - {publishingConcert.concertName || '未命名演唱會'}</strong> 的觀後心得發佈至公開分享牆！
           </p>
@@ -2527,7 +2529,7 @@ function App() {
               type="button"
               onClick={() => handlePublishToBoard(nickname)}
             >
-              確認發佈 🚀
+              確認發佈 <RocketIcon style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
             </button>
             <button
               className="publish-cancel-btn"
@@ -2613,7 +2615,7 @@ function App() {
               <CloseIcon />
             </button>
             <h2 style={{ fontSize: '1.35rem', color: 'var(--gold)', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.6rem', borderBottom: '1px solid var(--border)', paddingBottom: '0.6rem' }}>
-              🚀 {lang === 'zh-TW' ? '發現新版本！' : 'New Version Available!'}
+              <RocketIcon style={{ verticalAlign: 'middle' }} /> {lang === 'zh-TW' ? '發現新版本！' : 'New Version Available!'}
             </h2>
             <div style={{ color: 'var(--muted)', fontSize: '0.85rem', marginBottom: '1.2rem', lineHeight: '1.4' }}>
               {lang === 'zh-TW' ? `從 v${APP_VERSION} 升級至 v${updateInfo.version}` : `Upgrade from v${APP_VERSION} to v${updateInfo.version}`}
@@ -2676,7 +2678,7 @@ function App() {
                 />
               ) : (
                 <div className="music-bar-placeholder">
-                  <span className="sp-logo">🎵</span>
+                  <span className="sp-logo"><MusicIcon /></span>
                   <span>{t('spotifyPlayerPlaceholder')}</span>
                 </div>
               )}

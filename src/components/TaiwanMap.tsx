@@ -21,7 +21,14 @@ const SHUANGBEI_VENUE_IDS = [
   'legacy-taipei',
   'the-wall',
   'tianmu',
-  'xinzhuang'
+  'xinzhuang',
+  'ticc',
+  'legacy-max',
+  'ntu-sports-center',
+  'clapper-studio',
+  'xinzhuang-gym',
+  'ntpc-exhibition-center',
+  'ntpc-hall'
 ]
 
 export function Stat({ number, label }: { number: number; label: string }) {
@@ -565,7 +572,7 @@ export function TaiwanMap({
             <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
             <circle className="cluster-plate" cx="0" cy="0" r="14" />
             <text x="0" y="4" textAnchor="middle" className="cluster-text">
-              9
+              {SHUANGBEI_VENUE_IDS.length}
             </text>
             <text x="0" y="27" textAnchor="middle" className="cluster-label">
               {t('shuangbeiCluster')}

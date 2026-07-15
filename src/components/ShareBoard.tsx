@@ -13,7 +13,8 @@ import {
   PinIcon,
   CalendarIcon,
   UserIcon,
-  CheckIcon
+  CheckIcon,
+  MessageIcon
 } from './SvgIcon'
 import { COMMUNITY_MOCK_NOTES } from '../constants/communityMock'
 import { collection, query, orderBy, onSnapshot, doc, updateDoc, deleteDoc, increment, addDoc } from 'firebase/firestore'
@@ -707,7 +708,7 @@ export function ShareBoard() {
 
               {/* Replies Section */}
               <div className="replies-section">
-                <h3>💬 {lang === 'zh-TW' ? '樂迷回覆' : 'Replies'} ({replies.length})</h3>
+                <h3><MessageIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />{lang === 'zh-TW' ? '樂迷回覆' : 'Replies'} ({replies.length})</h3>
                 
                 <div className="replies-list">
                   {replies.length === 0 ? (

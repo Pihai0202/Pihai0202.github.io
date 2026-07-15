@@ -486,4 +486,14 @@ export const VolumeXIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => 
   </svg>
 );
 
+// 🚀 Rocket Icon
+export const RocketIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4.5 16.5c-1.5 1.25-2.5 3.5-2.5 3.5s2.25-1 3.5-2.5" />
+    <path d="M12 2C6 2 2 6 2 12c0 2.5 1 4.5 2.5 6l6-6" />
+    <path d="M12 2c6 0 10 4 10 10 0 2.5-1 4.5-2.5 6l-6-6" />
+    <path d="M9 15l6-6" />
+  </svg>
+);
+
 
