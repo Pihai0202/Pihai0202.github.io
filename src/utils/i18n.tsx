@@ -851,6 +851,21 @@ export const translateVenueName = (name: string, lang: string): string => {
     '亞太國際棒球訓練中心成棒主球場': { en: 'Asia-Pacific International Baseball Stadium', ja: '亞太国際棒球場', ko: '아시아태평양 국제야구장' },
     '澄清湖棒球場': { en: 'Chengqing Lake Baseball Stadium', ja: '澄清湖棒球場 (澄清湖野球場)', ko: '청칭후 야구장' },
     '台東棒球場': { en: 'Taitung Baseball Stadium', ja: '台東棒球場 (台東野球場)', ko: '타이둥 야구장' },
+    // Renamed Venues
+    '臺北大巨蛋': { en: 'Taipei Dome', ja: '臺北大巨蛋 (台北ドーム)', ko: '타이베이 돔' },
+    '臺北小巨蛋': { en: 'Taipei Arena', ja: '臺北小巨蛋 (台北アリーナ)', ko: '타이베이 아레나' },
+    '南港展覽館 1 館': { en: 'Nangang Exhibition Center Hall 1', ja: '南港展覧館1号館', ko: '난강 전람관 1관' },
+    '樂天桃園棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '楽天桃猿棒球場 (桃園野球場)', ko: '라쿠텐 타오위안 야구장' },
+    'K-ARENA 高雄巨蛋': { en: 'K-ARENA Kaohsiung Arena', ja: 'K-ARENA 高雄巨蛋 (高雄アリーナ)', ko: 'K-ARENA 가오슝 아레나' },
+    // 4.0 & 5.0 New Venues
+    'TICC 台北國際會議中心': { en: 'Taipei International Convention Center (TICC)', ja: 'TICC 台北国際會議中心', ko: '타이베이 국제회의센터 (TICC)' },
+    '信義劇場 Legacy MAX': { en: 'Legacy MAX Sinyi', ja: '信義劇場 Legacy MAX', ko: '신이 극장 Legacy MAX' },
+    '台大體育館 (1樓多功能球場 / 3樓主球場)': { en: 'NTU Sports Center (1F / 3F)', ja: '台大体育館 (1F多目的アリーナ / 3Fメインアリーナ)', ko: '대만대 체육관 (1층 다목적 경기장 / 3층 메인 경기장)' },
+    'Clapper Studio': { en: 'Clapper Studio', ja: 'Clapper Studio', ko: 'Clapper Studio' },
+    '新莊體育館': { en: 'Xinzhuang Gymnasium', ja: '新荘体育館', ko: '신좡 체육관' },
+    '新北市工商展覽中心': { en: 'New Taipei City Exhibition Hall', ja: '新北市工商展覧センター', ko: '신베이시 공상전람센터' },
+    '新北市政府多功能集會堂': { en: 'New Taipei City Hall Multi-purpose Assembly Hall', ja: '新北市政府多機能集会堂', ko: '신베이시청 다목적 집회장' },
+    '林口體育館': { en: 'National Taiwan Sport University Arena (Linkou Arena)', ja: '林口体育館', ko: '린커우 체육관' },
   }
   return venueMap[name]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || name
 }
