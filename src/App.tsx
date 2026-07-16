@@ -1034,17 +1034,20 @@ function App() {
   const handleMediaUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     files.forEach((file) => {
+      if (!file.type.startsWith('image/')) {
+        showToast(lang === 'zh-TW' ? '僅支援上傳照片檔案！' : 'Only photo files are supported!', 'error')
+        return
+      }
+      
       const reader = new FileReader()
       reader.onload = async () => {
         if (typeof reader.result !== 'string') return
         
         let finalDataUrl = reader.result
-        if (file.type.startsWith('image/')) {
-          try {
-            finalDataUrl = await compressConcertImage(reader.result)
-          } catch (err) {
-            console.warn('Failed to compress image:', err)
-          }
+        try {
+          finalDataUrl = await compressConcertImage(reader.result)
+        } catch (err) {
+          console.warn('Failed to compress image:', err)
         }
 
         setPendingMedia((current) => [
@@ -2292,16 +2295,16 @@ function App() {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片 / 影片' : 'Photos / Videos'}</label>
+            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片' : 'Photos'}</label>
             <div className="media-upload-area">
               <div className="upload-icon"><CameraIcon /></div>
               <div className="upload-text">{lang === 'zh-TW' ? '點擊或拖曳上傳' : 'Click or drag files to upload'}</div>
-              <div className="upload-sub">{lang === 'zh-TW' ? '支援 JPG, PNG, MP4, MOV' : 'Supports JPG, PNG, MP4, MOV'}</div>
+              <div className="upload-sub">{lang === 'zh-TW' ? '支援 JPG, PNG, GIF' : 'Supports JPG, PNG, GIF'}</div>
               <input
                 id="input-media"
                 type="file"
                 multiple
-                accept="image/*,video/*"
+                accept="image/*"
                 onChange={handleMediaUpload}
               />
             </div>
