@@ -11362,13 +11362,131 @@ body:has(.main-layout) {
   font-size: 0.8rem;
 }
 
+/* Mobile view footprints modal and button */
+.view-records-mobile-btn {
+  display: none;
+  width: 100%;
+  padding: 0.9rem 1.2rem;
+  background: var(--surface2, #181614);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: all 0.25s ease;
+}
 
+.view-records-mobile-btn:hover {
+  background: rgba(var(--gold-rgb), 0.08);
+  border-color: var(--gold);
+  color: var(--gold);
+}
 
+.records-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.75);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  backdrop-filter: blur(8px);
+}
 
+.records-modal-content {
+  background: var(--surface2, #181614);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 640px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+  animation: recordsModalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  overflow: hidden;
+}
 
+@keyframes recordsModalFadeIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
 
+.records-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid var(--border);
+}
 
+.records-modal-header h4 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--text);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
 
+.close-records-modal-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 1.6rem;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
 
+.close-records-modal-btn:hover {
+  color: var(--text);
+}
 
+.records-modal-body {
+  padding: 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
 
+/* Ensure the footprints section in the modal is styled nicely */
+.records-modal-body .profile-content-section {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  box-shadow: none !important;
+}
+
+.records-modal-body .section-header-row {
+  margin-bottom: 1.25rem;
+}
+
+/* Hide header in footprints section within modal because it is already in modal header */
+.records-modal-body .section-header-row h3 {
+  display: none !important;
+}
+
+.records-modal-body .profile-search-input {
+  width: 100% !important;
+}
+
+@media (max-width: 768px) {
+  .view-records-mobile-btn {
+    display: flex;
+  }
+}

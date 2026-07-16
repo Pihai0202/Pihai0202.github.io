@@ -52,6 +52,17 @@ export function ProfilePage({
   const [myReviews, setMyReviews] = useState<UserReview[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth <= 768 : false)
+  const [showRecordsModal, setShowRecordsModal] = useState(false)
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768)
+    }
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -239,6 +250,66 @@ export function ProfilePage({
     return `hsl(${hue}, 60%, 40%)`
   }, [user.email, user.nickname])
 
+  const footprintsSection = (
+    <section className="profile-content-section">
+      <div className="section-header-row">
+        <h3>
+          <ActivityIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+          {lang === 'zh-TW' ? '我的音樂現場足跡' : 'My Live Music Footprint'}
+        </h3>
+        <input
+          type="text"
+          placeholder={lang === 'zh-TW' ? '搜尋我的記錄...' : 'Search my logs...'}
+          className="profile-search-input"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+      </div>
+
+      <div className="profile-concert-table-wrapper">
+        {filteredConcerts.length === 0 ? (
+          <div className="profile-empty-state">
+            {searchQuery ? (lang === 'zh-TW' ? '找不到符合的記錄' : 'No matching records found') : (lang === 'zh-TW' ? '還沒有任何記錄，點擊地圖上的場館來新增吧！' : 'No records yet. Click venues on the map to add!')}
+          </div>
+        ) : (
+          <table className="profile-concert-table">
+            <thead>
+              <tr>
+                <th>{lang === 'zh-TW' ? '歌手 / 演出者' : 'Artist'}</th>
+                <th>{lang === 'zh-TW' ? '演唱會名稱' : 'Concert Name'}</th>
+                <th>{lang === 'zh-TW' ? '日期' : 'Date'}</th>
+                <th>{lang === 'zh-TW' ? '場館 / 地點' : 'Venue'}</th>
+                <th>{lang === 'zh-TW' ? '操作' : 'Action'}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredConcerts.map((c) => (
+                <tr key={c.id}>
+                  <td className="bold-text">{c.artist}</td>
+                  <td>{c.concertName || '—'}</td>
+                  <td className="mono-text">{c.date || '—'}</td>
+                  <td>{c.venueName} · {c.venueCity}</td>
+                  <td>
+                    <button
+                      type="button"
+                      className="profile-table-view-btn"
+                      onClick={() => {
+                        onOpenConcertDetail(c.id);
+                        setShowRecordsModal(false);
+                      }}
+                    >
+                      {lang === 'zh-TW' ? '檢視' : 'View'}
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </section>
+  );
+
   return (
     <div className="profile-board-container">
       {/* 頂部導航 */}
@@ -348,61 +419,20 @@ export function ProfilePage({
 
         {/* 右側：詳細記錄與社群分享足跡 */}
         <main className="profile-main-content">
-          {/* 足跡管理 */}
-          <section className="profile-content-section">
-            <div className="section-header-row">
-              <h3>
-                <ActivityIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '我的音樂現場足跡' : 'My Live Music Footprint'}
-              </h3>
-              <input
-                type="text"
-                placeholder={lang === 'zh-TW' ? '搜尋我的記錄...' : 'Search my logs...'}
-                className="profile-search-input"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-              />
-            </div>
-
-            <div className="profile-concert-table-wrapper">
-              {filteredConcerts.length === 0 ? (
-                <div className="profile-empty-state">
-                  {searchQuery ? (lang === 'zh-TW' ? '找不到符合的記錄' : 'No matching records found') : (lang === 'zh-TW' ? '還沒有任何記錄，點擊地圖上的場館來新增吧！' : 'No records yet. Click venues on the map to add!')}
-                </div>
-              ) : (
-                <table className="profile-concert-table">
-                  <thead>
-                    <tr>
-                      <th>{lang === 'zh-TW' ? '歌手 / 演出者' : 'Artist'}</th>
-                      <th>{lang === 'zh-TW' ? '演唱會名稱' : 'Concert Name'}</th>
-                      <th>{lang === 'zh-TW' ? '日期' : 'Date'}</th>
-                      <th>{lang === 'zh-TW' ? '場館 / 地點' : 'Venue'}</th>
-                      <th>{lang === 'zh-TW' ? '操作' : 'Action'}</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {filteredConcerts.map((c) => (
-                      <tr key={c.id}>
-                        <td className="bold-text">{c.artist}</td>
-                        <td>{c.concertName || '—'}</td>
-                        <td className="mono-text">{c.date || '—'}</td>
-                        <td>{c.venueName} · {c.venueCity}</td>
-                        <td>
-                          <button
-                            type="button"
-                            className="profile-table-view-btn"
-                            onClick={() => onOpenConcertDetail(c.id)}
-                          >
-                            {lang === 'zh-TW' ? '檢視' : 'View'}
-                          </button>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          </section>
+          {/* 手機版：顯示查看足跡按鈕，點擊開啟彈窗 */}
+          {isMobile ? (
+            <button
+              className="view-records-mobile-btn"
+              type="button"
+              onClick={() => setShowRecordsModal(true)}
+            >
+              <ActivityIcon size="1.2em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              <span>{lang === 'zh-TW' ? '查看我的音樂現場足跡' : 'View My Live Music Footprints'}</span>
+            </button>
+          ) : (
+            /* 電腦版：直接嵌入足跡列表 */
+            footprintsSection
+          )}
 
           {/* 社群分享牆發佈 */}
           <section className="profile-content-section">
@@ -492,6 +522,26 @@ export function ProfilePage({
                   {lang === 'zh-TW' ? '🗑️ 清除並恢復預設' : '🗑️ Clear & Reset'}
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 手機版足跡彈窗 */}
+      {isMobile && showRecordsModal && (
+        <div className="records-modal-overlay" onClick={() => setShowRecordsModal(false)}>
+          <div className="records-modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="records-modal-header">
+              <h4>
+                <ActivityIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                {lang === 'zh-TW' ? '我的音樂現場足跡' : 'My Live Music Footprint'}
+              </h4>
+              <button className="close-records-modal-btn" onClick={() => setShowRecordsModal(false)}>
+                &times;
+              </button>
+            </div>
+            <div className="records-modal-body">
+              {footprintsSection}
             </div>
           </div>
         </div>
