@@ -4,6 +4,7 @@ import type { Concert, ConcertMedia } from '../types'
 import { ShareMenu } from './ShareMenu'
 import { parseSpotifyEmbedUrl } from '../App'
 import { CalendarIcon, PinIcon, TicketIcon } from './SvgIcon'
+import { SafeIframe } from './SafeIframe'
 
 interface SpotifyEmbedProps {
   url: string
@@ -18,7 +19,7 @@ export function SpotifyEmbed({ url }: SpotifyEmbedProps) {
   return (
     <>
       <div className="detail-spotify">
-        <iframe
+        <SafeIframe
           src={embedUrl}
           height={height}
           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

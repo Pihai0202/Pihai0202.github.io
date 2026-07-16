@@ -4,6 +4,7 @@ import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
+import { SafeIframe } from './SafeIframe'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -183,7 +184,7 @@ export function VenueInfo({
 
           {venue.address && showMap && (
             <div className="venue-map-embed">
-              <iframe
+              <SafeIframe
                 src={`https://maps.google.com/maps?q=${encodeURIComponent(`${venue.city} ${venue.name} ${venue.address}`)}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
                 title={`${venue.name} map`}
                 loading="lazy"

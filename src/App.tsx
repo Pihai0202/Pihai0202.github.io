@@ -28,6 +28,7 @@ import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
+import { SafeIframe } from './components/SafeIframe'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
@@ -1720,6 +1721,7 @@ function App() {
                         ) : (
                           <div className="drawer-concert-list-wrapper">
                             <UpcomingConcerts
+                              key={selectedVenueId || 'all'}
                               concerts={filteredRemoteConcerts}
                               status={remoteStatus}
                               updatedAt={remoteUpdatedAt}
@@ -1807,6 +1809,7 @@ function App() {
                         {mobileDrawerState === 'full' && (
                           <div className="drawer-general-concerts">
                             <UpcomingConcerts
+                              key={selectedVenueId || 'all'}
                               concerts={filteredRemoteConcerts}
                               status={remoteStatus}
                               updatedAt={remoteUpdatedAt}
@@ -1877,6 +1880,7 @@ function App() {
                   )}
                   {mobileTab !== 'search' && <TransitInfoBoard />}
                   <UpcomingConcerts
+                    key={selectedVenueId || 'all'}
                     concerts={filteredRemoteConcerts}
                     status={remoteStatus}
                     updatedAt={remoteUpdatedAt}
@@ -1949,6 +1953,7 @@ function App() {
                   {sidebarTab === 'tickets' && (
                     <div className="tickets-tab-scroll-wrapper">
                       <UpcomingConcerts
+                        key={selectedVenueId || 'all'}
                         concerts={filteredRemoteConcerts}
                         status={remoteStatus}
                         updatedAt={remoteUpdatedAt}
@@ -1982,7 +1987,7 @@ function App() {
                     </div>
                     <div className="spotify-player-body">
                       {musicBarEmbedUrl ? (
-                        <iframe
+                        <SafeIframe
                           src={musicBarEmbedUrl}
                           height="80"
                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -2665,7 +2670,7 @@ function App() {
           <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
             <div className="music-bar-content">
               {musicBarEmbedUrl ? (
-                <iframe
+                <SafeIframe
                   src={musicBarEmbedUrl}
                   height="90"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"

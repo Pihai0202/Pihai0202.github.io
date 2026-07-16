@@ -106,6 +106,8 @@ export function TicketDetailModal({
       orderBy('createdAt', 'asc')
     )
 
+    let unsubscribeFallback: (() => void) | null = null
+
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const list: TicketComment[] = []
       snapshot.forEach((doc) => {
@@ -130,7 +132,7 @@ export function TicketDetailModal({
         collection(db, 'ticket_comments'),
         where('ticketId', '==', ticket.id)
       )
-      onSnapshot(fallbackQuery, (snapshot) => {
+      unsubscribeFallback = onSnapshot(fallbackQuery, (snapshot) => {
         const list: TicketComment[] = []
         snapshot.forEach((doc) => {
           const data = doc.data()
@@ -149,7 +151,12 @@ export function TicketDetailModal({
       })
     })
 
-    return () => unsubscribe()
+    return () => {
+      unsubscribe()
+      if (unsubscribeFallback) {
+        unsubscribeFallback()
+      }
+    }
   }, [ticket.id])
 
   // 2. Fetch Spotify tracks for this artist
