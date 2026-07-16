@@ -63,7 +63,8 @@ import {
   GlobeIcon,
   VolumeXIcon,
   MegaphoneIcon,
-  RocketIcon
+  RocketIcon,
+  TrashIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -3189,19 +3190,24 @@ function ConcertCard({
   const { t, lang } = useTranslation()
   return (
     <div className="concert-card" onClick={() => onOpenDetail(concert.id)}>
-      {onDelete && (
-        <button
-          className="delete-btn"
-          type="button"
-          title={t('deleteBtn')}
-          onClick={(event) => onDelete(concert.id, event)}
-        >
-          <CloseIcon />
-        </button>
-      )}
       <div className="concert-card-header">
         <div className="concert-artist">{concert.artist}</div>
-        <div className="concert-date">{concert.date || (lang === 'zh-TW' ? '日期未知' : 'Date TBD')}</div>
+        <div className="concert-card-header-right">
+          <div className="concert-date">{concert.date || (lang === 'zh-TW' ? '日期未知' : 'Date TBD')}</div>
+          {onDelete && (
+            <button
+              className="concert-card-delete-btn"
+              type="button"
+              title={t('deleteBtn')}
+              onClick={(event) => {
+                event.stopPropagation()
+                onDelete(concert.id, event)
+              }}
+            >
+              <TrashIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+            </button>
+          )}
+        </div>
       </div>
       {showVenue && (
         <div className="concert-venue-tag">

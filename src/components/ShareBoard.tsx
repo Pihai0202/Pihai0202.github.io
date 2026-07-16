@@ -843,7 +843,7 @@ export function ShareBoard() {
                             {reply.author === (localStorage.getItem('tw-nickname') || '') && (
                               <button
                                 type="button"
-                                className="reply-action-btn delete-btn"
+                                className="reply-action-btn reply-delete-btn"
                                 onClick={() => handleReplyDelete(reply.id)}
                                 title={lang === 'zh-TW' ? '刪除此回覆' : 'Delete reply'}
                               >

@@ -11548,11 +11548,11 @@ body:has(.main-layout) {
   background: rgba(var(--gold-rgb), 0.1);
 }
 
-.reply-action-btn.delete-btn {
+.reply-action-btn.reply-delete-btn {
   margin-left: auto;
 }
 
-.reply-action-btn.delete-btn:hover {
+.reply-action-btn.reply-delete-btn:hover {
   color: #ff4d4f;
   background: rgba(255, 77, 79, 0.1);
 }
@@ -11587,4 +11587,36 @@ body:has(.main-layout) {
 
 .cancel-reply-to-btn:hover {
   transform: scale(1.2);
+}
+
+/* Concert Card Header Actions & Responsive Delete Button */
+.concert-card-header-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.concert-card-delete-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
+}
+
+.concert-card-delete-btn:hover {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+  transform: scale(1.05);
+}
+
+.concert-card-delete-btn:active {
+  transform: scale(0.95);
 }
