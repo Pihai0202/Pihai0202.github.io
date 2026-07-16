@@ -10159,28 +10159,7 @@ header {
   color: #ff4d4f !important;
 }
 
-/* 6. 輸入框極簡化 */
-input,
-textarea,
-select {
-  background: var(--surface) !important;
-  border: 1px solid var(--border) !important;
-  border-radius: 6px !important;
-  color: var(--text) !important;
-  box-shadow: none !important;
-}
 
-option {
-  background: var(--surface2) !important;
-  color: var(--text) !important;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  border-color: var(--gold) !important;
-  box-shadow: none !important;
-}
 
 /* 7. 社群標籤與微小元素去裝飾 */
 .card-artist-tag {
