@@ -1357,10 +1357,6 @@ function App() {
                 className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
                 type="button"
                 onClick={() => setView('profile')}
-                style={{
-                  border: view === 'profile' ? '1px solid var(--gold)' : '1px solid rgba(255, 255, 255, 0.15)',
-                  color: view === 'profile' ? 'var(--gold)' : 'var(--text)'
-                }}
               >
                 <UserIcon style={{ marginRight: '6px' }} /> {t('profile')}
               </button>

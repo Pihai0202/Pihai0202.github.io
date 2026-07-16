@@ -4252,11 +4252,12 @@ body.player-open .music-bar-toggle {
   display: flex;
   align-items: center;
   gap: 0.6rem;
-  border: 1px solid rgba(var(--gold-rgb), 0.3);
-  border-radius: 20px;
-  padding: 0.2rem 0.3rem 0.2rem 0.8rem;
-  background: rgba(var(--gold-rgb), 0.05);
   flex-shrink: 0;
+}
+
+.profile-trigger-btn.active {
+  border-color: var(--gold) !important;
+  color: var(--gold) !important;
 }
 
 .user-name {
