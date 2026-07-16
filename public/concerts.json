@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-16T11:44:20.419825+00:00",
-  "count": 463,
+  "updated_at": "2026-07-16T13:57:54.319832+00:00",
+  "count": 465,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -4885,6 +4885,28 @@
       ]
     },
     {
+      "id": "ticketplus-6b6f5f6e4d34bbbcf0f5bf85e5bf6e27-7549c79d286a78209732257b28af007d",
+      "source": "遠大售票",
+      "name": "Lizi 栗子【OFF THE CHAIN】小巡迴 (台北場)",
+      "venue_raw": "The Wall No Stage,No__ 台北市文山區羅斯福路四段200號B1",
+      "venue_id": "the-wall",
+      "venue_name": "The Wall",
+      "city": "台北",
+      "date": "2026-08-22",
+      "image": "https://static.ticketplus.com.tw/event/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27/picBigHomeThumbnail_1784190957477.jpeg",
+      "url": "https://ticketplus.com.tw/activity/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27",
+      "price": "550 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27"
+        }
+      ]
+    },
+    {
       "id": "cpbl-2026-280",
       "source": "中華職棒",
       "name": "中華職棒例行賽：樂天桃猿 vs 台鋼雄鷹",
@@ -6397,6 +6419,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/6754f898fb01089075512958f2a40cb9"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-6b6f5f6e4d34bbbcf0f5bf85e5bf6e27-ed25f5d0b23b55d55ae84cfdd2237f9c",
+      "source": "遠大售票",
+      "name": "Lizi 栗子【OFF THE CHAIN】小巡迴 (台南場)",
+      "venue_raw": "TCRC Live House 台南市中西區西門路二段314號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-05",
+      "image": "https://static.ticketplus.com.tw/event/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27/picBigHomeThumbnail_1784190957477.jpeg",
+      "url": "https://ticketplus.com.tw/activity/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27",
+      "price": "550 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/6b6f5f6e4d34bbbcf0f5bf85e5bf6e27"
         }
       ]
     },
