@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import type { RemoteConcert, SpotifyItem } from '../types'
 import { useTranslation, translateVenueName } from '../utils/i18n.tsx'
+import { LazyImage } from './LazyImage'
 import { db } from '../firebase'
 import { collection, query, where, orderBy, onSnapshot, addDoc } from 'firebase/firestore'
 import {
@@ -416,7 +417,7 @@ export function TicketDetailModal({
                       }
                     }}
                   >
-                    {track.img && <img src={track.img} alt="" className="track-thumb" />}
+                    {track.img && <LazyImage src={track.img} alt="" className="track-thumb" />}
                     <div className="track-info">
                       <div className="track-name">{track.name}</div>
                       <div className="track-artist">{track.sub}</div>
@@ -444,7 +445,7 @@ export function TicketDetailModal({
                   }</span>
                 </div>
                 <div className="playing-track-card">
-                  {selectedTrack.img && <img src={selectedTrack.img} alt="" className="playing-track-thumb" />}
+                  {selectedTrack.img && <LazyImage src={selectedTrack.img} alt="" className="playing-track-thumb" />}
                   <div className="playing-track-detail">
                     <div className="playing-track-name">{selectedTrack.name}</div>
                     <div className="playing-track-sub">{selectedTrack.sub}</div>

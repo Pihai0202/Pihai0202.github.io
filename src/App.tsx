@@ -29,6 +29,7 @@ import { ProfilePage } from './components/ProfilePage'
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
 import { SafeIframe } from './components/SafeIframe'
+import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
@@ -2272,7 +2273,7 @@ function App() {
               {selectedSpotify && (
                 <div className="spotify-selected-preview">
                   {selectedSpotify.img && (
-                    <img
+                    <LazyImage
                       className={`sp-selected-img${selectedSpotify.type === 'artist' ? ' round' : ''}`}
                       src={selectedSpotify.img}
                       alt=""
@@ -3080,7 +3081,11 @@ function UpcomingConcerts({
             onSelectTicket(concert)
           }}
         >
-          {concert.image ? <img src={concert.image} alt="" /> : <div className="remote-card-fallback">LIVE</div>}
+          <LazyImage
+            src={concert.image}
+            alt=""
+            fallback={<div className="remote-card-fallback">LIVE</div>}
+          />
           <div className="remote-card-body">
             <div className="remote-card-top">
               <span>{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
@@ -3328,15 +3333,12 @@ function SpotifyResults({
               key={`${item.type}-${item.id}`}
               onClick={() => onSelect(item)}
             >
-              {item.img ? (
-                <img
-                  className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`}
-                  src={item.img}
-                  alt=""
-                />
-              ) : (
-                <div className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`} />
-              )}
+              <LazyImage
+                className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`}
+                src={item.img}
+                alt=""
+                fallback={<div className={`sp-result-img${item.type === 'artist' ? ' round' : ''}`} />}
+              />
               <div className="sp-result-info">
                 <div className="sp-result-name">{item.name}</div>
                 <div className="sp-result-sub">{item.sub}</div>
