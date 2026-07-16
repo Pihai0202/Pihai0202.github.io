@@ -1633,7 +1633,8 @@ export function TransitInfoBoard() {
                         fontSize: '0.8rem',
                         lineHeight: '1.4'
                       }}>
-                        ⚠️ {(() => {
+                        <WarningIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                        {(() => {
                           const staleTimeStr = formatStaleTime(metroLiveBoard[0].SrcUpdateTime || metroLiveBoard[0].UpdateTime)
                           return lang === 'zh-TW' 
                             ? `即時到站資訊已中斷更新（${staleTimeStr}）。系統目前無法取得最新列車位置，請參考時刻表。` 

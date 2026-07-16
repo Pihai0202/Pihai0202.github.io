@@ -860,7 +860,10 @@ export function ShareBoard() {
 
               {/* Reply Form */}
               <div className="reply-form-container">
-                <h4>✍️ {lang === 'zh-TW' ? '發表回覆' : 'Post Reply'}</h4>
+                <h4>
+                  <EditIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+                  {lang === 'zh-TW' ? '發表回覆' : 'Post Reply'}
+                </h4>
                 {replyTo && (
                   <div className="reply-to-info-banner">
                     <span>
