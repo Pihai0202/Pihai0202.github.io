@@ -50,6 +50,8 @@ export function ShareBoard() {
   })
   const [replyActiveTab, setReplyActiveTab] = useState<'edit' | 'preview'>('edit')
   const [isPublishingReply, setIsPublishingReply] = useState(false)
+  const [likedReplies, setLikedReplies] = useState<Record<string, boolean>>({})
+  const [replyTo, setReplyTo] = useState<{ id: string; author: string } | null>(null)
 
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return `<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">${lang === 'zh-TW' ? '（輸入心得後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing reviews)'}</p>`
@@ -125,6 +127,16 @@ export function ShareBoard() {
       }
     }
 
+    // Load liked reply IDs
+    const storedReplyLikes = localStorage.getItem('tw-liked-replies')
+    if (storedReplyLikes) {
+      try {
+        setLikedReplies(JSON.parse(storedReplyLikes))
+      } catch {
+        setLikedReplies({})
+      }
+    }
+
     return () => unsubscribe()
   }, [])
 
@@ -146,7 +158,9 @@ export function ShareBoard() {
           id: doc.id,
           author: data.author,
           content: data.content,
-          createdAt: data.createdAt
+          createdAt: data.createdAt,
+          likes: data.likes || 0,
+          replyTo: data.replyTo || null
         })
       })
       setReplies(list)
@@ -179,13 +193,16 @@ export function ShareBoard() {
       await addDoc(collection(db, 'reviews', selectedNote.id, 'replies'), {
         author,
         content,
-        createdAt: new Date().toISOString()
+        createdAt: new Date().toISOString(),
+        likes: 0,
+        replyTo: replyTo ? replyTo.author : null
       })
       // Save author nickname
       localStorage.setItem('tw-nickname', author)
       // Reset form
       setReplyForm((prev) => ({ ...prev, content: '' }))
       setReplyActiveTab('edit')
+      setReplyTo(null)
       logCustomEvent('reply_community_note', {
         note_id: selectedNote.id
       })
@@ -194,6 +211,56 @@ export function ShareBoard() {
       alert(lang === 'zh-TW' ? '發表回覆失敗，請檢查連線並重試！' : 'Failed to post reply. Please check your connection and try again!')
     } finally {
       setIsPublishingReply(false)
+    }
+  }
+
+  // Handle Reply Like Toggle
+  const handleReplyLikeToggle = async (replyId: string, currentLikes: number) => {
+    if (!selectedNote) return
+    const isLiked = likedReplies[replyId]
+    const newLikes = isLiked ? Math.max(0, currentLikes - 1) : currentLikes + 1
+    const updatedLikesState = { ...likedReplies, [replyId]: !isLiked }
+    setLikedReplies(updatedLikesState)
+    localStorage.setItem('tw-liked-replies', JSON.stringify(updatedLikesState))
+
+    try {
+      await updateDoc(doc(db, 'reviews', selectedNote.id, 'replies', replyId), {
+        likes: newLikes
+      })
+    } catch (err) {
+      console.error('Failed to update reply likes:', err)
+    }
+  }
+
+  // Trigger Reply to another reply
+  const handleTriggerReplyTo = (replyId: string, author: string) => {
+    setReplyTo({ id: replyId, author })
+    
+    // Focus reply input
+    const textarea = document.getElementById('reply-content') as HTMLTextAreaElement
+    if (textarea) {
+      textarea.focus()
+      // Prepend @mention if not already there
+      setReplyForm(prev => {
+        if (prev.content.includes(`@${author}`)) return prev
+        return {
+          ...prev,
+          content: `@${author} ${prev.content}`
+        }
+      })
+    }
+  }
+
+  // Handle delete of a reply
+  const handleReplyDelete = async (replyId: string) => {
+    if (!selectedNote) return
+    if (!confirm(lang === 'zh-TW' ? '確定要刪除這則回覆嗎？' : 'Are you sure you want to delete this reply?')) return
+    try {
+      await deleteDoc(doc(db, 'reviews', selectedNote.id, 'replies', replyId))
+      alert(lang === 'zh-TW' ? '刪除成功！' : 'Deleted successfully!')
+    } catch (err) {
+      console.error('Failed to delete reply:', err)
+      alert(lang === 'zh-TW' ? '刪除失敗，請重試！' : 'Failed to delete reply. Please try again!')
     }
   }
 
@@ -729,6 +796,11 @@ export function ShareBoard() {
                             <span className="reply-author">
                               <UserIcon size="0.8em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
                               {reply.author}
+                              {reply.replyTo && (
+                                <span className="reply-to-tag">
+                                  {lang === 'zh-TW' ? '回覆' : 'reply to'} @{reply.replyTo}
+                                </span>
+                              )}
                             </span>
                             <span className="reply-date">{replyDate}</span>
                           </div>
@@ -744,6 +816,41 @@ export function ShareBoard() {
                               })() 
                             }} 
                           />
+                          <div className="reply-actions-row">
+                            <button
+                              type="button"
+                              className={`reply-action-btn like-btn${likedReplies[reply.id] ? ' liked' : ''}`}
+                              onClick={() => handleReplyLikeToggle(reply.id, reply.likes)}
+                              title={likedReplies[reply.id] ? (lang === 'zh-TW' ? '取消按讚' : 'Unlike') : (lang === 'zh-TW' ? '點擊按讚' : 'Like')}
+                            >
+                              {likedReplies[reply.id] ? (
+                                <HeartFilledIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+                              ) : (
+                                <HeartOutlineIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+                              )}
+                              <span>{reply.likes || 0}</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              className="reply-action-btn reply-btn"
+                              onClick={() => handleTriggerReplyTo(reply.id, reply.author)}
+                            >
+                              <MessageIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+                              <span>{lang === 'zh-TW' ? '回覆' : 'Reply'}</span>
+                            </button>
+
+                            {reply.author === (localStorage.getItem('tw-nickname') || '') && (
+                              <button
+                                type="button"
+                                className="reply-action-btn delete-btn"
+                                onClick={() => handleReplyDelete(reply.id)}
+                                title={lang === 'zh-TW' ? '刪除此回覆' : 'Delete reply'}
+                              >
+                                <TrashIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+                              </button>
+                            )}
+                          </div>
                         </div>
                       )
                     })
@@ -754,6 +861,20 @@ export function ShareBoard() {
               {/* Reply Form */}
               <div className="reply-form-container">
                 <h4>✍️ {lang === 'zh-TW' ? '發表回覆' : 'Post Reply'}</h4>
+                {replyTo && (
+                  <div className="reply-to-info-banner">
+                    <span>
+                      {lang === 'zh-TW' ? `正在回覆 @${replyTo.author}` : `Replying to @${replyTo.author}`}
+                    </span>
+                    <button
+                      type="button"
+                      className="cancel-reply-to-btn"
+                      onClick={() => setReplyTo(null)}
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
                 <form onSubmit={handleAddReply}>
                   <div className="form-group">
                     <label htmlFor="reply-author">{t('nicknameForm')}</label>

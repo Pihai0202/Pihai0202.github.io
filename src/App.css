@@ -11490,3 +11490,101 @@ body:has(.main-layout) {
     display: flex;
   }
 }
+
+/* Comment Reply Likes, Sub-replies, and Deletes Styling */
+.reply-to-tag {
+  font-size: 0.72rem;
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.1);
+  border: 1px solid rgba(var(--gold-rgb), 0.15);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+}
+
+.reply-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.reply-action-btn {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.reply-action-btn:hover {
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.reply-action-btn.like-btn.liked {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.05);
+}
+
+.reply-action-btn.like-btn.liked:hover {
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.reply-action-btn.reply-btn:hover {
+  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.1);
+}
+
+.reply-action-btn.delete-btn {
+  margin-left: auto;
+}
+
+.reply-action-btn.delete-btn:hover {
+  color: #ff4d4f;
+  background: rgba(255, 77, 79, 0.1);
+}
+
+.reply-to-info-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(var(--gold-rgb), 0.08);
+  border: 1px dashed rgba(var(--gold-rgb), 0.4);
+  border-radius: 8px;
+  padding: 8px 12px;
+  margin-bottom: 12px;
+  font-size: 0.82rem;
+  color: var(--gold);
+  font-weight: 500;
+}
+
+.cancel-reply-to-btn {
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+  line-height: 1;
+  transition: transform 0.2s ease;
+}
+
+.cancel-reply-to-btn:hover {
+  transform: scale(1.2);
+}
