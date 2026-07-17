@@ -11954,6 +11954,12 @@ body:has(.main-layout) {
     left: 20px !important;
   }
 
+  [data-theme='light'] .venue-panel-container {
+    background: rgba(255, 255, 255, 0.88) !important;
+    border-color: var(--border) !important;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1) !important;
+  }
+
   .venue-panel-container.collapsed {
     width: 50px !important;
     height: 50px !important;
