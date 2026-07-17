@@ -11661,7 +11661,7 @@ body:has(.main-layout) {
 }
 
 /* 2. Responsive header overrides for laptops/MacBooks (Compact & Icon-only modes) */
-@media (min-width: 769px) and (max-width: 1400px) {
+@media (min-width: 769px) and (max-width: 1800px) {
   /* Hide stats bar completely on laptops to save massive space */
   header .stats-bar {
     display: none !important;
@@ -11686,12 +11686,7 @@ body:has(.main-layout) {
   }
 }
 
-@media (min-width: 769px) and (max-width: 1280px) {
-  /* Hide logo text completely on smaller laptop widths */
-  header .logo-text {
-    display: none !important;
-  }
-
+@media (min-width: 769px) and (max-width: 1440px) {
   /* Make nav buttons icon-only */
   header .nav-toggle-btn .btn-label {
     display: none !important;
@@ -11707,6 +11702,13 @@ body:has(.main-layout) {
     height: 38px !important;
     border-radius: 50% !important;
     justify-content: center !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1280px) {
+  /* Hide logo text completely on smaller laptop widths */
+  header .logo-text {
+    display: none !important;
   }
 
   header .header-search {
