@@ -11832,6 +11832,12 @@ body:has(.main-layout) {
     left: 20px !important;
   }
 
+  .venue-panel-container.collapsed {
+    width: 50px !important;
+    height: 50px !important;
+    border-radius: 50% !important;
+  }
+
   /* Since header is hidden, make sure map container fills height */
   .map-container {
     height: 100% !important;
