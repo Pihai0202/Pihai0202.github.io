@@ -11844,12 +11844,22 @@ body:has(.main-layout) {
     display: none !important; /* Hide text for the record plus button to keep it clean */
   }
 
-  /* Move map legend to top-left */
+  /* Move map legend to top-left (below collapsed search button) */
   .map-legend {
-    top: 20px !important;
-    left: 320px !important;
+    top: 90px !important;
+    left: 20px !important;
     bottom: auto !important;
   }
+
+  /* Reorder items on tablet landscape to center the Plus (+) button */
+  .mobile-bottom-nav > :nth-child(1) { order: 1 !important; } /* Map */
+  .mobile-bottom-nav > :nth-child(2) { order: 2 !important; } /* Calendar */
+  .mobile-bottom-nav > :nth-child(4) { order: 3 !important; } /* Board */
+  .mobile-bottom-nav > :nth-child(3) { order: 4 !important; } /* Plus (+) */
+  .mobile-bottom-nav > :nth-child(5) { order: 5 !important; } /* Profile */
+  .mobile-bottom-nav > :nth-child(6) { order: 6 !important; } /* Language */
+  .mobile-bottom-nav > :nth-child(7) { order: 7 !important; } /* Theme */
+  .mobile-bottom-nav > :nth-child(8) { order: 8 !important; } /* Tour */
 
   /* Light Theme overrides for the Floating Dock */
   [data-theme='light'] .mobile-bottom-nav {
