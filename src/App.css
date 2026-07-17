@@ -145,14 +145,14 @@ header {
   header {
     --sidebar-w: 420px;
     position: fixed !important;
-    top: 20px !important;
+    top: 12px !important;
     left: calc((100% - var(--sidebar-w)) / 2) !important;
     transform: translateX(-50%) !important;
     width: fit-content !important;
     min-width: 650px !important;
     max-width: calc(100% - var(--sidebar-w) - 40px) !important;
-    height: 68px !important;
-    padding: 0 24px !important;
+    height: 52px !important;
+    padding: 0 16px !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
@@ -491,15 +491,15 @@ header {
   }
 
   .venue-panel-container {
-    top: 140px !important;
+    top: 76px !important;
   }
 
   .map-weather-overlay {
-    top: 140px !important;
+    top: 76px !important;
   }
 
   .shuangbei-popover {
-    top: 140px !important;
+    top: 76px !important;
   }
 }
 

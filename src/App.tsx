@@ -286,7 +286,12 @@ function App() {
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(1.1)
+  const [zoom, setZoom] = useState(() => {
+    if (typeof window !== 'undefined' && window.innerWidth <= 1200) {
+      return 0.95
+    }
+    return 1.1
+  })
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
@@ -1545,7 +1550,7 @@ function App() {
               <button
                 className="zoom-btn reset"
                 type="button"
-                onClick={() => setZoom(1.1)}
+                onClick={() => setZoom(window.innerWidth <= 1200 ? 0.95 : 1.1)}
                 title="重設縮放"
               >
                 ⟲

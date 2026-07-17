@@ -164,8 +164,8 @@ export function TaiwanMap({
     // Calculate targets
     const targetX = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).x : 455
     let targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
-    // 若使用者已經手動調整過縮放比例（不等於初始的 1.1），則在選取場館時維持使用者當前的縮放比；否則使用預設特寫縮放比 1.8
-    const targetZoom = selectedVenue ? (zoom !== 1.1 ? zoom : 1.8) : 1.1
+    const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
+    const targetZoom = selectedVenue ? (zoom !== defaultZoom ? zoom : 1.8) : defaultZoom
 
     const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
     if (selectedVenue && isMobile) {
