@@ -231,6 +231,20 @@ function extractArtistFromTitle(title: string): string {
 
 const APP_VERSION = '1.1.4'
 
+const getDefaultZoom = () => {
+  if (typeof window !== 'undefined') {
+    const isPortrait = window.innerHeight > window.innerWidth
+    const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024
+    if (isTablet && isPortrait) {
+      return 1.55 // 155% default zoom for tablet portrait
+    }
+    if (window.innerWidth <= 1200) {
+      return 0.95
+    }
+  }
+  return 1.1
+}
+
 function App() {
   const { t, lang, setLang } = useTranslation()
   const [updateInfo, setUpdateInfo] = useState<{ version: string; url: string; notes: string } | null>(null)
@@ -286,12 +300,7 @@ function App() {
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
-  const [zoom, setZoom] = useState(() => {
-    if (typeof window !== 'undefined' && window.innerWidth <= 1200) {
-      return 0.95
-    }
-    return 1.1
-  })
+  const [zoom, setZoom] = useState(() => getDefaultZoom())
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
@@ -1554,7 +1563,7 @@ function App() {
               <button
                 className="zoom-btn reset"
                 type="button"
-                onClick={() => setZoom(window.innerWidth <= 1200 ? 0.95 : 1.1)}
+                onClick={() => setZoom(getDefaultZoom())}
                 title="重設縮放"
               >
                 ⟲
