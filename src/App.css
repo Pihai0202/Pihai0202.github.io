@@ -4681,6 +4681,12 @@ body.player-open .music-bar-toggle {
   transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1),
               background 0.25s ease,
               box-shadow 0.25s ease !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
 }
 .mobile-bottom-nav.dragging {
   transform: scale(1.04) !important;
@@ -4694,6 +4700,12 @@ body.player-open .music-bar-toggle {
 .bottom-nav-item {
   transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1),
               color 0.2s ease !important;
+  -webkit-touch-callout: none !important;
+  -webkit-user-select: none !important;
+  -khtml-user-select: none !important;
+  -moz-user-select: none !important;
+  -ms-user-select: none !important;
+  user-select: none !important;
 }
 .bottom-nav-item.hovered {
   transform: scale(1.3) translateY(-4px) !important;
