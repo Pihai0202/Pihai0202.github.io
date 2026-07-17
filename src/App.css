@@ -4659,6 +4659,26 @@ body.player-open .music-bar-toggle {
 
 .mobile-bottom-nav {
   display: none;
+  position: relative; /* Ensure relative positioning for absolute indicator */
+}
+.nav-indicator-glide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 1;
+  border-radius: 99px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  transition: transform 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
+              width 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
+              height 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
+              opacity 0.25s ease;
+}
+[data-theme='light'] .nav-indicator-glide {
+  background: rgba(0, 0, 0, 0.05);
+  border-color: rgba(0, 0, 0, 0.08);
 }
 .mobile-menu-toggle-btn {
   display: none;
@@ -7163,6 +7183,7 @@ body.player-open .music-bar-toggle {
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
     text-decoration: none;
     position: relative;
+    z-index: 2;
   }
 
   .bottom-nav-item:active {
@@ -11806,10 +11827,11 @@ body:has(.main-layout) {
     outline: none !important;
     min-width: 44px !important;
     height: 44px !important;
+    z-index: 2 !important;
   }
 
   .bottom-nav-item.active {
-    background: rgba(255, 255, 255, 0.08) !important;
+    background: transparent !important; /* Managed by nav-indicator-glide */
     color: var(--gold) !important;
   }
 
@@ -11855,8 +11877,8 @@ body:has(.main-layout) {
   .mobile-bottom-nav > :nth-child(1) { order: 1 !important; } /* Map */
   .mobile-bottom-nav > :nth-child(2) { order: 2 !important; } /* Calendar */
   .mobile-bottom-nav > :nth-child(4) { order: 3 !important; } /* Board */
-  .mobile-bottom-nav > :nth-child(3) { order: 4 !important; } /* Plus (+) */
-  .mobile-bottom-nav > :nth-child(5) { order: 5 !important; } /* Profile */
+  .mobile-bottom-nav > :nth-child(5) { order: 4 !important; } /* Profile */
+  .mobile-bottom-nav > :nth-child(3) { order: 5 !important; } /* Plus (+) */
   .mobile-bottom-nav > :nth-child(6) { order: 6 !important; } /* Language */
   .mobile-bottom-nav > :nth-child(7) { order: 7 !important; } /* Theme */
   .mobile-bottom-nav > :nth-child(8) { order: 8 !important; } /* Tour */
@@ -11873,7 +11895,7 @@ body:has(.main-layout) {
   }
 
   [data-theme='light'] .bottom-nav-item.active {
-    background: rgba(0, 0, 0, 0.05) !important;
+    background: transparent !important; /* Managed by nav-indicator-glide */
     color: #141413 !important;
   }
 

@@ -303,6 +303,42 @@ function App() {
   const [zoom, setZoom] = useState(() => getDefaultZoom())
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
+
+  const bottomNavRef = useRef<HTMLDivElement>(null)
+  const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({
+    transform: 'translate3d(0, 0, 0)',
+    width: 0,
+    height: 0,
+    opacity: 0,
+  })
+
+  useEffect(() => {
+    const updateIndicator = () => {
+      if (!bottomNavRef.current) return
+      const activeEl = bottomNavRef.current.querySelector('.bottom-nav-item.active') as HTMLElement
+      if (activeEl) {
+        setIndicatorStyle({
+          transform: `translate3d(${activeEl.offsetLeft}px, ${activeEl.offsetTop}px, 0)`,
+          width: activeEl.offsetWidth,
+          height: activeEl.offsetHeight,
+          opacity: 1,
+        })
+      } else {
+        setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }))
+      }
+    }
+
+    updateIndicator()
+    
+    // Brief delay for window rendering to settle
+    const timer = setTimeout(updateIndicator, 50)
+
+    window.addEventListener('resize', updateIndicator)
+    return () => {
+      window.removeEventListener('resize', updateIndicator)
+      clearTimeout(timer)
+    }
+  }, [view, lang])
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false)
@@ -2869,7 +2905,7 @@ function App() {
             </div>
           </div>
           
-          <div className="mobile-bottom-nav">
+          <div className="mobile-bottom-nav" ref={bottomNavRef}>
             <button
               className={`bottom-nav-item${view === 'map' ? ' active' : ''}`}
               type="button"
@@ -2962,6 +2998,7 @@ function App() {
               <span className="icon"><SparklesIcon /></span>
               <span className="label">{t('siteTour')}</span>
             </button>
+            <div className="nav-indicator-glide" style={indicatorStyle} />
           </div>
         </>
       )}
