@@ -2938,6 +2938,30 @@ function App() {
               <span className="icon"><UserIcon /></span>
               <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
             </button>
+            <button
+              className="bottom-nav-item tablet-only-nav-item"
+              type="button"
+              onClick={() => setIsLanguageModalOpen(true)}
+            >
+              <span className="icon"><GlobeIcon size="1.1em" /></span>
+              <span className="label">{lang === 'zh-TW' ? '語言' : lang === 'ja' ? '言語' : lang === 'ko' ? '언어' : 'Lang'}</span>
+            </button>
+            <button
+              className="bottom-nav-item tablet-only-nav-item"
+              type="button"
+              onClick={toggleTheme}
+            >
+              <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
+              <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '淺色' : lang === 'ja' ? 'ライト' : lang === 'ko' ? '라이트' : 'Light') : (lang === 'zh-TW' ? '深色' : lang === 'ja' ? 'ダーク' : lang === 'ko' ? '다크' : 'Dark')}</span>
+            </button>
+            <button
+              className="bottom-nav-item tablet-only-nav-item"
+              type="button"
+              onClick={() => setIsGuideModalOpen(true)}
+            >
+              <span className="icon"><SparklesIcon /></span>
+              <span className="label">{t('siteTour')}</span>
+            </button>
           </div>
         </>
       )}
