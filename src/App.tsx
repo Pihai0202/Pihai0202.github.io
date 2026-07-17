@@ -1363,7 +1363,7 @@ function App() {
                 <UserIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('profile')}</span>
               </button>
               <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
-                <span className="btn-label">{t('logout')}</span>
+                <LogoutIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('logout')}</span>
               </button>
             </div>
           ) : (
