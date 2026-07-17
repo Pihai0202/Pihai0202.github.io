@@ -339,6 +339,96 @@ function App() {
       clearTimeout(timer)
     }
   }, [view, lang])
+
+  const [isDraggingNav, setIsDraggingNav] = useState(false)
+
+  const getButtonFromX = useCallback((clientX: number) => {
+    if (!bottomNavRef.current) return null
+    const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
+    for (const btn of buttons) {
+      const rect = btn.getBoundingClientRect()
+      if (clientX >= rect.left && clientX <= rect.right) {
+        return btn
+      }
+    }
+    return null
+  }, [])
+
+  const snapIndicatorToActive = useCallback(() => {
+    if (!bottomNavRef.current) return
+    const activeEl = bottomNavRef.current.querySelector('.bottom-nav-item.active') as HTMLElement
+    if (activeEl) {
+      setIndicatorStyle({
+        transform: `translate3d(${activeEl.offsetLeft}px, ${activeEl.offsetTop}px, 0)`,
+        width: activeEl.offsetWidth,
+        height: activeEl.offsetHeight,
+        opacity: 1,
+      })
+    } else {
+      setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }))
+    }
+  }, [])
+
+  const highlightNavButton = useCallback((btn: HTMLElement) => {
+    setIndicatorStyle({
+      transform: `translate3d(${btn.offsetLeft}px, ${btn.offsetTop}px, 0)`,
+      width: btn.offsetWidth,
+      height: btn.offsetHeight,
+      opacity: 1,
+    })
+    
+    const btnView = btn.getAttribute('data-view') as any
+    if (btnView && btnView !== view) {
+      setView(btnView)
+    }
+  }, [view])
+
+  const handleNavPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.button !== 0 && e.pointerType === 'mouse') return
+    setIsDraggingNav(true)
+    e.currentTarget.setPointerCapture(e.pointerId)
+    const btn = getButtonFromX(e.clientX)
+    if (btn) {
+      highlightNavButton(btn)
+    }
+  }, [getButtonFromX, highlightNavButton])
+
+  const handleNavPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingNav) return
+    const btn = getButtonFromX(e.clientX)
+    if (btn) {
+      highlightNavButton(btn)
+    }
+  }, [isDraggingNav, getButtonFromX, highlightNavButton])
+
+  const handleNavPointerUp = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    if (!isDraggingNav) return
+    setIsDraggingNav(false)
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch (err) {}
+    
+    const btn = getButtonFromX(e.clientX)
+    if (btn) {
+      const isUtility = btn.getAttribute('data-utility') === 'true'
+      const btnView = btn.getAttribute('data-view')
+      if (isUtility) {
+        btn.click()
+      } else if (btnView) {
+        btn.click()
+      }
+    }
+    snapIndicatorToActive()
+  }, [isDraggingNav, getButtonFromX, snapIndicatorToActive])
+
+  const handleNavPointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
+    setIsDraggingNav(false)
+    try {
+      e.currentTarget.releasePointerCapture(e.pointerId)
+    } catch (err) {}
+    snapIndicatorToActive()
+  }, [snapIndicatorToActive])
+
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
   const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false)
@@ -2905,10 +2995,19 @@ function App() {
             </div>
           </div>
           
-          <div className="mobile-bottom-nav" ref={bottomNavRef}>
+          <div
+            className="mobile-bottom-nav"
+            ref={bottomNavRef}
+            onPointerDown={handleNavPointerDown}
+            onPointerMove={handleNavPointerMove}
+            onPointerUp={handleNavPointerUp}
+            onPointerCancel={handleNavPointerCancel}
+            style={{ touchAction: 'none' }}
+          >
             <button
               className={`bottom-nav-item${view === 'map' ? ' active' : ''}`}
               type="button"
+              data-view="map"
               onClick={() => {
                 if (view !== 'map') {
                   setView('map')
@@ -2934,6 +3033,7 @@ function App() {
             <button
               className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
               type="button"
+              data-view="calendar"
               onClick={() => {
                 setView('calendar')
               }}
@@ -2944,6 +3044,7 @@ function App() {
             <button
               className="bottom-nav-item bottom-nav-item-record"
               type="button"
+              data-utility="true"
               onClick={() => openAddModal()}
               title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}
             >
@@ -2953,6 +3054,7 @@ function App() {
             <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
               type="button"
+              data-view="board"
               onClick={() => {
                 setView('board')
               }}
@@ -2963,6 +3065,7 @@ function App() {
             <button
               className={`bottom-nav-item${view === 'profile' ? ' active' : ''}`}
               type="button"
+              data-view="profile"
               onClick={() => {
                 if (isLoggedIn) {
                   setView('profile')
@@ -2977,6 +3080,7 @@ function App() {
             <button
               className="bottom-nav-item tablet-only-nav-item"
               type="button"
+              data-utility="true"
               onClick={() => setIsLanguageModalOpen(true)}
             >
               <span className="icon"><GlobeIcon size="1.1em" /></span>
@@ -2985,6 +3089,7 @@ function App() {
             <button
               className="bottom-nav-item tablet-only-nav-item"
               type="button"
+              data-utility="true"
               onClick={toggleTheme}
             >
               <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
@@ -2993,6 +3098,7 @@ function App() {
             <button
               className="bottom-nav-item tablet-only-nav-item"
               type="button"
+              data-utility="true"
               onClick={() => setIsGuideModalOpen(true)}
             >
               <span className="icon"><SparklesIcon /></span>
