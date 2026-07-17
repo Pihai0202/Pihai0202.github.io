@@ -376,17 +376,34 @@ function App() {
       height: btn.offsetHeight,
       opacity: 1,
     })
-    
-    const btnView = btn.getAttribute('data-view') as any
-    if (btnView && btnView !== view) {
-      setView(btnView)
+
+    if (bottomNavRef.current) {
+      const buttons = bottomNavRef.current.querySelectorAll('.bottom-nav-item')
+      buttons.forEach((el) => {
+        el.classList.remove('hovered', 'neighbor')
+      })
     }
-  }, [view])
+    btn.classList.add('hovered')
+
+    if (btn.parentElement) {
+      const siblings = Array.from(btn.parentElement.children) as HTMLElement[]
+      const index = siblings.indexOf(btn)
+      // Highlight left neighbor
+      if (index > 0) {
+        siblings[index - 1].classList.add('neighbor')
+      }
+      // Highlight right neighbor
+      if (index < siblings.length - 1) {
+        siblings[index + 1].classList.add('neighbor')
+      }
+    }
+  }, [])
 
   const handleNavPointerDown = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (e.button !== 0 && e.pointerType === 'mouse') return
     setIsDraggingNav(true)
     e.currentTarget.setPointerCapture(e.pointerId)
+    bottomNavRef.current?.classList.add('dragging')
     const btn = getButtonFromX(e.clientX)
     if (btn) {
       highlightNavButton(btn)
@@ -408,6 +425,13 @@ function App() {
       e.currentTarget.releasePointerCapture(e.pointerId)
     } catch (err) {}
     
+    if (bottomNavRef.current) {
+      bottomNavRef.current.classList.remove('dragging')
+      bottomNavRef.current.querySelectorAll('.bottom-nav-item').forEach((el) => {
+        el.classList.remove('hovered', 'neighbor')
+      })
+    }
+
     const btn = getButtonFromX(e.clientX)
     if (btn) {
       const isUtility = btn.getAttribute('data-utility') === 'true'
@@ -426,6 +450,12 @@ function App() {
     try {
       e.currentTarget.releasePointerCapture(e.pointerId)
     } catch (err) {}
+    if (bottomNavRef.current) {
+      bottomNavRef.current.classList.remove('dragging')
+      bottomNavRef.current.querySelectorAll('.bottom-nav-item').forEach((el) => {
+        el.classList.remove('hovered', 'neighbor')
+      })
+    }
     snapIndicatorToActive()
   }, [snapIndicatorToActive])
 

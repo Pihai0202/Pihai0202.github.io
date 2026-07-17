@@ -4676,9 +4676,31 @@ body.player-open .music-bar-toggle {
               height 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
               opacity 0.25s ease;
 }
-[data-theme='light'] .nav-indicator-glide {
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.08);
+/* Liquid glass fish-eye magnification styles on drag */
+.mobile-bottom-nav {
+  transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1),
+              background 0.25s ease,
+              box-shadow 0.25s ease !important;
+}
+.mobile-bottom-nav.dragging {
+  transform: scale(1.04) !important;
+  background: rgba(20, 20, 32, 0.9) !important;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.55) !important;
+}
+[data-theme='light'] .mobile-bottom-nav.dragging {
+  background: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
+}
+.bottom-nav-item {
+  transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1),
+              color 0.2s ease !important;
+}
+.bottom-nav-item.hovered {
+  transform: scale(1.3) translateY(-4px) !important;
+  color: var(--gold) !important;
+}
+.bottom-nav-item.neighbor {
+  transform: scale(1.12) translateY(-1px) !important;
 }
 .mobile-menu-toggle-btn {
   display: none;
@@ -11809,6 +11831,10 @@ body:has(.main-layout) {
 
   .main-layout:not(.sidebar-collapsed) ~ .mobile-bottom-nav {
     left: calc((100% - 340px) / 2) !important;
+  }
+
+  .mobile-bottom-nav.dragging {
+    transform: translateX(-50%) scale(1.08) !important;
   }
 
   /* Adjust theme toggles or buttons on the floating dock */
