@@ -1277,6 +1277,10 @@ function App() {
         )}
         <div className="logo" onClick={handleHeaderClick}>
           <div className="logo-icon"><TaiwanIcon /></div>
+          <div className="logo-text">
+            <h1>{t('title')}</h1>
+            <span>{t('subtitle')}</span>
+          </div>
         </div>
 
         <div className="header-search">
