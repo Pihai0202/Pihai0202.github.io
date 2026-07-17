@@ -175,7 +175,7 @@ header {
 
   @media (max-width: 1200px) {
     header {
-      --sidebar-w: 360px;
+      --sidebar-w: 400px;
     }
   }
 
@@ -11660,8 +11660,18 @@ body:has(.main-layout) {
   }
 }
 
-/* 2. Hide navigation button text labels on screens <= 1200px (Icon-only mode) */
+/* 2. Hide navigation button text labels, stats bar, and logo text on screens <= 1200px (Icon-only & compact mode) */
 @media (min-width: 769px) and (max-width: 1200px) {
+  /* Hide stats bar completely to save space */
+  header .stats-bar {
+    display: none !important;
+  }
+
+  /* Hide logo text in capsule view to prevent overflow */
+  header .logo-text {
+    display: none !important;
+  }
+
   header .nav-toggle-btn .btn-label {
     display: none !important;
   }
