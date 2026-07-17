@@ -236,7 +236,7 @@ const getDefaultZoom = () => {
     const isPortrait = window.innerHeight > window.innerWidth
     const isTablet = window.innerWidth >= 768 && window.innerWidth <= 1024
     if (isTablet && isPortrait) {
-      return 1.55 // 155% default zoom for tablet portrait
+      return 1.45 // 145% default zoom for tablet portrait
     }
     if (window.innerWidth <= 1200) {
       return 0.95
