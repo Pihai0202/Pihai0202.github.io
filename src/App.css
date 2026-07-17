@@ -11708,7 +11708,6 @@ body:has(.main-layout) {
     box-sizing: border-box !important;
   }
 
-  .calendar-main-layout,
   .share-board-container,
   .profile-board-container,
   .login-page-container {
@@ -11718,6 +11717,15 @@ body:has(.main-layout) {
     min-height: 100vh !important;
     box-sizing: border-box !important;
     overflow-y: auto !important; /* allow scrolling inside pages */
+  }
+
+  .calendar-main-layout {
+    padding-top: 25px !important;
+    padding-bottom: 95px !important; /* bottom padding for dock */
+    height: 100vh !important;
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important; /* prevent page scrolling */
   }
 
   /* 2. Style the mobile-bottom-nav as a centered floating iPad dock */
@@ -11872,8 +11880,49 @@ body:has(.main-layout) {
     grid-template-columns: 1.35fr 1fr !important;
     grid-template-rows: auto 1fr !important;
     gap: 1rem !important;
-    height: calc(100vh - 140px) !important;
+    height: 100% !important;
     overflow: hidden !important;
+    margin: 0 !important;
+  }
+
+  /* Alignment styling for year/month/day selectors inside calendar header */
+  .month-selector-buttons {
+    display: flex !important;
+    align-items: center !important;
+    height: 36px !important;
+    gap: 0.8rem !important;
+  }
+
+  .current-month-selects {
+    display: flex !important;
+    align-items: center !important;
+    height: 36px !important;
+    gap: 0.4rem !important;
+  }
+
+  .cal-select {
+    margin: 0 !important;
+    height: 36px !important;
+    box-sizing: border-box !important;
+    line-height: 1 !important;
+    padding: 0.35rem 0.6rem !important;
+    display: inline-block !important;
+    vertical-align: middle !important;
+  }
+
+  .cal-today-btn {
+    margin: 0 !important;
+    height: 36px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0 1rem !important;
+  }
+
+  .cal-year-label {
+    line-height: 36px !important;
+    margin-right: 0.2rem !important;
   }
 
   .calendar-header-panel {
@@ -11897,6 +11946,7 @@ body:has(.main-layout) {
     min-height: 0 !important;
     height: 100% !important;
     gap: 0.5rem !important;
+    overflow: hidden !important;
   }
 
   .calendar-week-headers {
@@ -11907,17 +11957,21 @@ body:has(.main-layout) {
     flex: 1 !important;
     display: grid !important;
     grid-template-columns: repeat(7, 1fr) !important;
-    grid-auto-rows: 1fr !important;
+    grid-template-rows: repeat(6, 1fr) !important;
     gap: 4px !important;
     min-height: 0 !important;
+    height: 100% !important;
+    overflow: hidden !important;
   }
 
   .calendar-day-cell {
     min-height: 0 !important;
+    height: 100% !important;
     padding: 4px 6px !important;
     display: flex !important;
     flex-direction: column !important;
     justify-content: space-between !important;
+    box-sizing: border-box !important;
   }
 
   .day-cell-header {
