@@ -638,6 +638,10 @@ header {
   }
 }
 
+.logo-text {
+  display: none !important;
+}
+
 .logo-text h1 {
   font-size: 1.3rem;
   font-weight: 900;
