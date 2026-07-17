@@ -11698,67 +11698,124 @@ body:has(.main-layout) {
 @media (min-width: 768px) and (max-width: 1366px) and (max-height: 850px) {
   /* 1. Header & General */
   header {
-    height: 60px !important;
-    padding: 0.5rem 1rem !important;
-    gap: 0.8rem !important;
+    display: none !important; /* Hide top header completely! */
   }
 
+  /* Make views occupy 100vh with bottom padding for the floating dock */
   .main-layout {
-    height: calc(100vh - 60px) !important;
+    height: 100vh !important;
+    padding-bottom: 95px !important; /* bottom padding for dock */
+    box-sizing: border-box !important;
   }
 
-  /* Restore and style logo text */
-  header .logo-text {
+  .calendar-main-layout,
+  .share-board-container,
+  .profile-board-container,
+  .login-page-container {
+    padding-top: 25px !important;
+    padding-bottom: 95px !important; /* bottom padding for dock */
+    height: 100vh !important;
+    min-height: 100vh !important;
+    box-sizing: border-box !important;
+    overflow-y: auto !important; /* allow scrolling inside pages */
+  }
+
+  /* 2. Style the mobile-bottom-nav as a centered floating iPad dock */
+  .mobile-bottom-nav {
     display: flex !important;
-    flex-direction: column !important;
+    position: fixed !important;
+    bottom: 20px !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: auto !important;
+    min-width: 480px !important;
+    background: rgba(20, 20, 32, 0.8) !important;
+    backdrop-filter: blur(16px) !important;
+    -webkit-backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    border-radius: 99px !important;
+    padding: 0.4rem 1.6rem !important;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45) !important;
+    z-index: 999 !important;
+    gap: 0.6rem !important;
+    align-items: center !important;
     justify-content: center !important;
   }
 
-  header .logo-text h1 {
-    font-size: 1.05rem !important;
-    line-height: 1.1 !important;
-    margin: 0 !important;
-  }
-
-  header .logo-text span {
-    font-size: 0.55rem !important;
-    display: block !important;
-  }
-
-  /* Compact Stats Bar */
-  header .stats-bar {
+  /* Adjust theme toggles or buttons on the floating dock */
+  .bottom-nav-item {
     display: flex !important;
-    gap: 0.6rem !important;
-    padding: 0.2rem 0.6rem !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 0.4rem 1rem !important;
+    border-radius: 20px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    color: var(--muted) !important;
+    background: transparent !important;
+    border: none !important;
+    cursor: pointer !important;
+    outline: none !important;
+    min-width: 70px !important;
+    height: 48px !important;
   }
 
-  header .stat-num {
-    font-size: 0.85rem !important;
+  .bottom-nav-item.active {
+    background: rgba(255, 255, 255, 0.08) !important;
+    color: var(--gold) !important;
   }
 
-  header .stat-label {
-    font-size: 0.5rem !important;
+  .bottom-nav-item .icon {
+    font-size: 1.1rem !important;
+    line-height: 1 !important;
+    margin-bottom: 2px !important;
   }
 
-  /* Concise button labels */
-  header .nav-toggle-btn {
-    padding: 0.35rem 0.6rem !important;
-    font-size: 0.8rem !important;
+  .bottom-nav-item .label {
+    font-size: 0.65rem !important;
+    font-weight: 600 !important;
+    letter-spacing: 0.05em !important;
+    display: inline !important; /* Force show label! */
   }
 
-  header .nav-toggle-btn .btn-label {
-    display: inline !important;
+  /* Plus button on bottom dock */
+  .bottom-nav-item-record {
+    background: linear-gradient(135deg, var(--gold) 0%, #ffc04d 100%) !important;
+    color: #000 !important;
+    border-radius: 50% !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    padding: 0 !important;
+    box-shadow: 0 4px 15px rgba(var(--gold-rgb), 0.3) !important;
   }
 
-  header .nav-toggle-btn svg {
-    margin-right: 4px !important;
+  .bottom-nav-item-record .icon {
+    margin-bottom: 0 !important;
+    font-size: 1.2rem !important;
   }
 
-  .header-search {
-    max-width: 240px !important;
+  .bottom-nav-item-record .label {
+    display: none !important; /* Hide text for the record plus button to keep it clean */
   }
 
-  /* 2. Map Layout & Sidebar */
+  /* Light Theme overrides for the Floating Dock */
+  [data-theme='light'] .mobile-bottom-nav {
+    background: rgba(252, 251, 250, 0.9) !important;
+    border: 1px solid rgba(20, 20, 20, 0.1) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12) !important;
+  }
+
+  [data-theme='light'] .bottom-nav-item {
+    color: #555555 !important;
+  }
+
+  [data-theme='light'] .bottom-nav-item.active {
+    background: rgba(0, 0, 0, 0.05) !important;
+    color: #141413 !important;
+  }
+
+  /* 3. Map Layout & Sidebar */
   .main-layout {
     grid-template-columns: 1fr 340px !important;
   }
@@ -11770,9 +11827,14 @@ body:has(.main-layout) {
     -webkit-backdrop-filter: blur(12px) !important;
     border: 1px solid rgba(255, 255, 255, 0.1) !important;
     width: 285px !important;
-    max-height: 82% !important;
-    top: 15px !important;
-    left: 15px !important;
+    max-height: 80% !important;
+    top: 20px !important;
+    left: 20px !important;
+  }
+
+  /* Since header is hidden, make sure map container fills height */
+  .map-container {
+    height: 100% !important;
   }
 
   .venue-panel-header {
@@ -11798,18 +11860,13 @@ body:has(.main-layout) {
     border-radius: 3px;
   }
 
-  /* 3. Calendar View Split-Pane Layout */
-  .calendar-main-layout {
-    padding: 1rem 1rem 3rem !important;
-    max-width: 100% !important;
-  }
-
+  /* 4. Calendar View Split-Pane Layout */
   .calendar-view-container {
     display: grid !important;
     grid-template-columns: 1.35fr 1fr !important;
     grid-template-rows: auto 1fr !important;
     gap: 1rem !important;
-    height: calc(100vh - 100px) !important;
+    height: calc(100vh - 140px) !important;
     overflow: hidden !important;
   }
 
@@ -11915,19 +11972,11 @@ body:has(.main-layout) {
   .calendar-list-view {
     grid-column: 1 / span 2 !important;
     overflow-y: auto !important;
-    max-height: calc(100vh - 180px) !important;
+    max-height: calc(100vh - 200px) !important;
     padding-right: 0.4rem !important;
   }
 
-  /* 4. Community Board (ShareBoard) */
-  .share-board-container {
-    padding: 1rem 1rem 3rem !important;
-  }
-
-  .share-board-header {
-    margin-bottom: 1.2rem !important;
-  }
-
+  /* 5. Community Board (ShareBoard) */
   .share-board-title {
     font-size: 1.8rem !important;
   }
@@ -11941,15 +11990,7 @@ body:has(.main-layout) {
     padding: 1rem !important;
   }
 
-  /* 5. Profile Page Split Layout */
-  .profile-board-container {
-    padding: 1rem 1rem 3rem !important;
-  }
-
-  .profile-header-actions {
-    margin-bottom: 1rem !important;
-  }
-
+  /* 6. Profile Page Split Layout */
   .profile-layout-grid {
     grid-template-columns: 280px 1fr !important;
     gap: 1.2rem !important;
@@ -11977,10 +12018,10 @@ body:has(.main-layout) {
     padding: 0.6rem !important;
   }
 
-  /* 6. Login Page */
+  /* 7. Login Page */
   .login-page-container {
-    min-height: calc(100vh - 60px) !important;
-    padding: 1.5rem !important;
+    min-height: calc(100vh - 40px) !important;
+    padding: 1rem !important;
   }
 
   .login-card {
