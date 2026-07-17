@@ -689,10 +689,19 @@ function App() {
   const resolvedRemoteConcerts = useMemo(() => {
     return resolveTixcraftUrls(remoteConcerts)
   }, [remoteConcerts])
-  const sortedRemoteConcerts = useMemo(
-    () => [...resolvedRemoteConcerts].sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999')),
-    [resolvedRemoteConcerts],
-  )
+  const sortedRemoteConcerts = useMemo(() => {
+    const d = new Date()
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000
+    const taipeiTime = new Date(utc + 3600000 * 8)
+    const yyyy = taipeiTime.getFullYear()
+    const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+    const dd = String(taipeiTime.getDate()).padStart(2, '0')
+    const todayStr = `${yyyy}-${mm}-${dd}`
+
+    return [...resolvedRemoteConcerts]
+      .filter((c) => !c.date || c.date.trim() >= todayStr)
+      .sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999'))
+  }, [resolvedRemoteConcerts])
   const categoryCounts = useMemo(() => {
     const all = sortedRemoteConcerts.length
     const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒').length

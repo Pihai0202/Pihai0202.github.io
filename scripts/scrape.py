@@ -10,7 +10,7 @@ import re
 import sys
 import time
 import ssl
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from html import unescape
 from pathlib import Path
 from urllib.request import urlopen, Request
@@ -232,7 +232,9 @@ def match_venue(text):
 
 
 def today_str():
-    return datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    # Use Taiwan timezone (UTC+8) to prevent timezone mismatch in GitHub Actions (UTC)
+    tz_taiwan = timezone(timedelta(hours=8))
+    return datetime.now(tz_taiwan).strftime("%Y-%m-%d")
 
 
 # ── KKTIX ──────────────────────────────────────────────────────────────────
@@ -1089,7 +1091,8 @@ def scrape_indievox():
                 cards.append(card)
 
     # Fetch subsequent pages via AJAX
-    today_slash = datetime.now(timezone.utc).strftime("%Y/%m/%d")
+    tz_taiwan = timezone(timedelta(hours=8))
+    today_slash = datetime.now(tz_taiwan).strftime("%Y/%m/%d")
     offset = 1
     consecutive_empty = 0
     while True:
