@@ -11660,35 +11660,57 @@ body:has(.main-layout) {
   }
 }
 
-/* 2. Hide navigation button text labels, stats bar, and logo text on screens <= 1200px (Icon-only & compact mode) */
-@media (min-width: 769px) and (max-width: 1200px) {
-  /* Hide stats bar completely to save space */
+/* 2. Responsive header overrides for laptops/MacBooks (Compact & Icon-only modes) */
+@media (min-width: 769px) and (max-width: 1400px) {
+  /* Hide stats bar completely on laptops to save massive space */
   header .stats-bar {
     display: none !important;
   }
 
-  /* Hide logo text in capsule view to prevent overflow */
+  /* Hide logo subtitle to save space, keep title */
+  header .logo-text span {
+    display: none !important;
+  }
+
+  header .logo-text h1 {
+    font-size: 0.95rem !important;
+  }
+
+  header .header-search {
+    max-width: 160px !important;
+  }
+  
+  header {
+    gap: 10px !important;
+    padding: 0 12px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1280px) {
+  /* Hide logo text completely on smaller laptop widths */
   header .logo-text {
     display: none !important;
   }
 
+  /* Make nav buttons icon-only */
   header .nav-toggle-btn .btn-label {
     display: none !important;
   }
+  
   header .nav-toggle-btn svg {
     margin-right: 0 !important;
   }
-  header .profile-trigger-btn .btn-label {
-    display: none !important;
+
+  header .nav-toggle-btn {
+    padding: 8px !important;
+    width: 38px !important;
+    height: 38px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
   }
-  header .profile-trigger-btn svg {
-    margin-right: 0 !important;
-  }
-  header .login-trigger-btn .btn-label {
-    display: none !important;
-  }
-  header .login-trigger-btn svg {
-    margin-right: 0 !important;
+
+  header .header-search {
+    max-width: 130px !important;
   }
 }
 
