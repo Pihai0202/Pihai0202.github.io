@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-16T23:00:46.115755+00:00",
-  "count": 461,
+  "updated_at": "2026-07-17T00:08:23.348929+00:00",
+  "count": 460,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -12,31 +12,6 @@
     "中華職棒"
   ],
   "events": [
-    {
-      "id": "cpbl-2026-210",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：統一7-ELEVEn獅 vs 樂天桃猿",
-      "venue_raw": "樂天桃園",
-      "venue_id": "taoyuan-arena",
-      "venue_name": "桃園國際棒球場",
-      "city": "桃園",
-      "date": "2026-07-16",
-      "image": "https://www.cpbl.com.tw/files/atts/0L015574823122453305/2024_CPBL六隊Logo_R2_官網.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "樂天桃猿售票網",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39428"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
     {
       "id": "indievox-26_iv04085f2-2026-07-17",
       "source": "iNDIEVOX",
