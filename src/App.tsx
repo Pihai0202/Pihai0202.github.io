@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react'
 import { marked } from 'marked'
-import { Capacitor } from '@capacitor/core'
 import './App.css'
 
 import type {
@@ -582,10 +581,8 @@ function App() {
   useEffect(() => {
     const fetchSuspension = async () => {
       try {
-        const isNative = Capacitor.isNativePlatform()
-        const baseUrl = isNative ? 'https://pihai0202.github.io/' : import.meta.env.BASE_URL
         const response = await fetch(
-          `${baseUrl}suspension.json?t=${Date.now()}`,
+          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/suspension.json?t=${Date.now()}`,
           { cache: 'no-store' }
         )
         if (!response.ok) throw new Error('suspension.json not found')
@@ -796,11 +793,10 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
-      const isNative = Capacitor.isNativePlatform()
-      const baseUrl = isNative ? 'https://pihai0202.github.io/' : import.meta.env.BASE_URL
-      const response = await fetch(`${baseUrl}concerts.json?t=${Date.now()}`, {
-        cache: 'no-store',
-      })
+      const response = await fetch(
+        `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
+        { cache: 'no-store' }
+      )
       if (!response.ok) throw new Error('concerts.json not found')
 
       const data = (await response.json()) as RemoteConcertPayload
