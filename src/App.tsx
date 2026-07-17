@@ -1310,21 +1310,21 @@ function App() {
             type="button"
             onClick={() => setView('map')}
           >
-            <MapIcon style={{ marginRight: '6px' }} /> {t('tabMap')}
+            <MapIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('tabMap')}</span>
           </button>
           <button
             className={`nav-toggle-btn${view === 'calendar' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('calendar')}
           >
-            <CalendarIcon style={{ marginRight: '6px' }} /> {t('tabCalendar')}
+            <CalendarIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('tabCalendar')}</span>
           </button>
           <button
             className={`nav-toggle-btn${view === 'board' ? ' active' : ''}`}
             type="button"
             onClick={() => setView('board')}
           >
-            <MessageIcon style={{ marginRight: '6px' }} /> {t('tabCommunity')}
+            <MessageIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('tabCommunity')}</span>
           </button>
           <button
             className="theme-toggle-btn lang-toggle-btn"
@@ -1360,10 +1360,10 @@ function App() {
                 type="button"
                 onClick={() => setView('profile')}
               >
-                <UserIcon style={{ marginRight: '6px' }} /> {t('profile')}
+                <UserIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('profile')}</span>
               </button>
               <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
-                {t('logout')}
+                <span className="btn-label">{t('logout')}</span>
               </button>
             </div>
           ) : (
@@ -1372,7 +1372,7 @@ function App() {
               type="button"
               onClick={() => setView('login')}
             >
-              <KeyIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('login')}
+              <KeyIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> <span className="btn-label">{t('login')}</span>
             </button>
           )}
         </div>

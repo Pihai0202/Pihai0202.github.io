@@ -141,7 +141,7 @@ header {
   backdrop-filter: blur(12px);
 }
 
-@media (min-width: 769px) {
+@media (min-width: 1025px) {
   header {
     --sidebar-w: 420px;
     position: fixed !important;
@@ -173,7 +173,7 @@ header {
     max-width: calc(100% - 40px) !important;
   }
 
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     header {
       --sidebar-w: 360px;
     }
@@ -11619,4 +11619,65 @@ body:has(.main-layout) {
 
 .concert-card-delete-btn:active {
   transform: scale(0.95);
+}
+
+/* ==========================================================================
+   Tablet UI Adaptiveness Overrides (769px - 1024px) & Responsive Button Labels
+   ========================================================================== */
+
+/* 1. Header sizing and padding on tablet range (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  header {
+    padding: 0.8rem 1.5rem !important;
+    gap: 1rem !important;
+    height: 68px !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Hide logo text in tablet view to avoid narrow column overlap */
+  header .logo-text {
+    display: none !important;
+  }
+
+  /* Make sure the main layout height matches the non-floating header height */
+  .main-layout {
+    height: calc(100vh - 68px) !important;
+  }
+
+  /* Remove top paddings on pages that were meant to clear the floating header */
+  .calendar-main-layout,
+  .share-board-container,
+  .profile-board-container,
+  .login-page-container {
+    padding-top: 20px !important;
+  }
+
+  /* Adjust overlays position on map since header is now standard top bar */
+  .venue-panel-container,
+  .map-weather-overlay,
+  .shuangbei-popover {
+    top: 24px !important;
+  }
+}
+
+/* 2. Hide navigation button text labels on screens <= 1200px (Icon-only mode) */
+@media (min-width: 769px) and (max-width: 1200px) {
+  header .nav-toggle-btn .btn-label {
+    display: none !important;
+  }
+  header .nav-toggle-btn svg {
+    margin-right: 0 !important;
+  }
+  header .profile-trigger-btn .btn-label {
+    display: none !important;
+  }
+  header .profile-trigger-btn svg {
+    margin-right: 0 !important;
+  }
+  header .login-trigger-btn .btn-label {
+    display: none !important;
+  }
+  header .login-trigger-btn svg {
+    margin-right: 0 !important;
+  }
 }
