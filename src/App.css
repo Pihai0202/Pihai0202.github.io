@@ -11772,18 +11772,22 @@ body:has(.main-layout) {
     left: 50% !important;
     transform: translateX(-50%) !important;
     width: auto !important;
-    min-width: 480px !important;
+    min-width: auto !important;
     background: rgba(20, 20, 32, 0.8) !important;
     backdrop-filter: blur(16px) !important;
     -webkit-backdrop-filter: blur(16px) !important;
     border: 1px solid rgba(255, 255, 255, 0.15) !important;
     border-radius: 99px !important;
-    padding: 0.4rem 1.6rem !important;
+    padding: 0.4rem 1.2rem !important;
     box-shadow: 0 10px 35px rgba(0, 0, 0, 0.45) !important;
     z-index: 999 !important;
-    gap: 0.6rem !important;
+    gap: 0.5rem !important;
     align-items: center !important;
     justify-content: center !important;
+  }
+
+  .main-layout:not(.sidebar-collapsed) ~ .mobile-bottom-nav {
+    left: calc((100% - 340px) / 2) !important;
   }
 
   /* Adjust theme toggles or buttons on the floating dock */
@@ -11792,16 +11796,16 @@ body:has(.main-layout) {
     flex-direction: column !important;
     align-items: center !important;
     justify-content: center !important;
-    padding: 0.4rem 1rem !important;
-    border-radius: 20px !important;
+    padding: 0.4rem !important;
+    border-radius: 50% !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     color: var(--muted) !important;
     background: transparent !important;
     border: none !important;
     cursor: pointer !important;
     outline: none !important;
-    min-width: 70px !important;
-    height: 48px !important;
+    min-width: 44px !important;
+    height: 44px !important;
   }
 
   .bottom-nav-item.active {
@@ -11810,16 +11814,13 @@ body:has(.main-layout) {
   }
 
   .bottom-nav-item .icon {
-    font-size: 1.1rem !important;
+    font-size: 1.25rem !important;
     line-height: 1 !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 0 !important;
   }
 
   .bottom-nav-item .label {
-    font-size: 0.65rem !important;
-    font-weight: 600 !important;
-    letter-spacing: 0.05em !important;
-    display: inline !important; /* Force show label! */
+    display: none !important; /* Hide labels completely to make it clean and prevent wrapping */
   }
 
   /* Plus button on bottom dock */
@@ -11836,11 +11837,18 @@ body:has(.main-layout) {
 
   .bottom-nav-item-record .icon {
     margin-bottom: 0 !important;
-    font-size: 1.2rem !important;
+    font-size: 1.25rem !important;
   }
 
   .bottom-nav-item-record .label {
     display: none !important; /* Hide text for the record plus button to keep it clean */
+  }
+
+  /* Move map legend to top-left */
+  .map-legend {
+    top: 20px !important;
+    left: 320px !important;
+    bottom: auto !important;
   }
 
   /* Light Theme overrides for the Floating Dock */
