@@ -4749,18 +4749,7 @@ body.player-open .music-bar-toggle {
   }
 
   .logo-text {
-    display: flex !important;
-    flex-direction: column;
-  }
-
-  .logo-text h1 {
-    font-size: 1.05rem !important;
-  }
-
-  .logo-text span {
-    font-size: 0.55rem !important;
-    letter-spacing: 0.15em !important;
-    white-space: nowrap !important;
+    display: none !important;
   }
 
   .mobile-menu-toggle-btn {
