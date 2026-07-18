@@ -475,13 +475,18 @@ function App() {
     if (btn) {
       const localX = e.clientX - containerLeftRef.current
       const halfW = indicatorWidthRef.current / 2
-      const minLeft = 8
-      const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
+      
+      const firstBtn = cachedButtonsRef.current[0]
+      const lastBtn = cachedButtonsRef.current[cachedButtonsRef.current.length - 1]
+      const minLeft = firstBtn ? firstBtn.offsetLeft : 8
+      const maxLeft = lastBtn ? lastBtn.offsetLeft : containerWidthRef.current - indicatorWidthRef.current - 8
+      
       const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
       
       lastTargetLeftRef.current = targetLeft
 
-      highlightNavButton(btn, targetLeft, 1, 1, 0)
+      // Expand bubble by 1.12x when dragging starts
+      highlightNavButton(btn, targetLeft, 1.12, 1.12, 0)
     }
   }, [getButtonFromX, highlightNavButton])
 
@@ -493,8 +498,12 @@ function App() {
       indicatorWidthRef.current = btn.offsetWidth
       const localX = e.clientX - containerLeftRef.current
       const halfW = indicatorWidthRef.current / 2
-      const minLeft = 8
-      const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
+      
+      const firstBtn = cachedButtonsRef.current[0]
+      const lastBtn = cachedButtonsRef.current[cachedButtonsRef.current.length - 1]
+      const minLeft = firstBtn ? firstBtn.offsetLeft : 8
+      const maxLeft = lastBtn ? lastBtn.offsetLeft : containerWidthRef.current - indicatorWidthRef.current - 8
+      
       const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
 
       const now = performance.now()
@@ -514,7 +523,8 @@ function App() {
         skew = Math.min(speed * 9, 14) * direction
       }
 
-      highlightNavButton(btn, targetLeft, stretch, squish, skew)
+      // Expand bubble by 1.12x and apply physical velocity distortion
+      highlightNavButton(btn, targetLeft, stretch * 1.12, squish * 1.12, skew)
     }
   }, [isDraggingNav, getButtonFromX, highlightNavButton])
 
