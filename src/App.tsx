@@ -3017,7 +3017,6 @@ function App() {
         </>
       )}
 
-      {view !== 'login' && (
         <>
           <div
             className={`mobile-sidebar-overlay${isMobileSidebarOpen ? ' active' : ''}`}
@@ -3108,7 +3107,7 @@ function App() {
                 </button>
               ) : (
                 <button
-                  className="sidebar-nav-item"
+                  className={`sidebar-nav-item${view === 'login' ? ' active' : ''}`}
                   type="button"
                   onClick={() => {
                     setView('login')
@@ -3239,7 +3238,7 @@ function App() {
               <span className="label">{t('tabCommunity')}</span>
             </button>
             <button
-              className={`bottom-nav-item${view === 'profile' ? ' active' : ''}`}
+              className={`bottom-nav-item${(view === 'profile' || view === 'login') ? ' active' : ''}`}
               type="button"
               data-view="profile"
               onClick={() => {
@@ -3283,7 +3282,6 @@ function App() {
             <div className="nav-indicator-glide" style={indicatorStyle} />
           </div>
         </>
-      )}
       {toast && (
         <div className={`app-toast ${toast.type || 'info'}`}>
           {toast.type === 'success' && <CheckIcon size="1.15em" style={{ color: '#81c784', verticalAlign: 'middle', marginRight: '6px' }} />}
