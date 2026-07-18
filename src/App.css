@@ -7225,20 +7225,18 @@ body.player-open .music-bar-toggle {
   }
 
   .bottom-nav-item .icon {
-    font-size: 1.25rem;
-    margin-bottom: 2px;
+    font-size: 1.35rem;
+    margin-bottom: 0;
     transition: transform 0.2s ease;
     display: inline-block;
   }
 
   .bottom-nav-item.active .icon {
-    transform: translateY(-2px);
+    transform: scale(1.12);
   }
 
   .bottom-nav-item .label {
-    font-size: 0.65rem;
-    font-weight: 600;
-    letter-spacing: 0.05em;
+    display: none !important;
   }
 
   .bottom-nav-item.active {
