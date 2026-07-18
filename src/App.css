@@ -4744,11 +4744,11 @@ body.player-open .music-bar-toggle {
 
 @media (max-width: 768px) {
   :root {
-    --bottom-offset: 60px;
+    --bottom-offset: calc(60px + env(safe-area-inset-bottom));
   }
 
   body.player-open {
-    --bottom-offset: 150px;
+    --bottom-offset: calc(150px + env(safe-area-inset-bottom));
   }
 
   /* Clean up Header */
