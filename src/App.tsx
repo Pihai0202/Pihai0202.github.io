@@ -342,7 +342,22 @@ function App() {
 
   const [isDraggingNav, setIsDraggingNav] = useState(false)
 
+  const cachedButtonsRef = useRef<{
+    el: HTMLElement;
+    left: number;
+    right: number;
+    offsetLeft: number;
+    offsetTop: number;
+    offsetWidth: number;
+    offsetHeight: number;
+  }[]>([])
+
   const getButtonFromX = useCallback((clientX: number) => {
+    for (const item of cachedButtonsRef.current) {
+      if (clientX >= item.left && clientX <= item.right) {
+        return item.el
+      }
+    }
     if (!bottomNavRef.current) return null
     const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
     for (const btn of buttons) {
@@ -370,14 +385,28 @@ function App() {
   }, [])
 
   const highlightNavButton = useCallback((btn: HTMLElement) => {
-    setIndicatorStyle({
-      transform: `translate3d(${btn.offsetLeft}px, ${btn.offsetTop}px, 0)`,
-      width: btn.offsetWidth,
-      height: btn.offsetHeight,
-      opacity: 1,
-    })
+    const cached = cachedButtonsRef.current.find((i) => i.el === btn)
+    if (cached) {
+      setIndicatorStyle({
+        transform: `translate3d(${cached.offsetLeft}px, ${cached.offsetTop}px, 0)`,
+        width: cached.offsetWidth,
+        height: cached.offsetHeight,
+        opacity: 1,
+      })
+    } else {
+      setIndicatorStyle({
+        transform: `translate3d(${btn.offsetLeft}px, ${btn.offsetTop}px, 0)`,
+        width: btn.offsetWidth,
+        height: btn.offsetHeight,
+        opacity: 1,
+      })
+    }
 
-    if (bottomNavRef.current) {
+    if (cachedButtonsRef.current.length > 0) {
+      for (const item of cachedButtonsRef.current) {
+        item.el.classList.remove('hovered', 'neighbor')
+      }
+    } else if (bottomNavRef.current) {
       const buttons = bottomNavRef.current.querySelectorAll('.bottom-nav-item')
       buttons.forEach((el) => {
         el.classList.remove('hovered', 'neighbor')
@@ -385,16 +414,22 @@ function App() {
     }
     btn.classList.add('hovered')
 
-    if (btn.parentElement) {
-      const siblings = Array.from(btn.parentElement.children) as HTMLElement[]
-      const index = siblings.indexOf(btn)
-      // Highlight left neighbor
+    const index = cachedButtonsRef.current.findIndex((i) => i.el === btn)
+    if (index !== -1) {
       if (index > 0) {
-        siblings[index - 1].classList.add('neighbor')
+        cachedButtonsRef.current[index - 1].el.classList.add('neighbor')
       }
-      // Highlight right neighbor
-      if (index < siblings.length - 1) {
-        siblings[index + 1].classList.add('neighbor')
+      if (index < cachedButtonsRef.current.length - 1) {
+        cachedButtonsRef.current[index + 1].el.classList.add('neighbor')
+      }
+    } else if (btn.parentElement) {
+      const siblings = Array.from(btn.parentElement.children) as HTMLElement[]
+      const idx = siblings.indexOf(btn)
+      if (idx > 0) {
+        siblings[idx - 1].classList.add('neighbor')
+      }
+      if (idx < siblings.length - 1) {
+        siblings[idx + 1].classList.add('neighbor')
       }
     }
   }, [])
@@ -404,6 +439,23 @@ function App() {
     setIsDraggingNav(true)
     e.currentTarget.setPointerCapture(e.pointerId)
     bottomNavRef.current?.classList.add('dragging')
+
+    if (bottomNavRef.current) {
+      const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
+      cachedButtonsRef.current = buttons.map((btn) => {
+        const rect = btn.getBoundingClientRect()
+        return {
+          el: btn,
+          left: rect.left,
+          right: rect.right,
+          offsetLeft: btn.offsetLeft,
+          offsetTop: btn.offsetTop,
+          offsetWidth: btn.offsetWidth,
+          offsetHeight: btn.offsetHeight,
+        }
+      })
+    }
+
     const btn = getButtonFromX(e.clientX)
     if (btn) {
       highlightNavButton(btn)
@@ -442,6 +494,7 @@ function App() {
         btn.click()
       }
     }
+    cachedButtonsRef.current = []
     snapIndicatorToActive()
   }, [isDraggingNav, getButtonFromX, snapIndicatorToActive])
 
@@ -456,6 +509,7 @@ function App() {
         el.classList.remove('hovered', 'neighbor')
       })
     }
+    cachedButtonsRef.current = []
     snapIndicatorToActive()
   }, [snapIndicatorToActive])
 

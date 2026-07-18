@@ -4674,7 +4674,12 @@ body.player-open .music-bar-toggle {
   transition: transform 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
               width 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
               height 0.38s cubic-bezier(0.25, 1.25, 0.5, 1.15),
-              opacity 0.25s ease;
+}
+.mobile-bottom-nav.dragging .nav-indicator-glide {
+  transition: transform 0.08s cubic-bezier(0.1, 0.9, 0.2, 1),
+              width 0.08s cubic-bezier(0.1, 0.9, 0.2, 1),
+              height 0.08s cubic-bezier(0.1, 0.9, 0.2, 1),
+              opacity 0.15s ease !important;
 }
 /* Liquid glass fish-eye magnification styles on drag */
 .mobile-bottom-nav {
