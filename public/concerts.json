@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-18T08:23:34.492261+00:00",
-  "count": 483,
+  "updated_at": "2026-07-18T10:00:11.520678+00:00",
+  "count": 485,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -6959,22 +6959,42 @@
       ]
     },
     {
-      "id": "kktix-org-alofewa1-2026-09-12",
+      "id": "kktix-org-djutkwd4-2026-09-12",
       "source": "KKTIX",
-      "name": "【早鳥票】WATERBOMB KAOHSIUNG 水炸彈音樂節",
+      "name": "【雙日票】WATERBOMB KAOHSIUNG 水炸彈音樂節",
       "venue_raw": "高雄夢時代正對面廣場",
       "venue_id": null,
       "venue_name": null,
       "city": "",
       "date": "2026-09-12",
-      "image": "https://assets.kktix.io/upload_images/546855/KKTIX_BANNER_v2-3-01_medium.png",
-      "url": "https://wve.kktix.cc/events/alofewa1",
+      "image": "https://assets.kktix.io/upload_images/546859/KKTIX_BANNER_v2-3-01_medium.png",
+      "url": "https://wve.kktix.cc/events/djutkwd4",
       "price": "",
       "ticket_links": [
         {
           "platform": "kktix",
           "name": "KKTIX",
-          "url": "https://wve.kktix.cc/events/alofewa1"
+          "url": "https://wve.kktix.cc/events/djutkwd4"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-bhjfewb2-2026-09-12",
+      "source": "KKTIX",
+      "name": "【9/12單日票】WATERBOMB KAOHSIUNG 水炸彈音樂節",
+      "venue_raw": "高雄夢時代正對面廣場",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-12",
+      "image": "https://assets.kktix.io/upload_images/546857/KKTIX_BANNER_v2-3-01_medium.png",
+      "url": "https://wve.kktix.cc/events/bhjfewb2",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://wve.kktix.cc/events/bhjfewb2"
         }
       ]
     },
@@ -6995,6 +7015,26 @@
           "platform": "kktix",
           "name": "KKTIX",
           "url": "https://wve.kktix.cc/events/2026waterbomb-kh"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-alofewa1-2026-09-12",
+      "source": "KKTIX",
+      "name": "【早鳥票】WATERBOMB KAOHSIUNG 水炸彈音樂節",
+      "venue_raw": "高雄夢時代正對面廣場",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-12",
+      "image": "https://assets.kktix.io/upload_images/546855/KKTIX_BANNER_v2-3-01_medium.png",
+      "url": "https://wve.kktix.cc/events/alofewa1",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://wve.kktix.cc/events/alofewa1"
         }
       ]
     },
