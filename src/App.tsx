@@ -354,6 +354,8 @@ function App() {
 
   const lastTargetLeftRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
+  const startClientXRef = useRef<number>(0)
+  const didDragRef = useRef<boolean>(false)
   const containerLeftRef = useRef<number>(0)
   const containerWidthRef = useRef<number>(0)
   const indicatorWidthRef = useRef<number>(60)
@@ -446,6 +448,8 @@ function App() {
     bottomNavRef.current?.classList.add('dragging')
 
     lastTimeRef.current = performance.now()
+    startClientXRef.current = e.clientX
+    didDragRef.current = false
 
     if (bottomNavRef.current) {
       const rect = bottomNavRef.current.getBoundingClientRect()
@@ -494,6 +498,10 @@ function App() {
 
   const handleNavPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingNav) return
+
+    if (!didDragRef.current && Math.abs(e.clientX - startClientXRef.current) > 8) {
+      didDragRef.current = true
+    }
 
     const btn = getButtonFromX(e.clientX)
     if (btn) {
@@ -544,18 +552,27 @@ function App() {
       })
     }
 
-    const btn = getButtonFromX(e.clientX)
-    if (btn) {
-      const isUtility = btn.getAttribute('data-utility') === 'true'
-      const btnView = btn.getAttribute('data-view')
-      if (isUtility) {
-        btn.click()
-      } else if (btnView) {
-        btn.click()
+    // Only click the target button programmatically if we actually dragged.
+    // Tap gestures are handled natively by the browser to avoid double clicks.
+    if (didDragRef.current) {
+      const btn = getButtonFromX(e.clientX)
+      if (btn) {
+        const isUtility = btn.getAttribute('data-utility') === 'true'
+        const btnView = btn.getAttribute('data-view')
+        if (isUtility) {
+          btn.click()
+        } else if (btnView) {
+          btn.click()
+        }
       }
     }
+
     cachedButtonsRef.current = []
-    snapIndicatorToActive()
+    
+    // Always force an indicator snap reset with a short timeout to prevent bubble stopping halfway
+    setTimeout(() => {
+      snapIndicatorToActive()
+    }, 50)
   }, [isDraggingNav, getButtonFromX, snapIndicatorToActive])
 
   const handleNavPointerCancel = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
@@ -570,7 +587,9 @@ function App() {
       })
     }
     cachedButtonsRef.current = []
-    snapIndicatorToActive()
+    setTimeout(() => {
+      snapIndicatorToActive()
+    }, 50)
   }, [snapIndicatorToActive])
 
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
