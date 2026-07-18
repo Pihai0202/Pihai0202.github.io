@@ -352,7 +352,7 @@ function App() {
     offsetHeight: number;
   }[]>([])
 
-  const lastXRef = useRef<number>(0)
+  const lastTargetLeftRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const containerLeftRef = useRef<number>(0)
   const containerWidthRef = useRef<number>(0)
@@ -444,7 +444,6 @@ function App() {
     e.currentTarget.setPointerCapture(e.pointerId)
     bottomNavRef.current?.classList.add('dragging')
 
-    lastXRef.current = e.clientX
     lastTimeRef.current = performance.now()
 
     if (bottomNavRef.current) {
@@ -479,6 +478,8 @@ function App() {
       const minLeft = 8
       const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
       const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
+      
+      lastTargetLeftRef.current = targetLeft
 
       highlightNavButton(btn, targetLeft, 1, 1, 0)
     }
@@ -486,23 +487,6 @@ function App() {
 
   const handleNavPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingNav) return
-
-    const now = performance.now()
-    const dt = now - lastTimeRef.current
-    const dx = e.clientX - lastXRef.current
-    lastTimeRef.current = now
-    lastXRef.current = e.clientX
-
-    let stretch = 1
-    let squish = 1
-    let skew = 0
-    if (dt > 0 && Math.abs(dx) > 0.5) {
-      const speed = Math.abs(dx / dt) // px per ms
-      stretch = Math.min(1 + speed * 0.22, 1.45)
-      squish = Math.max(1 - speed * 0.1, 0.8)
-      const direction = dx > 0 ? 1 : -1
-      skew = Math.min(speed * 9, 14) * direction
-    }
 
     const btn = getButtonFromX(e.clientX)
     if (btn) {
@@ -512,6 +496,23 @@ function App() {
       const minLeft = 8
       const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
       const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
+
+      const now = performance.now()
+      const dt = now - lastTimeRef.current
+      const dx = targetLeft - lastTargetLeftRef.current
+      lastTimeRef.current = now
+      lastTargetLeftRef.current = targetLeft
+
+      let stretch = 1
+      let squish = 1
+      let skew = 0
+      if (dt > 0 && Math.abs(dx) > 0.1) {
+        const speed = Math.abs(dx / dt) // px per ms
+        stretch = Math.min(1 + speed * 0.22, 1.45)
+        squish = Math.max(1 - speed * 0.1, 0.8)
+        const direction = dx > 0 ? 1 : -1
+        skew = Math.min(speed * 9, 14) * direction
+      }
 
       highlightNavButton(btn, targetLeft, stretch, squish, skew)
     }
