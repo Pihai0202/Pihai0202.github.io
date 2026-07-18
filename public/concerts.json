@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-18T11:13:36.070050+00:00",
+  "updated_at": "2026-07-18T12:29:44.174606+00:00",
   "count": 483,
   "sources": [
     "KKTIX",
@@ -33,22 +33,22 @@
       ]
     },
     {
-      "id": "kktix-org-og6y7a1-2026-07-18",
+      "id": "kktix-org-af6b4633-2026-07-18",
       "source": "KKTIX",
-      "name": "【7/18】ON FIRE DAY 2026 滅火器台北小巨蛋演唱會",
-      "venue_raw": "「你愛相信，咱的夢，永遠遐爾媠」 和你一起青春熱血，陪你一起成家立業。人生中總有一首滅火器，陪你走過某段深刻的歲月。 人生這部電影仍繼續著，還有更多美好情節等著我們去創造。Let's Go！咱作伙繼續向前行。 金曲獎最佳樂團－滅火器，成軍 ",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
+      "name": "【7/18】Sabrina 胡恂舞《花皮 Florskyn》首張專輯同名演唱會 - 花皮中南巡迴場",
+      "venue_raw": "後台 Backstage Live",
+      "venue_id": "backstage-live",
+      "venue_name": "後台 Backstage Live",
+      "city": "高雄",
       "date": "2026-07-18",
-      "image": "https://assets.kktix.io/upload_images/311658/_7_18_2603_%E5%AD%90%E7%9A%BF_%E6%BB%85%E7%81%AB%E5%99%A8%E5%B0%8F%E5%B7%A8%E8%9B%8B_RESIZE_%E5%96%AE%E6%97%A5_KKTIX%E5%AE%98%E7%B6%B2_%E4%B9%9D%E5%AE%AE%E6%A0%BC_1200x630_medium.jpg",
-      "url": "https://kklivetw.kktix.cc/events/og6y7a1",
+      "image": "https://assets.kktix.io/upload_images/527207/_0528_sabrina_%E5%B0%88%E5%A0%B4KV_1200x630_medium.jpg",
+      "url": "https://umusic.kktix.cc/events/af6b4633",
       "price": "",
       "ticket_links": [
         {
           "platform": "kktix",
           "name": "KKTIX",
-          "url": "https://kklivetw.kktix.cc/events/og6y7a1"
+          "url": "https://umusic.kktix.cc/events/af6b4633"
         }
       ]
     },
@@ -6140,26 +6140,6 @@
       ]
     },
     {
-      "id": "kktix-org-pdiewc-2026-09-05",
-      "source": "KKTIX",
-      "name": "2026 洪佩瑜《開了又開》巡迴演唱會",
-      "venue_raw": "依活動頁為主",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-09-05",
-      "image": "https://assets.kktix.io/upload_images/547083/Resize_1200-630_medium.jpg",
-      "url": "https://kklivetw.kktix.cc/events/pdiewc",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kktix",
-          "name": "KKTIX",
-          "url": "https://kklivetw.kktix.cc/events/pdiewc"
-        }
-      ]
-    },
-    {
       "id": "kktix-org-qoekf-a1-2026-09-05",
       "source": "KKTIX",
       "name": "【臺中場】2026 洪佩瑜《開了又開》巡迴演唱會",
@@ -6176,6 +6156,26 @@
           "platform": "kktix",
           "name": "KKTIX",
           "url": "https://kklivetw.kktix.cc/events/qoekf-a1"
+        }
+      ]
+    },
+    {
+      "id": "kktix-org-pdiewc-2026-09-05",
+      "source": "KKTIX",
+      "name": "2026 洪佩瑜《開了又開》巡迴演唱會",
+      "venue_raw": "依活動頁為主",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-09-05",
+      "image": "https://assets.kktix.io/upload_images/547083/Resize_1200-630_medium.jpg",
+      "url": "https://kklivetw.kktix.cc/events/pdiewc",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kktix",
+          "name": "KKTIX",
+          "url": "https://kklivetw.kktix.cc/events/pdiewc"
         }
       ]
     },
