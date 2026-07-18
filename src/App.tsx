@@ -352,6 +352,9 @@ function App() {
     offsetHeight: number;
   }[]>([])
 
+  const lastXRef = useRef<number>(0)
+  const lastTimeRef = useRef<number>(0)
+
   const getButtonFromX = useCallback((clientX: number) => {
     for (const item of cachedButtonsRef.current) {
       if (clientX >= item.left && clientX <= item.right) {
@@ -384,22 +387,21 @@ function App() {
     }
   }, [])
 
-  const highlightNavButton = useCallback((btn: HTMLElement) => {
+  const highlightNavButton = useCallback((btn: HTMLElement, stretch = 1, squish = 1, skew = 0) => {
     const cached = cachedButtonsRef.current.find((i) => i.el === btn)
-    if (cached) {
-      setIndicatorStyle({
-        transform: `translate3d(${cached.offsetLeft}px, ${cached.offsetTop}px, 0)`,
-        width: cached.offsetWidth,
-        height: cached.offsetHeight,
-        opacity: 1,
-      })
-    } else {
-      setIndicatorStyle({
-        transform: `translate3d(${btn.offsetLeft}px, ${btn.offsetTop}px, 0)`,
-        width: btn.offsetWidth,
-        height: btn.offsetHeight,
-        opacity: 1,
-      })
+    const left = cached ? cached.offsetLeft : btn.offsetLeft
+    const width = cached ? cached.offsetWidth : btn.offsetWidth
+    const height = cached ? cached.offsetHeight : btn.offsetHeight
+    const top = cached ? cached.offsetTop : btn.offsetTop
+
+    if (bottomNavRef.current) {
+      const indicator = bottomNavRef.current.querySelector('.nav-indicator-glide') as HTMLElement
+      if (indicator) {
+        indicator.style.transform = `translate3d(${left}px, ${top}px, 0) scale(${stretch}, ${squish}) skewX(${skew}deg)`
+        indicator.style.width = `${width}px`
+        indicator.style.height = `${height}px`
+        indicator.style.opacity = '1'
+      }
     }
 
     if (cachedButtonsRef.current.length > 0) {
@@ -440,6 +442,9 @@ function App() {
     e.currentTarget.setPointerCapture(e.pointerId)
     bottomNavRef.current?.classList.add('dragging')
 
+    lastXRef.current = e.clientX
+    lastTimeRef.current = performance.now()
+
     if (bottomNavRef.current) {
       const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
       cachedButtonsRef.current = buttons.map((btn) => {
@@ -458,15 +463,33 @@ function App() {
 
     const btn = getButtonFromX(e.clientX)
     if (btn) {
-      highlightNavButton(btn)
+      highlightNavButton(btn, 1, 1, 0)
     }
   }, [getButtonFromX, highlightNavButton])
 
   const handleNavPointerMove = useCallback((e: React.PointerEvent<HTMLDivElement>) => {
     if (!isDraggingNav) return
+
+    const now = performance.now()
+    const dt = now - lastTimeRef.current
+    const dx = e.clientX - lastXRef.current
+    lastTimeRef.current = now
+    lastXRef.current = e.clientX
+
+    let stretch = 1
+    let squish = 1
+    let skew = 0
+    if (dt > 0 && Math.abs(dx) > 0.5) {
+      const speed = Math.abs(dx / dt) // px per ms
+      stretch = Math.min(1 + speed * 0.22, 1.45)
+      squish = Math.max(1 - speed * 0.1, 0.8)
+      const direction = dx > 0 ? 1 : -1
+      skew = Math.min(speed * 9, 14) * direction
+    }
+
     const btn = getButtonFromX(e.clientX)
     if (btn) {
-      highlightNavButton(btn)
+      highlightNavButton(btn, stretch, squish, skew)
     }
   }, [isDraggingNav, getButtonFromX, highlightNavButton])
 
