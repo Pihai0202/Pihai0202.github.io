@@ -365,7 +365,8 @@ function App() {
       }
     }
     if (!bottomNavRef.current) return null
-    const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
+    const buttons = (Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[])
+      .filter((btn) => btn.offsetWidth > 0)
     for (const btn of buttons) {
       const rect = btn.getBoundingClientRect()
       if (clientX >= rect.left && clientX <= rect.right) {
@@ -456,7 +457,8 @@ function App() {
         indicatorWidthRef.current = activeEl.offsetWidth
       }
 
-      const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
+      const buttons = (Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[])
+        .filter((btn) => btn.offsetWidth > 0)
       cachedButtonsRef.current = buttons.map((btn) => {
         const r = btn.getBoundingClientRect()
         return {
