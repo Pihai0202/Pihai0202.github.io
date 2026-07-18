@@ -354,6 +354,9 @@ function App() {
 
   const lastXRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
+  const containerLeftRef = useRef<number>(0)
+  const containerWidthRef = useRef<number>(0)
+  const indicatorWidthRef = useRef<number>(60)
 
   const getButtonFromX = useCallback((clientX: number) => {
     for (const item of cachedButtonsRef.current) {
@@ -387,9 +390,8 @@ function App() {
     }
   }, [])
 
-  const highlightNavButton = useCallback((btn: HTMLElement, stretch = 1, squish = 1, skew = 0) => {
+  const highlightNavButton = useCallback((btn: HTMLElement, targetLeft: number, stretch = 1, squish = 1, skew = 0) => {
     const cached = cachedButtonsRef.current.find((i) => i.el === btn)
-    const left = cached ? cached.offsetLeft : btn.offsetLeft
     const width = cached ? cached.offsetWidth : btn.offsetWidth
     const height = cached ? cached.offsetHeight : btn.offsetHeight
     const top = cached ? cached.offsetTop : btn.offsetTop
@@ -397,7 +399,7 @@ function App() {
     if (bottomNavRef.current) {
       const indicator = bottomNavRef.current.querySelector('.nav-indicator-glide') as HTMLElement
       if (indicator) {
-        indicator.style.transform = `translate3d(${left}px, ${top}px, 0) scale(${stretch}, ${squish}) skewX(${skew}deg)`
+        indicator.style.transform = `translate3d(${targetLeft}px, ${top}px, 0) scale(${stretch}, ${squish}) skewX(${skew}deg)`
         indicator.style.width = `${width}px`
         indicator.style.height = `${height}px`
         indicator.style.opacity = '1'
@@ -446,13 +448,22 @@ function App() {
     lastTimeRef.current = performance.now()
 
     if (bottomNavRef.current) {
+      const rect = bottomNavRef.current.getBoundingClientRect()
+      containerLeftRef.current = rect.left
+      containerWidthRef.current = rect.width
+
+      const activeEl = bottomNavRef.current.querySelector('.bottom-nav-item.active') as HTMLElement
+      if (activeEl) {
+        indicatorWidthRef.current = activeEl.offsetWidth
+      }
+
       const buttons = Array.from(bottomNavRef.current.querySelectorAll('.bottom-nav-item')) as HTMLElement[]
       cachedButtonsRef.current = buttons.map((btn) => {
-        const rect = btn.getBoundingClientRect()
+        const r = btn.getBoundingClientRect()
         return {
           el: btn,
-          left: rect.left,
-          right: rect.right,
+          left: r.left,
+          right: r.right,
           offsetLeft: btn.offsetLeft,
           offsetTop: btn.offsetTop,
           offsetWidth: btn.offsetWidth,
@@ -463,7 +474,13 @@ function App() {
 
     const btn = getButtonFromX(e.clientX)
     if (btn) {
-      highlightNavButton(btn, 1, 1, 0)
+      const localX = e.clientX - containerLeftRef.current
+      const halfW = indicatorWidthRef.current / 2
+      const minLeft = 8
+      const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
+      const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
+
+      highlightNavButton(btn, targetLeft, 1, 1, 0)
     }
   }, [getButtonFromX, highlightNavButton])
 
@@ -489,7 +506,14 @@ function App() {
 
     const btn = getButtonFromX(e.clientX)
     if (btn) {
-      highlightNavButton(btn, stretch, squish, skew)
+      indicatorWidthRef.current = btn.offsetWidth
+      const localX = e.clientX - containerLeftRef.current
+      const halfW = indicatorWidthRef.current / 2
+      const minLeft = 8
+      const maxLeft = containerWidthRef.current - indicatorWidthRef.current - 8
+      const targetLeft = Math.max(minLeft, Math.min(localX - halfW, maxLeft))
+
+      highlightNavButton(btn, targetLeft, stretch, squish, skew)
     }
   }, [isDraggingNav, getButtonFromX, highlightNavButton])
 
