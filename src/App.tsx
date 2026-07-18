@@ -3140,7 +3140,7 @@ function App() {
           </div>
           
           <div
-            className="mobile-bottom-nav"
+            className={`mobile-bottom-nav${isAnyModalOpen ? ' modal-open-hidden' : ''}`}
             ref={bottomNavRef}
             onPointerDown={handleNavPointerDown}
             onPointerMove={handleNavPointerMove}

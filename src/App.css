@@ -4687,6 +4687,9 @@ body.player-open .music-bar-toggle {
               height 0.22s cubic-bezier(0.25, 1.4, 0.5, 1),
               opacity 0.15s ease !important;
 }
+.mobile-bottom-nav.modal-open-hidden {
+  display: none !important;
+}
 /* Liquid glass fish-eye magnification styles on drag */
 .mobile-bottom-nav {
   transition: transform 0.25s cubic-bezier(0.2, 1, 0.2, 1),
