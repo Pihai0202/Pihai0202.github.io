@@ -8,6 +8,7 @@
 }
 
 :root {
+  --bottom-offset: 0px;
   --bg: #0d0b09;
   --bg-rgb: 13, 11, 9;
   --surface: #14120f;
@@ -4820,7 +4821,7 @@ body.player-open .music-bar-toggle {
   /* Mobile View Selector Tabs */
   .mobile-view-selector-tabs {
     display: flex !important;
-    position: absolute !important;
+    position: fixed !important;
     bottom: calc(var(--bottom-offset) + 16px) !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
