@@ -4705,11 +4705,11 @@ body.player-open .music-bar-toggle {
 }
 .mobile-bottom-nav.dragging {
   transform: scale(1.04) !important;
-  background: rgba(20, 20, 32, 0.9) !important;
+  background: var(--surface) !important;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.55) !important;
 }
 [data-theme='light'] .mobile-bottom-nav.dragging {
-  background: rgba(255, 255, 255, 0.95) !important;
+  background: var(--bg) !important;
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15) !important;
 }
 .bottom-nav-item {
@@ -7196,9 +7196,7 @@ body.player-open .music-bar-toggle {
     left: 0;
     right: 0;
     height: 60px;
-    background: rgba(var(--surface-rgb), 0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: var(--surface) !important;
     border-top: 1px solid var(--border);
     display: flex;
     justify-content: space-around;
@@ -7209,7 +7207,7 @@ body.player-open .music-bar-toggle {
   }
 
   [data-theme='light'] .mobile-bottom-nav {
-    background: rgba(var(--bg-rgb), 0.85);
+    background: var(--bg) !important;
     border-top-color: var(--border);
   }
 
