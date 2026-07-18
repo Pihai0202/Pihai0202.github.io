@@ -388,8 +388,21 @@ function App() {
         height: activeEl.offsetHeight,
         opacity: 1,
       })
+
+      // Force direct DOM style reset to clear any drag deformation scale/skew!
+      const indicator = bottomNavRef.current.querySelector('.nav-indicator-glide') as HTMLElement
+      if (indicator) {
+        indicator.style.transform = `translate3d(${activeEl.offsetLeft}px, ${activeEl.offsetTop}px, 0) scale(1, 1) skewX(0deg)`
+        indicator.style.width = `${activeEl.offsetWidth}px`
+        indicator.style.height = `${activeEl.offsetHeight}px`
+        indicator.style.opacity = '1'
+      }
     } else {
       setIndicatorStyle((prev) => ({ ...prev, opacity: 0 }))
+      const indicator = bottomNavRef.current.querySelector('.nav-indicator-glide') as HTMLElement
+      if (indicator) {
+        indicator.style.opacity = '0'
+      }
     }
   }, [])
 
