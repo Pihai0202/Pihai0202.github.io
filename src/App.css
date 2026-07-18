@@ -11873,27 +11873,6 @@ body:has(.main-layout) {
     display: none !important; /* Hide labels completely to make it clean and prevent wrapping */
   }
 
-  /* Plus button on bottom dock */
-  .bottom-nav-item-record {
-    background: linear-gradient(135deg, var(--gold) 0%, #ffc04d 100%) !important;
-    color: #000 !important;
-    border-radius: 50% !important;
-    width: 44px !important;
-    height: 44px !important;
-    min-width: 44px !important;
-    padding: 0 !important;
-    box-shadow: 0 4px 15px rgba(var(--gold-rgb), 0.3) !important;
-  }
-
-  .bottom-nav-item-record .icon {
-    margin-bottom: 0 !important;
-    font-size: 1.25rem !important;
-  }
-
-  .bottom-nav-item-record .label {
-    display: none !important; /* Hide text for the record plus button to keep it clean */
-  }
-
   /* Move map legend to top-left (below collapsed search button) */
   .map-legend {
     top: 90px !important;
