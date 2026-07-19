@@ -286,6 +286,7 @@ function App() {
   const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
   const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
+  const [editingConcertId, setEditingConcertId] = useState<string | null>(null)
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
   const [selectedTicket, setSelectedTicket] = useState<RemoteConcert | null>(null)
   const [form, setForm] = useState<ConcertForm>(EMPTY_FORM)
@@ -1341,6 +1342,7 @@ function App() {
       setFormVenueCity('台北')
     }
     setPendingMedia([])
+    setEditingConcertId(null)
     setSpotifyQuery('')
     setSpotifyResults([])
     setSpotifyStatus('')
@@ -1350,8 +1352,34 @@ function App() {
     setIsAddModalOpen(true)
   }
 
+  const openEditModal = (concert: Concert) => {
+    setForm({
+      artist: concert.artist,
+      concertName: concert.concertName || '',
+      date: concert.date || '',
+      seat: concert.seat || '',
+      notes: concert.notes || '',
+      spotifyUrl: concert.spotifyUrl || ''
+    })
+    setFormVenueId(concert.venueId)
+    setFormVenueName(concert.venueName)
+    setFormVenueCity(concert.venueCity)
+    setPendingMedia(concert.media)
+    setEditingConcertId(concert.id)
+
+    setSpotifyQuery('')
+    setSpotifyResults([])
+    setSpotifyStatus('')
+    setSelectedSpotify(null)
+    setSpotifyTab('artist')
+    setNotesActiveTab('edit')
+    setIsAddModalOpen(true)
+    setDetailConcertId(null) // Close the detail modal when editing
+  }
+
   const closeAddModal = () => {
     setNotesActiveTab('edit')
+    setEditingConcertId(null)
     setIsAddModalOpen(false)
   }
   const closeDetailModal = () => setDetailConcertId(null)
@@ -1486,7 +1514,7 @@ function App() {
     const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
     const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
 
-    const concertId = Date.now().toString()
+    const concertId = editingConcertId || Date.now().toString()
 
     showToast(lang === 'zh-TW' ? '正在儲存與上傳媒體檔案...' : 'Saving and uploading media files...', 'info')
 
@@ -1527,7 +1555,7 @@ function App() {
         return {
           id: mediaId,
           name: item.name,
-          dataUrl: '', // Leave empty to save localStorage space
+          dataUrl: item.dataUrl.startsWith('http') ? item.dataUrl : '', // If cloud url, keep it. Otherwise empty string.
           type: item.type
         }
       })
@@ -1545,7 +1573,7 @@ function App() {
       notes: form.notes.trim(),
       spotifyUrl: form.spotifyUrl.trim(),
       media: processedMedia,
-      createdAt: new Date().toISOString(),
+      createdAt: editingConcertId ? (concerts.find(c => c.id === editingConcertId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
     }
 
     // Keep base64 URLs in memory list for instant rendering in UI without flicker
@@ -1557,9 +1585,16 @@ function App() {
       }))
     }
 
-    const updatedList = [...concerts, concertForState]
+    let updatedList: Concert[]
+    if (editingConcertId) {
+      updatedList = concerts.map((c) => c.id === editingConcertId ? concertForState : c)
+    } else {
+      updatedList = [...concerts, concertForState]
+    }
+
     await updateConcertsList(updatedList)
     setIsAddModalOpen(false)
+    setEditingConcertId(null)
     showToast(lang === 'zh-TW' ? '紀錄已成功儲存！' : 'Record saved successfully!', 'success')
 
     logCustomEvent('add_concert_record', {
@@ -2814,6 +2849,12 @@ function App() {
               setIsPublishModalOpen(true)
               setDetailConcertId(null) // Close detail modal immediately
             }}
+            onEditConcert={openEditModal}
+            onDeleteConcert={(id) => {
+              deleteConcert(id, { stopPropagation: () => {} } as any)
+              setDetailConcertId(null) // Close detail modal after delete
+            }}
+            lang={lang}
           />
         </Modal>
       )}

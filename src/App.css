@@ -9776,6 +9776,67 @@ body.player-open .music-bar-toggle {
   max-width: 650px !important;
 }
 
+.detail-actions-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+[data-theme='light'] .detail-actions-row {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.detail-action-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 12px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.detail-action-btn.edit-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.detail-action-btn.edit-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme='light'] .detail-action-btn.edit-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  color: #333;
+}
+
+[data-theme='light'] .detail-action-btn.edit-btn:hover {
+  background: rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.detail-action-btn.delete-btn {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.detail-action-btn.delete-btn:hover {
+  background: rgba(239, 68, 68, 0.25);
+  border-color: rgba(239, 68, 68, 0.35);
+  box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);
+}
+
 .detail-modal-header {
   border-bottom: 1px solid var(--border);
   padding-bottom: 1rem;

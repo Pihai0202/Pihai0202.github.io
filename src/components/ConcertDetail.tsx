@@ -38,12 +38,18 @@ interface ConcertDetailProps {
   concert: Concert
   onOpenLightbox: (mediaIndex: number) => void
   onPublishToBoard: () => void
+  onEditConcert: (concert: Concert) => void
+  onDeleteConcert: (id: string) => void
+  lang?: string
 }
 
 export function ConcertDetail({
   concert,
   onOpenLightbox,
   onPublishToBoard,
+  onEditConcert,
+  onDeleteConcert,
+  lang = 'zh-TW',
 }: ConcertDetailProps) {
   const renderedHtml = useMemo(() => {
     if (!concert.notes) return ''
@@ -106,6 +112,23 @@ export function ConcertDetail({
           </div>
         </>
       )}
+
+      <div className="detail-actions-row">
+        <button
+          className="detail-action-btn edit-btn"
+          type="button"
+          onClick={() => onEditConcert(concert)}
+        >
+          {lang === 'zh-TW' ? '編輯記錄' : 'Edit Log'}
+        </button>
+        <button
+          className="detail-action-btn delete-btn"
+          type="button"
+          onClick={() => onDeleteConcert(concert.id)}
+        >
+          {lang === 'zh-TW' ? '刪除記錄' : 'Delete Log'}
+        </button>
+      </div>
     </>
   )
 }
