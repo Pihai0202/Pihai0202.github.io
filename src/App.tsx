@@ -1631,6 +1631,7 @@ function App() {
                 updateConcertsList(nextList)
                 return nextList
               })
+              showToast(lang === 'zh-TW' ? '媒體檔案雲端備份同步成功！' : 'Media cloud sync completed!', 'success')
               console.log('Background upload completed and synced to Firestore.')
             }
           } catch (bgErr) {
