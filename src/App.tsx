@@ -31,8 +31,8 @@ import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
-import { db, logCustomEvent, auth, storage, ref, uploadString, getDownloadURL } from './firebase'
-import { saveLocalMedia, getLocalMedia, deleteLocalMedia } from './utils/indexedDB'
+import { db, logCustomEvent, auth } from './firebase'
+import { deleteLocalMedia } from './utils/indexedDB'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
 import {
   MenuIcon,
@@ -1142,51 +1142,39 @@ function App() {
   }, [])
 
   const updateConcertsList = async (updatedList: Concert[]) => {
-    // Strip heavy base64 dataUrl before saving to localStorage/Firestore
-    const listToSave = updatedList.map((c) => ({
-      ...c,
-      media: (c.media || []).map((m) => {
-        if (m.dataUrl && (m.dataUrl.startsWith('http') || m.dataUrl.startsWith('https'))) {
-          return m
-        }
-        return { ...m, dataUrl: '' }
-      })
-    }))
-
     if (isLoggedIn && currentUser?.email) {
       const email = currentUser.email
       try {
         const docRef = doc(db, 'users_concerts', email)
         await setDoc(docRef, {
           email,
-          concerts: listToSave,
+          concerts: updatedList,
           updatedAt: new Date().toISOString()
         }, { merge: true })
         // Also update local cache for quick loading next time
-        localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(listToSave))
+        localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(updatedList))
       } catch (error) {
         console.error('Failed to save to Firestore:', error)
         showToast(
           lang === 'zh-TW' 
-            ? '同步至雲端失敗！可能因為照片或影片累計容量過大，請減少媒體檔案以利同步。' 
-            : 'Sync to cloud failed! Cumulative file size might be too large. Please reduce media files to sync.', 
+            ? '同步至雲端失敗！可能因為照片累計容量過大，請減少照片數量後再試。' 
+            : 'Sync to cloud failed! Cumulative file size might be too large. Please reduce photos to sync.', 
           'error'
         )
       }
     } else {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(listToSave))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList))
       } catch (error) {
         console.error('Failed to save guest concerts:', error)
         showToast(
           lang === 'zh-TW' 
-            ? '儲存失敗！本機儲存空間已滿，請刪除部分照片或影片後再試。' 
-            : 'Save failed! Local storage is full. Please delete some media files and try again.', 
+            ? '儲存失敗！本機儲存空間已滿，請減少照片數量後再試。' 
+            : 'Save failed! Local storage is full. Please reduce photos and try again.', 
           'error'
         )
       }
     }
-    // Update local state with the list (which contains base64 URLs for instant render)
     setConcerts(updatedList)
   }
 
@@ -1295,41 +1283,7 @@ function App() {
     }
   }, [isMusicBarVisible])
 
-  // Hydrate local IndexedDB media into React state
-  const unhydratedCount = concerts.reduce((acc, c) => {
-    return acc + (c.media || []).filter(m => m.id && !m.dataUrl).length
-  }, 0)
 
-  useEffect(() => {
-    let active = true
-    const hydrate = async () => {
-      let changed = false
-      const hydrated = await Promise.all(
-        concerts.map(async (c) => {
-          const hydratedMedia = await Promise.all(
-            (c.media || []).map(async (m) => {
-              if (m.id && !m.dataUrl && !m.dataUrl?.startsWith('http')) {
-                const localData = await getLocalMedia(m.id)
-                if (localData) {
-                  changed = true
-                  return { ...m, dataUrl: localData }
-                }
-              }
-              return m
-            })
-          )
-          return { ...c, media: hydratedMedia }
-        })
-      )
-      if (active && changed) {
-        setConcerts(hydrated)
-      }
-    }
-    hydrate()
-    return () => {
-      active = false
-    }
-  }, [unhydratedCount])
 
   const openAddModal = (date?: string, venue?: typeof VENUES[0] | null) => {
     const activeVenue = venue !== undefined ? venue : selectedVenue
@@ -1523,54 +1477,7 @@ function App() {
 
       const concertId = editingConcertId || Date.now().toString()
 
-      // Show toast and save instantly to IndexedDB to make UI response extremely fast
-      showToast(lang === 'zh-TW' ? '正在儲存紀錄並上傳檔案，請稍候...' : 'Saving record and uploading media, please wait...', 'info')
-
-      // 1. Process media list by uploading to Firebase Storage and IndexedDB synchronously
-      const processedMedia = await Promise.all(
-        (pendingMedia || []).map(async (item) => {
-          const mediaId = item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${item.name}`
-          const itemDataUrl = item.dataUrl || ''
-          
-          // 1. If logged in and it's a new base64 data, upload to Firebase Storage synchronously
-          if (isLoggedIn && currentUser?.email && itemDataUrl.startsWith('data:')) {
-            try {
-              const storageRef = ref(storage, `users/${currentUser.email}/concerts/${concertId}/${mediaId}`)
-              await uploadString(storageRef, itemDataUrl, 'data_url')
-              const downloadUrl = await getDownloadURL(storageRef)
-              
-              // Also cache locally in IndexedDB for instant offline load
-              await saveLocalMedia(mediaId, itemDataUrl)
-              
-              return {
-                id: mediaId,
-                name: item.name,
-                dataUrl: downloadUrl, // Store public cloud url
-                type: item.type
-              }
-            } catch (err) {
-              console.error('Failed to upload to Firebase Storage:', err)
-              // Fallback to local storage if upload fails
-            }
-          }
-          
-          // 2. Save to local IndexedDB (only if it's new base64 content)
-          if (itemDataUrl.startsWith('data:')) {
-            try {
-              await saveLocalMedia(mediaId, itemDataUrl)
-            } catch (err) {
-              console.error('Failed to save to local IndexedDB:', err)
-            }
-          }
-          
-          return {
-            id: mediaId,
-            name: item.name,
-            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // If cloud url, keep it. Otherwise empty string.
-            type: item.type
-          }
-        })
-      )
+      showToast(lang === 'zh-TW' ? '正在儲存紀錄...' : 'Saving record...', 'info')
 
       const concert: Concert = {
         id: concertId,
@@ -1583,33 +1490,23 @@ function App() {
         seat: form.seat.trim(),
         notes: form.notes.trim(),
         spotifyUrl: form.spotifyUrl.trim(),
-        media: processedMedia,
+        media: pendingMedia || [],
         createdAt: editingConcertId ? (concerts.find(c => c.id === editingConcertId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
-      }
-
-      // Keep base64 URLs in memory list for instant rendering in UI without flicker
-      const concertForState: Concert = {
-        ...concert,
-        media: processedMedia.map((m, idx) => ({
-          ...m,
-          dataUrl: pendingMedia[idx]?.dataUrl || m.dataUrl
-        }))
       }
 
       let updatedList: Concert[]
       if (editingConcertId) {
-        updatedList = concerts.map((c) => c.id === editingConcertId ? concertForState : c)
+        updatedList = concerts.map((c) => c.id === editingConcertId ? concert : c)
       } else {
-        updatedList = [...concerts, concertForState]
+        updatedList = [...concerts, concert]
       }
 
-      // Save to Firestore and localStorage synchronously (so remote updates are immediately synced before closing)
       await updateConcertsList(updatedList)
       
       setIsAddModalOpen(false)
       setEditingConcertId(null)
       setIsSaving(false)
-      showToast(lang === 'zh-TW' ? '紀錄與檔案已成功儲存與同步！' : 'Record and media saved and synced successfully!', 'success')
+      showToast(lang === 'zh-TW' ? '紀錄已成功儲存並同步！' : 'Record saved and synced successfully!', 'success')
 
       logCustomEvent('add_concert_record', {
         venue_id: concert.venueId,
