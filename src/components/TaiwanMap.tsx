@@ -257,7 +257,7 @@ export function TaiwanMap({
       const zoomFactor = 1.08
       let newZoom = currentZoom
       if (e.deltaY < 0) {
-        newZoom = Math.min(7.5, currentZoom * zoomFactor)
+        newZoom = Math.min(9.99, currentZoom * zoomFactor)
       } else {
         newZoom = Math.max(0.7, currentZoom / zoomFactor)
       }
@@ -422,7 +422,7 @@ export function TaiwanMap({
 
         const ratio = distance / pinchStartDistanceRef.current
         let newZoom = pinchStartZoomRef.current * ratio
-        newZoom = Math.max(0.7, Math.min(7.5, newZoom))
+        newZoom = Math.max(0.7, Math.min(9.99, newZoom))
 
         const svgRect = svgEl.getBoundingClientRect()
 
