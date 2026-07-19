@@ -28,7 +28,8 @@ const SHUANGBEI_VENUE_IDS = [
   'clapper-studio',
   'xinzhuang-gym',
   'ntpc-exhibition-center',
-  'ntpc-hall'
+  'ntpc-hall',
+  'linkou-arena'
 ]
 
 export function Stat({ number, label }: { number: number; label: string }) {
@@ -401,6 +402,7 @@ export function TaiwanMap({
         scheduleRafUpdate()
       } else if (e.touches.length === 2) {
         e.preventDefault() // Block browser native viewport zoom
+        didDragRef.current = true // Mark as drag/pinch gesture to prevent click trigger on release
         if (
           pinchStartDistanceRef.current === null ||
           pinchStartZoomRef.current === null ||
@@ -502,7 +504,8 @@ export function TaiwanMap({
     'asia-pacific-main',
     'chengcing-lake',
     'douliou',
-    'chiayi'
+    'chiayi',
+    'linkou-arena'
   ]
 
   const width = 800 / displayZoom
@@ -604,12 +607,40 @@ export function TaiwanMap({
             return (
               <g
                 key={venue.id}
+                data-venue-id={venue.id}
                 className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
                 transform={`translate(${project(venue.longitude || 0, venue.latitude || 0).x},${project(venue.longitude || 0, venue.latitude || 0).y})`}
                 onClick={(e) => {
                   if (isCategoryInactive || didDragRef.current) return
                   e.stopPropagation()
-                  onSelectVenue(venue.id)
+                  
+                  let targetVenueId = venue.id
+                  if (svgRef.current) {
+                    const groups = Array.from(svgRef.current.querySelectorAll('.venue-icon-group:not(.category-inactive)'))
+                    let minDistance = Infinity
+                    let closestId = venue.id
+                    
+                    groups.forEach((el) => {
+                      const vId = el.getAttribute('data-venue-id')
+                      if (vId) {
+                        const r = el.getBoundingClientRect()
+                        const cx = r.left + r.width / 2
+                        const cy = r.top + r.height / 2
+                        const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2))
+                        if (dist < minDistance) {
+                          minDistance = dist
+                          closestId = vId
+                        }
+                      }
+                    })
+                    
+                    // Snap to the closest venue within a reasonable 45px tap radius
+                    if (minDistance < 45) {
+                      targetVenueId = closestId
+                    }
+                  }
+                  
+                  onSelectVenue(targetVenueId)
                   setShowShuangbeiDetail(false)
                 }}
                 onMouseEnter={() => {
@@ -661,7 +692,7 @@ export function TaiwanMap({
           
           <div className="popover-map-container">
             <svg viewBox="495 205 125 115" className="shuangbei-mini-map">
-              {['Taipei', 'New Taipei', 'Keelung'].map((countyName) => (
+              {['Taipei', 'New Taipei', 'Keelung', 'Taoyuan'].map((countyName) => (
                 <path
                   key={countyName}
                   d={TAIWAN_PATHS[countyName]}
