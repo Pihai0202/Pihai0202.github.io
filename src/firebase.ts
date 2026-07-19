@@ -3,6 +3,8 @@ import { getFirestore } from 'firebase/firestore'
 import { getAnalytics, logEvent } from 'firebase/analytics'
 import { getAuth } from 'firebase/auth'
 
+import { getStorage } from 'firebase/storage'
+
 // Reads Firebase configuration from Vite environment variables
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -22,6 +24,10 @@ export const db = getFirestore(app)
 
 // Export Firebase Authentication
 export const auth = getAuth(app)
+
+// Export Firebase Storage
+export const storage = getStorage(app)
+export { ref, uploadString, getDownloadURL } from 'firebase/storage'
 
 // Initialize & Export Analytics (check if window is defined for SSR/build safety)
 export const analytics = typeof window !== 'undefined' && firebaseConfig.measurementId ? getAnalytics(app) : null

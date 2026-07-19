@@ -12,6 +12,7 @@ export type Venue = {
 }
 
 export type ConcertMedia = {
+  id?: string
   name: string
   dataUrl: string
   type: string
