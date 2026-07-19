@@ -6271,6 +6271,7 @@ body.player-open .music-bar-toggle {
 .profile-concert-table-wrapper {
   max-height: 320px;
   overflow-y: auto;
+  overflow-x: auto;
   border: 1px solid var(--border);
   border-radius: 8px;
   background: rgba(0, 0, 0, 0.1);
@@ -6278,14 +6279,18 @@ body.player-open .music-bar-toggle {
 
 .profile-concert-table {
   width: 100%;
+  min-width: 600px;
   border-collapse: collapse;
   text-align: left;
   font-size: 0.85rem;
+  table-layout: fixed;
 }
 
 .profile-concert-table th, .profile-concert-table td {
-  padding: 0.8rem 1rem;
+  padding: 0.8rem 0.6rem;
   border-bottom: 1px solid var(--border);
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
 .profile-concert-table th {
@@ -6296,6 +6301,39 @@ body.player-open .music-bar-toggle {
   position: sticky;
   top: 0;
   z-index: 1;
+}
+
+.profile-concert-table th:nth-child(1),
+.profile-concert-table td:nth-child(1) {
+  width: 100px;
+  white-space: nowrap;
+}
+
+.profile-concert-table th:nth-child(2),
+.profile-concert-table td:nth-child(2) {
+  width: 180px;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.profile-concert-table th:nth-child(3),
+.profile-concert-table td:nth-child(3) {
+  width: 100px;
+  white-space: nowrap;
+}
+
+.profile-concert-table th:nth-child(4),
+.profile-concert-table td:nth-child(4) {
+  width: 160px;
+  white-space: normal;
+  word-break: break-all;
+}
+
+.profile-concert-table th:nth-child(5),
+.profile-concert-table td:nth-child(5) {
+  width: 60px;
+  white-space: nowrap;
+  text-align: center;
 }
 
 .profile-concert-table tr:hover {
