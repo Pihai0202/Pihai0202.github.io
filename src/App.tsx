@@ -287,6 +287,7 @@ function App() {
   const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
   const [editingConcertId, setEditingConcertId] = useState<string | null>(null)
+  const [isSaving, setIsSaving] = useState(false)
   const [lightbox, setLightbox] = useState<{ concertId: string; mediaIndex: number } | null>(null)
   const [selectedTicket, setSelectedTicket] = useState<RemoteConcert | null>(null)
   const [form, setForm] = useState<ConcertForm>(EMPTY_FORM)
@@ -1515,6 +1516,7 @@ function App() {
     }
 
     try {
+      setIsSaving(true)
       const finalVenueId = formVenueId
       const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
       const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
@@ -1522,14 +1524,37 @@ function App() {
       const concertId = editingConcertId || Date.now().toString()
 
       // Show toast and save instantly to IndexedDB to make UI response extremely fast
-      showToast(lang === 'zh-TW' ? '正在儲存紀錄...' : 'Saving record...', 'info')
+      showToast(lang === 'zh-TW' ? '正在儲存紀錄並上傳檔案，請稍候...' : 'Saving record and uploading media, please wait...', 'info')
 
-      // 1. Process media list instantly by caching all new base64 files to IndexedDB
+      // 1. Process media list by uploading to Firebase Storage and IndexedDB synchronously
       const processedMedia = await Promise.all(
         (pendingMedia || []).map(async (item) => {
           const mediaId = item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${item.name}`
           const itemDataUrl = item.dataUrl || ''
           
+          // 1. If logged in and it's a new base64 data, upload to Firebase Storage synchronously
+          if (isLoggedIn && currentUser?.email && itemDataUrl.startsWith('data:')) {
+            try {
+              const storageRef = ref(storage, `users/${currentUser.email}/concerts/${concertId}/${mediaId}`)
+              await uploadString(storageRef, itemDataUrl, 'data_url')
+              const downloadUrl = await getDownloadURL(storageRef)
+              
+              // Also cache locally in IndexedDB for instant offline load
+              await saveLocalMedia(mediaId, itemDataUrl)
+              
+              return {
+                id: mediaId,
+                name: item.name,
+                dataUrl: downloadUrl, // Store public cloud url
+                type: item.type
+              }
+            } catch (err) {
+              console.error('Failed to upload to Firebase Storage:', err)
+              // Fallback to local storage if upload fails
+            }
+          }
+          
+          // 2. Save to local IndexedDB (only if it's new base64 content)
           if (itemDataUrl.startsWith('data:')) {
             try {
               await saveLocalMedia(mediaId, itemDataUrl)
@@ -1541,7 +1566,7 @@ function App() {
           return {
             id: mediaId,
             name: item.name,
-            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // Empty for local data to save Firestore space
+            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // If cloud url, keep it. Otherwise empty string.
             type: item.type
           }
         })
@@ -1578,11 +1603,13 @@ function App() {
         updatedList = [...concerts, concertForState]
       }
 
-      // Update local state and localStorage instantly (so modal closes and updates immediately!)
+      // Save to Firestore and localStorage synchronously (so remote updates are immediately synced before closing)
       await updateConcertsList(updatedList)
+      
       setIsAddModalOpen(false)
       setEditingConcertId(null)
-      showToast(lang === 'zh-TW' ? '紀錄已成功儲存！' : 'Record saved successfully!', 'success')
+      setIsSaving(false)
+      showToast(lang === 'zh-TW' ? '紀錄與檔案已成功儲存與同步！' : 'Record and media saved and synced successfully!', 'success')
 
       logCustomEvent('add_concert_record', {
         venue_id: concert.venueId,
@@ -1590,57 +1617,9 @@ function App() {
         artist: concert.artist,
         concert_name: concert.concertName
       })
-
-      // 2. If logged in, trigger Firebase Storage upload in the background
-      if (isLoggedIn && currentUser?.email) {
-        const email = currentUser.email
-        const currentPendingMedia = [...pendingMedia] // clone to prevent closure references changing
-        
-        setTimeout(async () => {
-          try {
-            let hasChanges = false
-            const finalMedia = await Promise.all(
-              processedMedia.map(async (m, idx) => {
-                const originalDataUrl = currentPendingMedia[idx]?.dataUrl || ''
-                // Only upload if it's a new base64 dataUrl
-                if (originalDataUrl.startsWith('data:')) {
-                  try {
-                    const storageRef = ref(storage, `users/${email}/concerts/${concertId}/${m.id}`)
-                    await uploadString(storageRef, originalDataUrl, 'data_url')
-                    const downloadUrl = await getDownloadURL(storageRef)
-                    hasChanges = true
-                    return { ...m, dataUrl: downloadUrl }
-                  } catch (uploadErr) {
-                    console.error('Background upload failed for media:', m.id, uploadErr)
-                  }
-                }
-                return m
-              })
-            )
-            
-            if (hasChanges) {
-              // Update state and remote Firestore with the new public cloud URLs
-              setConcerts((currentConcerts) => {
-                const nextList = currentConcerts.map((c) => {
-                  if (c.id === concertId) {
-                    return { ...c, media: finalMedia }
-                  }
-                  return c
-                })
-                // Save to Firestore and localStorage
-                updateConcertsList(nextList)
-                return nextList
-              })
-              showToast(lang === 'zh-TW' ? '媒體檔案雲端備份同步成功！' : 'Media cloud sync completed!', 'success')
-              console.log('Background upload completed and synced to Firestore.')
-            }
-          } catch (bgErr) {
-            console.error('Background media sync process failed:', bgErr)
-          }
-        }, 100)
-      }
     } catch (err) {
       console.error('Error in saveConcert:', err)
+      setIsSaving(false)
       showToast(lang === 'zh-TW' ? '儲存失敗！發生未知錯誤。' : 'Save failed! An unknown error occurred.', 'error')
     }
   }
@@ -2873,8 +2852,17 @@ function App() {
             <MediaPreviewGrid media={pendingMedia} onRemove={removePendingMedia} />
           </div>
 
-          <button className="modal-submit" type="button" onClick={saveConcert}>
-            {lang === 'zh-TW' ? '儲存記錄' : 'Save Log'} <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />
+          <button
+            className="modal-submit"
+            type="button"
+            onClick={saveConcert}
+            disabled={isSaving}
+            style={isSaving ? { opacity: 0.7, cursor: 'not-allowed' } : undefined}
+          >
+            {isSaving
+              ? (lang === 'zh-TW' ? '正在上傳與儲存...' : 'Saving and uploading...')
+              : (lang === 'zh-TW' ? '儲存記錄' : 'Save Log')}
+            {!isSaving && <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />}
           </button>
         </Modal>
       )}
