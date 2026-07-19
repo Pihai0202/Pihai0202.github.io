@@ -88,11 +88,11 @@ export function ConcertDetail({
         </div>
       )}
 
-      {concert.media.length > 0 && (
+      {concert.media && concert.media.length > 0 && (
         <>
           <div className="section-title">— 照片 / 影片 —</div>
           <div className="media-gallery">
-            {concert.media.map((item: ConcertMedia, index: number) => (
+            {(concert.media || []).map((item: ConcertMedia, index: number) => (
               <button
                 className="gallery-item"
                 type="button"

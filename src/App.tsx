@@ -1144,7 +1144,7 @@ function App() {
     // Strip heavy base64 dataUrl before saving to localStorage/Firestore
     const listToSave = updatedList.map((c) => ({
       ...c,
-      media: c.media.map((m) => {
+      media: (c.media || []).map((m) => {
         if (m.dataUrl && (m.dataUrl.startsWith('http') || m.dataUrl.startsWith('https'))) {
           return m
         }
@@ -1302,7 +1302,7 @@ function App() {
       const hydrated = await Promise.all(
         concerts.map(async (c) => {
           const hydratedMedia = await Promise.all(
-            c.media.map(async (m) => {
+            (c.media || []).map(async (m) => {
               if (m.id && !m.dataUrl && !m.dataUrl?.startsWith('http')) {
                 const localData = await getLocalMedia(m.id)
                 if (localData) {
@@ -1517,37 +1517,15 @@ function App() {
 
       const concertId = editingConcertId || Date.now().toString()
 
-      showToast(lang === 'zh-TW' ? '正在儲存與上傳媒體檔案...' : 'Saving and uploading media files...', 'info')
+      // Show toast and save instantly to IndexedDB to make UI response extremely fast
+      showToast(lang === 'zh-TW' ? '正在儲存紀錄...' : 'Saving record...', 'info')
 
-      // Handle media processing
+      // 1. Process media list instantly by caching all new base64 files to IndexedDB
       const processedMedia = await Promise.all(
-        pendingMedia.map(async (item) => {
+        (pendingMedia || []).map(async (item) => {
           const mediaId = item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${item.name}`
           const itemDataUrl = item.dataUrl || ''
           
-          // 1. If logged in and it's a new base64 data, upload to Firebase Storage
-          if (isLoggedIn && currentUser?.email && itemDataUrl.startsWith('data:')) {
-            try {
-              const storageRef = ref(storage, `users/${currentUser.email}/concerts/${concertId}/${mediaId}`)
-              await uploadString(storageRef, itemDataUrl, 'data_url')
-              const downloadUrl = await getDownloadURL(storageRef)
-              
-              // Also cache locally in IndexedDB for instant offline load
-              await saveLocalMedia(mediaId, itemDataUrl)
-              
-              return {
-                id: mediaId,
-                name: item.name,
-                dataUrl: downloadUrl, // Store public cloud url
-                type: item.type
-              }
-            } catch (err) {
-              console.error('Failed to upload to Firebase Storage:', err)
-              // Fallback to local storage if upload fails
-            }
-          }
-          
-          // 2. Save to local IndexedDB for guests (only if it's new base64 content)
           if (itemDataUrl.startsWith('data:')) {
             try {
               await saveLocalMedia(mediaId, itemDataUrl)
@@ -1555,11 +1533,11 @@ function App() {
               console.error('Failed to save to local IndexedDB:', err)
             }
           }
-
+          
           return {
             id: mediaId,
             name: item.name,
-            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // If cloud url, keep it. Otherwise empty string.
+            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // Empty for local data to save Firestore space
             type: item.type
           }
         })
@@ -1596,6 +1574,7 @@ function App() {
         updatedList = [...concerts, concertForState]
       }
 
+      // Update local state and localStorage instantly (so modal closes and updates immediately!)
       await updateConcertsList(updatedList)
       setIsAddModalOpen(false)
       setEditingConcertId(null)
@@ -1607,6 +1586,54 @@ function App() {
         artist: concert.artist,
         concert_name: concert.concertName
       })
+
+      // 2. If logged in, trigger Firebase Storage upload in the background
+      if (isLoggedIn && currentUser?.email) {
+        const email = currentUser.email
+        const currentPendingMedia = [...pendingMedia] // clone to prevent closure references changing
+        
+        setTimeout(async () => {
+          try {
+            let hasChanges = false
+            const finalMedia = await Promise.all(
+              processedMedia.map(async (m, idx) => {
+                const originalDataUrl = currentPendingMedia[idx]?.dataUrl || ''
+                // Only upload if it's a new base64 dataUrl
+                if (originalDataUrl.startsWith('data:')) {
+                  try {
+                    const storageRef = ref(storage, `users/${email}/concerts/${concertId}/${m.id}`)
+                    await uploadString(storageRef, originalDataUrl, 'data_url')
+                    const downloadUrl = await getDownloadURL(storageRef)
+                    hasChanges = true
+                    return { ...m, dataUrl: downloadUrl }
+                  } catch (uploadErr) {
+                    console.error('Background upload failed for media:', m.id, uploadErr)
+                  }
+                }
+                return m
+              })
+            )
+            
+            if (hasChanges) {
+              // Update state and remote Firestore with the new public cloud URLs
+              setConcerts((currentConcerts) => {
+                const nextList = currentConcerts.map((c) => {
+                  if (c.id === concertId) {
+                    return { ...c, media: finalMedia }
+                  }
+                  return c
+                })
+                // Save to Firestore and localStorage
+                updateConcertsList(nextList)
+                return nextList
+              })
+              console.log('Background upload completed and synced to Firestore.')
+            }
+          } catch (bgErr) {
+            console.error('Background media sync process failed:', bgErr)
+          }
+        }, 100)
+      }
     } catch (err) {
       console.error('Error in saveConcert:', err)
       showToast(lang === 'zh-TW' ? '儲存失敗！發生未知錯誤。' : 'Save failed! An unknown error occurred.', 'error')
