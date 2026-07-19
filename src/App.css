@@ -9047,7 +9047,18 @@ body.player-open .music-bar-toggle {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
   width: 220px;
   padding: 10px;
-  animation: fadeInScale 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.overlap-venues-popover.position-top {
+  transform: translate(-50%, -100%);
+  margin-top: -15px;
+  animation: fadeInScaleTop 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.overlap-venues-popover.position-bottom {
+  transform: translate(-50%, 0);
+  margin-top: 15px;
+  animation: fadeInScaleBottom 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
 [data-theme='light'] .overlap-venues-popover {
@@ -9156,7 +9167,7 @@ body.player-open .music-bar-toggle {
   opacity: 0.5;
 }
 
-@keyframes fadeInScale {
+@keyframes fadeInScaleTop {
   from {
     opacity: 0;
     transform: translate(-50%, -100%) scale(0.95);
@@ -9164,6 +9175,17 @@ body.player-open .music-bar-toggle {
   to {
     opacity: 1;
     transform: translate(-50%, -100%) scale(1);
+  }
+}
+
+@keyframes fadeInScaleBottom {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 0) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0) scale(1);
   }
 }
 

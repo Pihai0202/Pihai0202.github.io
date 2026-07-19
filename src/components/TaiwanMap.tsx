@@ -805,13 +805,11 @@ export function TaiwanMap({
 
       {overlappingVenues && overlapPos && (
         <div
-          className="overlap-venues-popover"
+          className={`overlap-venues-popover ${overlapPos.y < 200 ? 'position-bottom' : 'position-top'}`}
           style={{
             position: 'absolute',
             left: overlapPos.x,
             top: overlapPos.y,
-            transform: 'translate(-50%, -100%)',
-            marginTop: '-15px',
             zIndex: 1000,
           }}
         >
