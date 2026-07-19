@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-19T15:34:14.633706+00:00",
-  "count": 476,
+  "updated_at": "2026-07-19T17:02:02.148795+00:00",
+  "count": 472,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -12,88 +12,6 @@
     "中華職棒"
   ],
   "events": [
-    {
-      "id": "tixcraft-26_kumachan-2026-07-19",
-      "source": "拓元售票",
-      "name": "熊仔 Kumachan 《人格特化療程→0》演唱會",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-07-19",
-      "image": "https://static.tixcraft.com/images/activity/26_kumachan_d630b14221979a1f19c5341c8721c9fd.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_kumachan",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_kumachan"
-        }
-      ]
-    },
-    {
-      "id": "tixcraft-26_exokh-2026-07-19",
-      "source": "拓元售票",
-      "name": "EXO PLANET #6 - EXhOrizon in KAOHSIUNG",
-      "venue_raw": "高雄巨蛋",
-      "venue_id": "kaohsiung-dome",
-      "venue_name": "高雄巨蛋",
-      "city": "高雄",
-      "date": "2026-07-19",
-      "image": "https://static.tixcraft.com/images/activity/26_exokh_0d75c0fce70aea4df7328c6c3bf22437.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_exokh",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_exokh"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv0408689-2026-07-19",
-      "source": "iNDIEVOX",
-      "name": "7.19（日）DISORDER LIVE ＃19",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-07-19",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0408689",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0408689"
-        }
-      ]
-    },
-    {
-      "id": "ticketplus-ee8b30fcf59c8529bf2959ec8cf41c22-d4b863bb1e9e54dadfc096f853670cf0",
-      "source": "遠大售票",
-      "name": "PLINI ASIA TOUR LIVE IN TAIPEI",
-      "venue_raw": "The Wall Live House 台北市文山區羅斯福路四段200號",
-      "venue_id": "the-wall",
-      "venue_name": "The Wall Live House",
-      "city": "台北",
-      "date": "2026-07-19",
-      "image": "https://static.ticketplus.com.tw/event/ee8b30fcf59c8529bf2959ec8cf41c22/picBigHomeThumbnail_1773727910280.jpeg",
-      "url": "https://ticketplus.com.tw/activity/ee8b30fcf59c8529bf2959ec8cf41c22",
-      "price": "900 - 1800",
-      "artist": "",
-      "category": "concert",
-      "ticket_links": [
-        {
-          "platform": "ticketplus",
-          "name": "遠大售票",
-          "url": "https://ticketplus.com.tw/activity/ee8b30fcf59c8529bf2959ec8cf41c22"
-        }
-      ]
-    },
     {
       "id": "cpbl-2026-211",
       "source": "中華職棒",
@@ -1555,26 +1473,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0413135-2026-08-01",
-      "source": "iNDIEVOX",
-      "name": "《迴響17週 x Sound Circuit Festa》",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-08-01",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0413135",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0413135"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04110f1-2026-08-01",
       "source": "iNDIEVOX",
       "name": "BUTTER RIOT presents：Right here，RIOT now",
@@ -1595,22 +1493,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0409277-2026-08-01",
+      "id": "indievox-26_iv0413135-2026-08-01",
       "source": "iNDIEVOX",
-      "name": "77 莊永麒「從陌生人變陌生人 EP發佈專場」",
-      "venue_raw": "LIVE WAREHOUSE",
-      "venue_id": "kaohsiung-music-center",
-      "venue_name": "LIVE WAREHOUSE",
-      "city": "高雄",
+      "name": "《迴響17週 x Sound Circuit Festa》",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-08-01",
       "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0409277",
+      "url": "https://www.indievox.com/activity/detail/26_iv0413135",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0409277"
+          "url": "https://www.indievox.com/activity/detail/26_iv0413135"
         }
       ]
     },
@@ -1651,6 +1549,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv040937b"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0409277-2026-08-01",
+      "source": "iNDIEVOX",
+      "name": "77 莊永麒「從陌生人變陌生人 EP發佈專場」",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "kaohsiung-music-center",
+      "venue_name": "LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2026-08-01",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0409277",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0409277"
         }
       ]
     },
@@ -2243,26 +2161,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0408171-2026-08-07",
-      "source": "iNDIEVOX",
-      "name": "傻子與白痴《笨笨的事情 Foolish Things》台北場",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-08-07",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0408171",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0408171"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0410257-2026-08-07",
       "source": "iNDIEVOX",
       "name": "庸俗救星【B-side 小巡迴】台北場",
@@ -2279,6 +2177,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0410257"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0408171-2026-08-07",
+      "source": "iNDIEVOX",
+      "name": "傻子與白痴《笨笨的事情 Foolish Things》台北場",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-08-07",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0408171",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0408171"
         }
       ]
     },
@@ -2751,22 +2669,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0408284-2026-08-09",
+      "id": "indievox-26_iv0409470-2026-08-09",
       "source": "iNDIEVOX",
-      "name": "傻子與白痴《笨笨的事情 Foolish Things》高雄場",
-      "venue_raw": "後台Backstage Live",
-      "venue_id": "backstage-live",
-      "venue_name": "後台",
-      "city": "高雄",
+      "name": "庸俗救星【B-side小巡迴】台中場",
+      "venue_raw": "The Pillars 柱",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-08-09",
       "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0408284",
+      "url": "https://www.indievox.com/activity/detail/26_iv0409470",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0408284"
+          "url": "https://www.indievox.com/activity/detail/26_iv0409470"
         }
       ]
     },
@@ -2791,22 +2709,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0409470-2026-08-09",
+      "id": "indievox-26_iv0408284-2026-08-09",
       "source": "iNDIEVOX",
-      "name": "庸俗救星【B-side小巡迴】台中場",
-      "venue_raw": "The Pillars 柱",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
+      "name": "傻子與白痴《笨笨的事情 Foolish Things》高雄場",
+      "venue_raw": "後台Backstage Live",
+      "venue_id": "backstage-live",
+      "venue_name": "後台",
+      "city": "高雄",
       "date": "2026-08-09",
       "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0409470",
+      "url": "https://www.indievox.com/activity/detail/26_iv0408284",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0409470"
+          "url": "https://www.indievox.com/activity/detail/26_iv0408284"
         }
       ]
     },
@@ -3892,26 +3810,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0408713-2026-08-16",
-      "source": "iNDIEVOX",
-      "name": "8.16（日）烙聲派對 LOUD SONIC FUCK’N SUMMER PARTY",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-08-16",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0408713",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0408713"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04089ea-2026-08-16",
       "source": "iNDIEVOX",
       "name": "That’s My Shhh + 國語作業簿 Present： 「TM國2」",
@@ -3928,6 +3826,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04089ea"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0408713-2026-08-16",
+      "source": "iNDIEVOX",
+      "name": "8.16（日）烙聲派對 LOUD SONIC FUCK’N SUMMER PARTY",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-08-16",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0408713",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0408713"
         }
       ]
     },
@@ -4243,26 +4161,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0411853-2026-08-21",
-      "source": "iNDIEVOX",
-      "name": "《陰森童話故事集 - 亞普恩的魔法棒》－高雄",
-      "venue_raw": "LIVE WAREHOUSE",
-      "venue_id": "kaohsiung-music-center",
-      "venue_name": "LIVE WAREHOUSE",
-      "city": "高雄",
-      "date": "2026-08-21",
-      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0411853",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0411853"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04137d8-2026-08-21",
       "source": "iNDIEVOX",
       "name": "大範大聲（tuā-pān tuā-siann）Vol.01 SADOG X Yo Chen",
@@ -4279,6 +4177,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04137d8"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0411853-2026-08-21",
+      "source": "iNDIEVOX",
+      "name": "《陰森童話故事集 - 亞普恩的魔法棒》－高雄",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "kaohsiung-music-center",
+      "venue_name": "LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2026-08-21",
+      "image": "https://www.indievox.com/themes/iNDIEVOX/images/no-image1.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0411853",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0411853"
         }
       ]
     },
