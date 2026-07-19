@@ -1510,99 +1510,107 @@ function App() {
       return
     }
 
-    const finalVenueId = formVenueId
-    const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
-    const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
+    try {
+      const finalVenueId = formVenueId
+      const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
+      const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
 
-    const concertId = editingConcertId || Date.now().toString()
+      const concertId = editingConcertId || Date.now().toString()
 
-    showToast(lang === 'zh-TW' ? '正在儲存與上傳媒體檔案...' : 'Saving and uploading media files...', 'info')
+      showToast(lang === 'zh-TW' ? '正在儲存與上傳媒體檔案...' : 'Saving and uploading media files...', 'info')
 
-    // Handle media processing
-    const processedMedia = await Promise.all(
-      pendingMedia.map(async (item) => {
-        const mediaId = item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${item.name}`
-        
-        // 1. If logged in, upload to Firebase Storage
-        if (isLoggedIn && currentUser?.email && item.dataUrl.startsWith('data:')) {
-          try {
-            const storageRef = ref(storage, `users/${currentUser.email}/concerts/${concertId}/${mediaId}`)
-            await uploadString(storageRef, item.dataUrl, 'data_url')
-            const downloadUrl = await getDownloadURL(storageRef)
-            
-            // Also cache locally in IndexedDB for instant offline load
-            await saveLocalMedia(mediaId, item.dataUrl)
-            
-            return {
-              id: mediaId,
-              name: item.name,
-              dataUrl: downloadUrl, // Store public cloud url
-              type: item.type
+      // Handle media processing
+      const processedMedia = await Promise.all(
+        pendingMedia.map(async (item) => {
+          const mediaId = item.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${item.name}`
+          const itemDataUrl = item.dataUrl || ''
+          
+          // 1. If logged in and it's a new base64 data, upload to Firebase Storage
+          if (isLoggedIn && currentUser?.email && itemDataUrl.startsWith('data:')) {
+            try {
+              const storageRef = ref(storage, `users/${currentUser.email}/concerts/${concertId}/${mediaId}`)
+              await uploadString(storageRef, itemDataUrl, 'data_url')
+              const downloadUrl = await getDownloadURL(storageRef)
+              
+              // Also cache locally in IndexedDB for instant offline load
+              await saveLocalMedia(mediaId, itemDataUrl)
+              
+              return {
+                id: mediaId,
+                name: item.name,
+                dataUrl: downloadUrl, // Store public cloud url
+                type: item.type
+              }
+            } catch (err) {
+              console.error('Failed to upload to Firebase Storage:', err)
+              // Fallback to local storage if upload fails
             }
-          } catch (err) {
-            console.error('Failed to upload to Firebase Storage:', err)
-            // Fallback to local storage if upload fails
           }
-        }
-        
-        // 2. Save to local IndexedDB for guests
-        try {
-          await saveLocalMedia(mediaId, item.dataUrl)
-        } catch (err) {
-          console.error('Failed to save to local IndexedDB:', err)
-        }
+          
+          // 2. Save to local IndexedDB for guests (only if it's new base64 content)
+          if (itemDataUrl.startsWith('data:')) {
+            try {
+              await saveLocalMedia(mediaId, itemDataUrl)
+            } catch (err) {
+              console.error('Failed to save to local IndexedDB:', err)
+            }
+          }
 
-        return {
-          id: mediaId,
-          name: item.name,
-          dataUrl: item.dataUrl.startsWith('http') ? item.dataUrl : '', // If cloud url, keep it. Otherwise empty string.
-          type: item.type
-        }
+          return {
+            id: mediaId,
+            name: item.name,
+            dataUrl: itemDataUrl.startsWith('http') ? itemDataUrl : '', // If cloud url, keep it. Otherwise empty string.
+            type: item.type
+          }
+        })
+      )
+
+      const concert: Concert = {
+        id: concertId,
+        venueId: finalVenueId,
+        venueName: finalVenueName,
+        venueCity: finalVenueCity,
+        artist,
+        concertName: form.concertName.trim(),
+        date: form.date,
+        seat: form.seat.trim(),
+        notes: form.notes.trim(),
+        spotifyUrl: form.spotifyUrl.trim(),
+        media: processedMedia,
+        createdAt: editingConcertId ? (concerts.find(c => c.id === editingConcertId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+      }
+
+      // Keep base64 URLs in memory list for instant rendering in UI without flicker
+      const concertForState: Concert = {
+        ...concert,
+        media: processedMedia.map((m, idx) => ({
+          ...m,
+          dataUrl: pendingMedia[idx]?.dataUrl || m.dataUrl
+        }))
+      }
+
+      let updatedList: Concert[]
+      if (editingConcertId) {
+        updatedList = concerts.map((c) => c.id === editingConcertId ? concertForState : c)
+      } else {
+        updatedList = [...concerts, concertForState]
+      }
+
+      await updateConcertsList(updatedList)
+      setIsAddModalOpen(false)
+      setEditingConcertId(null)
+      showToast(lang === 'zh-TW' ? '紀錄已成功儲存！' : 'Record saved successfully!', 'success')
+
+      logCustomEvent('add_concert_record', {
+        venue_id: concert.venueId,
+        venue_name: concert.venueName,
+        artist: concert.artist,
+        concert_name: concert.concertName
       })
-    )
-
-    const concert: Concert = {
-      id: concertId,
-      venueId: finalVenueId,
-      venueName: finalVenueName,
-      venueCity: finalVenueCity,
-      artist,
-      concertName: form.concertName.trim(),
-      date: form.date,
-      seat: form.seat.trim(),
-      notes: form.notes.trim(),
-      spotifyUrl: form.spotifyUrl.trim(),
-      media: processedMedia,
-      createdAt: editingConcertId ? (concerts.find(c => c.id === editingConcertId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
+    } catch (err) {
+      console.error('Error in saveConcert:', err)
+      showToast(lang === 'zh-TW' ? '儲存失敗！發生未知錯誤。' : 'Save failed! An unknown error occurred.', 'error')
     }
-
-    // Keep base64 URLs in memory list for instant rendering in UI without flicker
-    const concertForState: Concert = {
-      ...concert,
-      media: processedMedia.map((m, idx) => ({
-        ...m,
-        dataUrl: pendingMedia[idx]?.dataUrl || m.dataUrl
-      }))
-    }
-
-    let updatedList: Concert[]
-    if (editingConcertId) {
-      updatedList = concerts.map((c) => c.id === editingConcertId ? concertForState : c)
-    } else {
-      updatedList = [...concerts, concertForState]
-    }
-
-    await updateConcertsList(updatedList)
-    setIsAddModalOpen(false)
-    setEditingConcertId(null)
-    showToast(lang === 'zh-TW' ? '紀錄已成功儲存！' : 'Record saved successfully!', 'success')
-
-    logCustomEvent('add_concert_record', {
-      venue_id: concert.venueId,
-      venue_name: concert.venueName,
-      artist: concert.artist,
-      concert_name: concert.concertName
-    })
   }
 
   const deleteConcert = (id: string, event: MouseEvent<HTMLButtonElement>) => {
