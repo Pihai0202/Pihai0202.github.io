@@ -9803,35 +9803,35 @@ body.player-open .music-bar-toggle {
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.detail-action-btn.edit-btn {
+.detail-action-btn.detail-edit-btn {
   background: rgba(255, 255, 255, 0.08);
   color: var(--text);
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.detail-action-btn.edit-btn:hover {
+.detail-action-btn.detail-edit-btn:hover {
   background: rgba(255, 255, 255, 0.15);
   border-color: rgba(255, 255, 255, 0.2);
 }
 
-[data-theme='light'] .detail-action-btn.edit-btn {
+[data-theme='light'] .detail-action-btn.detail-edit-btn {
   background: rgba(0, 0, 0, 0.04);
   border: 1px solid rgba(0, 0, 0, 0.08);
   color: #333;
 }
 
-[data-theme='light'] .detail-action-btn.edit-btn:hover {
+[data-theme='light'] .detail-action-btn.detail-edit-btn:hover {
   background: rgba(0, 0, 0, 0.08);
   border-color: rgba(0, 0, 0, 0.15);
 }
 
-.detail-action-btn.delete-btn {
+.detail-action-btn.detail-delete-btn {
   background: rgba(239, 68, 68, 0.15);
   color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.25);
 }
 
-.detail-action-btn.delete-btn:hover {
+.detail-action-btn.detail-delete-btn:hover {
   background: rgba(239, 68, 68, 0.25);
   border-color: rgba(239, 68, 68, 0.35);
   box-shadow: 0 0 8px rgba(239, 68, 68, 0.2);

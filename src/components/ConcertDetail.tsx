@@ -115,14 +115,14 @@ export function ConcertDetail({
 
       <div className="detail-actions-row">
         <button
-          className="detail-action-btn edit-btn"
+          className="detail-action-btn detail-edit-btn"
           type="button"
           onClick={() => onEditConcert(concert)}
         >
           {lang === 'zh-TW' ? '編輯記錄' : 'Edit Log'}
         </button>
         <button
-          className="detail-action-btn delete-btn"
+          className="detail-action-btn detail-delete-btn"
           type="button"
           onClick={() => onDeleteConcert(concert.id)}
         >
