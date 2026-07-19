@@ -95,6 +95,8 @@ export function TaiwanMap({
   const [displayCenter, setDisplayCenter] = useState(center)
   const [hoveredVenue, setHoveredVenue] = useState<Venue | null>(null)
   const [tooltipPos, setTooltipPos] = useState({ x: 0, y: 0 })
+  const [overlappingVenues, setOverlappingVenues] = useState<typeof VENUES | null>(null)
+  const [overlapPos, setOverlapPos] = useState<{ x: number; y: number } | null>(null)
 
   const isAnimatingRef = useRef(false)
   const animationRef = useRef<number | null>(null)
@@ -108,6 +110,12 @@ export function TaiwanMap({
   useEffect(() => {
     zoomRef.current = zoom
   }, [zoom])
+
+  useEffect(() => {
+    if (selectedVenueId === null) {
+      setOverlappingVenues(null)
+    }
+  }, [selectedVenueId])
 
   const rafPendingRef = useRef<{ center: { x: number; y: number } | null; zoom: number | null }>({ center: null, zoom: null })
   const rafIdRef = useRef<number | null>(null)
@@ -486,6 +494,7 @@ export function TaiwanMap({
     if (!didDragRef.current) {
       onClearVenue()
       setShowShuangbeiDetail(false)
+      setOverlappingVenues(null)
     }
   }
 
@@ -617,8 +626,7 @@ export function TaiwanMap({
                   let targetVenueId = venue.id
                   if (svgRef.current) {
                     const groups = Array.from(svgRef.current.querySelectorAll('.venue-icon-group:not(.category-inactive)'))
-                    let minDistance = Infinity
-                    let closestId = venue.id
+                    const nearbyVenuesList: typeof VENUES = []
                     
                     groups.forEach((el) => {
                       const vId = el.getAttribute('data-venue-id')
@@ -627,21 +635,55 @@ export function TaiwanMap({
                         const cx = r.left + r.width / 2
                         const cy = r.top + r.height / 2
                         const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2))
-                        if (dist < minDistance) {
-                          minDistance = dist
-                          closestId = vId
+                        if (dist < 22) {
+                          const vObj = VENUES.find(v => v.id === vId)
+                          if (vObj) {
+                            nearbyVenuesList.push(vObj)
+                          }
                         }
                       }
                     })
                     
-                    // Snap to the closest venue within a reasonable 45px tap radius
-                    if (minDistance < 45) {
-                      targetVenueId = closestId
+                    if (nearbyVenuesList.length >= 2) {
+                      const container = svgRef.current.parentElement
+                      if (container) {
+                        const containerRect = container.getBoundingClientRect()
+                        const x = e.clientX - containerRect.left
+                        const y = e.clientY - containerRect.top
+                        setOverlapPos({ x, y })
+                        setOverlappingVenues(nearbyVenuesList)
+                      }
+                      return
+                    }
+                    
+                    if (nearbyVenuesList.length === 1) {
+                      targetVenueId = nearbyVenuesList[0].id
+                    } else {
+                      // Fallback: find the single closest venue within 45px
+                      let minDistance = Infinity
+                      let closestId = venue.id
+                      groups.forEach((el) => {
+                        const vId = el.getAttribute('data-venue-id')
+                        if (vId) {
+                          const r = el.getBoundingClientRect()
+                          const cx = r.left + r.width / 2
+                          const cy = r.top + r.height / 2
+                          const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2))
+                          if (dist < minDistance) {
+                            minDistance = dist
+                            closestId = vId
+                          }
+                        }
+                      })
+                      if (minDistance < 45) {
+                        targetVenueId = closestId
+                      }
                     }
                   }
                   
                   onSelectVenue(targetVenueId)
                   setShowShuangbeiDetail(false)
+                  setOverlappingVenues(null)
                 }}
                 onMouseEnter={() => {
                   if (isCategoryInactive || isDragging) return
@@ -755,6 +797,49 @@ export function TaiwanMap({
                     </span>
                   </div>
                 </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {overlappingVenues && overlapPos && (
+        <div
+          className="overlap-venues-popover"
+          style={{
+            position: 'absolute',
+            left: overlapPos.x,
+            top: overlapPos.y,
+            transform: 'translate(-50%, -100%)',
+            marginTop: '-15px',
+            zIndex: 1000,
+          }}
+        >
+          <div className="overlap-popover-header">
+            <span>{lang === 'zh-TW' ? '請選擇場館' : lang === 'ja' ? '会場を選択してください' : lang === 'ko' ? '공연장을 선택하세요' : 'Select Venue'}</span>
+            <button className="overlap-close-btn" type="button" onClick={() => setOverlappingVenues(null)}>✕</button>
+          </div>
+          <div className="overlap-venue-list">
+            {overlappingVenues.map((venue) => {
+              const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+              const isActive = selectedVenueId === venue.id
+              return (
+                <button
+                  key={venue.id}
+                  type="button"
+                  className={`overlap-venue-item${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                  onClick={() => {
+                    onSelectVenue(venue.id)
+                    setOverlappingVenues(null)
+                  }}
+                >
+                  <div className="overlap-venue-name">{translateVenueName(venue.name, lang)}</div>
+                  <div className="overlap-venue-meta">
+                    <span>{translateCityName(venue.city, lang)}</span>
+                    <span className="dot-divider">•</span>
+                    <span>{t('capacityPeople', { capacity: venue.capacity })}</span>
+                  </div>
+                </button>
               )
             })}
           </div>
