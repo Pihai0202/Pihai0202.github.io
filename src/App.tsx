@@ -1152,6 +1152,12 @@ function App() {
         localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(updatedList))
       } catch (error) {
         console.error('Failed to save to Firestore:', error)
+        showToast(
+          lang === 'zh-TW' 
+            ? '同步至雲端失敗！可能因為照片或影片累計容量過大，請減少媒體檔案以利同步。' 
+            : 'Sync to cloud failed! Cumulative file size might be too large. Please reduce media files to sync.', 
+          'error'
+        )
       }
     } else {
       setConcerts(updatedList)
@@ -1159,6 +1165,12 @@ function App() {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList))
       } catch (error) {
         console.error('Failed to save guest concerts:', error)
+        showToast(
+          lang === 'zh-TW' 
+            ? '儲存失敗！本機儲存空間已滿，請刪除部分照片或影片後再試。' 
+            : 'Save failed! Local storage is full. Please delete some media files and try again.', 
+          'error'
+        )
       }
     }
   }
@@ -1358,9 +1370,31 @@ function App() {
   const handleMediaUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     files.forEach((file) => {
-      if (!file.type.startsWith('image/')) {
-        showToast(lang === 'zh-TW' ? '僅支援上傳照片檔案！' : 'Only photo files are supported!', 'error')
+      const isImage = file.type.startsWith('image/')
+      const isVideo = file.type.startsWith('video/')
+
+      if (!isImage && !isVideo) {
+        showToast(lang === 'zh-TW' ? '僅支援上傳照片與影片檔案！' : 'Only photo and video files are supported!', 'error')
         return
+      }
+
+      if (isImage) {
+        if (file.size > 10 * 1024 * 1024) {
+          showToast(lang === 'zh-TW' ? '單張照片容量不能超過 10MB！' : 'Single photo size cannot exceed 10MB!', 'error')
+          return
+        }
+      }
+
+      if (isVideo) {
+        if (file.size > 3 * 1024 * 1024) {
+          showToast(
+            lang === 'zh-TW' 
+              ? '單個影片容量不能超過 3MB！(過大會導致無法儲存與同步)' 
+              : 'Single video size cannot exceed 3MB! (Too large will prevent saving and syncing)', 
+            'error'
+          )
+          return
+        }
       }
       
       const reader = new FileReader()
@@ -1368,15 +1402,17 @@ function App() {
         if (typeof reader.result !== 'string') return
         
         let finalDataUrl = reader.result
-        try {
-          finalDataUrl = await compressConcertImage(reader.result)
-        } catch (err) {
-          console.warn('Failed to compress image:', err)
+        if (isImage) {
+          try {
+            finalDataUrl = await compressConcertImage(reader.result)
+          } catch (err) {
+            console.warn('Failed to compress image:', err)
+          }
         }
 
         setPendingMedia((current) => [
           ...current,
-          { name: file.name, dataUrl: finalDataUrl, type: 'image/jpeg' },
+          { name: file.name, dataUrl: finalDataUrl, type: file.type },
         ])
       }
       reader.readAsDataURL(file)
@@ -2627,16 +2663,20 @@ function App() {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片' : 'Photos'}</label>
+            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片 / 影片' : 'Photos / Videos'}</label>
             <div className="media-upload-area">
               <div className="upload-icon"><CameraIcon /></div>
               <div className="upload-text">{lang === 'zh-TW' ? '點擊或拖曳上傳' : 'Click or drag files to upload'}</div>
-              <div className="upload-sub">{lang === 'zh-TW' ? '支援 JPG, PNG, GIF' : 'Supports JPG, PNG, GIF'}</div>
+              <div className="upload-sub">
+                {lang === 'zh-TW' 
+                  ? '支援圖片與影片 (影片上限 3MB)' 
+                  : 'Supports images & videos (Video max 3MB)'}
+              </div>
               <input
                 id="input-media"
                 type="file"
                 multiple
-                accept="image/*"
+                accept="image/*,video/*"
                 onChange={handleMediaUpload}
               />
             </div>
