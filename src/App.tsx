@@ -671,7 +671,7 @@ function App() {
     setIsEditingZoom(false)
     const val = parseInt(tempZoomInput, 10)
     if (!isNaN(val)) {
-      const clampedVal = Math.max(70, Math.min(500, val))
+      const clampedVal = Math.max(70, Math.min(750, val))
       setZoom(clampedVal / 100)
     }
   }
@@ -1858,7 +1858,7 @@ function App() {
               <button
                 className="zoom-btn"
                 type="button"
-                onClick={() => setZoom((z) => Math.min(5.0, z + 0.1))}
+                onClick={() => setZoom((z) => Math.min(7.5, z + 0.1))}
                 title="放大地圖"
               >
                 +
