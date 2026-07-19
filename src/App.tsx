@@ -1295,6 +1295,10 @@ function App() {
   }, [isMusicBarVisible])
 
   // Hydrate local IndexedDB media into React state
+  const unhydratedCount = concerts.reduce((acc, c) => {
+    return acc + (c.media || []).filter(m => m.id && !m.dataUrl).length
+  }, 0)
+
   useEffect(() => {
     let active = true
     const hydrate = async () => {
@@ -1324,7 +1328,7 @@ function App() {
     return () => {
       active = false
     }
-  }, [concerts.length])
+  }, [unhydratedCount])
 
   const openAddModal = (date?: string, venue?: typeof VENUES[0] | null) => {
     const activeVenue = venue !== undefined ? venue : selectedVenue
