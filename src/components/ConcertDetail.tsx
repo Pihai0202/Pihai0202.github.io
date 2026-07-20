@@ -90,7 +90,7 @@ export function ConcertDetail({
 
       {concert.media && concert.media.length > 0 && (
         <>
-          <div className="section-title">— 照片 / 影片 —</div>
+          <div className="section-title">— {lang === 'zh-TW' ? '照片' : lang === 'ja' ? '写真' : lang === 'ko' ? '사진' : 'Photos'} —</div>
           <div className="media-gallery">
             {(concert.media || []).map((item: ConcertMedia, index: number) => (
               <button

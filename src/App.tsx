@@ -1515,30 +1515,15 @@ function App() {
     const files = Array.from(event.target.files ?? [])
     files.forEach((file) => {
       const isImage = file.type.startsWith('image/')
-      const isVideo = file.type.startsWith('video/')
 
-      if (!isImage && !isVideo) {
-        showToast(lang === 'zh-TW' ? '僅支援上傳照片與影片檔案！' : 'Only photo and video files are supported!', 'error')
+      if (!isImage) {
+        showToast(lang === 'zh-TW' ? '僅支援上傳照片檔案！' : 'Only photo files are supported!', 'error')
         return
       }
 
-      if (isImage) {
-        if (file.size > 10 * 1024 * 1024) {
-          showToast(lang === 'zh-TW' ? '單張照片容量不能超過 10MB！' : 'Single photo size cannot exceed 10MB!', 'error')
-          return
-        }
-      }
-
-      if (isVideo) {
-        if (file.size > 3 * 1024 * 1024) {
-          showToast(
-            lang === 'zh-TW' 
-              ? '單個影片容量不能超過 3MB！(過大會導致無法儲存與同步)' 
-              : 'Single video size cannot exceed 3MB! (Too large will prevent saving and syncing)', 
-            'error'
-          )
-          return
-        }
+      if (file.size > 10 * 1024 * 1024) {
+        showToast(lang === 'zh-TW' ? '單張照片容量不能超過 10MB！' : 'Single photo size cannot exceed 10MB!', 'error')
+        return
       }
       
       const mediaId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${file.name}`
@@ -2886,20 +2871,20 @@ function App() {
             </div>
           </div>
           <div className="form-group">
-            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片 / 影片' : 'Photos / Videos'}</label>
+            <label htmlFor="input-media">{lang === 'zh-TW' ? '照片' : 'Photos'}</label>
             <div className="media-upload-area">
               <div className="upload-icon"><CameraIcon /></div>
               <div className="upload-text">{lang === 'zh-TW' ? '點擊或拖曳上傳' : 'Click or drag files to upload'}</div>
               <div className="upload-sub">
                 {lang === 'zh-TW' 
-                  ? '支援圖片與影片 (影片上限 3MB)' 
-                  : 'Supports images & videos (Video max 3MB)'}
+                  ? '支援 jpg, png, gif，最多上傳 3 張' 
+                  : 'Supports jpg, png, gif, up to 3 photos'}
               </div>
               <input
                 id="input-media"
                 type="file"
                 multiple
-                accept="image/*,video/*"
+                accept="image/*"
                 onChange={handleMediaUpload}
               />
             </div>
