@@ -58,6 +58,24 @@ const SORTED_TAIWAN_PATHS = Object.entries(TAIWAN_PATHS).sort(([a], [b]) =>
   a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0
 )
 
+const TaiwanMapBackground = memo(function TaiwanMapBackground() {
+  return (
+    <>
+      {SORTED_TAIWAN_PATHS.map(([countyName, pathD]) => (
+        <path
+          key={countyName}
+          d={pathD}
+          fill="var(--map-land, #1e2040)"
+          stroke="var(--map-land-stroke, #2a2a60)"
+          strokeWidth="1.2"
+          opacity="0.9"
+          style={{ transition: 'fill 0.3s' }}
+        />
+      ))}
+    </>
+  )
+})
+
 const PREPROJECTED_VENUES = VENUES.map((venue) => ({
   ...venue,
   pos: project(venue.longitude || 0, venue.latitude || 0),
@@ -188,6 +206,13 @@ function TaiwanMapComponent({
     if (selectedVenueId === lastSelectedVenueId.current) return
     lastSelectedVenueId.current = selectedVenueId
 
+    // Cancel any active animation and reset animation flag on transition
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+      animationRef.current = null
+    }
+    isAnimatingRef.current = false
+
     if (selectedVenue) {
       const projected = project(selectedVenue.longitude || 0, selectedVenue.latitude || 0)
       let targetZoom = 3.5
@@ -195,9 +220,10 @@ function TaiwanMapComponent({
         targetZoom = 3.8
       }
 
-      const startZoom = zoomRef.current
-      const startX = centerRef.current.x
-      const startY = centerRef.current.y
+      // Start animating from current visual coordinates
+      const startZoom = displayZoom
+      const startX = displayCenter.x
+      const startY = displayCenter.y
       const targetX = projected.x
       const targetY = projected.y
 
@@ -224,17 +250,50 @@ function TaiwanMapComponent({
         }
       }
 
-      if (animationRef.current) cancelAnimationFrame(animationRef.current)
       animationRef.current = requestAnimationFrame(animate)
-
-      return () => {
-        if (animationRef.current) cancelAnimationFrame(animationRef.current)
-        isAnimatingRef.current = false
-      }
     } else {
       const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
-      onZoomChange(defaultZoom)
-      setCenter({ x: 455, y: 500 })
+      // Start animating from current visual coordinates back to default zoom and center
+      const startZoom = displayZoom
+      const startX = displayCenter.x
+      const startY = displayCenter.y
+      const targetX = 455
+      const targetY = 500
+
+      const duration = 500
+      const startTime = performance.now()
+      isAnimatingRef.current = true
+
+      const animate = (time: number) => {
+        const elapsed = time - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const ease = 1 - Math.pow(1 - progress, 3)
+
+        const newZoom = startZoom + (defaultZoom - startZoom) * ease
+        const newX = startX + (targetX - startX) * ease
+        const newY = startY + (targetY - startY) * ease
+
+        setDisplayZoom(newZoom)
+        setDisplayCenter({ x: newX, y: newY })
+
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animate)
+        } else {
+          isAnimatingRef.current = false
+          onZoomChange(defaultZoom)
+          setCenter({ x: 455, y: 500 })
+        }
+      }
+
+      animationRef.current = requestAnimationFrame(animate)
+    }
+
+    return () => {
+      if (animationRef.current) {
+        cancelAnimationFrame(animationRef.current)
+        animationRef.current = null
+      }
+      isAnimatingRef.current = false
     }
   }, [selectedVenueId, selectedVenue, onZoomChange])
 
@@ -441,17 +500,7 @@ function TaiwanMapComponent({
         </defs>
 
         <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
-        {SORTED_TAIWAN_PATHS.map(([countyName, pathD]) => (
-          <path
-            key={countyName}
-            d={pathD}
-            fill="var(--map-land, #1e2040)"
-            stroke="var(--map-land-stroke, #2a2a60)"
-            strokeWidth="1.2"
-            opacity="0.9"
-            style={{ transition: 'fill 0.3s' }}
-          />
-        ))}
+        <TaiwanMapBackground />
 
         <g>
           {PREPROJECTED_VENUES.map((venue) => {
