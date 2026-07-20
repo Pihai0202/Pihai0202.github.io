@@ -1,4 +1,4 @@
-import { useState, useRef, useMemo, useEffect } from 'react'
+import { useState, useRef, useMemo, useEffect, memo } from 'react'
 import type { MouseEvent } from 'react'
 import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
@@ -32,6 +32,39 @@ const SHUANGBEI_VENUE_IDS = [
   'linkou-arena'
 ]
 
+const SPORT_VENUE_IDS = [
+  'taipei-dome',
+  'taoyuan-arena',
+  'hsinchu',
+  'taichung-dome',
+  'changhua',
+  'tainan',
+  'kaohsiung-natl',
+  'hualien',
+  'taitung',
+  'tianmu',
+  'xinzhuang',
+  'asia-pacific-main',
+  'chengcing-lake',
+  'douliou',
+  'chiayi',
+  'linkou-arena'
+]
+
+const SHUANGBEI_SET = new Set(SHUANGBEI_VENUE_IDS)
+const SPORT_SET = new Set(SPORT_VENUE_IDS)
+
+const SORTED_TAIWAN_PATHS = Object.entries(TAIWAN_PATHS).sort(([a], [b]) =>
+  a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0
+)
+
+const PREPROJECTED_VENUES = VENUES.map((venue) => ({
+  ...venue,
+  pos: project(venue.longitude || 0, venue.latitude || 0),
+  isShuangbei: SHUANGBEI_SET.has(venue.id),
+  isSport: SPORT_SET.has(venue.id),
+}))
+
 export function Stat({ number, label }: { number: number; label: string }) {
   return (
     <div className="stat">
@@ -61,7 +94,7 @@ interface TaiwanMapProps {
   categoryFilter?: 'all' | 'concert' | 'sport'
 }
 
-export function TaiwanMap({
+function TaiwanMapComponent({
   concerts,
   selectedVenueId,
   onSelectVenue,
@@ -80,7 +113,6 @@ export function TaiwanMap({
   const dragStartRef = useRef<{ clientX: number; clientY: number; centerX: number; centerY: number } | null>(null)
   const didDragRef = useRef(false)
 
-  // Pinch-to-zoom state refs
   const pinchStartDistanceRef = useRef<number | null>(null)
   const pinchStartZoomRef = useRef<number | null>(null)
   const pinchStartMidpointRef = useRef<{ clientX: number; clientY: number } | null>(null)
@@ -89,6 +121,11 @@ export function TaiwanMap({
   const selectedVenue = useMemo(
     () => VENUES.find((v) => v.id === selectedVenueId),
     [selectedVenueId],
+  )
+
+  const visitedVenueIds = useMemo(
+    () => new Set(concerts.map((c) => c.venueId)),
+    [concerts],
   )
 
   const [displayZoom, setDisplayZoom] = useState(zoom)
@@ -111,34 +148,22 @@ export function TaiwanMap({
     zoomRef.current = zoom
   }, [zoom])
 
-  useEffect(() => {
-    if (selectedVenueId === null) {
-      setOverlappingVenues(null)
-    }
-  }, [selectedVenueId])
-
-  const rafPendingRef = useRef<{ center: { x: number; y: number } | null; zoom: number | null }>({ center: null, zoom: null })
+  const rafPendingRef = useRef<{ center?: { x: number; y: number }; zoom?: number }>({})
   const rafIdRef = useRef<number | null>(null)
-  const wheelTimeoutRef = useRef<any>(null)
 
   const scheduleRafUpdate = () => {
     if (rafIdRef.current !== null) return
-
     rafIdRef.current = requestAnimationFrame(() => {
       rafIdRef.current = null
-      const { center: nextCenter, zoom: nextZoom } = rafPendingRef.current
-
-      if (nextCenter !== null) {
-        setDisplayCenter(nextCenter)
-        centerRef.current = nextCenter
+      if (rafPendingRef.current.center) {
+        setDisplayCenter(rafPendingRef.current.center)
+        centerRef.current = rafPendingRef.current.center
       }
-
-      if (nextZoom !== null) {
-        setDisplayZoom(nextZoom)
-        zoomRef.current = nextZoom
+      if (typeof rafPendingRef.current.zoom === 'number') {
+        setDisplayZoom(rafPendingRef.current.zoom)
+        zoomRef.current = rafPendingRef.current.zoom
       }
-
-      rafPendingRef.current = { center: null, zoom: null }
+      rafPendingRef.current = {}
     })
   }
 
@@ -149,84 +174,71 @@ export function TaiwanMap({
     }
   }, [])
 
-  // Keep display states synchronized instantly when not animating
   useEffect(() => {
-    if (!isAnimatingRef.current) {
-      setDisplayZoom(zoom)
-    }
+    if (!isAnimatingRef.current) setDisplayZoom(zoom)
   }, [zoom])
 
   useEffect(() => {
-    if (!isAnimatingRef.current) {
-      setDisplayCenter(center)
-    }
+    if (!isAnimatingRef.current) setDisplayCenter(center)
   }, [center])
 
   const lastSelectedVenueId = useRef(selectedVenueId)
 
   useEffect(() => {
-    if (selectedVenueId === lastSelectedVenueId.current) {
-      return
-    }
+    if (selectedVenueId === lastSelectedVenueId.current) return
     lastSelectedVenueId.current = selectedVenueId
 
-    // Calculate targets
-    const targetX = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).x : 455
-    let targetY = selectedVenue ? project(selectedVenue.longitude || 0, selectedVenue.latitude || 0).y : 500
-    const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
-    const targetZoom = selectedVenue ? (zoom !== defaultZoom ? zoom : 1.8) : defaultZoom
+    if (selectedVenue) {
+      const projected = project(selectedVenue.longitude || 0, selectedVenue.latitude || 0)
+      let targetZoom = 3.5
+      if (selectedVenue.id === 'linkou-arena' || selectedVenue.id === 'taoyuan-arena') {
+        targetZoom = 3.8
+      }
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth <= 768
-    if (selectedVenue && isMobile) {
-      // 底部抽屜在手機端佔用下半部約 45% 高度，將選取的場館中心點往上偏移以置中於上方可視區（地圖往下移 22% 視區高度）
-      // 偏移量會依據選取時的 zoom 比例動態縮放，確保在任何縮放比下都能精確置中
-      const heightVal = 800 / targetZoom
-      targetY += heightVal * 0.22
-    }
+      const startZoom = zoomRef.current
+      const startX = centerRef.current.x
+      const startY = centerRef.current.y
+      const targetX = projected.x
+      const targetY = projected.y
 
-    // Update target states in React first
-    setCenter({ x: targetX, y: targetY })
-    onZoomChange(targetZoom)
+      const duration = 500
+      const startTime = performance.now()
+      isAnimatingRef.current = true
 
-    const startX = displayCenter.x
-    const startY = displayCenter.y
-    const startZoom = displayZoom
+      const animate = (time: number) => {
+        const elapsed = time - startTime
+        const progress = Math.min(elapsed / duration, 1)
+        const ease = 1 - Math.pow(1 - progress, 3)
 
-    const duration = 500 // ms
-    const startTime = performance.now()
-    isAnimatingRef.current = true
+        const newZoom = startZoom + (targetZoom - startZoom) * ease
+        const newX = startX + (targetX - startX) * ease
+        const newY = startY + (targetY - startY) * ease
 
-    const animate = (time: number) => {
-      const elapsed = time - startTime
-      const progress = Math.min(elapsed / duration, 1)
-      const ease = 1 - Math.pow(1 - progress, 3) // easeOutCubic
+        setDisplayZoom(newZoom)
+        setDisplayCenter({ x: newX, y: newY })
 
-      const newZoom = startZoom + (targetZoom - startZoom) * ease
-      const newX = startX + (targetX - startX) * ease
-      const newY = startY + (targetY - startY) * ease
+        if (progress < 1) {
+          animationRef.current = requestAnimationFrame(animate)
+        } else {
+          isAnimatingRef.current = false
+        }
+      }
 
-      setDisplayZoom(newZoom)
-      setDisplayCenter({ x: newX, y: newY })
+      if (animationRef.current) cancelAnimationFrame(animationRef.current)
+      animationRef.current = requestAnimationFrame(animate)
 
-      if (progress < 1) {
-        animationRef.current = requestAnimationFrame(animate)
-      } else {
+      return () => {
+        if (animationRef.current) cancelAnimationFrame(animationRef.current)
         isAnimatingRef.current = false
       }
-    }
-
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current)
-    }
-    animationRef.current = requestAnimationFrame(animate)
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-      }
-      isAnimatingRef.current = false
+    } else {
+      const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
+      onZoomChange(defaultZoom)
+      setCenter({ x: 455, y: 500 })
     }
   }, [selectedVenueId, selectedVenue, onZoomChange])
+
+  const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const svgEl = svgRef.current
@@ -234,49 +246,29 @@ export function TaiwanMap({
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault()
-
       const rect = svgEl.getBoundingClientRect()
       const clientX = e.clientX - rect.left
       const clientY = e.clientY - rect.top
-
       const pctX = clientX / rect.width
       const pctY = clientY / rect.height
-
       const currentZoom = zoomRef.current
       const currentCenter = centerRef.current
-
       const w = 800 / currentZoom
       const h = 800 / currentZoom
-
       const minX = currentCenter.x - w / 2
       const minY = currentCenter.y - h / 2
-
       const mx = minX + pctX * w
       const my = minY + pctY * h
-
       const zoomFactor = 1.08
-      let newZoom = currentZoom
-      if (e.deltaY < 0) {
-        newZoom = Math.min(9.99, currentZoom * zoomFactor)
-      } else {
-        newZoom = Math.max(0.7, currentZoom / zoomFactor)
-      }
-
+      const newZoom = Math.max(0.7, Math.min(9.99, e.deltaY < 0 ? currentZoom * zoomFactor : currentZoom / zoomFactor))
       const newWidth = 800 / newZoom
       const newHeight = 800 / newZoom
-
       const newMinX = mx - pctX * newWidth
       const newMinY = my - pctY * newHeight
-
-      const nextCenter = {
-        x: newMinX + newWidth / 2,
-        y: newMinY + newHeight / 2,
-      }
-
+      const nextCenter = { x: newMinX + newWidth / 2, y: newMinY + newHeight / 2 }
       rafPendingRef.current.center = nextCenter
       rafPendingRef.current.zoom = newZoom
       scheduleRafUpdate()
-
       if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current)
       wheelTimeoutRef.current = setTimeout(() => {
         setCenter(centerRef.current)
@@ -285,9 +277,7 @@ export function TaiwanMap({
     }
 
     svgEl.addEventListener('wheel', handleWheel, { passive: false })
-    return () => {
-      svgEl.removeEventListener('wheel', handleWheel)
-    }
+    return () => svgEl.removeEventListener('wheel', handleWheel)
   }, [onZoomChange])
 
   const handleMouseDown = (e: MouseEvent<SVGSVGElement>) => {
@@ -295,36 +285,19 @@ export function TaiwanMap({
     e.preventDefault()
     didDragRef.current = false
     setHoveredVenue(null)
-    dragStartRef.current = {
-      clientX: e.clientX,
-      clientY: e.clientY,
-      centerX: centerRef.current.x,
-      centerY: centerRef.current.y,
-    }
+    dragStartRef.current = { clientX: e.clientX, clientY: e.clientY, centerX: centerRef.current.x, centerY: centerRef.current.y }
     setIsDragging(true)
   }
 
   const handleMouseMove = (e: MouseEvent<SVGSVGElement>) => {
     if (!isDragging || !dragStartRef.current || !svgRef.current) return
-
     const dx = e.clientX - dragStartRef.current.clientX
     const dy = e.clientY - dragStartRef.current.clientY
-    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-      didDragRef.current = true
-    }
-
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDragRef.current = true
     const svgRect = svgRef.current.getBoundingClientRect()
-    const currentZoom = zoomRef.current
-    const w = 800 / currentZoom
-    const h = 800 / currentZoom
-    const scaleX = w / svgRect.width
-    const scaleY = h / svgRect.height
-
-    const nextCenter = {
-      x: dragStartRef.current.centerX - dx * scaleX,
-      y: dragStartRef.current.centerY - dy * scaleY,
-    }
-    rafPendingRef.current.center = nextCenter
+    const w = 800 / zoomRef.current
+    const h = 800 / zoomRef.current
+    rafPendingRef.current.center = { x: dragStartRef.current.centerX - dx * (w / svgRect.width), y: dragStartRef.current.centerY - dy * (h / svgRect.height) }
     scheduleRafUpdate()
   }
 
@@ -334,46 +307,34 @@ export function TaiwanMap({
     setCenter(centerRef.current)
   }
 
-  // Bind native touch event listeners non-passively to prevent browser viewport zoom
+  const handleSvgClick = (e: MouseEvent<SVGSVGElement>) => {
+    if (didDragRef.current) return
+    if (e.target === svgRef.current || (e.target as HTMLElement).tagName === 'path') {
+      onClearVenue()
+      setOverlappingVenues(null)
+    }
+  }
+
   useEffect(() => {
     const svgEl = svgRef.current
     if (!svgEl) return
 
     const getTouchInfo = (touches: TouchList) => {
-      const t1 = touches[0]
-      const t2 = touches[1]
-      const dx = t1.clientX - t2.clientX
-      const dy = t1.clientY - t2.clientY
-      const distance = Math.sqrt(dx * dx + dy * dy)
-      const midpoint = {
-        clientX: (t1.clientX + t2.clientX) / 2,
-        clientY: (t1.clientY + t2.clientY) / 2,
-      }
-      return { distance, midpoint }
+      const t1 = touches[0], t2 = touches[1]
+      const dx = t1.clientX - t2.clientX, dy = t1.clientY - t2.clientY
+      return { distance: Math.sqrt(dx * dx + dy * dy), midpoint: { clientX: (t1.clientX + t2.clientX) / 2, clientY: (t1.clientY + t2.clientY) / 2 } }
     }
 
-    const handleTouchStartNative = (e: globalThis.TouchEvent) => {
+    const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
-        const touch = e.touches[0]
         didDragRef.current = false
-        setHoveredVenue(null)
-        dragStartRef.current = {
-          clientX: touch.clientX,
-          clientY: touch.clientY,
-          centerX: centerRef.current.x,
-          centerY: centerRef.current.y,
-        }
+        const t = e.touches[0]
+        dragStartRef.current = { clientX: t.clientX, clientY: t.clientY, centerX: centerRef.current.x, centerY: centerRef.current.y }
         setIsDragging(true)
-        
-        pinchStartDistanceRef.current = null
-        pinchStartZoomRef.current = null
-        pinchStartMidpointRef.current = null
-        pinchStartMapCenterRef.current = null
       } else if (e.touches.length === 2) {
-        e.preventDefault() // Block browser native viewport zoom
+        e.preventDefault()
         setIsDragging(false)
         dragStartRef.current = null
-
         const { distance, midpoint } = getTouchInfo(e.touches)
         pinchStartDistanceRef.current = distance
         pinchStartZoomRef.current = zoomRef.current
@@ -382,146 +343,73 @@ export function TaiwanMap({
       }
     }
 
-    const handleTouchMoveNative = (e: globalThis.TouchEvent) => {
-      if (e.touches.length === 1) {
-        if (!isDragging || !dragStartRef.current) return
-        e.preventDefault() // Block browser viewport scroll/pull-to-refresh during map panning
-        const touch = e.touches[0]
-
-        const dx = touch.clientX - dragStartRef.current.clientX
-        const dy = touch.clientY - dragStartRef.current.clientY
-        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) {
-          didDragRef.current = true
-        }
-
-        const svgRect = svgEl.getBoundingClientRect()
-        const currentZoom = zoomRef.current
-        const w = 800 / currentZoom
-        const h = 800 / currentZoom
-        const scaleX = w / svgRect.width
-        const scaleY = h / svgRect.height
-
-        const nextCenter = {
-          x: dragStartRef.current.centerX - dx * scaleX,
-          y: dragStartRef.current.centerY - dy * scaleY,
-        }
-
-        rafPendingRef.current.center = nextCenter
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1 && dragStartRef.current && svgRef.current) {
+        const t = e.touches[0]
+        const dx = t.clientX - dragStartRef.current.clientX
+        const dy = t.clientY - dragStartRef.current.clientY
+        if (Math.abs(dx) > 3 || Math.abs(dy) > 3) didDragRef.current = true
+        const svgRect = svgRef.current.getBoundingClientRect()
+        const w = 800 / zoomRef.current
+        const h = 800 / zoomRef.current
+        rafPendingRef.current.center = { x: dragStartRef.current.centerX - dx * (w / svgRect.width), y: dragStartRef.current.centerY - dy * (h / svgRect.height) }
         scheduleRafUpdate()
-      } else if (e.touches.length === 2) {
-        e.preventDefault() // Block browser native viewport zoom
-        didDragRef.current = true // Mark as drag/pinch gesture to prevent click trigger on release
-        if (
-          pinchStartDistanceRef.current === null ||
-          pinchStartZoomRef.current === null ||
-          pinchStartMidpointRef.current === null ||
-          pinchStartMapCenterRef.current === null
-        ) return
-
+      } else if (e.touches.length === 2 && pinchStartDistanceRef.current !== null && pinchStartZoomRef.current !== null && pinchStartMidpointRef.current !== null && pinchStartMapCenterRef.current !== null && svgRef.current) {
+        e.preventDefault()
+        didDragRef.current = true
         const { distance, midpoint } = getTouchInfo(e.touches)
-
-        const ratio = distance / pinchStartDistanceRef.current
-        let newZoom = pinchStartZoomRef.current * ratio
-        newZoom = Math.max(0.7, Math.min(9.99, newZoom))
-
-        const svgRect = svgEl.getBoundingClientRect()
-
-        const deltaClientX = midpoint.clientX - pinchStartMidpointRef.current.clientX
-        const deltaClientY = midpoint.clientY - pinchStartMidpointRef.current.clientY
-
-        const currentW = 800 / newZoom
-        const currentH = 800 / newZoom
-        const scaleX = currentW / svgRect.width
-        const scaleY = currentH / svgRect.height
-
-        const clientX = midpoint.clientX - svgRect.left
-        const clientY = midpoint.clientY - svgRect.top
-        const pctX = clientX / svgRect.width
-        const pctY = clientY / svgRect.height
-
-        const startW = 800 / pinchStartZoomRef.current
-        const startH = 800 / pinchStartZoomRef.current
-        const startMinX = pinchStartMapCenterRef.current.x - startW / 2
-        const startMinY = pinchStartMapCenterRef.current.y - startH / 2
-        const mx = startMinX + pctX * startW
-        const my = startMinY + pctY * startH
-
-        const newWidth = 800 / newZoom
-        const newHeight = 800 / newZoom
-        const newMinX = mx - pctX * newWidth
-        const newMinY = my - pctY * newHeight
-
-        const adjustedMinX = newMinX - deltaClientX * scaleX
-        const adjustedMinY = newMinY - deltaClientY * scaleY
-
-        const nextCenter = {
-          x: adjustedMinX + newWidth / 2,
-          y: adjustedMinY + newHeight / 2,
-        }
-
-        rafPendingRef.current.center = nextCenter
+        const scale = distance / pinchStartDistanceRef.current
+        const newZoom = Math.min(9.99, Math.max(0.7, pinchStartZoomRef.current * scale))
+        const rect = svgRef.current.getBoundingClientRect()
+        const clientX = midpoint.clientX - rect.left
+        const clientY = midpoint.clientY - rect.top
+        const pctX = clientX / rect.width
+        const pctY = clientY / rect.height
+        const w = 800 / pinchStartZoomRef.current
+        const h = 800 / pinchStartZoomRef.current
+        const mx = pinchStartMapCenterRef.current.x - w / 2 + pctX * w
+        const my = pinchStartMapCenterRef.current.y - h / 2 + pctY * h
+        const newW = 800 / newZoom, newH = 800 / newZoom
+        rafPendingRef.current.center = { x: mx - pctX * newW + newW / 2, y: my - pctY * newH + newH / 2 }
         rafPendingRef.current.zoom = newZoom
         scheduleRafUpdate()
       }
     }
 
-    const handleTouchEndNative = () => {
-      setIsDragging(false)
-      dragStartRef.current = null
-      pinchStartDistanceRef.current = null
-      pinchStartZoomRef.current = null
-      pinchStartMidpointRef.current = null
-      pinchStartMapCenterRef.current = null
-
-      setCenter(centerRef.current)
-      onZoomChange(zoomRef.current)
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length < 2) {
+        if (pinchStartDistanceRef.current !== null) {
+          setCenter(centerRef.current)
+          onZoomChange(zoomRef.current)
+        }
+        pinchStartDistanceRef.current = null
+        pinchStartZoomRef.current = null
+        pinchStartMidpointRef.current = null
+        pinchStartMapCenterRef.current = null
+      }
+      if (e.touches.length === 0) {
+        setIsDragging(false)
+        dragStartRef.current = null
+        setCenter(centerRef.current)
+      }
     }
 
-    svgEl.addEventListener('touchstart', handleTouchStartNative, { passive: false })
-    svgEl.addEventListener('touchmove', handleTouchMoveNative, { passive: false })
-    svgEl.addEventListener('touchend', handleTouchEndNative, { passive: true })
-    svgEl.addEventListener('touchcancel', handleTouchEndNative, { passive: true })
-
+    svgEl.addEventListener('touchstart', handleTouchStart, { passive: false })
+    svgEl.addEventListener('touchmove', handleTouchMove, { passive: false })
+    svgEl.addEventListener('touchend', handleTouchEnd)
+    svgEl.addEventListener('touchcancel', handleTouchEnd)
     return () => {
-      svgEl.removeEventListener('touchstart', handleTouchStartNative)
-      svgEl.removeEventListener('touchmove', handleTouchMoveNative)
-      svgEl.removeEventListener('touchend', handleTouchEndNative)
-      svgEl.removeEventListener('touchcancel', handleTouchEndNative)
+      svgEl.removeEventListener('touchstart', handleTouchStart)
+      svgEl.removeEventListener('touchmove', handleTouchMove)
+      svgEl.removeEventListener('touchend', handleTouchEnd)
+      svgEl.removeEventListener('touchcancel', handleTouchEnd)
     }
-  }, [isDragging, onZoomChange])
-
-  const handleSvgClick = () => {
-    if (!didDragRef.current) {
-      onClearVenue()
-      setShowShuangbeiDetail(false)
-      setOverlappingVenues(null)
-    }
-  }
-
-  const SPORT_VENUE_IDS = [
-    'taipei-dome',
-    'taoyuan-arena',
-    'hsinchu',
-    'taichung-dome',
-    'changhua',
-    'tainan',
-    'kaohsiung-natl',
-    'hualien',
-    'taitung',
-    'tianmu',
-    'xinzhuang',
-    'asia-pacific-main',
-    'chengcing-lake',
-    'douliou',
-    'chiayi',
-    'linkou-arena'
-  ]
+  }, [onZoomChange])
 
   const width = 800 / displayZoom
   const height = 800 / displayZoom
   const minX = displayCenter.x - width / 2
   const minY = displayCenter.y - height / 2
-  const viewBoxStr = `${minX} ${minY} ${width} ${height}`
 
   return (
     <div className="taiwan-map-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
@@ -529,14 +417,13 @@ export function TaiwanMap({
         id="taiwan-map"
         ref={svgRef}
         className={isDragging ? 'dragging' : ''}
-        viewBox={viewBoxStr}
+        viewBox={`${minX} ${minY} ${width} ${height}`}
         xmlns="http://www.w3.org/2000/svg"
         onClick={handleSvgClick}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleDragEnd}
         onMouseLeave={handleDragEnd}
-        style={{ '--map-zoom': displayZoom } as React.CSSProperties}
       >
         <defs>
           <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
@@ -546,9 +433,7 @@ export function TaiwanMap({
         </defs>
 
         <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
-        {Object.entries(TAIWAN_PATHS)
-          .sort(([a], [b]) => (a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0))
-          .map(([countyName, pathD]) => (
+        {SORTED_TAIWAN_PATHS.map(([countyName, pathD]) => (
           <path
             key={countyName}
             d={pathD}
@@ -559,66 +444,21 @@ export function TaiwanMap({
             style={{ transition: 'fill 0.3s' }}
           />
         ))}
-        <text x="213" y="585" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          {lang === 'zh-TW' ? '澎湖' : 'Penghu'}
-        </text>
-        <text x="25" y="375" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          {lang === 'zh-TW' ? '金門' : 'Kinmen'}
-        </text>
-        <text x="324" y="115" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
-          {lang === 'zh-TW' ? '馬祖' : 'Matsu'}
-        </text>
-
-        {displayZoom < 1.5 && (
-          <g
-            className={`shuangbei-cluster-group${showShuangbeiDetail ? ' active' : ''}`}
-            transform={`translate(537,247)`}
-            onClick={(e) => {
-              if (didDragRef.current) return
-              e.stopPropagation()
-              setShowShuangbeiDetail(true)
-            }}
-            style={{ cursor: 'pointer' }}
-          >
-            <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
-            <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
-            <circle className="cluster-plate" cx="0" cy="0" r="14" />
-            <text x="0" y="4" textAnchor="middle" className="cluster-text">
-              {SHUANGBEI_VENUE_IDS.length}
-            </text>
-            <text x="0" y="27" textAnchor="middle" className="cluster-label">
-              {t('shuangbeiCluster')}
-            </text>
-          </g>
-        )}
 
         <g>
-          {VENUES.map((venue) => {
-            const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+          {PREPROJECTED_VENUES.map((venue) => {
+            const hasVisits = visitedVenueIds.has(venue.id)
             const isActive = selectedVenueId === venue.id
             const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
-            const hasActiveConcerts = Boolean(activeVenueIds && activeVenueIds.has(venue.id))
-
-            // Show full icon if active, visited, has active concerts, zoomed in (>=1.5), or currently hovered
-            const shouldShowIcon = isActive ||
-                                   hasVisits ||
-                                   hasActiveConcerts ||
-                                   displayZoom >= 1.5 ||
-                                   (hoveredVenue && hoveredVenue.id === venue.id)
-
-            const isShuangbei = SHUANGBEI_VENUE_IDS.includes(venue.id)
-            if (displayZoom < 1.5 && isShuangbei) {
-              return null
-            }
-
-            const isSport = SPORT_VENUE_IDS.includes(venue.id)
+            const shouldShowIcon = isActive || hasVisits || (activeVenueIds && activeVenueIds.has(venue.id)) || displayZoom >= 1.5 || (hoveredVenue && hoveredVenue.id === venue.id)
+            if (displayZoom < 1.5 && venue.isShuangbei) return null
 
             return (
               <g
                 key={venue.id}
                 data-venue-id={venue.id}
                 className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
-                transform={`translate(${project(venue.longitude || 0, venue.latitude || 0).x},${project(venue.longitude || 0, venue.latitude || 0).y})`}
+                transform={`translate(${venue.pos.x},${venue.pos.y})`}
                 onClick={(e) => {
                   if (isCategoryInactive || didDragRef.current) return
                   e.stopPropagation()
@@ -626,64 +466,31 @@ export function TaiwanMap({
                   let targetVenueId = venue.id
                   if (svgRef.current) {
                     const groups = Array.from(svgRef.current.querySelectorAll('.venue-icon-group:not(.category-inactive)'))
-                    const nearbyVenuesList: typeof VENUES = []
-                    
-                    groups.forEach((el) => {
-                      const vId = el.getAttribute('data-venue-id')
-                      if (vId) {
+                    const nearby = groups
+                      .filter((el) => {
                         const r = el.getBoundingClientRect()
-                        const cx = r.left + r.width / 2
-                        const cy = r.top + r.height / 2
-                        const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2))
-                        if (dist < 22) {
-                          const vObj = VENUES.find(v => v.id === vId)
-                          if (vObj) {
-                            nearbyVenuesList.push(vObj)
-                          }
-                        }
-                      }
-                    })
-                    
-                    if (nearbyVenuesList.length >= 2) {
+                        const dist = Math.sqrt(Math.pow(e.clientX - (r.left + r.width / 2), 2) + Math.pow(e.clientY - (r.top + r.height / 2), 2))
+                        return dist < 22
+                      })
+                      .map((el) => VENUES.find((v) => v.id === el.getAttribute('data-venue-id')))
+                      .filter(Boolean) as Venue[]
+
+                    if (nearby.length >= 2) {
                       const container = svgRef.current.parentElement
                       if (container) {
                         const containerRect = container.getBoundingClientRect()
-                        const x = e.clientX - containerRect.left
-                        const y = e.clientY - containerRect.top
-                        setOverlapPos({ x, y })
-                        setOverlappingVenues(nearbyVenuesList)
-                      }
-                      return
-                    }
-                    
-                    if (nearbyVenuesList.length === 1) {
-                      targetVenueId = nearbyVenuesList[0].id
-                    } else {
-                      // Fallback: find the single closest venue within 45px
-                      let minDistance = Infinity
-                      let closestId = venue.id
-                      groups.forEach((el) => {
-                        const vId = el.getAttribute('data-venue-id')
-                        if (vId) {
-                          const r = el.getBoundingClientRect()
-                          const cx = r.left + r.width / 2
-                          const cy = r.top + r.height / 2
-                          const dist = Math.sqrt(Math.pow(e.clientX - cx, 2) + Math.pow(e.clientY - cy, 2))
-                          if (dist < minDistance) {
-                            minDistance = dist
-                            closestId = vId
-                          }
-                        }
-                      })
-                      if (minDistance < 45) {
-                        targetVenueId = closestId
+                        const offsetX = e.clientX - containerRect.left
+                        const offsetY = e.clientY - containerRect.top
+                        setOverlappingVenues(nearby)
+                        setOverlapPos({ x: offsetX, y: offsetY })
+                        return
                       }
                     }
                   }
-                  
+
+                  setOverlappingVenues(null)
                   onSelectVenue(targetVenueId)
                   setShowShuangbeiDetail(false)
-                  setOverlappingVenues(null)
                 }}
                 onMouseEnter={() => {
                   if (isCategoryInactive || isDragging) return
@@ -702,7 +509,7 @@ export function TaiwanMap({
                 <g className="venue-icon">
                   <g transform="scale(0.666667) translate(-12, -12)">
                     <circle className="icon-plate" cx="12" cy="12" r="11" />
-                    {isSport ? (
+                    {venue.isSport ? (
                       <g className="icon-symbol" strokeWidth="1.5" fill="none" stroke="currentColor">
                         <path d="M6 12a6 6 0 0 1 12 0" />
                         <path d="M6 12a6 6 0 0 0 12 0" />
@@ -729,7 +536,7 @@ export function TaiwanMap({
               <PinIcon size="1.1em" style={{ marginRight: '6px', color: '#ef5350', verticalAlign: 'middle' }} />
               {lang === 'zh-TW' ? '雙北地區場館特寫' : lang === 'ja' ? '双北（台北・新北）会場ズーム' : lang === 'ko' ? '쌍북(타이베이·신베이) 공연장 돋보기' : 'Shuangbei Venues Detail'}
             </span>
-            <button className="popover-close-btn" onClick={() => setShowShuangbeiDetail(false)}>×</button>
+            <button className="popover-close-btn" type="button" onClick={() => setShowShuangbeiDetail(false)}>×</button>
           </div>
           
           <div className="popover-map-container">
@@ -742,8 +549,8 @@ export function TaiwanMap({
                 />
               ))}
               
-              {VENUES.filter(v => SHUANGBEI_VENUE_IDS.includes(v.id)).map((venue) => {
-                const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+              {VENUES.filter(v => SHUANGBEI_SET.has(v.id)).map((venue) => {
+                const hasVisits = visitedVenueIds.has(venue.id)
                 const isActive = selectedVenueId === venue.id
                 const { x, y } = project(venue.longitude || 0, venue.latitude || 0)
                 
@@ -769,8 +576,8 @@ export function TaiwanMap({
           </div>
           
           <div className="popover-venue-list">
-            {VENUES.filter(v => SHUANGBEI_VENUE_IDS.includes(v.id)).map((venue) => {
-              const hasVisits = concerts.some((concert) => concert.venueId === venue.id)
+            {VENUES.filter(v => SHUANGBEI_SET.has(v.id)).map((venue) => {
+              const hasVisits = visitedVenueIds.has(venue.id)
               const isActive = selectedVenueId === venue.id
               
               return (
@@ -874,3 +681,5 @@ export function TaiwanMap({
     </div>
   )
 }
+
+export const TaiwanMap = memo(TaiwanMapComponent)

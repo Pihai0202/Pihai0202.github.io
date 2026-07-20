@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react'
 import { marked } from 'marked'
 import './App.css'
@@ -3585,7 +3585,7 @@ function App() {
   )
 }
 
-function UpcomingConcerts({
+const UpcomingConcerts = memo(function UpcomingConcerts({
   concerts,
   status,
   updatedAt,
@@ -3616,7 +3616,17 @@ function UpcomingConcerts({
 }) {
   const { t, lang } = useTranslation()
   const [isExpanded, setIsExpanded] = useState(false)
-  const displayedConcerts = isExpanded ? concerts : concerts.slice(0, 8)
+  const displayedConcerts = useMemo(() => isExpanded ? concerts : concerts.slice(0, 8), [isExpanded, concerts])
+
+  const todayStr = useMemo(() => {
+    const d = new Date()
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000
+    const taipeiTime = new Date(utc + 3600000 * 8)
+    const yyyy = taipeiTime.getFullYear()
+    const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+    const dd = String(taipeiTime.getDate()).padStart(2, '0')
+    return `${yyyy}-${mm}-${dd}`
+  }, [])
 
   const translateSource = (src: string): string => {
     if (lang === 'zh-TW') return src
@@ -3721,7 +3731,9 @@ function UpcomingConcerts({
           {searchQuery ? (lang === 'zh-TW' ? `找不到符合「${searchQuery}」的售票資料` : `No tickets found matching "${searchQuery}"`) : t('noTicketsFound')}
         </div>
       )}
-      {displayedConcerts.map((concert) => (
+      {displayedConcerts.map((concert) => {
+        const isToday = concert.date && concert.date.trim() === todayStr
+        return (
         <div
           className="remote-card"
           style={{ cursor: 'pointer' }}
@@ -3747,25 +3759,12 @@ function UpcomingConcerts({
               <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
-            {(() => {
-              const d = new Date()
-              const utc = d.getTime() + d.getTimezoneOffset() * 60000
-              const taipeiTime = new Date(utc + 3600000 * 8)
-              const yyyy = taipeiTime.getFullYear()
-              const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
-              const dd = String(taipeiTime.getDate()).padStart(2, '0')
-              const todayStr = `${yyyy}-${mm}-${dd}`
-              
-              const isToday = concert.date && concert.date.trim() === todayStr
-              if (!isToday) return null
-              
-              return getCitySuspensionStatus(concert.city, suspensionItems) ? (
-                <div className="typhoon-warning-badge">
-                  <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
-                  {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
-                </div>
-              ) : null
-            })()}
+            {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
+              <div className="typhoon-warning-badge">
+                <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
+                {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+              </div>
+            ) : null}
             <div className="remote-card-meta">
               {getVenueMetaText(concert)}
               {concert.price ? ` · ${translatePrice(concert.price)}` : ''}
@@ -3790,7 +3789,8 @@ function UpcomingConcerts({
             )}
           </div>
         </div>
-      ))}
+        )
+      })}
       {concerts.length > 8 && (
         <button
           className="show-more-btn"
@@ -3802,7 +3802,7 @@ function UpcomingConcerts({
       )}
     </section>
   )
-}
+})
 
 
 
@@ -3841,7 +3841,7 @@ function ConcertList({
   )
 }
 
-function ConcertCard({
+const ConcertCard = memo(function ConcertCard({
   concert,
   showVenue = false,
   onOpenDetail,
@@ -3884,7 +3884,7 @@ function ConcertCard({
       <MediaStrip media={concert.media} />
     </div>
   )
-}
+})
 
 function MediaStrip({ media }: { media: ConcertMedia[] }) {
   if (!media.length) return null
@@ -3896,7 +3896,7 @@ function MediaStrip({ media }: { media: ConcertMedia[] }) {
     <div className="concert-media-preview">
       {visibleMedia.map((item, index) =>
         item.type.startsWith('image') ? (
-          <img className="media-thumb" key={`${item.name}-${index}`} src={item.dataUrl} alt="" />
+          <img className="media-thumb" key={`${item.name}-${index}`} src={item.dataUrl} alt="" loading="lazy" />
         ) : (
           <div className="media-thumb-video" key={`${item.name}-${index}`}>
             <PlayIcon />
