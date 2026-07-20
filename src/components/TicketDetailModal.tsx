@@ -21,7 +21,7 @@ import {
 interface TicketDetailModalProps {
   ticket: RemoteConcert
   onClose: () => void
-  spotifyTokenFetcher: () => Promise<string | null>
+  spotifyTokenFetcher: (forceRefresh?: boolean) => Promise<string | null>
   onPlayMusicBar?: (url: string) => void
   onLogAsPersonal?: (ticket: RemoteConcert) => void
 }
@@ -168,15 +168,23 @@ export function TicketDetailModal({
 
       setSpotifyLoading(true)
       try {
-        const token = await spotifyTokenFetcher()
+        let token = await spotifyTokenFetcher()
         const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
           artistQuery
         )}&type=track&limit=5&market=TW`
         
-        const response = await fetch(url, {
+        let response = await fetch(url, {
           headers: { Authorization: `Bearer ${token}` }
         })
-        if (!response.ok) throw new Error('Spotify API failure')
+
+        if (response.status === 401) {
+          token = await spotifyTokenFetcher(true)
+          response = await fetch(url, {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        }
+
+        if (!response.ok) throw new Error(`Spotify API failure (HTTP ${response.status})`)
         
         const data = await response.json()
         const tracks = data.tracks?.items ?? []

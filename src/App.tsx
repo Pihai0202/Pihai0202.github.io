@@ -80,8 +80,8 @@ const EMPTY_FORM: ConcertForm = {
   spotifyUrl: '',
 }
 
-const SPOTIFY_CLIENT_ID = 'cf537ab8a23b4365876e09a0071554df'
-const SPOTIFY_CLIENT_SECRET = '5a30e4bec5994805b5d82573a105e814'
+const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'cf537ab8a23b4365876e09a0071554df'
+const SPOTIFY_CLIENT_SECRET = import.meta.env.VITE_SPOTIFY_CLIENT_SECRET || '5a30e4bec5994805b5d82573a105e814'
 const SPOTIFY_TYPE_LABELS: Record<SpotifyItem['type'], string> = {
   artist: '歌手',
   album: '專輯',
@@ -1751,20 +1751,31 @@ function App() {
     setSpotifyStatus(`搜尋中 ${query}...`)
 
     try {
-      const token = await getSpotifyToken()
+      let token = await getSpotifyToken()
       const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
         query,
       )}&type=artist,album,track&limit=5&market=TW`
-      const response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
-      if (!response.ok) throw new Error('Spotify search failed')
+      
+      let response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+
+      if (response.status === 401) {
+        token = await getSpotifyToken(true)
+        response = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+      }
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+
       const data = await response.json()
       const results = normalizeSpotifyResults(data)
 
       setSpotifyResults(results)
       setSpotifyStatus(results.length === 0 ? `找不到「${query}」的結果` : '')
-    } catch {
+    } catch (err: any) {
+      console.error('Spotify search error:', err)
       setSpotifyResults([])
-      setSpotifyStatus('搜尋失敗，請稍後再試')
+      setSpotifyStatus(err?.message ? `搜尋失敗 (${err.message})，請檢查 API 金鑰或網路` : '搜尋失敗，請稍後再試')
     } finally {
       setIsSpotifySearching(false)
     }
@@ -4095,23 +4106,34 @@ function Modal({
   )
 }
 
-async function getSpotifyToken() {
-  if (spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken
+async function getSpotifyToken(forceRefresh = false) {
+  if (!forceRefresh && spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken
 
-  const response = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Authorization: `Basic ${btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)}`,
-    },
-    body: 'grant_type=client_credentials',
-  })
-  if (!response.ok) throw new Error('Unable to get Spotify token')
+  try {
+    const response = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Authorization: `Basic ${btoa(`${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}`)}`,
+      },
+      body: 'grant_type=client_credentials',
+    })
+    if (!response.ok) {
+      spotifyToken = null
+      spotifyTokenExpiry = 0
+      const errData = await response.json().catch(() => ({}))
+      throw new Error(errData?.error_description || errData?.error || `HTTP ${response.status}: Unable to get Spotify token`)
+    }
 
-  const data = await response.json()
-  spotifyToken = data.access_token
-  spotifyTokenExpiry = Date.now() + (data.expires_in - 60) * 1000
-  return spotifyToken
+    const data = await response.json()
+    spotifyToken = data.access_token
+    spotifyTokenExpiry = Date.now() + (data.expires_in - 60) * 1000
+    return spotifyToken
+  } catch (err) {
+    spotifyToken = null
+    spotifyTokenExpiry = 0
+    throw err
+  }
 }
 
 function normalizeSpotifyResults(data: any): SpotifyItem[] {
@@ -4157,7 +4179,11 @@ export function parseSpotifyEmbedUrl(url: string | null | undefined) {
   try {
     const parsedUrl = new URL(url)
     if (!parsedUrl.hostname.includes('spotify.com')) return null
-    return `https://open.spotify.com/embed${parsedUrl.pathname}?utm_source=generator&theme=0`
+    let cleanPath = parsedUrl.pathname.replace(/^\/intl-[a-zA-Z]{2}(-[a-zA-Z]{2})?/, '')
+    if (!cleanPath.startsWith('/')) {
+      cleanPath = '/' + cleanPath
+    }
+    return `https://open.spotify.com/embed${cleanPath}?utm_source=generator&theme=0`
   } catch {
     return null
   }
