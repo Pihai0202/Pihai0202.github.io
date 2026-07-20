@@ -16,6 +16,7 @@ export type ConcertMedia = {
   name: string
   dataUrl: string
   type: string
+  isUploading?: boolean
 }
 
 export type Concert = {

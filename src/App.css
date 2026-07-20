@@ -1464,6 +1464,23 @@ svg#taiwan-map.dragging {
   font-size: 0.7rem;
 }
 
+.media-uploading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.media-uploading-overlay .spinner {
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
+  border-top-color: var(--accent);
+}
+
 .modal-submit {
   width: 100%;
   padding: 0.8rem;

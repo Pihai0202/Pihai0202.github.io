@@ -855,6 +855,7 @@ function App() {
     const stored = localStorage.getItem('tw-user-info')
     return stored ? JSON.parse(stored) : null
   })
+  const [hasCheckedMigration, setHasCheckedMigration] = useState(false)
   const [toast, setToast] = useState<{ message: string; type?: 'info' | 'success' | 'error' } | null>(null)
   const showToast = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
     setToast({ message, type })
@@ -1265,6 +1266,78 @@ function App() {
     return () => unsubscribe()
   }, [isLoggedIn, currentUser])
 
+  // Background migration of old Base64 images to ImgBB
+  useEffect(() => {
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+    if (!apiKey || concerts.length === 0 || hasCheckedMigration) return
+
+    const migrateOldPhotos = async () => {
+      // Find all concerts that have old base64 images
+      const concertsToMigrate = concerts.filter(c =>
+        c.media && c.media.some(m => m.type.startsWith('image/') && m.dataUrl.startsWith('data:image/'))
+      )
+
+      if (concertsToMigrate.length === 0) {
+        setHasCheckedMigration(true)
+        return
+      }
+
+      setHasCheckedMigration(true)
+      showToast(
+        lang === 'zh-TW' 
+          ? '偵測到舊照片，正在背景備份至雲端空間...' 
+          : 'Old photos detected, backing up to cloud in background...', 
+        'info'
+      )
+
+      let updatedList = [...concerts]
+      let hasChanges = false
+
+      for (let i = 0; i < updatedList.length; i++) {
+        const concert = updatedList[i]
+        if (!concert.media || concert.media.length === 0) continue
+
+        let concertMediaChanged = false
+        const newMedia = await Promise.all(
+          concert.media.map(async (m) => {
+            if (m.type.startsWith('image/') && m.dataUrl.startsWith('data:image/')) {
+              try {
+                const blob = dataURLtoBlob(m.dataUrl)
+                const imgbbUrl = await uploadImageToImgBB(blob, m.name || 'migrated_photo.jpg')
+                concertMediaChanged = true
+                hasChanges = true
+                return { ...m, dataUrl: imgbbUrl }
+              } catch (err) {
+                console.error(`Failed to migrate image ${m.name} in concert ${concert.id}:`, err)
+                return m
+              }
+            }
+            return m
+          })
+        )
+
+        if (concertMediaChanged) {
+          updatedList[i] = { ...concert, media: newMedia }
+        }
+      }
+
+      if (hasChanges) {
+        try {
+          await updateConcertsList(updatedList)
+          showToast(
+            lang === 'zh-TW' 
+              ? '舊照片備份至雲端完成！' 
+              : 'Old photos backup completed!', 
+            'success'
+          )
+        } catch (err) {
+          console.error('Failed to save migrated concerts list:', err)
+        }
+      }
+    }
+
+    migrateOldPhotos()
+  }, [concerts, hasCheckedMigration, lang])
 
   useEffect(() => {
     loadRemoteConcerts()
@@ -1399,6 +1472,45 @@ function App() {
     })
   }
 
+  const dataURLtoBlob = (dataUrl: string): Blob => {
+    const arr = dataUrl.split(',')
+    const mime = arr[0].match(/:(.*?);/)?.[1] || 'image/jpeg'
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+    return new Blob([u8arr], { type: mime })
+  }
+
+  const uploadImageToImgBB = async (fileBlob: Blob, fileName: string): Promise<string> => {
+    const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+    if (!apiKey) {
+      throw new Error('ImgBB API key is missing')
+    }
+
+    const formData = new FormData()
+    formData.append('image', fileBlob, fileName)
+
+    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: 'POST',
+      body: formData,
+    })
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}))
+      throw new Error(errorData?.error?.message || `HTTP error! status: ${response.status}`)
+    }
+
+    const result = await response.json()
+    if (result?.success && result?.data?.url) {
+      return result.data.url
+    } else {
+      throw new Error('Invalid response from ImgBB')
+    }
+  }
+
   const handleMediaUpload = (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? [])
     files.forEach((file) => {
@@ -1429,24 +1541,64 @@ function App() {
         }
       }
       
+      const mediaId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${file.name}`
       const reader = new FileReader()
       reader.onload = async () => {
         if (typeof reader.result !== 'string') return
         
         let finalDataUrl = reader.result
+        let imageBlob: Blob | null = null
+
         if (isImage) {
           try {
             finalDataUrl = await compressConcertImage(reader.result)
+            imageBlob = dataURLtoBlob(finalDataUrl)
           } catch (err) {
             console.warn('Failed to compress image:', err)
           }
         }
 
-        const mediaId = `${Date.now()}-${Math.random().toString(36).substring(2, 9)}-${file.name}`
+        const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+
+        // Add to pending list immediately with preview data URL and uploading flag
         setPendingMedia((current) => [
           ...current,
-          { id: mediaId, name: file.name, dataUrl: finalDataUrl, type: file.type },
+          { 
+            id: mediaId, 
+            name: file.name, 
+            dataUrl: finalDataUrl, 
+            type: file.type, 
+            isUploading: isImage && !!apiKey 
+          },
         ])
+
+        if (isImage && apiKey) {
+          try {
+            const blobToUpload = imageBlob || file
+            const imgbbUrl = await uploadImageToImgBB(blobToUpload, file.name)
+            
+            // Swap preview with ImgBB URL and clear loading state
+            setPendingMedia((current) =>
+              current.map((item) =>
+                item.id === mediaId ? { ...item, dataUrl: imgbbUrl, isUploading: false } : item
+              )
+            )
+          } catch (err) {
+            console.error('Failed to upload image to ImgBB:', err)
+            showToast(
+              lang === 'zh-TW' 
+                ? `照片上傳失敗，將降級為本地儲存：${err instanceof Error ? err.message : ''}` 
+                : `Photo upload failed, falling back to local: ${err instanceof Error ? err.message : ''}`,
+              'error'
+            )
+            // Fallback: keep local compressed dataUrl, set isUploading: false
+            setPendingMedia((current) =>
+              current.map((item) =>
+                item.id === mediaId ? { ...item, isUploading: false } : item
+              )
+            )
+          }
+        }
       }
       reader.readAsDataURL(file)
     })
@@ -1454,6 +1606,11 @@ function App() {
   }
 
   const saveConcert = async () => {
+    if (pendingMedia.some((m) => m.isUploading)) {
+      showToast(lang === 'zh-TW' ? '照片仍在儲存/上傳中，請稍候。' : 'Photos are still uploading, please wait.', 'info')
+      return
+    }
+
     const artist = form.artist.trim()
 
     if (!artist) {
@@ -2753,13 +2910,15 @@ function App() {
             className="modal-submit"
             type="button"
             onClick={saveConcert}
-            disabled={isSaving}
-            style={isSaving ? { opacity: 0.7, cursor: 'not-allowed' } : undefined}
+            disabled={isSaving || pendingMedia.some((m) => m.isUploading)}
+            style={isSaving || pendingMedia.some((m) => m.isUploading) ? { opacity: 0.7, cursor: 'not-allowed' } : undefined}
           >
-            {isSaving
-              ? (lang === 'zh-TW' ? '正在上傳與儲存...' : 'Saving and uploading...')
-              : (lang === 'zh-TW' ? '儲存記錄' : 'Save Log')}
-            {!isSaving && <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />}
+            {pendingMedia.some((m) => m.isUploading)
+              ? (lang === 'zh-TW' ? '正在上傳照片...' : 'Uploading photos...')
+              : isSaving
+                ? (lang === 'zh-TW' ? '正在儲存...' : 'Saving...')
+                : (lang === 'zh-TW' ? '儲存記錄' : 'Save Log')}
+            {!isSaving && !pendingMedia.some((m) => m.isUploading) && <CheckIcon style={{ marginLeft: '4px', verticalAlign: 'middle' }} />}
           </button>
         </Modal>
       )}
@@ -3752,12 +3911,17 @@ function MediaPreviewGrid({
       {media.map((item, index) => (
         <div className="preview-item" key={`${item.name}-${index}`}>
           {item.type.startsWith('image') ? (
-            <img src={item.dataUrl} alt={item.name} />
+            <img src={item.dataUrl} alt={item.name} style={item.isUploading ? { opacity: 0.5 } : undefined} />
           ) : (
             <>
               <video src={item.dataUrl} />
               <div className="video-preview-overlay"><PlayIcon /></div>
             </>
+          )}
+          {item.isUploading && (
+            <div className="media-uploading-overlay">
+              <div className="spinner"></div>
+            </div>
           )}
           <button className="remove-media" type="button" onClick={() => onRemove(index)}>
             <CloseIcon />
