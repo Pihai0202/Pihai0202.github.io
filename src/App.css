@@ -1172,6 +1172,7 @@ svg#taiwan-map.dragging {
 }
 
 .concert-artist {
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-weight: 700;
   font-size: 1rem;
   color: var(--text);
