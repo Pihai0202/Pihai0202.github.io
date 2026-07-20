@@ -66,7 +66,8 @@ import {
   VolumeXIcon,
   MegaphoneIcon,
   RocketIcon,
-  TrashIcon
+  TrashIcon,
+  RefreshIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -2585,10 +2586,10 @@ function App() {
                           <button
                             type="button"
                             onClick={handleReloadPlayer}
-                            style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.8rem', padding: '0 2px' }}
+                            style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.8rem', padding: '0 2px', display: 'inline-flex', alignItems: 'center' }}
                             title="重新載入播放器"
                           >
-                            🔄
+                            <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
                           </button>
                         )}
                         <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
@@ -3348,10 +3349,10 @@ function App() {
                 <button
                   type="button"
                   onClick={handleReloadPlayer}
-                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.85rem', padding: 0 }}
+                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.85rem', padding: 0, display: 'inline-flex', alignItems: 'center' }}
                   title="重新寫入 / 重試"
                 >
-                  🔄
+                  <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
                 </button>
               )}
               <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
