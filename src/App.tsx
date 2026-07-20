@@ -302,7 +302,9 @@ function App() {
   const [selectedSpotify, setSelectedSpotify] = useState<SpotifyItem | null>(null)
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
+  const [playerReloadKey, setPlayerReloadKey] = useState(0)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
+  const handleReloadPlayer = useCallback(() => setPlayerReloadKey((k) => k + 1), [])
   const [zoom, setZoom] = useState(() => getDefaultZoom())
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
   const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
@@ -2564,11 +2566,35 @@ function App() {
                   <div className="right-panel-spotify-player">
                     <div className="spotify-player-header">
                       <span className="sp-title"><MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />{t('spotifyPlayerTitle')}</span>
-                      <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                        {musicBarUrl && (
+                          <a
+                            href={musicBarUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            style={{ fontSize: '0.72rem', color: 'var(--teal)', textDecoration: 'none' }}
+                            title="在 Spotify 開啟"
+                          >
+                            ↗ Spotify
+                          </a>
+                        )}
+                        {musicBarEmbedUrl && (
+                          <button
+                            type="button"
+                            onClick={handleReloadPlayer}
+                            style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.8rem', padding: '0 2px' }}
+                            title="重新載入播放器"
+                          >
+                            🔄
+                          </button>
+                        )}
+                        <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
+                      </div>
                     </div>
                     <div className="spotify-player-body">
                       {musicBarEmbedUrl ? (
                         <SafeIframe
+                          key={`${musicBarEmbedUrl}-${playerReloadKey}`}
                           src={musicBarEmbedUrl}
                           height="80"
                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -3288,6 +3314,7 @@ function App() {
             <div className="music-bar-content">
               {musicBarEmbedUrl ? (
                 <SafeIframe
+                  key={`${musicBarEmbedUrl}-${playerReloadKey}`}
                   src={musicBarEmbedUrl}
                   height="90"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
@@ -3301,9 +3328,33 @@ function App() {
                 </div>
               )}
             </div>
-            <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
-              ✕
-            </button>
+            <div className="music-bar-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', justifyContent: 'center' }}>
+              {musicBarUrl && (
+                <a
+                  href={musicBarUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="music-bar-open-external"
+                  title="在 Spotify 開啟"
+                  style={{ color: 'var(--teal)', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 'bold' }}
+                >
+                  ↗
+                </a>
+              )}
+              {musicBarEmbedUrl && (
+                <button
+                  type="button"
+                  onClick={handleReloadPlayer}
+                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.85rem', padding: 0 }}
+                  title="重新寫入 / 重試"
+                >
+                  🔄
+                </button>
+              )}
+              <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
+                ✕
+              </button>
+            </div>
           </div>
         </>
       )}
