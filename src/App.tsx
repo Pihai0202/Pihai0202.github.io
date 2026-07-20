@@ -1521,8 +1521,8 @@ function App() {
         return
       }
 
-      if (file.size > 10 * 1024 * 1024) {
-        showToast(lang === 'zh-TW' ? '單張照片容量不能超過 10MB！' : 'Single photo size cannot exceed 10MB!', 'error')
+      if (file.size > 32 * 1024 * 1024) {
+        showToast(lang === 'zh-TW' ? '單張照片容量不能超過 32MB！' : 'Single photo size cannot exceed 32MB!', 'error')
         return
       }
       
