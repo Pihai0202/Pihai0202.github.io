@@ -502,6 +502,39 @@ function TaiwanMapComponent({
         <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
         <TaiwanMapBackground />
 
+        <text x="213" y="585" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
+          {lang === 'zh-TW' ? '澎湖' : 'Penghu'}
+        </text>
+        <text x="25" y="375" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
+          {lang === 'zh-TW' ? '金門' : 'Kinmen'}
+        </text>
+        <text x="324" y="115" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">
+          {lang === 'zh-TW' ? '馬祖' : 'Matsu'}
+        </text>
+
+        {displayZoom < 1.5 && (
+          <g
+            className={`shuangbei-cluster-group${showShuangbeiDetail ? ' active' : ''}`}
+            transform="translate(537,247)"
+            onClick={(e) => {
+              if (didDragRef.current) return
+              e.stopPropagation()
+              setShowShuangbeiDetail(true)
+            }}
+            style={{ cursor: 'pointer' }}
+          >
+            <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
+            <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
+            <circle className="cluster-plate" cx="0" cy="0" r="14" />
+            <text x="0" y="4" textAnchor="middle" className="cluster-text">
+              {SHUANGBEI_VENUE_IDS.length}
+            </text>
+            <text x="0" y="27" textAnchor="middle" className="cluster-label">
+              {t('shuangbeiCluster')}
+            </text>
+          </g>
+        )}
+
         <g>
           {PREPROJECTED_VENUES.map((venue) => {
             const hasVisits = visitedVenueIds.has(venue.id)
