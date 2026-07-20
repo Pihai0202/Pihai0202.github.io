@@ -2618,19 +2618,34 @@ function App() {
             }
           }}
           onUpdateAvatar={async (newAvatar) => {
+            let finalAvatar = newAvatar
+            if (newAvatar && newAvatar.startsWith('data:image/')) {
+              try {
+                showToast(lang === 'zh-TW' ? '正在上傳大頭貼至 imgbb...' : 'Uploading avatar to imgbb...', 'info')
+                const blob = dataURLtoBlob(newAvatar)
+                const imgbbUrl = await uploadImageToImgBB(blob, 'avatar.jpg')
+                finalAvatar = imgbbUrl
+                showToast(lang === 'zh-TW' ? '大頭貼更新成功！' : 'Avatar updated successfully!', 'success')
+              } catch (err) {
+                console.error('Failed to upload avatar to ImgBB:', err)
+                showToast(lang === 'zh-TW' ? '大頭貼上傳失敗，請稍後再試！' : 'Avatar upload failed, please try again later!', 'error')
+                return
+              }
+            }
+
             const emailKey = currentUser?.email || 'guest'
-            if (newAvatar) {
-              localStorage.setItem(`tw-avatar-${emailKey}`, newAvatar)
+            if (finalAvatar) {
+              localStorage.setItem(`tw-avatar-${emailKey}`, finalAvatar)
             } else {
               localStorage.removeItem(`tw-avatar-${emailKey}`)
             }
-            const updated = { ...currentUser, avatarUrl: newAvatar || undefined }
+            const updated = { ...currentUser, avatarUrl: finalAvatar || undefined }
             setCurrentUser(updated)
             localStorage.setItem('tw-user-info', JSON.stringify(updated))
 
             if (auth.currentUser) {
               try {
-                await updateProfile(auth.currentUser, { photoURL: newAvatar || null })
+                await updateProfile(auth.currentUser, { photoURL: finalAvatar || null })
               } catch (err) {
                 console.error('Failed to update Firebase photoURL:', err)
               }
@@ -2639,7 +2654,7 @@ function App() {
             if (currentUser?.email) {
               try {
                 const docRef = doc(db, 'users_concerts', currentUser.email)
-                await setDoc(docRef, { avatarUrl: newAvatar || null }, { merge: true })
+                await setDoc(docRef, { avatarUrl: finalAvatar || null }, { merge: true })
               } catch (err) {
                 console.error('Failed to sync avatar to Firestore:', err)
               }
