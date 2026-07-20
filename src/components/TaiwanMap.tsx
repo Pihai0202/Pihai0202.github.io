@@ -702,7 +702,7 @@ function TaiwanMapComponent({
 
       {overlappingVenues && overlapPos && (
         <div
-          className={`overlap-venues-popover ${overlapPos.y < 200 ? 'position-bottom' : 'position-top'}`}
+          className={`overlap-venues-popover ${overlapPos.y < 320 ? 'position-bottom' : 'position-top'}`}
           style={{
             position: 'absolute',
             left: overlapPos.x,
