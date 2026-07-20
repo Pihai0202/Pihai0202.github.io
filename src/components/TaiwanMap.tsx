@@ -412,7 +412,15 @@ function TaiwanMapComponent({
   const minY = displayCenter.y - height / 2
 
   return (
-    <div className="taiwan-map-wrapper" style={{ position: 'relative', width: '100%', height: '100%' }}>
+    <div
+      className="taiwan-map-wrapper"
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        ['--map-zoom' as any]: displayZoom,
+      }}
+    >
       <svg
         id="taiwan-map"
         ref={svgRef}

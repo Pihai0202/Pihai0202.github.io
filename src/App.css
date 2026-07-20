@@ -1898,7 +1898,7 @@ svg#taiwan-map.dragging {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 90px;
+  height: 152px;
   background: rgba(10, 10, 18, 0.97);
   border-top: 1px solid var(--border);
   backdrop-filter: blur(20px);
@@ -1956,7 +1956,7 @@ svg#taiwan-map.dragging {
 
 .music-bar iframe {
   width: 100%;
-  height: 90px;
+  height: 152px;
   border: none;
   border-radius: 0;
 }
@@ -1978,7 +1978,7 @@ svg#taiwan-map.dragging {
 
 .music-bar-close {
   width: 50px;
-  height: 90px;
+  height: 152px;
   background: none;
   border: none;
   border-left: 1px solid var(--border);
@@ -1992,12 +1992,14 @@ svg#taiwan-map.dragging {
   color: var(--text);
 }
 
-body.player-open .main-layout {
-  height: calc(100vh - 91px - 90px);
-}
+@media (max-width: 768px) {
+  body.player-open .main-layout {
+    height: calc(100vh - 91px - 152px);
+  }
 
-body.player-open .music-bar-toggle {
-  bottom: calc(90px + 1.5rem);
+  body.player-open .music-bar-toggle {
+    bottom: calc(152px + 1.5rem);
+  }
 }
 
 .spotify-search-box {
@@ -2324,7 +2326,7 @@ body.player-open .music-bar-toggle {
 
   body.player-open .main-layout {
     height: auto;
-    padding-bottom: 90px;
+    padding-bottom: 152px;
   }
 
   .remote-card {
@@ -5180,7 +5182,7 @@ body.player-open .music-bar-toggle {
 
   /* Ensure correct padding with player open */
   body.player-open .main-layout {
-    height: calc(100vh - 62px - 90px) !important; /* Minus player height */
+    height: calc(100vh - 62px - 152px) !important; /* Minus player height */
   }
 
   /* Hide details button on list tab since we're already there */

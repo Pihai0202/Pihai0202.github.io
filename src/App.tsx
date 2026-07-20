@@ -1119,6 +1119,9 @@ function App() {
   const visitedVenueCount = new Set(concerts.map((concert) => concert.venueId)).size
   const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
+  const musicBarPlayerHeight = musicBarUrl
+    ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 152 : 352)
+    : 80
 
   const loadRemoteConcerts = useCallback(async () => {
     setIsRemoteRefreshing(true)
@@ -2596,7 +2599,7 @@ function App() {
                         <SafeIframe
                           key={`${musicBarEmbedUrl}-${playerReloadKey}`}
                           src={musicBarEmbedUrl}
-                          height="80"
+                          height={musicBarPlayerHeight}
                           allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                           loading="lazy"
                           title="Spotify player"
@@ -3316,7 +3319,7 @@ function App() {
                 <SafeIframe
                   key={`${musicBarEmbedUrl}-${playerReloadKey}`}
                   src={musicBarEmbedUrl}
-                  height="90"
+                  height="152"
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
                   title="Spotify player"
