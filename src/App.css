@@ -1166,7 +1166,7 @@ svg#taiwan-map.dragging {
 .concert-card-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   gap: 0.75rem;
   margin-bottom: 0.4rem;
 }
@@ -1175,9 +1175,11 @@ svg#taiwan-map.dragging {
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-weight: 700;
   font-size: 1rem;
+  line-height: 1.2;
   color: var(--text);
   min-width: 0;
   overflow-wrap: anywhere;
+  padding-bottom: 2px;
 }
 
 .concert-date {
