@@ -496,4 +496,79 @@ export const RocketIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
+// 🎸 Guitar Icon
+export const GuitarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M18.8 3.2a1.8 1.8 0 0 0-2.6 0L12 7.4 16.6 12l4.2-4.2a1.8 1.8 0 0 0 0-2.6z" />
+    <path d="M15.4 6.6 6.8 15.2a3.8 3.8 0 1 0 5.4 5.4l8.6-8.6z" />
+    <path d="M2 22l4-4" />
+  </svg>
+);
 
+// 🎹 Piano Icon
+export const PianoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
+    <line x1="6" y1="3" x2="6" y2="13" />
+    <line x1="10" y1="3" x2="10" y2="13" />
+    <line x1="14" y1="3" x2="14" y2="13" />
+    <line x1="18" y1="3" x2="18" y2="13" />
+    <line x1="6" y1="13" x2="6" y2="21" />
+    <line x1="10" y1="13" x2="10" y2="21" />
+    <line x1="14" y1="13" x2="14" y2="21" />
+    <line x1="18" y1="13" x2="18" y2="21" />
+    <line x1="2" y1="13" x2="22" y2="13" />
+  </svg>
+);
+
+// 🎧 Headphones Icon
+export const HeadphonesIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
+    <path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z" />
+  </svg>
+);
+
+// 🥁 Drum Icon
+export const DrumIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <ellipse cx="12" cy="7" rx="10" ry="3" />
+    <path d="M2 7v10c0 1.66 4.48 3 10 3s10-1.34 10-3V7" />
+    <path d="M12 7v13" />
+    <path d="m4 4 6 3" />
+    <path d="m20 4-6 3" />
+    <circle cx="3" cy="3" r="1" />
+    <circle cx="21" cy="3" r="1" />
+  </svg>
+);
+
+// 💃 Dancer Icon
+export const DancerIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="4" r="2" />
+    <path d="M9 10a3 3 0 0 1 6 0v4l4 6" />
+    <path d="m5 20 4-6h6l-2-6" />
+  </svg>
+);
+
+// 🕺 Disco Icon
+export const DiscoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="5" r="2" />
+    <path d="m7 21 3-5h4l3 5" />
+    <path d="M10 16v-6l-5-2" />
+    <path d="m14 10 5-3" />
+  </svg>
+);
+
+// 🤘 Rock Icon
+export const RockIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M18 10v6a6 6 0 0 1-12 0v-6" />
+    <path d="M6 10V4a1 1 0 0 1 2 0v6" />
+    <path d="M16 10V4a1 1 0 0 1 2 0v6" />
+    <path d="M10 10V8a1 1 0 0 1 2 0v2" />
+    <path d="M12 10V8a1 1 0 0 1 2 0v2" />
+    <path d="M6 13a4 4 0 0 1 4 4" />
+  </svg>
+);

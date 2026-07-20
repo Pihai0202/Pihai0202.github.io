@@ -13,8 +13,66 @@ import {
   BuildingIcon,
   ActivityIcon,
   MegaphoneIcon,
-  HeartFilledIcon
+  HeartFilledIcon,
+  MusicIcon,
+  GuitarIcon,
+  PianoIcon,
+  HeadphonesIcon,
+  DrumIcon,
+  DancerIcon,
+  DiscoIcon,
+  SparklesIcon,
+  RockIcon,
+  TicketIcon,
+  CameraIcon,
+  TrashIcon
 } from './SvgIcon'
+
+const EMOJI_TO_AVATAR_KEY: Record<string, string> = {
+  '🎵': 'music',
+  '🎤': 'mic',
+  '🎸': 'guitar',
+  '🎹': 'piano',
+  '🎧': 'headphones',
+  '🥁': 'drum',
+  '💃': 'dancer',
+  '🕺': 'disco',
+  '✨': 'sparkles',
+  '🔥': 'fire',
+  '🤘': 'rock',
+  '🎟️': 'ticket',
+  '🎫': 'ticket',
+}
+
+const PRESET_AVATAR_MAP: Record<string, React.ComponentType<{ size?: string | number }>> = {
+  music: MusicIcon,
+  mic: MicIcon,
+  guitar: GuitarIcon,
+  piano: PianoIcon,
+  headphones: HeadphonesIcon,
+  drum: DrumIcon,
+  dancer: DancerIcon,
+  disco: DiscoIcon,
+  sparkles: SparklesIcon,
+  fire: FlameIcon,
+  rock: RockIcon,
+  ticket: TicketIcon,
+}
+
+const PRESET_AVATAR_KEYS = [
+  'music',
+  'mic',
+  'guitar',
+  'piano',
+  'headphones',
+  'drum',
+  'dancer',
+  'disco',
+  'sparkles',
+  'fire',
+  'rock',
+  'ticket',
+]
 import { collection, query, where, getDocs } from 'firebase/firestore'
 
 interface ProfilePageProps {
@@ -66,8 +124,6 @@ export function ProfilePage({
 
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-
-  const PRESET_EMOJIS = ['🎵', '🎤', '🎸', '🎹', '🎧', '🥁', '💃', '🕺', '✨', '🔥', '🤘', '🎟️']
 
   const compressImage = (base64Str: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -328,9 +384,10 @@ export function ProfilePage({
         {/* 左側：個人名片與統計資料 */}
         <aside className="profile-sidebar-card">
           <div className="profile-card-header">
-            <div 
+            <button 
+              type="button"
               className="profile-avatar-large editable" 
-              style={{ backgroundColor: avatarBg }}
+              style={{ backgroundColor: avatarBg, padding: 0, border: '3px solid rgba(255, 255, 255, 0.1)' }}
               onClick={() => setIsAvatarModalOpen(true)}
               title={lang === 'zh-TW' ? '點擊更換頭像' : 'Click to change avatar'}
             >
@@ -338,7 +395,13 @@ export function ProfilePage({
                 user.avatarUrl.startsWith('data:image') || user.avatarUrl.startsWith('http') ? (
                   <img src={user.avatarUrl} alt="Avatar" className="avatar-img" />
                 ) : (
-                  <span className="avatar-emoji">{user.avatarUrl}</span>
+                  <span className="avatar-emoji">
+                    {(() => {
+                      const key = EMOJI_TO_AVATAR_KEY[user.avatarUrl] || user.avatarUrl
+                      const SvgComponent = PRESET_AVATAR_MAP[key]
+                      return SvgComponent ? <SvgComponent size="1em" /> : user.avatarUrl
+                    })()}
+                  </span>
                 )
               ) : (
                 user.nickname.charAt(0).toUpperCase()
@@ -346,7 +409,7 @@ export function ProfilePage({
               <div className="avatar-overlay">
                 <span>{lang === 'zh-TW' ? '更換頭像' : 'Change Avatar'}</span>
               </div>
-            </div>
+            </button>
             {isEditingName ? (
               <div className="edit-nickname-row">
                 <input
@@ -486,16 +549,19 @@ export function ProfilePage({
             </h2>
             
             <div className="avatar-selection-grid">
-              {PRESET_EMOJIS.map((emoji) => (
-                <button
-                  key={emoji}
-                  type="button"
-                  className="avatar-option-btn"
-                  onClick={() => handleSelectEmoji(emoji)}
-                >
-                  {emoji}
-                </button>
-              ))}
+              {PRESET_AVATAR_KEYS.map((key) => {
+                const SvgComponent = PRESET_AVATAR_MAP[key]
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    className="avatar-option-btn"
+                    onClick={() => handleSelectEmoji(key)}
+                  >
+                    {SvgComponent && <SvgComponent size="1em" />}
+                  </button>
+                )
+              })}
             </div>
 
             <div className="avatar-upload-row">
@@ -510,16 +576,20 @@ export function ProfilePage({
                 type="button"
                 className="avatar-upload-btn"
                 onClick={() => fileInputRef.current?.click()}
+                style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
               >
-                {lang === 'zh-TW' ? '📷 上傳自訂照片' : '📷 Upload Custom Photo'}
+                <CameraIcon size="1.1em" />
+                {lang === 'zh-TW' ? '上傳自訂照片' : 'Upload Custom Photo'}
               </button>
               {user.avatarUrl && (
                 <button
                   type="button"
                   className="avatar-reset-btn"
                   onClick={handleResetAvatar}
+                  style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '6px' }}
                 >
-                  {lang === 'zh-TW' ? '🗑️ 清除並恢復預設' : '🗑️ Clear & Reset'}
+                  <TrashIcon size="1.1em" />
+                  {lang === 'zh-TW' ? '清除並恢復預設' : 'Clear & Reset'}
                 </button>
               )}
             </div>
