@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-07-21T14:37:32.116991+00:00",
-  "count": 486,
+  "updated_at": "2026-07-21T16:27:48.817213+00:00",
+  "count": 484,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -12,56 +12,6 @@
     "中華職棒"
   ],
   "events": [
-    {
-      "id": "cpbl-2026-211",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：台鋼雄鷹 vs 中信兄弟",
-      "venue_raw": "洲際",
-      "venue_id": "taichung-dome",
-      "venue_name": "台中洲際棒球場",
-      "city": "台中",
-      "date": "2026-07-21",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "中信兄弟售票網",
-          "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
-    {
-      "id": "cpbl-2026-212",
-      "source": "中華職棒",
-      "name": "中華職棒例行賽：樂天桃猿 vs 味全龍",
-      "venue_raw": "大巨蛋",
-      "venue_id": "taipei-dome",
-      "venue_name": "台北大巨蛋",
-      "city": "台北",
-      "date": "2026-07-21",
-      "image": "https://www.cpbl.com.tw/files/atts/0L021497845061333235/logo_dragon.png",
-      "url": "https://www.cpbl.com.tw/schedule",
-      "price": "依官網/主隊公告為準",
-      "ticket_links": [
-        {
-          "platform": "cpbl",
-          "name": "味全龍售票網",
-          "url": "https://tix.wdragons.com/UTK0101_"
-        },
-        {
-          "platform": "manual",
-          "name": "中華職棒官方賽程",
-          "url": "https://www.cpbl.com.tw/schedule"
-        }
-      ]
-    },
     {
       "id": "kktix-org-ofkewr-2026-07-22",
       "source": "KKTIX",
