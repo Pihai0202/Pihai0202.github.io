@@ -1356,7 +1356,8 @@ function App() {
 
   useEffect(() => {
     document.body.classList.toggle('player-open', isMusicBarVisible)
-    document.documentElement.style.setProperty('--player-height', `${musicBarPlayerHeight}px`)
+    const totalHeight = isMusicBarVisible ? (musicBarPlayerHeight + 34) : 0
+    document.documentElement.style.setProperty('--player-height', `${totalHeight}px`)
 
     return () => {
       document.body.classList.remove('player-open')
@@ -3304,64 +3305,66 @@ function App() {
         </div>
       )}
 
-      {isMobile && (
-        <>
-          <button
-            className="music-bar-toggle"
-            type="button"
-            onClick={() => setIsMusicBarVisible((visible) => !visible)}
-          >
-            <div className="spotify-icon" />
-            <span>{isMusicBarVisible ? t('spotifyPlayerCollapse') : t('spotifyPlayerTitle')}</span>
-          </button>
-
-          <div className={`music-bar${isMusicBarVisible ? ' visible' : ''}`}>
-            <div className="music-bar-content">
-              {musicBarEmbedUrl ? (
-                <SafeIframe
-                  key={`${musicBarEmbedUrl}-${playerReloadKey}`}
-                  src={musicBarEmbedUrl}
-                  height={musicBarPlayerHeight}
-                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                  loading="lazy"
-                  title="Spotify player"
-                />
-              ) : (
-                <div className="music-bar-placeholder">
-                  <span className="sp-logo"><MusicIcon /></span>
-                  <span>{t('spotifyPlayerPlaceholder')}</span>
-                </div>
-              )}
-            </div>
-            <div className="music-bar-controls" style={{ display: 'flex', flexDirection: 'column', gap: '4px', alignItems: 'center', justifyContent: 'center' }}>
+      {/* Global Keep-Alive Spotify Player for both desktop and mobile */}
+      {isMusicBarVisible && musicBarEmbedUrl && (
+        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+          <div className="spotify-player-header">
+            <span className="sp-title">
+              <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
+              {t('spotifyPlayerTitle')}
+            </span>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
               {musicBarUrl && (
                 <a
                   href={musicBarUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="music-bar-open-external"
+                  className="sp-open-link"
                   title="在 Spotify 開啟"
-                  style={{ color: 'var(--teal)', fontSize: '0.8rem', textDecoration: 'none', fontWeight: 'bold' }}
                 >
-                  ↗
+                  ↗ Spotify
                 </a>
               )}
-              {musicBarEmbedUrl && (
-                <button
-                  type="button"
-                  onClick={handleReloadPlayer}
-                  style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.85rem', padding: 0, display: 'inline-flex', alignItems: 'center' }}
-                  title="重新寫入 / 重試"
-                >
-                  <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
-                </button>
-              )}
-              <button className="music-bar-close" type="button" onClick={() => setIsMusicBarVisible(false)}>
+              <button
+                type="button"
+                className="sp-reload-btn"
+                onClick={handleReloadPlayer}
+                title="重新載入播放器"
+              >
+                <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+              </button>
+              <button 
+                className="sp-close-btn" 
+                type="button" 
+                onClick={() => setIsMusicBarVisible(false)}
+                title="關閉播放器"
+              >
                 ✕
               </button>
             </div>
           </div>
-        </>
+          <div className="spotify-player-body">
+            <SafeIframe
+              key={`${musicBarEmbedUrl}-${playerReloadKey}`}
+              src={musicBarEmbedUrl}
+              height={musicBarPlayerHeight}
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy"
+              title="Spotify player"
+            />
+          </div>
+        </div>
+      )}
+
+      {isMobile && (
+        <button
+          className="music-bar-toggle"
+          type="button"
+          onClick={() => setIsMusicBarVisible((visible) => !visible)}
+        >
+          <div className="spotify-icon" />
+          <span>{isMusicBarVisible ? t('spotifyPlayerCollapse') : t('spotifyPlayerTitle')}</span>
+        </button>
       )}
 
         <>
