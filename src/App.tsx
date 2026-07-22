@@ -1121,7 +1121,7 @@ function App() {
   const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
   const musicBarPlayerHeight = musicBarUrl
-    ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 152 : 352)
+    ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 80 : 352)
     : 80
 
   const loadRemoteConcerts = useCallback(async () => {
@@ -1356,11 +1356,12 @@ function App() {
 
   useEffect(() => {
     document.body.classList.toggle('player-open', isMusicBarVisible)
+    document.documentElement.style.setProperty('--player-height', `${musicBarPlayerHeight}px`)
 
     return () => {
       document.body.classList.remove('player-open')
     }
-  }, [isMusicBarVisible])
+  }, [isMusicBarVisible, musicBarPlayerHeight])
 
 
 
@@ -3320,7 +3321,7 @@ function App() {
                 <SafeIframe
                   key={`${musicBarEmbedUrl}-${playerReloadKey}`}
                   src={musicBarEmbedUrl}
-                  height="152"
+                  height={musicBarPlayerHeight}
                   allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                   loading="lazy"
                   title="Spotify player"

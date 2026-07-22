@@ -14,7 +14,7 @@ export function SpotifyEmbed({ url }: SpotifyEmbedProps) {
   const embedUrl = parseSpotifyEmbedUrl(url)
   if (!embedUrl) return null
 
-  const height = url.includes('/track/') || url.includes('/episode/') ? 152 : 352
+  const height = url.includes('/track/') || url.includes('/episode/') ? 80 : 352
 
   return (
     <>
