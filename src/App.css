@@ -8470,7 +8470,7 @@ svg#taiwan-map.dragging {
 /* 平板尺寸 (769px - 1024px) 側邊欄寬度最佳化 */
 @media (min-width: 769px) and (max-width: 1024px) {
   .main-layout {
-    grid-template-columns: 1fr 360px !important;
+    grid-template-columns: 1fr var(--sidebar-width, 420px) !important;
   }
 }
 
@@ -11575,7 +11575,7 @@ body:has(.main-layout) {
 
 /* Global Spotify Player (SPA Keep-Alive) */
 :root {
-  --sidebar-width: 380px;
+  --sidebar-width: 420px;
 }
 
 @media (min-width: 769px) {
@@ -11608,7 +11608,7 @@ body:has(.main-layout) {
     bottom: 0;
     right: 0;
     width: var(--sidebar-width);
-    padding: 8px 12px;
+    padding: 6px 8px;
     border-top: 1px solid var(--border);
     border-left: 1px solid var(--border);
     border-radius: 0;
@@ -11625,8 +11625,9 @@ body:has(.main-layout) {
   .global-spotify-player.profile {
     bottom: 24px;
     right: 24px;
-    width: 320px;
-    padding: 10px 14px;
+    width: 440px;
+    max-width: calc(100vw - 48px);
+    padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
@@ -12305,7 +12306,7 @@ body:has(.main-layout) {
 
   /* 3. Map Layout & Sidebar */
   .main-layout {
-    grid-template-columns: 1fr 340px !important;
+    grid-template-columns: 1fr var(--sidebar-width, 420px) !important;
   }
 
   /* Venue Panel Floating Glassmorphism Style */
