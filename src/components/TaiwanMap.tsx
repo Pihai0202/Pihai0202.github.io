@@ -264,13 +264,29 @@ function TaiwanMapComponent({
   const animationRef = useRef<number | null>(null)
   const centerRef = useRef(center)
   const zoomRef = useRef(zoom)
+  const displayZoomRef = useRef(zoom)
+  const displayCenterRef = useRef(center)
+
+  const updateDisplayZoom = (z: number) => {
+    displayZoomRef.current = z
+    zoomRef.current = z
+    setDisplayZoom(z)
+  }
+
+  const updateDisplayCenter = (c: { x: number; y: number }) => {
+    displayCenterRef.current = c
+    centerRef.current = c
+    setDisplayCenter(c)
+  }
 
   useEffect(() => {
     centerRef.current = center
+    displayCenterRef.current = center
   }, [center])
 
   useEffect(() => {
     zoomRef.current = zoom
+    displayZoomRef.current = zoom
   }, [zoom])
 
   const rafPendingRef = useRef<{ center?: { x: number; y: number }; zoom?: number }>({})
@@ -281,12 +297,10 @@ function TaiwanMapComponent({
     rafIdRef.current = requestAnimationFrame(() => {
       rafIdRef.current = null
       if (rafPendingRef.current.center) {
-        setDisplayCenter(rafPendingRef.current.center)
-        centerRef.current = rafPendingRef.current.center
+        updateDisplayCenter(rafPendingRef.current.center)
       }
       if (typeof rafPendingRef.current.zoom === 'number') {
-        setDisplayZoom(rafPendingRef.current.zoom)
-        zoomRef.current = rafPendingRef.current.zoom
+        updateDisplayZoom(rafPendingRef.current.zoom)
       }
       rafPendingRef.current = {}
     })
@@ -300,11 +314,11 @@ function TaiwanMapComponent({
   }, [])
 
   useEffect(() => {
-    if (!isAnimatingRef.current) setDisplayZoom(zoom)
+    if (!isAnimatingRef.current) updateDisplayZoom(zoom)
   }, [zoom])
 
   useEffect(() => {
-    if (!isAnimatingRef.current) setDisplayCenter(center)
+    if (!isAnimatingRef.current) updateDisplayCenter(center)
   }, [center])
 
   const lastSelectedVenueId = useRef(selectedVenueId)
@@ -328,9 +342,9 @@ function TaiwanMapComponent({
       }
 
       // Start animating from current visual coordinates
-      const startZoom = displayZoom
-      const startX = displayCenter.x
-      const startY = displayCenter.y
+      const startZoom = displayZoomRef.current || displayZoom
+      const startX = displayCenterRef.current.x
+      const startY = displayCenterRef.current.y
       const targetX = projected.x
       const targetY = projected.y
 
@@ -347,13 +361,15 @@ function TaiwanMapComponent({
         const newX = startX + (targetX - startX) * ease
         const newY = startY + (targetY - startY) * ease
 
-        setDisplayZoom(newZoom)
-        setDisplayCenter({ x: newX, y: newY })
+        updateDisplayZoom(newZoom)
+        updateDisplayCenter({ x: newX, y: newY })
 
         if (progress < 1) {
           animationRef.current = requestAnimationFrame(animate)
         } else {
           isAnimatingRef.current = false
+          setCenter({ x: targetX, y: targetY })
+          onZoomChange(targetZoom)
         }
       }
 
@@ -361,9 +377,9 @@ function TaiwanMapComponent({
     } else {
       const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
       // Start animating from current visual coordinates back to default zoom and center
-      const startZoom = displayZoom
-      const startX = displayCenter.x
-      const startY = displayCenter.y
+      const startZoom = displayZoomRef.current || displayZoom
+      const startX = displayCenterRef.current.x
+      const startY = displayCenterRef.current.y
       const targetX = 455
       const targetY = 500
 
@@ -380,8 +396,8 @@ function TaiwanMapComponent({
         const newX = startX + (targetX - startX) * ease
         const newY = startY + (targetY - startY) * ease
 
-        setDisplayZoom(newZoom)
-        setDisplayCenter({ x: newX, y: newY })
+        updateDisplayZoom(newZoom)
+        updateDisplayCenter({ x: newX, y: newY })
 
         if (progress < 1) {
           animationRef.current = requestAnimationFrame(animate)
@@ -417,8 +433,8 @@ function TaiwanMapComponent({
       const clientY = e.clientY - rect.top
       const pctX = clientX / rect.width
       const pctY = clientY / rect.height
-      const currentZoom = zoomRef.current
-      const currentCenter = centerRef.current
+      const currentZoom = displayZoomRef.current || zoomRef.current
+      const currentCenter = displayCenterRef.current || centerRef.current
       const w = 800 / currentZoom
       const h = 800 / currentZoom
       const minX = currentCenter.x - w / 2
@@ -432,14 +448,19 @@ function TaiwanMapComponent({
       const newMinX = mx - pctX * newWidth
       const newMinY = my - pctY * newHeight
       const nextCenter = { x: newMinX + newWidth / 2, y: newMinY + newHeight / 2 }
+      
+      updateDisplayZoom(newZoom)
+      updateDisplayCenter(nextCenter)
+
       rafPendingRef.current.center = nextCenter
       rafPendingRef.current.zoom = newZoom
       scheduleRafUpdate()
+
       if (wheelTimeoutRef.current) clearTimeout(wheelTimeoutRef.current)
       wheelTimeoutRef.current = setTimeout(() => {
         setCenter(centerRef.current)
         onZoomChange(zoomRef.current)
-      }, 100)
+      }, 50)
     }
 
     svgEl.addEventListener('wheel', handleWheel, { passive: false })
