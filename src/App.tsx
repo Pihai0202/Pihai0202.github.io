@@ -854,7 +854,7 @@ function App() {
   }, [searchQuery])
   const [nickname, setNickname] = useState(() => localStorage.getItem('tw-nickname') || '')
   const [isLoggedIn, setIsLoggedIn] = useState(() => localStorage.getItem('tw-logged-in') === 'true')
-  const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string; avatarUrl?: string } | null>(() => {
+  const [currentUser, setCurrentUser] = useState<{ nickname: string; email?: string; avatarUrl?: string; spotifyUrl?: string } | null>(() => {
     const stored = localStorage.getItem('tw-user-info')
     return stored ? JSON.parse(stored) : null
   })
@@ -1204,14 +1204,16 @@ function App() {
 
           const cloudNickname = docData.nickname as string | undefined
           const cloudAvatar = docData.avatarUrl as string | undefined
+          const cloudSpotifyUrl = docData.spotifyUrl as string | undefined
 
-          if (cloudNickname || cloudAvatar) {
+          if (cloudNickname || cloudAvatar || cloudSpotifyUrl !== undefined) {
             setCurrentUser((prev) => {
               if (!prev) return null
               const updated = {
                 ...prev,
                 nickname: cloudNickname || prev.nickname,
-                avatarUrl: cloudAvatar || prev.avatarUrl
+                avatarUrl: cloudAvatar || prev.avatarUrl,
+                spotifyUrl: cloudSpotifyUrl !== undefined ? (cloudSpotifyUrl || undefined) : prev.spotifyUrl
               }
               localStorage.setItem('tw-user-info', JSON.stringify(updated))
               if (cloudNickname) {
@@ -2702,6 +2704,21 @@ function App() {
                 console.error('Failed to sync avatar to Firestore:', err)
               }
             }
+          }}
+          onUpdateSpotifyUrl={async (newSpotifyUrl) => {
+            const updated = { ...currentUser, spotifyUrl: newSpotifyUrl || undefined }
+            setCurrentUser(updated)
+            localStorage.setItem('tw-user-info', JSON.stringify(updated))
+
+            if (currentUser?.email) {
+              try {
+                const docRef = doc(db, 'users_concerts', currentUser.email)
+                await setDoc(docRef, { spotifyUrl: newSpotifyUrl || null }, { merge: true })
+              } catch (err) {
+                console.error('Failed to sync spotifyUrl to Firestore:', err)
+              }
+            }
+            showToast(lang === 'zh-TW' ? '已更新個人主題曲！' : 'Theme song updated!', 'success')
           }}
           onLogout={handleLogout}
           onBack={() => setView('map')}

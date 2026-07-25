@@ -12588,3 +12588,84 @@ body:has(.main-layout) {
     margin-bottom: 0.8rem !important;
   }
 }
+
+/* Profile Page Theme Music Box */
+.profile-theme-music-box {
+  margin-top: 1.2rem;
+  padding: 1rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border);
+  transition: all 0.25s ease;
+}
+
+.profile-theme-music-box:hover {
+  border-color: rgba(29, 185, 84, 0.4);
+  box-shadow: 0 4px 20px rgba(29, 185, 84, 0.12);
+}
+
+.theme-music-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.theme-music-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+}
+
+.edit-theme-music-btn {
+  background: rgba(29, 185, 84, 0.12);
+  border: 1px solid rgba(29, 185, 84, 0.3);
+  color: #1db954;
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+}
+
+.edit-theme-music-btn:hover {
+  background: #1db954;
+  color: #000;
+  transform: translateY(-1px);
+}
+
+.theme-music-player-wrapper iframe {
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  display: block;
+}
+
+.theme-music-placeholder-btn {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px dashed rgba(29, 185, 84, 0.35);
+  border-radius: 10px;
+  padding: 0.8rem;
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: all 0.25s ease;
+}
+
+.theme-music-placeholder-btn:hover {
+  background: rgba(29, 185, 84, 0.08);
+  border-color: #1db954;
+  color: var(--text);
+}

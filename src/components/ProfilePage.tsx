@@ -74,12 +74,15 @@ const PRESET_AVATAR_KEYS = [
   'ticket',
 ]
 import { collection, query, where, getDocs } from 'firebase/firestore'
+import { parseSpotifyEmbedUrl } from '../App'
+import { SafeIframe } from './SafeIframe'
 
 interface ProfilePageProps {
-  user: { nickname: string; email?: string; avatarUrl?: string }
+  user: { nickname: string; email?: string; avatarUrl?: string; spotifyUrl?: string }
   concerts: Concert[]
   onUpdateNickname: (newNickname: string) => void
   onUpdateAvatar: (newAvatar: string) => void
+  onUpdateSpotifyUrl?: (newSpotifyUrl: string) => void
   onLogout: () => void
   onBack: () => void
   onOpenConcertDetail: (id: string) => void
@@ -100,6 +103,7 @@ export function ProfilePage({
   concerts,
   onUpdateNickname,
   onUpdateAvatar,
+  onUpdateSpotifyUrl,
   onLogout,
   onBack,
   onOpenConcertDetail
@@ -107,6 +111,8 @@ export function ProfilePage({
   const { t, lang } = useTranslation()
   const [isEditingName, setIsEditingName] = useState(false)
   const [editNickname, setEditNickname] = useState(user.nickname)
+  const [isSpotifyModalOpen, setIsSpotifyModalOpen] = useState(false)
+  const [spotifyInputUrl, setSpotifyInputUrl] = useState(user.spotifyUrl || '')
   const [myReviews, setMyReviews] = useState<UserReview[]>([])
   const [reviewsLoading, setReviewsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
@@ -438,6 +444,52 @@ export function ProfilePage({
               <MailIcon size="0.9em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
               {user.email || (lang === 'zh-TW' ? '訪客模式' : 'Guest Mode')}
             </p>
+
+            {/* 個人主題曲區塊 / Theme Song Section */}
+            <div className="profile-theme-music-box">
+              <div className="theme-music-header">
+                <span className="theme-music-title">
+                  <MusicIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle', color: '#1db954' }} />
+                  {lang === 'zh-TW' ? '個人主題曲' : 'Theme Song'}
+                </span>
+                <button
+                  type="button"
+                  className="edit-theme-music-btn"
+                  onClick={() => {
+                    setSpotifyInputUrl(user.spotifyUrl || '')
+                    setIsSpotifyModalOpen(true)
+                  }}
+                  title={lang === 'zh-TW' ? '設定 / 更換主題曲' : 'Set / Edit Theme Song'}
+                >
+                  <EditIcon size="0.85em" style={{ verticalAlign: 'middle' }} />
+                  <span>{user.spotifyUrl ? (lang === 'zh-TW' ? '編輯' : 'Edit') : (lang === 'zh-TW' ? '新增' : 'Add')}</span>
+                </button>
+              </div>
+
+              {user.spotifyUrl && parseSpotifyEmbedUrl(user.spotifyUrl) ? (
+                <div className="theme-music-player-wrapper">
+                  <SafeIframe
+                    src={parseSpotifyEmbedUrl(user.spotifyUrl)!}
+                    height={user.spotifyUrl.includes('/track/') || user.spotifyUrl.includes('/episode/') ? 80 : 152}
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                    loading="lazy"
+                    title="Profile Theme Song"
+                  />
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  className="theme-music-placeholder-btn"
+                  onClick={() => {
+                    setSpotifyInputUrl(user.spotifyUrl || '')
+                    setIsSpotifyModalOpen(true)
+                  }}
+                >
+                  <MusicIcon size="1.2em" style={{ color: '#1db954', opacity: 0.8 }} />
+                  <span>{lang === 'zh-TW' ? '+ 點擊設定 Spotify 主題曲' : '+ Click to add Spotify theme song'}</span>
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="profile-stats-card-list">
@@ -612,6 +664,97 @@ export function ProfilePage({
             </div>
             <div className="records-modal-body">
               {footprintsSection}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 個人主題曲編輯彈窗 */}
+      {isSpotifyModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsSpotifyModalOpen(false)}>
+          <div className="modal spotify-edit-modal" style={{ maxWidth: '440px', padding: '1.8rem', borderRadius: '20px' }} onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setIsSpotifyModalOpen(false)}>
+              ✕
+            </button>
+            <h3 style={{ fontSize: '1.2rem', color: 'var(--text)', marginBottom: '0.8rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <MusicIcon style={{ color: '#1db954' }} />
+              {lang === 'zh-TW' ? '設定個人主題曲' : 'Set Profile Theme Song'}
+            </h3>
+            <p style={{ color: 'var(--muted)', fontSize: '0.82rem', marginBottom: '1.2rem', lineHeight: '1.5' }}>
+              {lang === 'zh-TW'
+                ? '貼上 Spotify 歌曲、專輯或歌單的分享連結，其他人造訪您的個人頁時就能直接聆聽您的主題音樂！'
+                : 'Paste a Spotify song, album, or playlist link to display and play your theme song on your profile!'}
+            </p>
+            
+            <div style={{ marginBottom: '1.2rem' }}>
+              <label style={{ display: 'block', fontSize: '0.8rem', color: 'var(--muted)', marginBottom: '0.4rem', fontWeight: 'bold' }}>
+                {lang === 'zh-TW' ? 'Spotify 網址連結' : 'Spotify URL Link'}
+              </label>
+              <input
+                type="url"
+                className="profile-search-input"
+                style={{ width: '100%', boxSizing: 'border-box', padding: '0.7rem 1rem', fontSize: '0.88rem' }}
+                placeholder="https://open.spotify.com/track/..."
+                value={spotifyInputUrl}
+                onChange={(e) => setSpotifyInputUrl(e.target.value)}
+              />
+            </div>
+
+            {/* 歌曲即時預覽 / Live Preview */}
+            {spotifyInputUrl.trim() && parseSpotifyEmbedUrl(spotifyInputUrl) && (
+              <div style={{ marginBottom: '1.2rem', background: 'rgba(0,0,0,0.3)', padding: '0.5rem', borderRadius: '12px', border: '1px solid var(--border)' }}>
+                <div style={{ fontSize: '0.75rem', color: 'var(--teal)', marginBottom: '0.4rem', fontWeight: 'bold' }}>
+                  ✓ {lang === 'zh-TW' ? '音樂預覽：' : 'Music Preview:'}
+                </div>
+                <SafeIframe
+                  src={parseSpotifyEmbedUrl(spotifyInputUrl)!}
+                  height={spotifyInputUrl.includes('/track/') || spotifyInputUrl.includes('/episode/') ? 80 : 152}
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  title="Theme Song Preview"
+                  style={{ width: '100%', border: 'none', borderRadius: '8px' }}
+                />
+              </div>
+            )}
+
+            <div style={{ display: 'flex', gap: '0.8rem', marginTop: '1.5rem' }}>
+              <button
+                type="button"
+                className="login-submit-btn"
+                style={{ flex: 1, padding: '0.65rem', borderRadius: '24px', background: '#1db954', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer' }}
+                onClick={() => {
+                  const trimmed = spotifyInputUrl.trim()
+                  if (onUpdateSpotifyUrl) {
+                    onUpdateSpotifyUrl(trimmed)
+                  }
+                  setIsSpotifyModalOpen(false)
+                }}
+              >
+                {lang === 'zh-TW' ? '儲存主題曲' : 'Save Theme Song'}
+              </button>
+              {user.spotifyUrl && (
+                <button
+                  type="button"
+                  style={{ padding: '0.65rem 1rem', borderRadius: '24px', background: 'rgba(255, 77, 77, 0.15)', color: '#ff4d4d', border: '1px solid rgba(255, 77, 77, 0.3)', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.85rem' }}
+                  onClick={() => {
+                    setSpotifyInputUrl('')
+                    if (onUpdateSpotifyUrl) {
+                      onUpdateSpotifyUrl('')
+                    }
+                    setIsSpotifyModalOpen(false)
+                  }}
+                >
+                  {lang === 'zh-TW' ? '移除' : 'Remove'}
+                </button>
+              )}
+              <button
+                type="button"
+                className="cancel-publish-btn"
+                style={{ padding: '0.65rem 1rem', borderRadius: '24px', background: 'transparent', color: 'var(--muted)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: '0.85rem' }}
+                onClick={() => setIsSpotifyModalOpen(false)}
+              >
+                {lang === 'zh-TW' ? '取消' : 'Cancel'}
+              </button>
             </div>
           </div>
         </div>
