@@ -20,6 +20,7 @@ const SHUANGBEI_VENUE_IDS = [
   'zepp-new-taipei',
   'legacy-taipei',
   'the-wall',
+  'witch-house',
   'tianmu',
   'xinzhuang',
   'ticc',
@@ -51,6 +52,112 @@ const SPORT_VENUE_IDS = [
   'linkou-arena'
 ]
 
+interface RegionClusterDef {
+  id: string
+  name: Record<string, string>
+  label: Record<string, string>
+  venueIds: string[]
+  pos: { x: number; y: number }
+  viewBox: string
+  counties: string[]
+}
+
+const REGION_CLUSTERS: RegionClusterDef[] = [
+  {
+    id: 'shuangbei',
+    name: {
+      'zh-TW': '雙北地區場館特寫',
+      ja: '双北（台北・新北）会場ズーム',
+      ko: '쌍북(타이베이·신베이) 공연장 돋보기',
+      en: 'Shuangbei Venues Detail',
+    },
+    label: {
+      'zh-TW': '雙北場館',
+      ja: '双北会場',
+      ko: '쌍북 공연장',
+      en: 'Shuangbei',
+    },
+    venueIds: SHUANGBEI_VENUE_IDS,
+    pos: { x: 537, y: 247 },
+    viewBox: '495 205 125 115',
+    counties: ['Taipei', 'New Taipei', 'Keelung', 'Taoyuan'],
+  },
+  {
+    id: 'kaohsiung',
+    name: {
+      'zh-TW': '高雄地區場館特寫',
+      ja: '高雄会場ズーム',
+      ko: '가오슝 공연장 돋보기',
+      en: 'Kaohsiung Venues Detail',
+    },
+    label: {
+      'zh-TW': '高雄場館',
+      ja: '高雄会場',
+      ko: '가오슝 공연장',
+      en: 'Kaohsiung',
+    },
+    venueIds: [
+      'kaohsiung-dome',
+      'kaohsiung-natl',
+      'kaohsiung-music-center',
+      'backstage-live',
+      'chengcing-lake',
+      'live-warehouse',
+    ],
+    pos: { x: 455, y: 680 },
+    viewBox: '430 640 100 90',
+    counties: ['Kaohsiung', 'Pingtung'],
+  },
+  {
+    id: 'tainan',
+    name: {
+      'zh-TW': '台南地區場館特寫',
+      ja: '台南会場ズーム',
+      ko: '타이남 공연장 돋보기',
+      en: 'Tainan Venues Detail',
+    },
+    label: {
+      'zh-TW': '台南場館',
+      ja: '台南会場',
+      ko: '타이남 공연장',
+      en: 'Tainan',
+    },
+    venueIds: [
+      'tainan',
+      'asia-pacific-main',
+      'tcrc-livehouse',
+      'wild-egret',
+    ],
+    pos: { x: 420, y: 590 },
+    viewBox: '390 540 100 90',
+    counties: ['Tainan', 'Chiayi'],
+  },
+  {
+    id: 'taichung',
+    name: {
+      'zh-TW': '台中地區場館特寫',
+      ja: '台中会場ズーム',
+      ko: '타이중 공연장 돋보기',
+      en: 'Taichung Venues Detail',
+    },
+    label: {
+      'zh-TW': '台中場館',
+      ja: '台中会場',
+      ko: '타이중 공연장',
+      en: 'Taichung',
+    },
+    venueIds: [
+      'taichung-dome',
+      'taichung-venue',
+      'legacy-taichung',
+    ],
+    pos: { x: 450, y: 400 },
+    viewBox: '420 350 110 90',
+    counties: ['Taichung', 'Changhua'],
+  },
+]
+
+const ALL_CLUSTERED_VENUE_IDS = new Set(REGION_CLUSTERS.flatMap(r => r.venueIds))
 const SHUANGBEI_SET = new Set(SHUANGBEI_VENUE_IDS)
 const SPORT_SET = new Set(SPORT_VENUE_IDS)
 
@@ -125,7 +232,7 @@ function TaiwanMapComponent({
   const { t, lang } = useTranslation()
   const [center, setCenter] = useState({ x: 455, y: 500 })
   const [isDragging, setIsDragging] = useState(false)
-  const [showShuangbeiDetail, setShowShuangbeiDetail] = useState(false)
+  const [activeClusterId, setActiveClusterId] = useState<string | null>(null)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
   const dragStartRef = useRef<{ clientX: number; clientY: number; centerX: number; centerY: number } | null>(null)
@@ -513,25 +620,34 @@ function TaiwanMapComponent({
         </text>
 
         {displayZoom < 1.5 && (
-          <g
-            className={`shuangbei-cluster-group${showShuangbeiDetail ? ' active' : ''}`}
-            transform="translate(537,247)"
-            onClick={(e) => {
-              if (didDragRef.current) return
-              e.stopPropagation()
-              setShowShuangbeiDetail(true)
-            }}
-            style={{ cursor: 'pointer' }}
-          >
-            <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
-            <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
-            <circle className="cluster-plate" cx="0" cy="0" r="14" />
-            <text x="0" y="4" textAnchor="middle" className="cluster-text">
-              {SHUANGBEI_VENUE_IDS.length}
-            </text>
-            <text x="0" y="27" textAnchor="middle" className="cluster-label">
-              {t('shuangbeiCluster')}
-            </text>
+          <g className="region-clusters-layer">
+            {REGION_CLUSTERS.map((cluster) => {
+              const isActive = activeClusterId === cluster.id
+              const labelText = cluster.label[lang] || cluster.label['zh-TW']
+              return (
+                <g
+                  key={cluster.id}
+                  className={`shuangbei-cluster-group${isActive ? ' active' : ''}`}
+                  transform={`translate(${cluster.pos.x},${cluster.pos.y})`}
+                  onClick={(e) => {
+                    if (didDragRef.current) return
+                    e.stopPropagation()
+                    setActiveClusterId(cluster.id)
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
+                  <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
+                  <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
+                  <circle className="cluster-plate" cx="0" cy="0" r="14" />
+                  <text x="0" y="4" textAnchor="middle" className="cluster-text">
+                    {cluster.venueIds.length}
+                  </text>
+                  <text x="0" y="27" textAnchor="middle" className="cluster-label">
+                    {labelText}
+                  </text>
+                </g>
+              )
+            })}
           </g>
         )}
 
@@ -541,7 +657,7 @@ function TaiwanMapComponent({
             const isActive = selectedVenueId === venue.id
             const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
             const shouldShowIcon = isActive || hasVisits || (activeVenueIds && activeVenueIds.has(venue.id)) || displayZoom >= 1.5 || (hoveredVenue && hoveredVenue.id === venue.id)
-            if (displayZoom < 1.5 && venue.isShuangbei) return null
+            if (displayZoom < 1.5 && ALL_CLUSTERED_VENUE_IDS.has(venue.id)) return null
 
             return (
               <g
@@ -580,7 +696,7 @@ function TaiwanMapComponent({
 
                   setOverlappingVenues(null)
                   onSelectVenue(targetVenueId)
-                  setShowShuangbeiDetail(false)
+                  setActiveClusterId(null)
                 }}
                 onMouseEnter={() => {
                   if (isCategoryInactive || isDragging) return
@@ -619,86 +735,92 @@ function TaiwanMapComponent({
         </g>
       </svg>
 
-      {showShuangbeiDetail && (
-        <div className="shuangbei-popover">
-          <div className="popover-header">
-            <span className="popover-title">
-              <PinIcon size="1.1em" style={{ marginRight: '6px', color: '#ef5350', verticalAlign: 'middle' }} />
-              {lang === 'zh-TW' ? '雙北地區場館特寫' : lang === 'ja' ? '双北（台北・新北）会場ズーム' : lang === 'ko' ? '쌍북(타이베이·신베이) 공연장 돋보기' : 'Shuangbei Venues Detail'}
-            </span>
-            <button className="popover-close-btn" type="button" onClick={() => setShowShuangbeiDetail(false)}>×</button>
-          </div>
-          
-          <div className="popover-map-container">
-            <svg viewBox="495 205 125 115" className="shuangbei-mini-map">
-              {['Taipei', 'New Taipei', 'Keelung', 'Taoyuan'].map((countyName) => (
-                <path
-                  key={countyName}
-                  d={TAIWAN_PATHS[countyName]}
-                  className="mini-map-county"
-                />
-              ))}
-              
-              {VENUES.filter(v => SHUANGBEI_SET.has(v.id)).map((venue) => {
+      {activeClusterId && (() => {
+        const activeCluster = REGION_CLUSTERS.find(c => c.id === activeClusterId) || REGION_CLUSTERS[0]
+        const clusterVenues = VENUES.filter(v => activeCluster.venueIds.includes(v.id))
+        const clusterTitle = activeCluster.name[lang] || activeCluster.name['zh-TW']
+
+        return (
+          <div className="shuangbei-popover">
+            <div className="popover-header">
+              <span className="popover-title">
+                <PinIcon size="1.1em" style={{ marginRight: '6px', color: '#ef5350', verticalAlign: 'middle' }} />
+                {clusterTitle}
+              </span>
+              <button className="popover-close-btn" type="button" onClick={() => setActiveClusterId(null)}>×</button>
+            </div>
+            
+            <div className="popover-map-container">
+              <svg viewBox={activeCluster.viewBox} className="shuangbei-mini-map">
+                {activeCluster.counties.map((countyName) => (
+                  <path
+                    key={countyName}
+                    d={TAIWAN_PATHS[countyName]}
+                    className="mini-map-county"
+                  />
+                ))}
+                
+                {clusterVenues.map((venue) => {
+                  const hasVisits = visitedVenueIds.has(venue.id)
+                  const isActive = selectedVenueId === venue.id
+                  const { x, y } = project(venue.longitude || 0, venue.latitude || 0)
+                  
+                  return (
+                    <g
+                      key={venue.id}
+                      className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                      transform={`translate(${x},${y})`}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onSelectVenue(venue.id)
+                        setActiveClusterId(null)
+                      }}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <circle className="mini-click-target" r="6" cx="0" cy="0" fill="transparent" />
+                      <circle className="mini-pulse-ring" r="4.5" cx="0" cy="0" />
+                      <circle className="mini-placeholder-dot" r="1.8" cx="0" cy="0" />
+                    </g>
+                  )
+                })}
+              </svg>
+            </div>
+            
+            <div className="popover-venue-list">
+              {clusterVenues.map((venue) => {
                 const hasVisits = visitedVenueIds.has(venue.id)
                 const isActive = selectedVenueId === venue.id
-                const { x, y } = project(venue.longitude || 0, venue.latitude || 0)
                 
                 return (
-                  <g
-                     key={venue.id}
-                     className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-                     transform={`translate(${x},${y})`}
-                     onClick={(e) => {
-                       e.stopPropagation()
-                       onSelectVenue(venue.id)
-                       setShowShuangbeiDetail(false)
-                     }}
-                     style={{ cursor: 'pointer' }}
+                  <div
+                    key={venue.id}
+                    className={`popover-venue-item${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
+                    onClick={() => {
+                      onSelectVenue(venue.id)
+                      setActiveClusterId(null)
+                    }}
                   >
-                    <circle className="mini-click-target" r="6" cx="0" cy="0" fill="transparent" />
-                    <circle className="mini-pulse-ring" r="4.5" cx="0" cy="0" />
-                    <circle className="mini-placeholder-dot" r="1.8" cx="0" cy="0" />
-                  </g>
+                    <div className="popover-venue-name-row">
+                      <span className="popover-venue-name">{translateVenueName(venue.name, lang)}</span>
+                      {hasVisits && <span className="visited-tick">✓</span>}
+                    </div>
+                    <div className="popover-venue-meta">
+                      <span>
+                        <UserIcon size="0.95em" style={{ marginRight: '4px', color: '#42a5f5', verticalAlign: 'middle' }} />
+                        {t('capacityPeople', { capacity: venue.capacity })}
+                      </span>
+                      <span>
+                        <PinIcon size="0.95em" style={{ marginRight: '4px', color: '#ef5350', verticalAlign: 'middle' }} />
+                        {translateCityName(venue.city, lang)}
+                      </span>
+                    </div>
+                  </div>
                 )
               })}
-            </svg>
+            </div>
           </div>
-          
-          <div className="popover-venue-list">
-            {VENUES.filter(v => SHUANGBEI_SET.has(v.id)).map((venue) => {
-              const hasVisits = visitedVenueIds.has(venue.id)
-              const isActive = selectedVenueId === venue.id
-              
-              return (
-                <div
-                  key={venue.id}
-                  className={`popover-venue-item${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-                  onClick={() => {
-                    onSelectVenue(venue.id)
-                    setShowShuangbeiDetail(false)
-                  }}
-                >
-                  <div className="popover-venue-name-row">
-                    <span className="popover-venue-name">{translateVenueName(venue.name, lang)}</span>
-                    {hasVisits && <span className="visited-tick">✓</span>}
-                  </div>
-                  <div className="popover-venue-meta">
-                    <span>
-                      <UserIcon size="0.95em" style={{ marginRight: '4px', color: '#42a5f5', verticalAlign: 'middle' }} />
-                      {t('capacityPeople', { capacity: venue.capacity })}
-                    </span>
-                    <span>
-                      <PinIcon size="0.95em" style={{ marginRight: '4px', color: '#ef5350', verticalAlign: 'middle' }} />
-                      {translateCityName(venue.city, lang)}
-                    </span>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
-        </div>
-      )}
+        )
+      })()}
 
       {overlappingVenues && overlapPos && (
         <div
