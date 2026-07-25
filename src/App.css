@@ -149,18 +149,20 @@ header {
     top: 12px !important;
     left: calc((100% - var(--sidebar-w)) / 2) !important;
     transform: translateX(-50%) !important;
-    width: fit-content !important;
-    min-width: 650px !important;
-    max-width: calc(100% - var(--sidebar-w) - 40px) !important;
+    width: max-content !important;
+    min-width: 0 !important;
+    max-width: min(calc(100% - var(--sidebar-w) - 24px), calc(100vw - 32px)) !important;
     height: 52px !important;
     padding: 0 16px !important;
-    display: flex !important;
+    display: inline-flex !important;
     align-items: center !important;
     justify-content: space-between !important;
+    gap: 8px !important;
     z-index: 1000 !important;
     border-radius: 999px !important;
     backdrop-filter: blur(12px) !important;
     -webkit-backdrop-filter: blur(12px) !important;
+    box-sizing: border-box !important;
     
     /* Light theme default styles */
     background: rgba(252, 251, 250, 0.9) !important;
@@ -171,7 +173,7 @@ header {
 
   header.full-width-header {
     left: 50% !important;
-    max-width: calc(100% - 40px) !important;
+    max-width: calc(100vw - 32px) !important;
   }
 
   @media (max-width: 1200px) {
@@ -12199,20 +12201,26 @@ body:has(.main-layout) {
   }
 }
 
-/* 2. Responsive header overrides for laptops/MacBooks (Compact & Icon-only modes) */
-@media (min-width: 769px) and (max-width: 1800px) {
-  /* Hide stats bar completely on laptops to save massive space */
+/* 2. Responsive header overrides for laptops/MacBooks & multi-language wide content */
+@media (min-width: 769px) and (max-width: 1650px) {
+  header .stats-bar .stat-label {
+    display: none !important;
+  }
+  header .stats-bar {
+    gap: 8px !important;
+    margin-right: 4px !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1440px) {
+  /* Hide stats bar completely on laptops/smaller screens to save space */
   header .stats-bar {
     display: none !important;
   }
 
-  /* Hide logo subtitle to save space, keep title */
+  /* Hide logo subtitle to save space */
   header .logo-text span {
     display: none !important;
-  }
-
-  header .logo-text h1 {
-    font-size: 0.95rem !important;
   }
 
   header .header-search {
@@ -12220,13 +12228,40 @@ body:has(.main-layout) {
   }
   
   header {
-    gap: 10px !important;
+    gap: 8px !important;
     padding: 0 12px !important;
   }
 }
 
-@media (min-width: 769px) and (max-width: 1440px) {
-  /* Make nav buttons icon-only */
+@media (min-width: 769px) and (max-width: 1280px) {
+  /* Make standard nav buttons icon-only on compact widths */
+  header .nav-toggle-btn:not(.profile-trigger-btn):not(.logout-btn):not(.login-trigger-btn) .btn-label {
+    display: none !important;
+  }
+  
+  header .nav-toggle-btn:not(.profile-trigger-btn):not(.logout-btn):not(.login-trigger-btn) svg {
+    margin-right: 0 !important;
+  }
+
+  header .nav-toggle-btn:not(.profile-trigger-btn):not(.logout-btn):not(.login-trigger-btn) {
+    padding: 6px !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 50% !important;
+    justify-content: center !important;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1100px) {
+  /* Hide logo text completely on smaller laptop widths */
+  header .logo-text {
+    display: none !important;
+  }
+
+  header .header-search {
+    max-width: 120px !important;
+  }
+
   header .nav-toggle-btn .btn-label {
     display: none !important;
   }
@@ -12236,22 +12271,11 @@ body:has(.main-layout) {
   }
 
   header .nav-toggle-btn {
-    padding: 8px !important;
-    width: 38px !important;
-    height: 38px !important;
+    padding: 6px !important;
+    width: 36px !important;
+    height: 36px !important;
     border-radius: 50% !important;
     justify-content: center !important;
-  }
-}
-
-@media (min-width: 769px) and (max-width: 1280px) {
-  /* Hide logo text completely on smaller laptop widths */
-  header .logo-text {
-    display: none !important;
-  }
-
-  header .header-search {
-    max-width: 130px !important;
   }
 }
 
