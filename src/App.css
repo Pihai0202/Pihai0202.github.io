@@ -11637,14 +11637,17 @@ body:has(.main-layout) {
 /* Mobile layout rules */
 @media (max-width: 768px) {
   .global-spotify-player {
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    padding: 8px 12px;
-    border-top: 1px solid var(--border);
-    border-radius: 0;
-    transform: translateY(0);
+    bottom: calc(88px + env(safe-area-inset-bottom, 0px)) !important;
+    left: 12px !important;
+    right: 12px !important;
+    width: calc(100% - 24px) !important;
+    max-width: 480px !important;
+    margin: 0 auto !important;
+    padding: 8px 10px !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6) !important;
+    z-index: 998 !important;
   }
 }
 
