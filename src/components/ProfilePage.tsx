@@ -507,10 +507,11 @@ export function ProfilePage({
                 <div className="theme-music-player-wrapper">
                   <SafeIframe
                     src={parseSpotifyEmbedUrl(user.spotifyUrl)!}
-                    height={user.spotifyUrl.includes('/track/') || user.spotifyUrl.includes('/episode/') ? 80 : 152}
+                    height={152}
                     allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                     loading="lazy"
                     title="Profile Theme Song"
+                    scrolling="no"
                   />
                 </div>
               ) : (

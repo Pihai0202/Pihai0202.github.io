@@ -12640,11 +12640,20 @@ body:has(.main-layout) {
   transform: translateY(-1px);
 }
 
-.theme-music-player-wrapper iframe {
+.theme-music-player-wrapper {
   width: 100%;
-  border-radius: 10px;
-  border: none;
-  display: block;
+  border-radius: 12px;
+  overflow: hidden !important;
+  background: rgba(0, 0, 0, 0.2);
+  line-height: 0;
+}
+
+.theme-music-player-wrapper iframe {
+  width: 100% !important;
+  border-radius: 12px !important;
+  border: none !important;
+  display: block !important;
+  overflow: hidden !important;
 }
 
 .theme-music-placeholder-btn {
