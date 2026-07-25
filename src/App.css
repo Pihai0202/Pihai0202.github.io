@@ -11681,11 +11681,11 @@ body:has(.main-layout) {
   .global-spotify-player.profile {
     bottom: 24px;
     right: 24px;
-    width: 440px;
+    width: 350px;
     max-width: calc(100vw - 48px);
-    padding: 8px 10px;
+    padding: 6px;
     border: 1px solid var(--border);
-    border-radius: 12px;
+    border-radius: 14px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
 
