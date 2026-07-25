@@ -528,11 +528,11 @@ export function ProfilePage({
                     </a>
                   </div>
 
-                  {/* 內嵌播放器 */}
+                  {/* 內嵌播放器 (僅顯示歌曲縮圖卡片，不含底部靜態進度條) */}
                   <div className="theme-music-player-wrapper">
                     <SafeIframe
                       src={parseSpotifyEmbedUrl(user.spotifyUrl)!}
-                      height={152}
+                      height={80}
                       allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
                       loading="lazy"
                       title="Profile Theme Song"

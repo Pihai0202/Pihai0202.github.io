@@ -12701,6 +12701,8 @@ body:has(.main-layout) {
 
 .theme-music-player-wrapper {
   width: 100%;
+  height: 80px !important;
+  max-height: 80px !important;
   border-radius: 12px;
   overflow: hidden !important;
   background: rgba(0, 0, 0, 0.2);
@@ -12709,6 +12711,8 @@ body:has(.main-layout) {
 
 .theme-music-player-wrapper iframe {
   width: 100% !important;
+  height: 80px !important;
+  max-height: 80px !important;
   border-radius: 12px !important;
   border: none !important;
   display: block !important;
