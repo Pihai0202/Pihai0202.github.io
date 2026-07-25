@@ -151,7 +151,7 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       'taichung-venue',
       'legacy-taichung',
     ],
-    pos: { x: 395, y: 395 },
+    pos: { x: 395, y: 372 },
     viewBox: '340 340 115 100',
     counties: ['Taichung', 'Changhua'],
   },
