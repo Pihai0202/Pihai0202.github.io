@@ -101,6 +101,14 @@ VENUE_MAP = {
     "斗六": "douliou",
     "嘉義市棒球場": "chiayi",
     "嘉義市": "chiayi",
+    "女巫店": "witch-house",
+    "飄丿白鷺": "wild-egret",
+    "白鷺": "wild-egret",
+    "TCRC Livehouse": "tcrc-livehouse",
+    "TCRC": "tcrc-livehouse",
+    "高雄 LIVE WAREHOUSE": "live-warehouse",
+    "LIVE WAREHOUSE": "live-warehouse",
+    "Live Warehouse": "live-warehouse",
 }
 
 VENUE_CITY = {
@@ -137,6 +145,10 @@ VENUE_CITY = {
     "chengcing-lake": "高雄",
     "douliou": "雲林",
     "chiayi": "嘉義",
+    "witch-house": "台北",
+    "wild-egret": "高雄",
+    "tcrc-livehouse": "台南",
+    "live-warehouse": "高雄",
 }
 
 # 售票網資訊

@@ -866,6 +866,10 @@ export const translateVenueName = (name: string, lang: string): string => {
     '新北市工商展覽中心': { en: 'New Taipei City Exhibition Hall', ja: '新北市工商展覧センター', ko: '신베이시 공상전람센터' },
     '新北市政府多功能集會堂': { en: 'New Taipei City Hall Multi-purpose Assembly Hall', ja: '新北市政府多機能集会堂', ko: '신베이시청 다목적 집회장' },
     '林口體育館': { en: 'National Taiwan Sport University Arena (Linkou Arena)', ja: '林口体育館', ko: '린커우 체육관' },
+    '女巫店': { en: 'Witch House', ja: '女巫店 (ウィッチハウス)', ko: '마녀의 집 (Witch House)' },
+    '飄丿白鷺': { en: 'Piau Piau Egret Livehouse', ja: '飄丿白鷺 (ライブハウス)', ko: '피아오 피아오 백로 (Livehouse)' },
+    'TCRC Livehouse': { en: 'TCRC Livehouse', ja: 'TCRC Livehouse', ko: 'TCRC 라이브하우스' },
+    '高雄 LIVE WAREHOUSE': { en: 'LIVE WAREHOUSE (Kaohsiung)', ja: '高雄 LIVE WAREHOUSE', ko: '가오슝 라이브 웨어하우스' },
   }
   return venueMap[name]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || name
 }
