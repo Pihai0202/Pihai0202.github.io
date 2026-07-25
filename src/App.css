@@ -11712,7 +11712,7 @@ body:has(.main-layout) {
 
   .global-spotify-player .spotify-player-body {
     width: 100%;
-    height: 152px !important;
+    height: 80px !important;
     overflow: hidden !important;
     line-height: 0;
   }
@@ -11720,7 +11720,7 @@ body:has(.main-layout) {
   .global-spotify-player .spotify-player-body iframe {
     width: 100% !important;
     min-width: 100% !important;
-    height: 152px !important;
+    height: 80px !important;
     border-radius: 8px !important;
     border: none !important;
     display: block !important;
