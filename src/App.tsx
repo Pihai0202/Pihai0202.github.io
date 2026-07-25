@@ -4182,7 +4182,7 @@ function Modal({
   )
 }
 
-async function getSpotifyToken(forceRefresh = false) {
+export async function getSpotifyToken(forceRefresh = false) {
   if (!forceRefresh && spotifyToken && Date.now() < spotifyTokenExpiry) return spotifyToken
 
   try {
@@ -4212,7 +4212,7 @@ async function getSpotifyToken(forceRefresh = false) {
   }
 }
 
-function normalizeSpotifyResults(data: any): SpotifyItem[] {
+export function normalizeSpotifyResults(data: any): SpotifyItem[] {
   const artists = data.artists?.items ?? []
   const albums = data.albums?.items ?? []
   const tracks = data.tracks?.items ?? []
