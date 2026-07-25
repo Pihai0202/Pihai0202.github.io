@@ -12619,6 +12619,27 @@ body:has(.main-layout) {
   align-items: center;
 }
 
+.play-theme-music-fast-btn {
+  background: #1db954;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 0.25rem 0.65rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  transition: all 0.2s ease;
+}
+
+.play-theme-music-fast-btn:hover {
+  background: #1ed760;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(29, 185, 84, 0.4);
+}
+
 .edit-theme-music-btn {
   background: rgba(29, 185, 84, 0.12);
   border: 1px solid rgba(29, 185, 84, 0.3);
@@ -12638,6 +12659,59 @@ body:has(.main-layout) {
   background: #1db954;
   color: #000;
   transform: translateY(-1px);
+}
+
+/* Theme Music Quick Controls Row */
+.theme-music-controls-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  align-items: center;
+}
+
+.theme-play-main-btn {
+  flex: 1;
+  background: #1db954;
+  color: #000;
+  border: none;
+  border-radius: 20px;
+  padding: 0.55rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 10px rgba(29, 185, 84, 0.25);
+}
+
+.theme-play-main-btn:hover {
+  background: #1ed760;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(29, 185, 84, 0.4);
+}
+
+.theme-open-spotify-btn {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 0.55rem 0.75rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.theme-open-spotify-btn:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
 .theme-music-player-wrapper {

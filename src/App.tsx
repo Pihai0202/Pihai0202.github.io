@@ -2720,6 +2720,10 @@ function App() {
             }
             showToast(lang === 'zh-TW' ? '已更新個人主題曲！' : 'Theme song updated!', 'success')
           }}
+          onPlaySpotifyTrack={(url) => {
+            setMusicBarUrl(url)
+            showToast(lang === 'zh-TW' ? '已將主題曲載入至底部全站播放器！' : 'Loaded to global music player!', 'info')
+          }}
           onLogout={handleLogout}
           onBack={() => setView('map')}
           onOpenConcertDetail={openConcertDetail}
