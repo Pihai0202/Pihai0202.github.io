@@ -104,8 +104,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       'chengcing-lake',
       'live-warehouse',
     ],
-    pos: { x: 455, y: 680 },
-    viewBox: '430 640 100 90',
+    pos: { x: 340, y: 663 },
+    viewBox: '290 610 110 100',
     counties: ['Kaohsiung', 'Pingtung'],
   },
   {
@@ -128,8 +128,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       'tcrc-livehouse',
       'wild-egret',
     ],
-    pos: { x: 420, y: 590 },
-    viewBox: '390 540 100 90',
+    pos: { x: 325, y: 600 },
+    viewBox: '275 545 110 100',
     counties: ['Tainan', 'Chiayi'],
   },
   {
@@ -151,8 +151,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       'taichung-venue',
       'legacy-taichung',
     ],
-    pos: { x: 450, y: 400 },
-    viewBox: '420 350 110 90',
+    pos: { x: 395, y: 395 },
+    viewBox: '340 340 115 100',
     counties: ['Taichung', 'Changhua'],
   },
 ]
