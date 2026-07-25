@@ -12815,20 +12815,63 @@ body:has(.main-layout) {
 
 /* Aligned Modal Footer Buttons */
 .spotify-modal-actions {
-  display: flex;
-  gap: 0.65rem;
-  align-items: center;
-  margin-top: 1.5rem;
-  width: 100%;
+  display: flex !important;
+  gap: 0.75rem !important;
+  align-items: center !important;
+  margin-top: 1.5rem !important;
+  width: 100% !important;
 }
 
-.spotify-modal-actions button {
-  height: 42px;
-  box-sizing: border-box;
-  font-size: 0.88rem;
-  font-weight: 700;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 24px;
+.spotify-action-btn {
+  flex: 1 !important;
+  height: 42px !important;
+  margin: 0 !important;
+  padding: 0 1rem !important;
+  box-sizing: border-box !important;
+  border-radius: 24px !important;
+  font-size: 0.88rem !important;
+  font-weight: 700 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  line-height: 1 !important;
+  vertical-align: middle !important;
+  text-decoration: none !important;
+}
+
+.spotify-action-btn.save {
+  background: #1db954 !important;
+  color: #000 !important;
+  border: 1px solid #1db954 !important;
+}
+
+.spotify-action-btn.save:hover {
+  background: #1ed760 !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 4px 15px rgba(29, 185, 84, 0.35) !important;
+}
+
+.spotify-action-btn.remove {
+  background: rgba(255, 77, 77, 0.15) !important;
+  color: #ff4d4d !important;
+  border: 1px solid rgba(255, 77, 77, 0.35) !important;
+}
+
+.spotify-action-btn.remove:hover {
+  background: rgba(255, 77, 77, 0.25) !important;
+  transform: translateY(-1px) !important;
+}
+
+.spotify-action-btn.cancel {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: var(--muted) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.spotify-action-btn.cancel:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: var(--text) !important;
+  transform: translateY(-1px) !important;
 }

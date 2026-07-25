@@ -838,8 +838,7 @@ export function ProfilePage({
             <div className="spotify-modal-actions">
               <button
                 type="button"
-                className="login-submit-btn"
-                style={{ flex: 1, padding: 0, height: '42px', borderRadius: '24px', background: '#1db954', color: '#000', fontWeight: 'bold', border: 'none', cursor: 'pointer', fontSize: '0.88rem' }}
+                className="spotify-action-btn save"
                 onClick={() => {
                   const trimmed = spotifyInputUrl.trim()
                   if (onUpdateSpotifyUrl) {
@@ -854,7 +853,7 @@ export function ProfilePage({
               {user.spotifyUrl && (
                 <button
                   type="button"
-                  style={{ flex: 1, padding: 0, height: '42px', borderRadius: '24px', background: 'rgba(255, 77, 77, 0.15)', color: '#ff4d4d', border: '1px solid rgba(255, 77, 77, 0.3)', cursor: 'pointer', fontWeight: 'bold', fontSize: '0.88rem' }}
+                  className="spotify-action-btn remove"
                   onClick={() => {
                     setSpotifyInputUrl('')
                     if (onUpdateSpotifyUrl) {
@@ -869,8 +868,7 @@ export function ProfilePage({
 
               <button
                 type="button"
-                className="cancel-publish-btn"
-                style={{ flex: 1, padding: 0, height: '42px', borderRadius: '24px', background: 'transparent', color: 'var(--muted)', border: '1px solid var(--border)', cursor: 'pointer', fontSize: '0.88rem' }}
+                className="spotify-action-btn cancel"
                 onClick={() => setIsSpotifyModalOpen(false)}
               >
                 {lang === 'zh-TW' ? '取消' : 'Cancel'}
