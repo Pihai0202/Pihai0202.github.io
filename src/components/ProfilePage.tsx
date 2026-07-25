@@ -491,35 +491,23 @@ export function ProfilePage({
                   <MusicIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle', color: '#1db954' }} />
                   {lang === 'zh-TW' ? '個人主題曲' : 'Theme Song'}
                 </span>
-                <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
-                  {user.spotifyUrl && onPlaySpotifyTrack && (
-                    <button
-                      type="button"
-                      className="play-theme-music-fast-btn"
-                      onClick={() => onPlaySpotifyTrack(user.spotifyUrl!)}
-                      title={lang === 'zh-TW' ? '使用全站播放器連續播放' : 'Play in Global Player'}
-                    >
-                      ▶ {lang === 'zh-TW' ? '播放' : 'Play'}
-                    </button>
-                  )}
-                  <button
-                    type="button"
-                    className="edit-theme-music-btn"
-                    onClick={() => {
-                      setSpotifyInputUrl(user.spotifyUrl || '')
-                      setIsSpotifyModalOpen(true)
-                    }}
-                    title={lang === 'zh-TW' ? '設定 / 更換主題曲' : 'Set / Edit Theme Song'}
-                  >
-                    <EditIcon size="0.85em" style={{ verticalAlign: 'middle' }} />
-                    <span>{user.spotifyUrl ? (lang === 'zh-TW' ? '編輯' : 'Edit') : (lang === 'zh-TW' ? '新增' : 'Add')}</span>
-                  </button>
-                </div>
+                <button
+                  type="button"
+                  className="edit-theme-music-btn"
+                  onClick={() => {
+                    setSpotifyInputUrl(user.spotifyUrl || '')
+                    setIsSpotifyModalOpen(true)
+                  }}
+                  title={lang === 'zh-TW' ? '設定 / 更換主題曲' : 'Set / Edit Theme Song'}
+                >
+                  <EditIcon size="0.85em" style={{ verticalAlign: 'middle' }} />
+                  <span>{user.spotifyUrl ? (lang === 'zh-TW' ? '編輯' : 'Edit') : (lang === 'zh-TW' ? '新增' : 'Add')}</span>
+                </button>
               </div>
 
               {user.spotifyUrl && parseSpotifyEmbedUrl(user.spotifyUrl) ? (
                 <div>
-                  {/* 快捷播放控制按鈕區 */}
+                  {/* 快捷播放控制按鈕區 (單一簡潔播放鈕) */}
                   <div className="theme-music-controls-row">
                     {onPlaySpotifyTrack && (
                       <button
@@ -527,7 +515,7 @@ export function ProfilePage({
                         className="theme-play-main-btn"
                         onClick={() => onPlaySpotifyTrack(user.spotifyUrl!)}
                       >
-                        ▶ {lang === 'zh-TW' ? '全站連續播放 (點擊即放)' : 'Play Continuously'}
+                        ▶ {lang === 'zh-TW' ? '播放主題曲' : 'Play Theme Song'}
                       </button>
                     )}
                     <a
@@ -540,7 +528,7 @@ export function ProfilePage({
                     </a>
                   </div>
 
-                  {/* 內嵌播放器 (設定高度 152px，無滾動條) */}
+                  {/* 內嵌播放器 */}
                   <div className="theme-music-player-wrapper">
                     <SafeIframe
                       src={parseSpotifyEmbedUrl(user.spotifyUrl)!}
