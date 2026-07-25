@@ -303,6 +303,7 @@ function App() {
   const [selectedSpotify, setSelectedSpotify] = useState<SpotifyItem | null>(null)
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
+  const [isPlayerHighlighted, setIsPlayerHighlighted] = useState(false)
   const [playerReloadKey, setPlayerReloadKey] = useState(0)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
   const handleReloadPlayer = useCallback(() => setPlayerReloadKey((k) => k + 1), [])
@@ -2723,7 +2724,9 @@ function App() {
           onPlaySpotifyTrack={(url) => {
             setMusicBarUrl(url)
             setIsMusicBarVisible(true)
-            showToast(lang === 'zh-TW' ? '已開啟播放器播放個人主題曲！' : 'Playing theme song in global player!', 'success')
+            setIsPlayerHighlighted(true)
+            setTimeout(() => setIsPlayerHighlighted(false), 3500)
+            showToast(lang === 'zh-TW' ? '已開啟播放器！點擊右下角 ▶ 即可開始播放' : 'Player opened! Click ▶ at bottom right to play', 'success')
           }}
           onLogout={handleLogout}
           onBack={() => setView('map')}
@@ -3329,7 +3332,7 @@ function App() {
 
       {/* Global Keep-Alive Spotify Player for both desktop and mobile */}
       {isMusicBarVisible && musicBarEmbedUrl && (
-        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''} ${isPlayerHighlighted ? 'highlight-pulse' : ''}`}>
           <div className="spotify-player-header">
             <span className="sp-title">
               <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
@@ -4264,7 +4267,7 @@ export function parseSpotifyEmbedUrl(url: string | null | undefined) {
     if (!cleanPath.startsWith('/')) {
       cleanPath = '/' + cleanPath
     }
-    return `https://open.spotify.com/embed${cleanPath}?utm_source=generator&theme=0`
+    return `https://open.spotify.com/embed${cleanPath}?utm_source=generator&theme=0&autoplay=1`
   } catch {
     return null
   }
