@@ -3369,10 +3369,11 @@ function App() {
             <SafeIframe
               key={`${musicBarEmbedUrl}-${playerReloadKey}`}
               src={musicBarEmbedUrl}
-              height={musicBarPlayerHeight}
+              height={152}
               allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
               loading="lazy"
               title="Spotify player"
+              scrolling="no"
             />
           </div>
           <button 

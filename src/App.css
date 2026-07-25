@@ -11688,6 +11688,23 @@ body:has(.main-layout) {
     border-radius: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
   }
+
+  .global-spotify-player .spotify-player-body {
+    width: 100%;
+    height: 152px !important;
+    overflow: hidden !important;
+    line-height: 0;
+  }
+
+  .global-spotify-player .spotify-player-body iframe {
+    width: 100% !important;
+    min-width: 100% !important;
+    height: 152px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    display: block !important;
+    overflow: hidden !important;
+  }
 }
 
 /* Mobile layout rules: Stacked directly above bottom nav bar (bottom: 60px) */
