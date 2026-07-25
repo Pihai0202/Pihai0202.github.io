@@ -303,6 +303,7 @@ function App() {
   const [selectedSpotify, setSelectedSpotify] = useState<SpotifyItem | null>(null)
   const [isSpotifySearching, setIsSpotifySearching] = useState(false)
   const [isMusicBarVisible, setIsMusicBarVisible] = useState(false)
+  const [isPlayerCollapsed, setIsPlayerCollapsed] = useState(false)
   const [playerReloadKey, setPlayerReloadKey] = useState(0)
   const [musicBarUrl, setMusicBarUrl] = useState<string | null>(null)
   const handleReloadPlayer = useCallback(() => setPlayerReloadKey((k) => k + 1), [])
@@ -3329,7 +3330,7 @@ function App() {
 
       {/* Global Keep-Alive Spotify Player for both desktop and mobile */}
       {isMusicBarVisible && musicBarEmbedUrl && (
-        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''} ${isPlayerCollapsed ? 'is-collapsed' : ''}`}>
           <div className="spotify-player-header">
             <span className="sp-title">
               <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
@@ -3350,6 +3351,14 @@ function App() {
               <button
                 type="button"
                 className="sp-reload-btn"
+                onClick={() => setIsPlayerCollapsed((v) => !v)}
+                title={isPlayerCollapsed ? '展開播放器' : '折疊播放器'}
+              >
+                {isPlayerCollapsed ? '▲' : '▼'}
+              </button>
+              <button
+                type="button"
+                className="sp-reload-btn"
                 onClick={handleReloadPlayer}
                 title="重新載入播放器"
               >
@@ -3365,16 +3374,18 @@ function App() {
               </button>
             </div>
           </div>
-          <div className="spotify-player-body">
-            <SafeIframe
-              key={`${musicBarEmbedUrl}-${playerReloadKey}`}
-              src={musicBarEmbedUrl}
-              height={musicBarPlayerHeight}
-              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-              loading="lazy"
-              title="Spotify player"
-            />
-          </div>
+          {!isPlayerCollapsed && (
+            <div className="spotify-player-body">
+              <SafeIframe
+                key={`${musicBarEmbedUrl}-${playerReloadKey}`}
+                src={musicBarEmbedUrl}
+                height={musicBarPlayerHeight}
+                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                loading="lazy"
+                title="Spotify player"
+              />
+            </div>
+          )}
         </div>
       )}
 
