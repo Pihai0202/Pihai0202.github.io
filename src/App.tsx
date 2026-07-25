@@ -32,7 +32,7 @@ import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
-import { deleteLocalMedia } from './utils/indexedDB'
+import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
 import {
   MenuIcon,
@@ -100,13 +100,6 @@ function getRegionForCity(city: string): string {
 let spotifyToken: string | null = null
 let spotifyTokenExpiry = 0
 
-function loadConcerts() {
-  try {
-    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') as Concert[]
-  } catch {
-    return []
-  }
-}
 
 function loadInitialConcerts() {
   try {
@@ -1149,29 +1142,58 @@ function App() {
   }, [])
 
   const updateConcertsList = async (updatedList: Concert[]) => {
+    // 1. Immediately update React state
+    setConcerts(updatedList)
+
+    // 2. Prepare clean list (sanitize fields to prevent undefined errors in Firestore)
+    const cleanList: Concert[] = updatedList.map((c) => ({
+      id: String(c.id || Date.now()),
+      venueId: String(c.venueId || ''),
+      venueName: String(c.venueName || ''),
+      venueCity: String(c.venueCity || ''),
+      artist: String(c.artist || ''),
+      concertName: String(c.concertName || ''),
+      date: String(c.date || ''),
+      seat: String(c.seat || ''),
+      notes: String(c.notes || ''),
+      spotifyUrl: String(c.spotifyUrl || ''),
+      media: (c.media || []).map((m) => ({
+        id: String(m.id || `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`),
+        name: String(m.name || 'photo.jpg'),
+        dataUrl: String(m.dataUrl || ''),
+        type: String(m.type || 'image/jpeg')
+      })),
+      createdAt: String(c.createdAt || new Date().toISOString())
+    }))
+
     if (isLoggedIn && currentUser?.email) {
       const email = currentUser.email
+      // ALWAYS update local cache first
+      try {
+        localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(cleanList))
+      } catch (e) {
+        console.error('Failed to save to local cache:', e)
+      }
+
       try {
         const docRef = doc(db, 'users_concerts', email)
         await setDoc(docRef, {
           email,
-          concerts: updatedList,
+          concerts: cleanList,
           updatedAt: new Date().toISOString()
         }, { merge: true })
-        // Also update local cache for quick loading next time
-        localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(updatedList))
       } catch (error) {
         console.error('Failed to save to Firestore:', error)
         showToast(
           lang === 'zh-TW' 
-            ? '同步至雲端失敗！可能因為照片累計容量過大，請減少照片數量後再試。' 
-            : 'Sync to cloud failed! Cumulative file size might be too large. Please reduce photos to sync.', 
+            ? '已儲存至本機，但雲端同步失敗！可能因為照片過大，請減少照片數量後再試。' 
+            : 'Saved locally, but cloud sync failed! Cumulative file size might be too large.', 
           'error'
         )
       }
     } else {
       try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(updatedList))
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanList))
       } catch (error) {
         console.error('Failed to save guest concerts:', error)
         showToast(
@@ -1182,7 +1204,6 @@ function App() {
         )
       }
     }
-    setConcerts(updatedList)
   }
 
   // Sync and load user-specific concerts from Firestore when login state changes
@@ -1194,7 +1215,9 @@ function App() {
       const docRef = doc(db, 'users_concerts', email)
 
       unsubscribe = onSnapshot(docRef, (docSnap) => {
-        // Load current local guest concerts to merge
+        // Load current local cached concerts and guest concerts
+        const localCached = localStorage.getItem(`tw-concerts-${email}`)
+        const localConcerts = localCached ? (JSON.parse(localCached) as Concert[]) : []
         const guestCached = localStorage.getItem(STORAGE_KEY)
         const guestConcerts = guestCached ? (JSON.parse(guestCached) as Concert[]) : []
 
@@ -1224,55 +1247,69 @@ function App() {
             })
           }
 
-          // Merge guest concerts into remote concerts (deduplicated by id)
-          let mergedConcerts = [...remoteConcerts]
-          let hasNewMerge = false
-          guestConcerts.forEach((gc) => {
-            if (!mergedConcerts.some((rc) => rc.id === gc.id)) {
-              mergedConcerts.push(gc)
-              hasNewMerge = true
+          // Safely merge: start with remoteConcerts, then add localConcerts and guestConcerts not present in remote
+          const concertMap = new Map<string, Concert>()
+          remoteConcerts.forEach((c) => {
+            if (c.id) concertMap.set(c.id, c)
+          })
+          
+          let hasNewLocalAdditions = false
+          localConcerts.forEach((lc) => {
+            if (lc.id && !concertMap.has(lc.id)) {
+              concertMap.set(lc.id, lc)
+              hasNewLocalAdditions = true
             }
           })
 
+          guestConcerts.forEach((gc) => {
+            if (gc.id && !concertMap.has(gc.id)) {
+              concertMap.set(gc.id, gc)
+              hasNewLocalAdditions = true
+            }
+          })
+
+          const mergedConcerts = Array.from(concertMap.values())
           setConcerts(mergedConcerts)
           localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(mergedConcerts))
 
-          if (hasNewMerge) {
+          if (hasNewLocalAdditions) {
             setDoc(docRef, {
               email,
               concerts: mergedConcerts,
               updatedAt: new Date().toISOString()
-            }, { merge: true }).catch((err) => console.error('Failed to merge guest concerts to Firestore:', err))
-            // Clear guest local storage after successful merge
+            }, { merge: true }).catch((err) => console.error('Failed to sync merged concerts to Firestore:', err))
             localStorage.setItem(STORAGE_KEY, '[]')
           }
         } else {
-          // Document doesn't exist, initialize with guest concerts
-          setConcerts(guestConcerts)
-          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(guestConcerts))
+          // Document doesn't exist, initialize with local/guest concerts
+          const concertMap = new Map<string, Concert>()
+          localConcerts.forEach((c) => { if (c.id) concertMap.set(c.id, c) })
+          guestConcerts.forEach((c) => { if (c.id) concertMap.set(c.id, c) })
+          const merged = Array.from(concertMap.values())
+
+          setConcerts(merged)
+          localStorage.setItem(`tw-concerts-${email}`, JSON.stringify(merged))
           setDoc(docRef, {
             email,
-            concerts: guestConcerts,
+            concerts: merged,
             updatedAt: new Date().toISOString()
           }).catch((err) => console.error('Failed to initialize user concerts in Firestore:', err))
-          // Clear guest local storage
           localStorage.setItem(STORAGE_KEY, '[]')
         }
       }, (error) => {
         console.error('Firestore real-time sync failed:', error)
-        // Fallback to local cache if offline/error
         const cached = localStorage.getItem(`tw-concerts-${email}`)
         if (cached) {
           setConcerts(JSON.parse(cached) as Concert[])
         }
       })
     } else {
-      // Fallback to guest list
-      setConcerts(loadConcerts())
+      const cached = localStorage.getItem(STORAGE_KEY)
+      setConcerts(cached ? (JSON.parse(cached) as Concert[]) : [])
     }
 
     return () => unsubscribe()
-  }, [isLoggedIn, currentUser])
+  }, [isLoggedIn, currentUser?.email])
 
   // Background migration of old Base64 images to ImgBB
   useEffect(() => {
@@ -1606,30 +1643,39 @@ function App() {
       return
     }
 
-    const artist = form.artist.trim()
+    const artist = (form.artist || '').trim()
 
     if (!artist) {
-      showToast('請輸入演出者名稱', 'error')
+      showToast(lang === 'zh-TW' ? '請輸入演出者名稱' : 'Please enter artist name', 'error')
       return
     }
     if (!formVenueId) {
-      showToast('請選擇或輸入活動場館', 'error')
+      showToast(lang === 'zh-TW' ? '請選擇或輸入活動場館' : 'Please select or enter venue', 'error')
       return
     }
-    if (formVenueId === 'custom' && !formVenueName.trim()) {
-      showToast('請輸入自訂場館名稱', 'error')
+    if (formVenueId === 'custom' && !(formVenueName || '').trim()) {
+      showToast(lang === 'zh-TW' ? '請輸入自訂場館名稱' : 'Please enter custom venue name', 'error')
       return
     }
 
     try {
       setIsSaving(true)
       const finalVenueId = formVenueId
-      const finalVenueName = formVenueId === 'custom' ? formVenueName.trim() : VENUES.find(v => v.id === formVenueId)?.name || ''
-      const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || ''
+      const finalVenueName = formVenueId === 'custom' ? (formVenueName || '').trim() : VENUES.find(v => v.id === formVenueId)?.name || (formVenueName || '').trim() || ''
+      const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || formVenueCity || '台北'
 
       const concertId = editingConcertId || Date.now().toString()
 
       showToast(lang === 'zh-TW' ? '正在儲存紀錄...' : 'Saving record...', 'info')
+
+      // Save photos to IndexedDB for local persistence backup
+      if (pendingMedia && pendingMedia.length > 0) {
+        pendingMedia.forEach((m) => {
+          if (m.id && m.dataUrl) {
+            saveLocalMedia(m.id, m.dataUrl).catch((err) => console.error('Failed to cache media to IndexedDB:', err))
+          }
+        })
+      }
 
       const concert: Concert = {
         id: concertId,
@@ -1637,12 +1683,17 @@ function App() {
         venueName: finalVenueName,
         venueCity: finalVenueCity,
         artist,
-        concertName: form.concertName.trim(),
-        date: form.date,
-        seat: form.seat.trim(),
-        notes: form.notes.trim(),
-        spotifyUrl: form.spotifyUrl.trim(),
-        media: pendingMedia || [],
+        concertName: (form.concertName || '').trim(),
+        date: form.date || '',
+        seat: (form.seat || '').trim(),
+        notes: (form.notes || '').trim(),
+        spotifyUrl: (form.spotifyUrl || '').trim(),
+        media: (pendingMedia || []).map((m) => ({
+          id: m.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
+          name: m.name || 'photo.jpg',
+          dataUrl: m.dataUrl || '',
+          type: m.type || 'image/jpeg'
+        })),
         createdAt: editingConcertId ? (concerts.find(c => c.id === editingConcertId)?.createdAt || new Date().toISOString()) : new Date().toISOString(),
       }
 
