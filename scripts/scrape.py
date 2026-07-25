@@ -103,6 +103,9 @@ VENUE_MAP = {
     "嘉義市": "chiayi",
     "女巫店": "witch-house",
     "飄丿白鷺": "wild-egret",
+    "漂丿白鷺": "wild-egret",
+    "飄丿白鷺 Live House": "wild-egret",
+    "漂丿白鷺 Live House": "wild-egret",
     "白鷺": "wild-egret",
     "TCRC Livehouse": "tcrc-livehouse",
     "TCRC": "tcrc-livehouse",
@@ -146,7 +149,7 @@ VENUE_CITY = {
     "douliou": "雲林",
     "chiayi": "嘉義",
     "witch-house": "台北",
-    "wild-egret": "高雄",
+    "wild-egret": "台南",
     "tcrc-livehouse": "台南",
     "live-warehouse": "高雄",
 }
