@@ -2722,7 +2722,8 @@ function App() {
           }}
           onPlaySpotifyTrack={(url) => {
             setMusicBarUrl(url)
-            showToast(lang === 'zh-TW' ? '已將主題曲載入至底部全站播放器！' : 'Loaded to global music player!', 'info')
+            setIsMusicBarVisible(true)
+            showToast(lang === 'zh-TW' ? '已開啟播放器播放個人主題曲！' : 'Playing theme song in global player!', 'success')
           }}
           onLogout={handleLogout}
           onBack={() => setView('map')}
