@@ -449,7 +449,7 @@ export function ProfilePage({
                   </span>
                 )
               ) : (
-                user.nickname.charAt(0).toUpperCase()
+                (user.nickname || '👤').charAt(0).toUpperCase()
               )}
               <div className="avatar-overlay">
                 <span>{lang === 'zh-TW' ? '更換頭像' : 'Change Avatar'}</span>
@@ -473,15 +473,15 @@ export function ProfilePage({
               </div>
             ) : (
               <div className="nickname-display-row">
-                <h2>{user.nickname}</h2>
-                <button type="button" onClick={() => setIsEditingName(true)} className="edit-name-trigger">
+                <h2>{user.nickname?.trim() || (lang === 'zh-TW' ? '未命名樂迷' : 'Anonymous Fan')}</h2>
+                <button type="button" onClick={() => setIsEditingName(true)} className="edit-name-trigger" title={lang === 'zh-TW' ? '編輯暱稱' : 'Edit Nickname'}>
                   <EditIcon size="0.9em" style={{ verticalAlign: 'middle' }} />
                 </button>
               </div>
             )}
             <p className="profile-email-badge">
-              <MailIcon size="0.9em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-              {user.email || (lang === 'zh-TW' ? '訪客模式' : 'Guest Mode')}
+              <MailIcon size="0.9em" style={{ marginRight: '6px', flexShrink: 0, verticalAlign: 'middle' }} />
+              <span className="badge-text">{user.email || (lang === 'zh-TW' ? '訪客模式' : 'Guest Mode')}</span>
             </p>
 
             {/* 個人主題曲區塊 / Theme Song Section */}

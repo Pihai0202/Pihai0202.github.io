@@ -6106,6 +6106,8 @@ svg#taiwan-map.dragging {
   text-overflow: ellipsis;
   overflow: hidden;
   white-space: nowrap;
+  flex: 1;
+  min-width: 0;
 }
 
 .edit-name-trigger {
@@ -7121,7 +7123,7 @@ svg#taiwan-map.dragging {
   .profile-card-header {
     display: grid !important;
     grid-template-columns: auto minmax(0, 1fr) !important;
-    grid-template-rows: auto auto !important;
+    grid-template-rows: auto auto auto !important;
     column-gap: 1rem !important;
     row-gap: 0.25rem !important;
     align-items: center !important;
@@ -7160,20 +7162,39 @@ svg#taiwan-map.dragging {
     text-overflow: ellipsis !important;
     overflow: hidden !important;
     white-space: nowrap !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    margin: 0 !important;
   }
 
   .profile-email-badge {
     grid-row: 2 !important;
     grid-column: 2 !important;
     margin: 0 !important;
-    padding: 0.15rem 0.5rem !important;
+    padding: 0.25rem 0.6rem !important;
     font-size: 0.72rem !important;
     max-width: 100% !important;
-    display: inline-block !important;
+    display: inline-flex !important;
+    align-items: center !important;
     overflow: hidden !important;
     text-overflow: ellipsis !important;
     white-space: nowrap !important;
     box-sizing: border-box !important;
+  }
+
+  .profile-email-badge .badge-text {
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+    min-width: 0 !important;
+  }
+
+  .profile-theme-music-box {
+    grid-column: 1 / span 2 !important;
+    grid-row: 3 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    margin-top: 0.75rem !important;
   }
 
   .edit-nickname-row input {
