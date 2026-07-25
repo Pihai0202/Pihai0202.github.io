@@ -25,7 +25,9 @@ import {
   RockIcon,
   TicketIcon,
   CameraIcon,
-  TrashIcon
+  TrashIcon,
+  SearchIcon,
+  LinkIcon
 } from './SvgIcon'
 
 const EMOJI_TO_AVATAR_KEY: Record<string, string> = {
@@ -728,14 +730,16 @@ export function ProfilePage({
                 className={`spotify-modal-tab-btn ${spotifyModalTab === 'search' ? 'active' : ''}`}
                 onClick={() => setSpotifyModalTab('search')}
               >
-                🔍 {lang === 'zh-TW' ? '搜尋歌曲' : 'Search Music'}
+                <SearchIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                <span>{lang === 'zh-TW' ? '搜尋歌曲' : 'Search Music'}</span>
               </button>
               <button
                 type="button"
                 className={`spotify-modal-tab-btn ${spotifyModalTab === 'paste' ? 'active' : ''}`}
                 onClick={() => setSpotifyModalTab('paste')}
               >
-                🔗 {lang === 'zh-TW' ? '貼上網址' : 'Paste Link'}
+                <LinkIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                <span>{lang === 'zh-TW' ? '貼上網址' : 'Paste Link'}</span>
               </button>
             </div>
 
@@ -756,7 +760,8 @@ export function ProfilePage({
                     onClick={() => handleDoSpotifySearch()}
                     disabled={isSpotifySearching}
                   >
-                    {isSpotifySearching ? (lang === 'zh-TW' ? '搜尋中...' : 'Searching...') : (lang === 'zh-TW' ? '搜尋' : 'Search')}
+                    <SearchIcon size="1em" style={{ verticalAlign: 'middle' }} />
+                    <span>{isSpotifySearching ? (lang === 'zh-TW' ? '搜尋中...' : 'Searching...') : (lang === 'zh-TW' ? '搜尋' : 'Search')}</span>
                   </button>
                 </div>
 
