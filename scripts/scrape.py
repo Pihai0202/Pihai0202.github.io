@@ -18,6 +18,12 @@ from urllib.error import URLError
 from urllib.parse import urlencode, urljoin, quote
 from html.parser import HTMLParser
 
+try:
+    from curl_cffi import requests as cffi_requests
+    HAS_CURL_CFFI = True
+except ImportError:
+    HAS_CURL_CFFI = False
+
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
     sys.stderr.reconfigure(encoding="utf-8")
@@ -159,6 +165,7 @@ TICKET_PLATFORMS = {
     "kktix":    {"name": "KKTIX",    "color": "#e63946"},
     "tixcraft": {"name": "拓元售票",  "color": "#f4a261"},
     "ibon":     {"name": "ibon售票", "color": "#2ec4b6"},
+    "kham":     {"name": "寬宏售票", "color": "#00b4d8"},
     "ticket":   {"name": "年代售票",  "color": "#9b5de5"},
     "ticketplus": {"name": "遠大售票", "color": "#00a6fb"},
     "indievox": {"name": "iNDIEVOX", "color": "#ff5a5f"},
@@ -169,7 +176,8 @@ TICKET_PLATFORMS = {
 PLATFORM_URLS = {
     "KKTIX": "https://kktix.com/",
     "拓元售票": "https://tixcraft.com/",
-    "ibon售票": "https://tickets.ibon.com.tw/",
+    "ibon售票": "https://ticket.ibon.com.tw/",
+    "寬宏售票": "https://kham.com.tw/",
     "年代售票": "https://www.ticket.com.tw/",
     "遠大售票": "https://ticketplus.com.tw/",
     "iNDIEVOX": "https://www.indievox.com/",
@@ -656,75 +664,203 @@ def _parse_ld_event(item, platform, events_list):
 # ── ibon 售票 ───────────────────────────────────────────────────────────────
 
 def scrape_ibon():
-    """Scrape ibon 售票 concert events."""
+    """Scrape ibon 售票 concert events via direct REST API."""
     events = []
     seen = set()
+    if not HAS_CURL_CFFI:
+        print("  ⚠ curl_cffi 不可用，跳過 ibon API 爬取", file=sys.stderr)
+        return events
 
-    # ibon 售票活動列表（演唱會分類）
-    pages = [
-        "https://tickets.ibon.com.tw/activity/category/concert",
-        "https://tickets.ibon.com.tw/activity/category/pop",
+    try:
+        patterns = ["Concert", "Pop", "Music"]
+        for pat in patterns:
+            res = cffi_requests.post(
+                'https://ticket.ibon.com.tw/api/ActivityInfo/GetIndexData',
+                data={'pattern': pat},
+                impersonate='chrome',
+                timeout=15
+            )
+            if res.status_code != 200:
+                continue
+            
+            data = res.json()
+            items = data.get('Item', {}).get('List', [])
+            for item in items:
+                aid = item.get('ActivityID')
+                aname = item.get('ActivityName')
+                if not aid or not aname:
+                    continue
+                
+                # Check for concert keywords
+                if not any(k in aname.lower() for k in ["演唱會", "巡迴", "音樂會", "live", "concert", "show", "fan"]):
+                    continue
+
+                # Detail page URL
+                ev_url = f"https://ticket.ibon.com.tw/ActivityInfo/Details/{aid}"
+
+                # Fetch detail for image & price
+                img_url = ""
+                price_str = ""
+                try:
+                    dres = cffi_requests.post(
+                        'https://ticket.ibon.com.tw/api/ActivityInfo/GetDetailData',
+                        data={'id': str(aid)},
+                        impersonate='chrome',
+                        timeout=10
+                    )
+                    if dres.status_code == 200:
+                        ditem = dres.json().get('Item', {})
+                        img_url = ditem.get('ActivityImageURL', "")
+                        price_str = ditem.get('ActivityLowPriceDes', "") or ditem.get('ActivityPrice', "")
+                except Exception:
+                    pass
+
+                # Fetch sessions/games for exact venue and dates
+                try:
+                    gres = cffi_requests.post(
+                        'https://ticket.ibon.com.tw/api/ActivityInfo/GetGameInfoList',
+                        json={'id': aid, 'hasDeadline': True, 'SystemBrowseType': 1},
+                        impersonate='chrome',
+                        timeout=10
+                    )
+                    if gres.status_code == 200:
+                        gitems = gres.json().get('Item', {}).get('GIHtmls', [])
+                        for g in gitems:
+                            venue_raw = g.get('VenueRegion', '')
+                            vid, vname = match_venue(venue_raw or aname)
+                            if not vid:
+                                vid, vname = match_venue(aname)
+
+                            date_match = re.search(r'(\d{4})[/\.-](\d{1,2})[/\.-](\d{1,2})', g.get('ShowSaleDate', ''))
+                            if not date_match:
+                                continue
+                            date_str = f"{date_match.group(1)}-{int(date_match.group(2)):02d}-{int(date_match.group(3)):02d}"
+                            if date_str < today_str():
+                                continue
+
+                            unique_key = f"ibon-{aid}-{date_str}"
+                            if unique_key in seen:
+                                continue
+                            seen.add(unique_key)
+
+                            eid = abs(hash(ev_url + date_str)) & 0xFFFFFF
+                            events.append({
+                                "id":         f"ibon-{eid}",
+                                "source":     "ibon售票",
+                                "name":       aname,
+                                "venue_raw":  venue_raw or (vname or "全台場館"),
+                                "venue_id":   vid or "unknown",
+                                "venue_name": vname or venue_raw or "全台場館",
+                                "city":       VENUE_CITY.get(vid, ""),
+                                "date":       date_str,
+                                "image":      img_url,
+                                "url":        ev_url,
+                                "price":      price_str,
+                                "ticket_links": [
+                                    {"platform": "ibon", "name": "ibon售票", "url": ev_url}
+                                ],
+                            })
+                except Exception:
+                    pass
+
+    except Exception as e:
+        print(f"  ⚠ scrape_ibon error: {e}", file=sys.stderr)
+
+    return events
+
+
+# ── 寬宏售票 kham.com.tw ───────────────────────────────────────────────────
+
+def scrape_kham():
+    """Scrape 寬宏售票 (kham.com.tw) concert events."""
+    events = []
+    seen = set()
+    if not HAS_CURL_CFFI:
+        print("  ⚠ curl_cffi 不可用，跳過寬宏售票爬取", file=sys.stderr)
+        return events
+
+    category_urls = [
+        "https://kham.com.tw/application/UTK01/UTK0101_06.aspx?TYPE=1&CATEGORY=98",  # 演唱會
+        "https://kham.com.tw/application/UTK01/UTK0101_06.aspx?TYPE=1&CATEGORY=80",  # 音樂會
+        "https://kham.com.tw/",
     ]
 
-    for page_url in pages:
-        print(f"  Fetching {page_url}", file=sys.stderr)
-        html = fetch(page_url)
-        if not html:
-            continue
+    detail_links = set()
+    for cat_url in category_urls:
+        try:
+            r = cffi_requests.get(cat_url, impersonate='chrome', timeout=10)
+            if r.status_code == 200:
+                found = re.findall(r'UTK0201[^\x22\x27\s<>]+', r.text)
+                for f in found:
+                    clean_path = f.lstrip('./').lstrip('../')
+                    detail_links.add('https://kham.com.tw/application/UTK02/' + clean_path)
+        except Exception as e:
+            print(f"  ⚠ 抓取寬宏分類頁失敗 {cat_url}: {e}", file=sys.stderr)
 
-        # 嘗試 LD+JSON
-        for ld_raw in re.findall(
-            r'<script[^>]+type=["\']application/ld\+json["\'][^>]*>(.*?)</script>',
-            html, re.DOTALL
-        ):
-            try:
-                ld = json.loads(ld_raw)
-                for item in (ld if isinstance(ld, list) else [ld]):
-                    if item.get("@type") not in ("Event", "MusicEvent"):
-                        continue
-                    uid = item.get("url", "") or item.get("name", "")
-                    if uid in seen:
-                        continue
-                    seen.add(uid)
-                    _parse_ld_event(item, "ibon", events)
-            except Exception:
-                pass
-
-        # 卡片連結解析
-        links = re.findall(r'href=["\']([^"\']+/activity/[A-Za-z0-9_-]+)["\']', html)
-        for link in links:
-            ev_url = link if link.startswith("http") else "https://tickets.ibon.com.tw" + link
-            if ev_url in seen:
+    for ev_url in detail_links:
+        try:
+            dr = cffi_requests.get(ev_url, impersonate='chrome', timeout=10)
+            if dr.status_code != 200:
                 continue
-            seen.add(ev_url)
+            ht = dr.text
 
-            detail = _generic_detail(ev_url, "ibon")
-            if not detail or not detail.get("dates"):
+            # 抓取活動名稱
+            titles = re.findall(r'class=[\x22\x27][^\x22\x27]*title[^\x22\x27]*[\x22\x27][^>]*>(.*?)</div>', ht, re.DOTALL | re.IGNORECASE)
+            name = titles[0].strip() if titles else ""
+            if not name:
+                og_titles = re.findall(r'<meta property=[\x22\x27]og:title[\x22\x27] content=[\x22\x27](.*?)[\x22\x27]', ht)
+                name = og_titles[0].strip() if og_titles else ""
+            if not name or name in ("寬宏售票系統", "節目資訊"):
                 continue
 
-            for d in detail["dates"]:
-                if d < today_str():
+            # 抓取圖片
+            imgs = re.findall(r'src=[\x22\x27]([^\x22\x27]*UTK2401[^\x22\x27]*)[\x22\x27]', ht)
+            img_url = imgs[0] if imgs else ""
+
+            # 場館匹配
+            vid, vname = match_venue(name)
+            if not vid:
+                vid, vname = match_venue(ht)
+
+            # 抓取日期 (YYYY/MM/DD 或 YYYY.MM.DD)
+            dates = re.findall(r'(\d{4}[/\.-]\d{1,2}[/\.-]\d{1,2})', ht)
+            valid_dates = []
+            for d in dates:
+                norm_d = d.replace('/', '-').replace('.', '-')
+                parts = norm_d.split('-')
+                if len(parts) == 3:
+                    formatted_d = f"{parts[0]}-{int(parts[1]):02d}-{int(parts[2]):02d}"
+                    if formatted_d >= today_str() and formatted_d not in valid_dates:
+                        valid_dates.append(formatted_d)
+
+            if not valid_dates:
+                continue
+
+            for d in valid_dates:
+                unique_key = f"kham-{name}-{d}"
+                if unique_key in seen:
                     continue
+                seen.add(unique_key)
+
                 eid = abs(hash(ev_url + d)) & 0xFFFFFF
                 events.append({
-                    "id":         f"ibon-{eid}",
-                    "source":     "ibon售票",
-                    "name":       detail["name"],
-                    "venue_raw":  detail["venue_raw"],
-                    "venue_id":   detail["venue_id"],
-                    "venue_name": detail["venue_name"],
-                    "city":       VENUE_CITY.get(detail["venue_id"], ""),
+                    "id":         f"kham-{eid}",
+                    "source":     "寬宏售票",
+                    "name":       name,
+                    "venue_raw":  vname or "全台場館",
+                    "venue_id":   vid or "unknown",
+                    "venue_name": vname or "全台場館",
+                    "city":       VENUE_CITY.get(vid, ""),
                     "date":       d,
-                    "image":      detail["image"],
+                    "image":      img_url,
                     "url":        ev_url,
-                    "price":      detail["price"],
+                    "price":      "",
                     "ticket_links": [
-                        {"platform": "ibon", "name": "ibon售票", "url": ev_url}
+                        {"platform": "kham", "name": "寬宏售票", "url": ev_url}
                     ],
                 })
-            time.sleep(0.4)
-
-        time.sleep(0.8)
+        except Exception:
+            pass
 
     return events
 
@@ -1891,6 +2027,17 @@ def main():
         if old_ibon:
             print(f"  ⚠ ibon 爬取為 0 筆，從舊檔案恢復 {len(old_ibon)} 筆未來活動", file=sys.stderr)
             events = old_ibon
+    all_events.extend(events)
+
+    # 4. 寬宏售票
+    print("→ 爬取寬宏售票...", file=sys.stderr)
+    events = scrape_kham()
+    print(f"  寬宏售票得到 {len(events)} 筆", file=sys.stderr)
+    if not events:
+        old_kham = [ev for ev in existing_events if ev.get("source") == "寬宏售票" and ev.get("date", "") >= today_str()]
+        if old_kham:
+            print(f"  ⚠ 寬宏爬取為 0 筆，從舊檔案恢復 {len(old_kham)} 筆未來活動", file=sys.stderr)
+            events = old_kham
     all_events.extend(events)
 
     # 4. 年代售票

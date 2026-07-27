@@ -25,7 +25,12 @@ jobs:
         with:
           python-version: '3.12'
 
-      - name: 🎵 執行爬蟲（KKTIX + 拓元 + ibon + 年代）
+      - name: 📦 安裝 Python 依賴庫 (curl_cffi)
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🎵 執行爬蟲（KKTIX + 拓元 + ibon + 寬宏 + 年代）
         run: |
           mkdir -p public
           python scripts/scrape.py
