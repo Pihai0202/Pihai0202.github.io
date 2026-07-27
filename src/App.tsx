@@ -630,31 +630,43 @@ function App() {
   }, [])
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      fetch('https://pihai0202.github.io/version.json?t=' + Date.now())
-        .then((res) => res.json())
-        .then((data) => {
-          if (data && data.version && data.version !== APP_VERSION) {
-            const curParts = APP_VERSION.split('.').map(Number)
-            const newParts = data.version.split('.').map(Number)
-            let isNewer = false
-            for (let i = 0; i < Math.max(curParts.length, newParts.length); i++) {
-              const curPart = curParts[i] || 0
-              const newPart = newParts[i] || 0
-              if (newPart > curPart) {
-                isNewer = true
-                break
-              } else if (newPart < curPart) {
-                break
-              }
-            }
-            if (isNewer) {
-              setUpdateInfo(data)
+    const checkVersion = async () => {
+      try {
+        let data: { version: string; url: string; notes: string } | null = null
+        try {
+          const res = await fetch('/version.json?t=' + Date.now(), { cache: 'no-store' })
+          if (res.ok) data = await res.json()
+        } catch { /* ignore */ }
+
+        if (!data) {
+          const res = await fetch('https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/version.json?t=' + Date.now(), { cache: 'no-store' })
+          if (res.ok) data = await res.json()
+        }
+
+        if (data && data.version && data.version !== APP_VERSION) {
+          const curParts = APP_VERSION.split('.').map(Number)
+          const newParts = data.version.split('.').map(Number)
+          let isNewer = false
+          for (let i = 0; i < Math.max(curParts.length, newParts.length); i++) {
+            const curPart = curParts[i] || 0
+            const newPart = newParts[i] || 0
+            if (newPart > curPart) {
+              isNewer = true
+              break
+            } else if (newPart < curPart) {
+              break
             }
           }
-        })
-        .catch((err) => console.log('Update check failed:', err))
-    }, 3000)
+          if (isNewer) {
+            setUpdateInfo(data)
+          }
+        }
+      } catch (err) {
+        console.log('Update check failed:', err)
+      }
+    }
+
+    const timer = setTimeout(checkVersion, 2000)
     return () => clearTimeout(timer)
   }, [])
 
