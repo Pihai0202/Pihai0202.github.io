@@ -98,52 +98,55 @@ export function LoginPage({ onLoginSuccess, onCancel }: LoginPageProps) {
     setIsLoading(true)
     setErrorMsg('')
     try {
-      if (typeof (window as any).Capacitor !== 'undefined') {
-        // Native App (Capacitor) Google Sign-in with Credential Manager disabled
-        const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false })
-        
-        const firebaseUser = result.user
-        if (firebaseUser) {
-          onLoginSuccess({
-            nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
-            email: firebaseUser.email || '',
-            avatarUrl: firebaseUser.photoUrl || undefined
-          })
-        } else {
-          // Fallback: exchange token manually if native user object is not present
-          const idToken = (result.credential as any)?.idToken
-          if (idToken) {
-            const credential = GoogleAuthProvider.credential(idToken)
-            const userCredential = await signInWithCredential(auth, credential)
-            const fUser = userCredential.user
+      if (typeof (window as any).Capacitor !== 'undefined' && (window as any).Capacitor.isNativePlatform()) {
+        try {
+          // Native App (Capacitor) Google Sign-in with Credential Manager disabled
+          const result = await FirebaseAuthentication.signInWithGoogle({ useCredentialManager: false })
+          const firebaseUser = result.user
+          if (firebaseUser) {
             onLoginSuccess({
-              nickname: fUser.displayName || fUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
-              email: fUser.email || '',
-              avatarUrl: fUser.photoURL || undefined
+              nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+              email: firebaseUser.email || '',
+              avatarUrl: firebaseUser.photoUrl || undefined
             })
+            return
           } else {
-            throw new Error(lang === 'zh-TW' ? '無法取得 Google 登入憑證' : 'Failed to get Google sign-in credentials')
+            const idToken = (result.credential as any)?.idToken
+            if (idToken) {
+              const credential = GoogleAuthProvider.credential(idToken)
+              const userCredential = await signInWithCredential(auth, credential)
+              const fUser = userCredential.user
+              onLoginSuccess({
+                nickname: fUser.displayName || fUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+                email: fUser.email || '',
+                avatarUrl: fUser.photoURL || undefined
+              })
+              return
+            }
           }
+        } catch (nativeErr: any) {
+          console.warn('Native Google Sign-In failed, attempting Web Popup fallback...', nativeErr)
         }
-      } else {
-        // Web Browser Google Sign-in
-        const provider = new GoogleAuthProvider()
-        const userCredential = await signInWithPopup(auth, provider)
-        const firebaseUser = userCredential.user
-        onLoginSuccess({
-          nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
-          email: firebaseUser.email || '',
-          avatarUrl: firebaseUser.photoURL || undefined
-        })
       }
+
+      // Web Browser or Native Fallback Google Sign-in
+      const provider = new GoogleAuthProvider()
+      const userCredential = await signInWithPopup(auth, provider)
+      const firebaseUser = userCredential.user
+      onLoginSuccess({
+        nickname: firebaseUser.displayName || firebaseUser.email?.split('@')[0] || (lang === 'zh-TW' ? 'Google樂迷' : 'Google Fan'),
+        email: firebaseUser.email || '',
+        avatarUrl: firebaseUser.photoURL || undefined
+      })
     } catch (err: any) {
       console.error('Google Sign-In Error:', err)
-      if (err.code === 'auth/popup-closed-by-user' || err.message?.includes('closed')) {
+      const msg = String(err?.message || err || '')
+      if (err.code === 'auth/popup-closed-by-user' || msg.includes('closed') || msg.includes('cancel')) {
         setErrorMsg(lang === 'zh-TW' ? '登入視窗已關閉！' : 'Login popup closed!')
-      } else if (err.code === 'auth/cancelled-popup-request' || err.message?.includes('cancel')) {
-        setErrorMsg(lang === 'zh-TW' ? '登入請求已被取消！' : 'Login request cancelled!')
+      } else if (msg.includes('10:') || msg.includes('10')) {
+        setErrorMsg(lang === 'zh-TW' ? 'Google 服務驗證失敗，請重試或改用 Email/訪客登入' : 'Google Play Services error, please try again')
       } else {
-        setErrorMsg(err.message || (lang === 'zh-TW' ? 'Google 登入失敗！' : 'Google Sign-In failed!'))
+        setErrorMsg(msg || (lang === 'zh-TW' ? 'Google 登入失敗！' : 'Google Sign-In failed!'))
       }
     } finally {
       setIsLoading(false)
