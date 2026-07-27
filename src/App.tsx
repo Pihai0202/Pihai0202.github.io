@@ -224,7 +224,7 @@ function extractArtistFromTitle(title: string): string {
   return clean.replace(/202\d/g, '').trim()
 }
 
-const APP_VERSION = '1.1.4'
+const APP_VERSION = '1.2.0'
 
 const getDefaultZoom = () => {
   if (typeof window !== 'undefined') {
