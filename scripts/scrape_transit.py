@@ -7,6 +7,7 @@
 
 import json
 import re
+import ssl
 import sys
 import time
 from datetime import datetime, timezone
@@ -29,10 +30,14 @@ HEADERS = {
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 OUTPUT_PATH = PROJECT_ROOT / "public" / "transit-status.json"
 
+SSL_CTX = ssl.create_default_context()
+SSL_CTX.check_hostname = False
+SSL_CTX.verify_mode = ssl.CERT_NONE
+
 def fetch_html(url, timeout=12):
     req = Request(url, headers=HEADERS)
     try:
-        with urlopen(req, timeout=timeout) as r:
+        with urlopen(req, timeout=timeout, context=SSL_CTX) as r:
             return r.read().decode("utf-8", errors="replace")
     except Exception as e:
         print(f"  ⚠ Fetch error {url}: {e}", file=sys.stderr)

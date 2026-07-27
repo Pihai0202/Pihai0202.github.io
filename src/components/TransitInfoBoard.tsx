@@ -724,16 +724,28 @@ export function TransitInfoBoard() {
   }, [])
 
 
-  // 1. 讀取營運通阻狀態（transit-status.json，由 GitHub Actions 每小時更新）
+  // 1. 讀取營運通阻狀態（transit-status.json，由 GitHub Actions / 自動爬蟲更新）
   const fetchStatus = useCallback(async () => {
     setLoading(true)
     try {
-      const response = await fetch(
-        `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/transit-status.json?t=${Date.now()}`,
-        { cache: 'no-store' }
-      )
-      if (!response.ok) throw new Error('transit-status.json not found')
-      const data = (await response.json()) as TransitPayload
+      let data: TransitPayload | null = null
+      try {
+        const localRes = await fetch(`/transit-status.json?t=${Date.now()}`, { cache: 'no-store' })
+        if (localRes.ok) {
+          data = (await localRes.json()) as TransitPayload
+        }
+      } catch { /* ignore */ }
+
+      if (!data) {
+        const response = await fetch(
+          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/transit-status.json?t=${Date.now()}`,
+          { cache: 'no-store' }
+        )
+        if (response.ok) {
+          data = (await response.json()) as TransitPayload
+        }
+      }
+
       if (data?.statuses) setStatuses(data.statuses)
     } catch (e) {
       console.error('Failed to fetch transit status:', e)
