@@ -630,6 +630,10 @@ function App() {
   }, [])
 
   useEffect(() => {
+    // 只有在 Capacitor 原生 App (Android/iOS) 環境下才檢查並跳出 APK 下載更新彈窗
+    const isNative = typeof (window as any).Capacitor !== 'undefined' && (window as any).Capacitor.isNativePlatform()
+    if (!isNative) return
+
     const checkVersion = async () => {
       try {
         let data: { version: string; url: string; notes: string } | null = null
