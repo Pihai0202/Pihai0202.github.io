@@ -2251,6 +2251,9 @@ function App() {
             <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
               <ClipboardIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> {t('allLogs')}
             </button>
+            <button className="add-concert-desktop-btn" type="button" onClick={() => openAddModal()}>
+              <PlusIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> {t('addRecord')}
+            </button>
 
             {/* Mobile Bottom Sheet (Sliding Drawer) */}
             <div 

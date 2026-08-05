@@ -1664,6 +1664,36 @@ svg#taiwan-map.dragging {
   box-shadow: 0 12px 36px 0 rgba(var(--gold-rgb), 0.2);
 }
 
+.add-concert-desktop-btn {
+  position: absolute;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  background: rgba(var(--surface-rgb), 0.7);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  padding: 0.6rem 1.2rem;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.add-concert-desktop-btn:hover {
+  background: rgba(var(--gold-rgb), 0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 36px 0 rgba(var(--gold-rgb), 0.2);
+}
+
 .empty-state {
   padding: 2rem;
   text-align: center;
@@ -8652,6 +8682,10 @@ svg#taiwan-map.dragging {
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25) !important;
   }
 
+  .add-concert-desktop-btn {
+    display: none !important;
+  }
+
   /* Reposition legend to top-left on mobile to prevent overlapping with bottom drawer */
   .map-legend {
     position: fixed !important;
@@ -10444,7 +10478,8 @@ header {
 .avatar-reset-btn,
 .oauth-btn,
 .login-back-btn,
-.all-concerts-btn {
+.all-concerts-btn,
+.add-concert-desktop-btn {
   background: var(--surface) !important;
   border: 1px solid var(--border) !important;
   color: var(--text) !important;
