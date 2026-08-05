@@ -49,25 +49,103 @@ function getHashColor(str: string): string {
   return AVATAR_COLORS[index]
 }
 
-function extractArtistQuery(title: string): string {
-  // Remove prefixes in brackets
-  let clean = title.replace(/【[^】]+】/g, '')
-  clean = clean.replace(/\[[^\]]+\]/g, '')
-  clean = clean.replace(/\([^)]+\)/g, '')
-  clean = clean.replace(/（[^）]+）/g, '')
-  
-  // Split by common separators
-  const separators = ['《', '<', ' - ', '—', '|', '：', ':', '★']
-  for (const sep of separators) {
-    if (clean.includes(sep)) {
-      clean = clean.split(sep)[0]
-    }
+type ExtractedQueryResult = {
+  artist: string
+  tourName: string
+}
+
+function extractArtistQuery(title: string): ExtractedQueryResult {
+  if (!title) return { artist: '', tourName: '' }
+
+  let raw = title.trim()
+
+  // 1. Extract tour/album/song name from 《...》 or 「...」
+  let tourName = ''
+  const quoteMatch = raw.match(/《([^》]+)》|「([^」]+)」/)
+  if (quoteMatch) {
+    tourName = (quoteMatch[1] || quoteMatch[2] || '').trim()
   }
-  
-  // Filter out year if present
-  clean = clean.replace(/202\d/g, '')
-  
-  return clean.trim()
+
+  // 2. Strip bracket expressions
+  let clean = raw
+    .replace(/【[^】]*】/g, ' ')
+    .replace(/\[[^\]]*\]/g, ' ')
+    .replace(/（[^）]*）/g, ' ')
+    .replace(/\([^)]*\)/g, ' ')
+    .replace(/《[^》]*》/g, ' ')
+    .replace(/「[^」]*」/g, ' ')
+
+  // 3. Filter out sponsors, bank names, ticketing platform names
+  const sponsors = [
+    '國泰世華銀行', '國泰世華', '中國信託商業銀行', '中國信託銀行', '中國信託', '中信銀', '中信',
+    '富邦金控', '台北富邦銀行', '富邦銀行', '富邦', '華南商業銀行', '華南銀行', '華南',
+    '台新國際商業銀行', '台新銀行', '台新', '玉山商業銀行', '玉山銀行', '玉山',
+    '遠東國際商業銀行', '遠東商銀', '兆豐國際商業銀行', '兆豐銀行', '兆豐',
+    '合作金庫商業銀行', '合作金庫', '合庫', '第一商業銀行', '第一銀行', '聯邦商業銀行', '聯邦銀行',
+    '永豐商業銀行', '永豐銀行', '永豐', '星展銀行', '渣打銀行', '花旗銀行', '新光銀行', '元大銀行',
+    '獨家贊助', '冠名贊助', '榮譽贊助', '特別贊助', '贊助呈獻', '贊助', '冠名', '呈獻', '主辦', '協辦', '承辦',
+    'KKTIX', 'ibon', '拓元', '寬宏售票', '寬宏', '遠雄'
+  ]
+  for (const sp of sponsors) {
+    clean = clean.split(sp).join(' ')
+  }
+
+  // 4. Filter out common event descriptors and noise words
+  const noiseRegexes = [
+    /202\d[年/.-]?/g,
+    /巡迴演唱會/g,
+    /世界巡迴/g,
+    /巡迴音樂會/g,
+    /巡迴/g,
+    /演唱會/g,
+    /音樂會/g,
+    /演奏會/g,
+    /粉絲見面會/g,
+    /見面會/g,
+    /專場/g,
+    /旗艦場/g,
+    /最終場/g,
+    /特別場/g,
+    /加場/g,
+    /加開/g,
+    /台北站/g,
+    /高雄站/g,
+    /台中站/g,
+    /桃園站/g,
+    /台南站/g,
+    /週年紀念/g,
+    /周年紀念/g,
+    /週年/g,
+    /周年/g,
+    /WORLD\s+TOUR/gi,
+    /LIVE\s+TOUR/gi,
+    /LIVE/gi,
+    /TOUR/gi,
+    /CONCERT/gi,
+    /FAN\s+MEETING/gi,
+    /IN\s+TAIPEI/gi,
+    /IN\s+KAOHSIUNG/gi,
+    /TAIPEI/gi,
+    /KAOHSIUNG/gi,
+  ]
+
+  for (const regex of noiseRegexes) {
+    clean = clean.replace(regex, ' ')
+  }
+
+  // 5. Clean punctuation and spaces
+  clean = clean.replace(/[-|:：★◆▲▼♦]/g, ' ')
+  clean = clean.replace(/\s+/g, ' ').trim()
+
+  // Fallback if empty
+  if (!clean) {
+    clean = title.split('《')[0].replace(/【[^】]+】/g, '').trim()
+  }
+
+  return {
+    artist: clean,
+    tourName: tourName
+  }
 }
 
 export function TicketDetailModal({
@@ -163,47 +241,78 @@ export function TicketDetailModal({
   // 2. Fetch Spotify tracks for this artist
   useEffect(() => {
     const searchTracks = async () => {
-      const artistQuery = extractArtistQuery(ticket.name)
-      if (!artistQuery) return
+      const { artist: cleanArtist, tourName } = extractArtistQuery(ticket.name)
+      if (!cleanArtist && !tourName) return
 
       setSpotifyLoading(true)
       try {
         let token = await spotifyTokenFetcher()
-        const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(
-          artistQuery
-        )}&type=track&limit=5&market=TW`
-        
-        let response = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
 
-        if (response.status === 401) {
-          token = await spotifyTokenFetcher(true)
-          response = await fetch(url, {
-            headers: { Authorization: `Bearer ${token}` }
-          })
+        const fetchSpotifyUrl = async (queryStr: string, limit = 10) => {
+          const url = `https://api.spotify.com/v1/search?q=${encodeURIComponent(queryStr)}&type=track&limit=${limit}&market=TW`
+          let res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+          if (res.status === 401) {
+            token = await spotifyTokenFetcher(true)
+            res = await fetch(url, { headers: { Authorization: `Bearer ${token}` } })
+          }
+          if (!res.ok) return []
+          const data = await res.json()
+          return data.tracks?.items ?? []
         }
 
-        if (!response.ok) throw new Error(`Spotify API failure (HTTP ${response.status})`)
-        
-        const data = await response.json()
-        const tracks = data.tracks?.items ?? []
-        
-        const normalized: SpotifyItem[] = tracks.map((track: any) => ({
-          type: 'track' as const,
-          id: track.id,
-          name: track.name,
-          sub: `${track.artists?.map((a: any) => a.name).join('、') || '未知藝人'} · ${track.album?.name || ''}`,
-          img: track.album?.images?.[2]?.url || track.album?.images?.[0]?.url || '',
-          url: track.external_urls?.spotify
-        })).filter((t: any) => t.url)
+        let rawTracks: any[] = []
 
-        setSpotifyTracks(normalized)
-        if (normalized.length > 0) {
-          setSelectedTrack(normalized[0])
-          // Sync with bottom player if requested
+        // Stage 1: Artist-specific search (artist:"歌手名稱")
+        if (cleanArtist) {
+          rawTracks = await fetchSpotifyUrl(`artist:"${cleanArtist}"`, 8)
+        }
+
+        // Stage 2: Search with artist + tour/song name
+        if (rawTracks.length === 0 && cleanArtist && tourName) {
+          rawTracks = await fetchSpotifyUrl(`${cleanArtist} ${tourName}`, 8)
+        }
+
+        // Stage 3: Search with tour/song name alone
+        if (rawTracks.length === 0 && tourName) {
+          rawTracks = await fetchSpotifyUrl(tourName, 8)
+        }
+
+        // Stage 4: General keyword search
+        if (rawTracks.length === 0 && cleanArtist) {
+          rawTracks = await fetchSpotifyUrl(cleanArtist, 8)
+        }
+
+        const normalized: (SpotifyItem & { artistNames: string })[] = rawTracks
+          .map((track: any) => ({
+            type: 'track' as const,
+            id: track.id,
+            name: track.name,
+            sub: `${track.artists?.map((a: any) => a.name).join('、') || '未知藝人'} · ${track.album?.name || ''}`,
+            img: track.album?.images?.[2]?.url || track.album?.images?.[0]?.url || '',
+            url: track.external_urls?.spotify,
+            artistNames: (track.artists?.map((a: any) => a.name.toLowerCase()) || []).join(' ')
+          }))
+          .filter((t: any) => t.url)
+
+        // Strict Artist Relevance Check: filter out tracks from completely unrelated artists
+        let verifiedTracks = normalized
+        if (cleanArtist) {
+          const lowerArtist = cleanArtist.toLowerCase()
+          const matched = normalized.filter((t) => {
+            return t.artistNames.includes(lowerArtist) || lowerArtist.includes(t.artistNames)
+          })
+          if (matched.length > 0) {
+            verifiedTracks = matched
+          }
+        }
+
+        const finalTracks: SpotifyItem[] = verifiedTracks.slice(0, 5).map(({ artistNames, ...rest }) => rest)
+
+        setSpotifyTracks(finalTracks)
+        if (finalTracks.length > 0) {
+          setSelectedTrack(finalTracks[0])
           if (autoPlay && onPlayMusicBar) {
-            onPlayMusicBar(normalized[0].url)
+            onPlayMusicBar(finalTracks[0].url)
           }
         }
       } catch (err) {
