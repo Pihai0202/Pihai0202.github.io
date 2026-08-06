@@ -234,6 +234,16 @@ chrome_ssl_context.set_ciphers(
 
 def fetch(url, as_json=False, headers=None):
     req_headers = headers if headers is not None else HEADERS
+    if HAS_CURL_CFFI:
+        try:
+            res = cffi_requests.get(url, headers=req_headers, impersonate='chrome', timeout=15)
+            if res.status_code == 200:
+                return res.json() if as_json else res.text
+            else:
+                print(f"  ⚠ fetch error {url}: HTTP Error {res.status_code}", file=sys.stderr)
+        except Exception as e:
+            print(f"  ⚠ curl_cffi fetch error {url}: {e}", file=sys.stderr)
+
     req = Request(url, headers=req_headers)
     try:
         with urlopen(req, context=chrome_ssl_context, timeout=15) as r:
@@ -281,31 +291,45 @@ def scrape_kktix():
         if not data:
             continue
 
-        items = data if isinstance(data, list) else data.get("events", [])
+        items = data if isinstance(data, list) else (data.get("entry", []) or data.get("events", []))
         print(f"  Got {len(items)} items", file=sys.stderr)
 
         for ev in items:
-            eid = str(ev.get("id", ""))
+            ev_url = ev.get("url") or ev.get("link") or ""
+            eid = str(ev.get("id", "")) or (ev_url.rstrip("/").split("/")[-1] if ev_url else "")
+            if not eid:
+                continue
             if eid in seen_ids:
                 continue
             seen_ids.add(eid)
 
-            name      = ev.get("name", "") or ev.get("title", "")
+            name = ev.get("name", "") or ev.get("title", "")
             venue_raw = ev.get("location", "") or ev.get("venue", "") or ev.get("address", "")
-            start_at  = ev.get("start_at") or ev.get("starts_at") or ev.get("started_at", "")
-            image     = (ev.get("cover_image_url") or ev.get("image_url") or
-                         ev.get("logo_url") or "")
-            slug      = ev.get("slug") or ev.get("url_name") or eid
-            ev_url    = f"https://kktix.com/events/{slug}"
-            price     = ev.get("price_description") or ev.get("price") or ""
+            start_at = ev.get("start_at") or ev.get("starts_at") or ev.get("published", "")
+            image = (ev.get("cover_image_url") or ev.get("image_url") or ev.get("logo_url") or "")
+            slug = ev.get("slug") or ev.get("url_name") or eid
+            if not ev_url:
+                ev_url = f"https://kktix.com/events/{slug}"
+            price = ev.get("price_description") or ev.get("price") or ""
+
+            content = ev.get("content", "")
+            if not venue_raw and content:
+                v_match = re.search(r'地點[：:\s]*([^/\n<]+)', content)
+                if v_match:
+                    venue_raw = v_match.group(1).strip()
 
             date_str = ""
+            if not start_at and content:
+                d_match = re.search(r'時間[：:\s]*(\d{4}[/-]\d{1,2}[/-]\d{1,2})', content)
+                if d_match:
+                    start_at = d_match.group(1)
+
             if start_at:
                 try:
                     dt = datetime.fromisoformat(start_at.replace("Z", "+00:00"))
                     date_str = dt.strftime("%Y-%m-%d")
                 except Exception:
-                    date_str = str(start_at)[:10]
+                    date_str = str(start_at)[:10].replace("/", "-")
 
             if date_str and date_str < today_str():
                 continue
