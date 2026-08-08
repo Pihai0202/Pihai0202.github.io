@@ -30,6 +30,7 @@ import { GuideModal } from './components/GuideModal'
 import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
+import { isTargetEventCategory } from './utils/eventFilterHelper'
 import { collection, addDoc, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
@@ -1183,7 +1184,8 @@ function App() {
       if (!response.ok) throw new Error('concerts.json not found')
 
       const data = (await response.json()) as RemoteConcertPayload
-      const events = Array.isArray(data.events) ? data.events : []
+      const rawEvents = Array.isArray(data.events) ? data.events : []
+      const events = rawEvents.filter(isTargetEventCategory)
       setRemoteConcerts(events)
       setRemoteUpdatedAt(data.updated_at ?? null)
       setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
