@@ -622,12 +622,11 @@ function TaiwanMapComponent({
       >
         <defs>
           <radialGradient id="mapGlow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="var(--map-glow-start, #1a1a3e)" stopOpacity="0.8" />
-            <stop offset="100%" stopColor="var(--map-glow-end, #0a0a0f)" stopOpacity="0" />
+            <stop offset="0%" stopColor="var(--map-glow-start, transparent)" stopOpacity="0" />
+            <stop offset="100%" stopColor="var(--map-glow-end, transparent)" stopOpacity="0" />
           </radialGradient>
         </defs>
 
-        <ellipse cx="455" cy="500" rx="300" ry="350" fill="url(#mapGlow)" />
         <TaiwanMapBackground />
 
         <text x="213" y="585" fill="var(--map-label, #4a4a70)" fontSize="13" fontWeight="bold" textAnchor="middle">

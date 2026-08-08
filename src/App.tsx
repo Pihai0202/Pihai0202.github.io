@@ -30,7 +30,7 @@ import { GuideModal } from './components/GuideModal'
 import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
-import { collection, addDoc, doc, setDoc, onSnapshot } from 'firebase/firestore'
+import { collection, addDoc, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
@@ -39,6 +39,7 @@ import {
   CloseIcon,
   SunIcon,
   MoonIcon,
+  PaletteIcon,
   CheckIcon,
   WarningIcon,
   SparklesIcon,
@@ -252,10 +253,29 @@ function App() {
     return 'dark'
   })
 
+  const [colorPalette, setColorPalette] = useState<'sage' | 'volcano'>(() => {
+    const storedPalette = localStorage.getItem('color-palette')
+    if (storedPalette === 'volcano' || storedPalette === 'sage') {
+      return storedPalette
+    }
+    return 'sage'
+  })
+
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
     localStorage.setItem('theme', theme)
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { preferredTheme: theme }, { merge: true }).catch(() => {})
+    }
   }, [theme])
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-palette', colorPalette)
+    localStorage.setItem('color-palette', colorPalette)
+    if (auth.currentUser) {
+      setDoc(doc(db, 'users', auth.currentUser.uid), { preferredPalette: colorPalette }, { merge: true }).catch(() => {})
+    }
+  }, [colorPalette])
 
   const toggleTheme = useCallback(() => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark'
@@ -267,6 +287,10 @@ function App() {
       setTheme(nextTheme)
     }
   }, [theme])
+
+  const toggleColorPalette = useCallback(() => {
+    setColorPalette((prev) => (prev === 'sage' ? 'volcano' : 'sage'))
+  }, [])
 
   const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
@@ -892,6 +916,21 @@ function App() {
         localStorage.setItem('tw-logged-in', 'true')
         localStorage.setItem('tw-user-info', JSON.stringify(user))
         localStorage.setItem('tw-nickname', user.nickname)
+
+        // Restore cloud-saved theme & palette preference
+        getDoc(doc(db, 'users', firebaseUser.uid))
+          .then((userSnap) => {
+            if (userSnap.exists()) {
+              const data = userSnap.data()
+              if (data.preferredTheme === 'light' || data.preferredTheme === 'dark') {
+                setTheme(data.preferredTheme)
+              }
+              if (data.preferredPalette === 'sage' || data.preferredPalette === 'volcano') {
+                setColorPalette(data.preferredPalette)
+              }
+            }
+          })
+          .catch(() => {})
       } else {
         // Maintain guest@example.com session if active (mock guest login)
         const stored = localStorage.getItem('tw-user-info')
@@ -2004,6 +2043,15 @@ function App() {
             aria-label="網站導覽"
           >
             <SparklesIcon />
+          </button>
+          <button
+            className="theme-toggle-btn palette-toggle-btn"
+            type="button"
+            onClick={toggleColorPalette}
+            title={colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Switch to Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Switch to Green Theme')}
+            aria-label="切換調色盤"
+          >
+            <PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} />
           </button>
           <button
             className="theme-toggle-btn"
@@ -3128,7 +3176,7 @@ function App() {
       {isSuspensionModalOpen && suspensionData && (
         <Modal className="suspension-modal" onClose={() => setIsSuspensionModalOpen(false)}>
           <div className="suspension-header">
-            <WarningIcon className="suspension-icon" style={{ color: '#faad14' }} />
+            <WarningIcon className="suspension-icon" style={{ color: 'var(--accent)' }} />
             <div>
               <h2 className="suspension-title">{t('suspensionTitle')}</h2>
               <div className="suspension-subtitle">
@@ -3326,12 +3374,12 @@ function App() {
                       padding: '0.85rem 1.2rem',
                       borderRadius: '12px',
                       background: isActive 
-                        ? 'linear-gradient(135deg, rgba(var(--gold-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.1) 100%)' 
+                        ? 'rgba(var(--accent-rgb), 0.15)' 
                         : 'var(--surface-hover)',
                       border: isActive 
-                        ? '1px solid rgba(var(--gold-rgb), 0.6)' 
+                        ? '1px solid var(--accent)' 
                         : '1px solid var(--border)',
-                      color: isActive ? 'var(--gold)' : 'var(--text)',
+                      color: isActive ? 'var(--accent)' : 'var(--text)',
                       fontSize: '0.92rem',
                       fontWeight: isActive ? '700' : '500',
                       cursor: 'pointer',
@@ -3597,6 +3645,17 @@ function App() {
                 className="sidebar-nav-item"
                 type="button"
                 onClick={() => {
+                  toggleColorPalette()
+                  setIsMobileSidebarOpen(false)
+                }}
+              >
+                <span className="icon"><PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} /></span>
+                <span className="label">{colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Green Theme')}</span>
+              </button>
+              <button
+                className="sidebar-nav-item"
+                type="button"
+                onClick={() => {
                   setIsMusicBarVisible((visible) => !visible)
                   setIsMobileSidebarOpen(false)
                 }}
@@ -3668,16 +3727,6 @@ function App() {
               <span className="label">{t('tabCalendar')}</span>
             </button>
             <button
-              className="bottom-nav-item bottom-nav-item-record"
-              type="button"
-              data-utility="true"
-              onClick={() => openAddModal()}
-              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}
-            >
-              <span className="icon"><PlusIcon /></span>
-              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
-            </button>
-            <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
               type="button"
               data-view="board"
@@ -3704,6 +3753,16 @@ function App() {
               <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
             </button>
             <button
+              className="bottom-nav-item bottom-nav-item-record"
+              type="button"
+              data-utility="true"
+              onClick={() => openAddModal()}
+              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}
+            >
+              <span className="icon"><PlusIcon /></span>
+              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
+            </button>
+            <button
               className="bottom-nav-item tablet-only-nav-item"
               type="button"
               data-utility="true"
@@ -3720,6 +3779,16 @@ function App() {
             >
               <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
               <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '淺色' : lang === 'ja' ? 'ライト' : lang === 'ko' ? '라이트' : 'Light') : (lang === 'zh-TW' ? '深色' : lang === 'ja' ? 'ダーク' : lang === 'ko' ? '다크' : 'Dark')}</span>
+            </button>
+            <button
+              className="bottom-nav-item tablet-only-nav-item"
+              type="button"
+              data-utility="true"
+              onClick={toggleColorPalette}
+              title={colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Switch to Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Switch to Green Theme')}
+            >
+              <span className="icon"><PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} /></span>
+              <span className="label">{colorPalette === 'sage' ? (lang === 'zh-TW' ? '黑橘' : 'Orange') : (lang === 'zh-TW' ? '綠色' : 'Green')}</span>
             </button>
             <button
               className="bottom-nav-item tablet-only-nav-item"

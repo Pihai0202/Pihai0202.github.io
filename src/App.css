@@ -7,74 +7,153 @@
   animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-:root {
+/* ==========================================================================
+   Color Schemes & Palettes (配色調色盤切換)
+   ========================================================================== */
+
+/* 🌿 Scheme A: Sage Olive Green (預設莫蘭迪鼠尾草綠) */
+:root,
+:root[data-palette="sage"] {
   --bottom-offset: 0px;
-  --bg: #0d0b09;
-  --bg-rgb: 13, 11, 9;
-  --surface: #14120f;
-  --surface-rgb: 20, 18, 15;
-  --surface2: #1e1915;
-  --border: #33271e;
-  --accent: #ff6b00;
-  --accent-rgb: 255, 107, 0;
-  --gold: #ffbe0b;
-  --gold-rgb: 255, 190, 11;
-  --teal: #ff9f1c;
-  --teal-rgb: 255, 159, 28;
-  --text: #f6f3eb;
-  --muted: #9c8e82;
+  --bg: #181C14;
+  --bg-rgb: 24, 28, 20;
+  --surface: #3C3D37;
+  --surface-rgb: 60, 61, 55;
+  --surface2: #262920;
+  --border: #52544c;
+  --accent: #82947d;
+  --accent-rgb: 130, 148, 125;
+  --gold: #82947d;
+  --gold-rgb: 130, 148, 125;
+  --teal: #82947d;
+  --teal-rgb: 130, 148, 125;
+  --text: #ECDFCC;
+  --muted: #a89f92;
   --chip-bg: rgba(var(--surface-rgb), 0.88);
   --header-bg: linear-gradient(180deg, rgba(var(--surface-rgb), 0.95) 0%, rgba(var(--bg-rgb), 0.4) 100%);
-  --map-bg-center: #1a1410;
-  --map-bg-edge: #0d0b09;
-  --map-glow-start: rgba(var(--accent-rgb), 0.18);
-  --map-glow-end: #0d0b09;
-  --map-land: #261d15;
-  --map-land-stroke: #403022;
-  --map-contour: #33271d;
-  --map-mountain: #1d150e;
-  --map-mountain-stroke: #3a291b;
-  --map-label: #8c7869;
-  --search-bg: rgba(var(--accent-rgb), 0.04);
-  --search-border: rgba(var(--accent-rgb), 0.15);
-  --search-hover-bg: rgba(var(--accent-rgb), 0.08);
-  --search-focus-bg: rgba(var(--accent-rgb), 0.12);
+  --map-bg-center: #181C14;
+  --map-bg-edge: #181C14;
+  --map-glow-start: transparent;
+  --map-glow-end: transparent;
+  --map-land: #3C3D37;
+  --map-land-stroke: #51544a;
+  --map-contour: #3C3D37;
+  --map-mountain: #1d2119;
+  --map-mountain-stroke: #33372c;
+  --map-label: #a89f92;
+  --search-bg: rgba(var(--accent-rgb), 0.08);
+  --search-border: rgba(var(--accent-rgb), 0.22);
+  --search-hover-bg: rgba(var(--accent-rgb), 0.15);
+  --search-focus-bg: rgba(var(--accent-rgb), 0.22);
   --legend-bg: rgba(var(--surface-rgb), 0.9);
   --mobile-nav-bg: rgba(var(--surface-rgb), 0.95);
 }
 
-[data-theme="light"] {
-  --bg: #fcfbfa;
-  --bg-rgb: 252, 251, 250;
+[data-theme="light"],
+[data-theme="light"][data-palette="sage"] {
+  --bg: #FAF9EE;
+  --bg-rgb: 250, 249, 238;
   --surface: #ffffff;
   --surface-rgb: 255, 255, 255;
-  --surface2: #f4f1eb;
-  --border: #e6dfd5;
-  --accent: #e65c00;
-  --accent-rgb: 230, 92, 0;
-  --gold: #b37400;
-  --gold-rgb: 179, 116, 0;
-  --teal: #d97706;
-  --teal-rgb: 217, 119, 6;
-  --text: #1d1610;
-  --muted: #7c7064;
+  --surface2: #ffffff;
+  --border: #DCCFC0;
+  --accent: #6B7F64;
+  --accent-rgb: 107, 127, 100;
+  --gold: #596B53;
+  --gold-rgb: 89, 107, 83;
+  --teal: #4c5c46;
+  --teal-rgb: 76, 92, 70;
+  --text: #272e25;
+  --muted: #6e796a;
   --chip-bg: rgba(var(--surface-rgb), 0.85);
   --header-bg: linear-gradient(180deg, rgba(var(--bg-rgb), 0.95) 0%, rgba(var(--bg-rgb), 0.4) 100%);
-  --map-bg-center: #f0eae1;
-  --map-bg-edge: #fcfbfa;
-  --map-glow-start: rgba(var(--accent-rgb), 0.1);
-  --map-glow-end: #fcfbfa;
-  --map-land: #ebdcc8;
-  --map-land-stroke: #caa680;
-  --map-contour: #ebdcc8;
-  --map-mountain: #ebdcc8;
-  --map-mountain-stroke: #caa680;
-  --map-label: #8c7869;
-  --search-bg: rgba(var(--accent-rgb), 0.03);
-  --search-border: rgba(var(--accent-rgb), 0.08);
-  --search-hover-bg: rgba(var(--accent-rgb), 0.05);
-  --search-focus-bg: rgba(var(--accent-rgb), 0.07);
-  --legend-bg: rgba(255, 255, 255, 0.9);
+  --map-bg-center: #FAF9EE;
+  --map-bg-edge: #FAF9EE;
+  --map-glow-start: transparent;
+  --map-glow-end: transparent;
+  --map-land: #e8e4da;
+  --map-land-stroke: #DCCFC0;
+  --map-contour: #e8e4da;
+  --map-mountain: #e8e4da;
+  --map-mountain-stroke: #DCCFC0;
+  --map-label: #6e796a;
+  --search-bg: rgba(var(--accent-rgb), 0.05);
+  --search-border: rgba(var(--accent-rgb), 0.15);
+  --search-hover-bg: rgba(var(--accent-rgb), 0.1);
+  --search-focus-bg: rgba(var(--accent-rgb), 0.15);
+  --legend-bg: rgba(255, 255, 255, 0.95);
+  --mobile-nav-bg: rgba(255, 255, 255, 0.95);
+}
+
+/* 🌋 Scheme B: Volcanic Amber Gold & Black Orange (經典黑橘風格) */
+:root[data-palette="volcano"] {
+  --bottom-offset: 0px;
+  --bg: #0b0b0e;
+  --bg-rgb: 11, 11, 14;
+  --surface: #141419;
+  --surface-rgb: 20, 20, 25;
+  --surface2: #181820;
+  --border: rgba(255, 145, 0, 0.28);
+  --accent: #ff9100;
+  --accent-rgb: 255, 145, 0;
+  --gold: #ff9100;
+  --gold-rgb: 255, 145, 0;
+  --teal: #ff9100;
+  --teal-rgb: 255, 145, 0;
+  --text: #f5f5f7;
+  --muted: #a0a0ab;
+  --chip-bg: rgba(var(--surface-rgb), 0.88);
+  --header-bg: linear-gradient(180deg, rgba(var(--surface-rgb), 0.95) 0%, rgba(var(--bg-rgb), 0.4) 100%);
+  --map-bg-center: #120e0a;
+  --map-bg-edge: #0b0b0e;
+  --map-glow-start: transparent;
+  --map-glow-end: transparent;
+  --map-land: #1c1814;
+  --map-land-stroke: #3d2d1d;
+  --map-contour: #1c1814;
+  --map-mountain: #14100c;
+  --map-mountain-stroke: #2e2014;
+  --map-label: #a0a0ab;
+  --search-bg: rgba(var(--accent-rgb), 0.08);
+  --search-border: rgba(var(--accent-rgb), 0.22);
+  --search-hover-bg: rgba(var(--accent-rgb), 0.15);
+  --search-focus-bg: rgba(var(--accent-rgb), 0.22);
+  --legend-bg: rgba(var(--surface-rgb), 0.9);
+  --mobile-nav-bg: rgba(var(--surface-rgb), 0.95);
+}
+
+[data-theme="light"][data-palette="volcano"] {
+  --bg: #ffffff;
+  --bg-rgb: 255, 255, 255;
+  --surface: #ffffff;
+  --surface-rgb: 255, 255, 255;
+  --surface2: #ffffff;
+  --border: #ffe0b2;
+  --accent: #f57c00;
+  --accent-rgb: 245, 124, 0;
+  --gold: #e65100;
+  --gold-rgb: 230, 81, 0;
+  --teal: #e65100;
+  --teal-rgb: 230, 81, 0;
+  --text: #1a1a1f;
+  --muted: #666670;
+  --chip-bg: rgba(var(--surface-rgb), 0.85);
+  --header-bg: linear-gradient(180deg, rgba(var(--bg-rgb), 0.95) 0%, rgba(var(--bg-rgb), 0.4) 100%);
+  --map-bg-center: #ffffff;
+  --map-bg-edge: #ffffff;
+  --map-glow-start: transparent;
+  --map-glow-end: transparent;
+  --map-land: #f3e8d6;
+  --map-land-stroke: #e2d2ba;
+  --map-contour: #f3e8d6;
+  --map-mountain: #f3e8d6;
+  --map-mountain-stroke: #e2d2ba;
+  --map-label: #666670;
+  --search-bg: rgba(var(--accent-rgb), 0.05);
+  --search-border: rgba(var(--accent-rgb), 0.15);
+  --search-hover-bg: rgba(var(--accent-rgb), 0.1);
+  --search-focus-bg: rgba(var(--accent-rgb), 0.15);
+  --legend-bg: rgba(255, 255, 255, 0.95);
   --mobile-nav-bg: rgba(255, 255, 255, 0.95);
 }
 
@@ -149,6 +228,7 @@ header {
     top: 12px !important;
     left: calc((100% - var(--sidebar-w)) / 2) !important;
     transform: translateX(-50%) !important;
+    margin: 0 !important;
     width: max-content !important;
     min-width: 0 !important;
     max-width: min(calc(100% - var(--sidebar-w) - 24px), calc(100vw - 32px)) !important;
@@ -168,11 +248,12 @@ header {
     background: rgba(252, 251, 250, 0.9) !important;
     border: 1.5px solid rgba(20, 20, 19, 0.12) !important;
     box-shadow: rgba(0, 0, 0, 0.04) 0px 4px 24px 0px !important;
-    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    transition: left 0.3s cubic-bezier(0.16, 1, 0.3, 1), max-width 0.3s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.3s ease, border-color 0.3s ease !important;
   }
 
   header.full-width-header {
     left: 50% !important;
+    transform: translateX(-50%) !important;
     max-width: calc(100vw - 32px) !important;
   }
 
@@ -214,11 +295,11 @@ header {
   .logo-icon svg {
     width: 28px !important;
     height: 28px !important;
-    color: #e65c00 !important;
+    color: var(--accent) !important;
   }
 
   [data-theme="dark"] .logo-icon svg {
-    color: #ff6b00 !important;
+    color: var(--accent) !important;
   }
 
   .logo-text h1 {
@@ -226,23 +307,23 @@ header {
     font-weight: 700 !important;
     letter-spacing: -0.01em !important;
     line-height: 1.2 !important;
-    color: #1d1610 !important;
+    color: var(--text) !important;
   }
 
   [data-theme="dark"] .logo-text h1 {
-    color: #f6f3eb !important;
+    color: var(--text) !important;
   }
 
   .logo-text span {
     font-size: 0.72rem !important;
-    color: #7c7064 !important;
+    color: var(--muted) !important;
     letter-spacing: 0.05em !important;
     display: block !important;
     white-space: nowrap !important;
   }
 
   [data-theme="dark"] .logo-text span {
-    color: #9c8e82 !important;
+    color: var(--muted) !important;
   }
 
   /* Header Search */
@@ -446,25 +527,25 @@ header {
   }
 
   .logout-btn {
-    border-color: #e65c00 !important;
-    color: #e65c00 !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
   }
 
   [data-theme="dark"] .logout-btn {
-    border-color: #ff6b00 !important;
-    color: #ff6b00 !important;
+    border-color: var(--accent) !important;
+    color: var(--accent) !important;
   }
 
   .logout-btn:hover {
-    background: #e65c00 !important;
+    background: var(--accent) !important;
     color: #ffffff !important;
-    border-color: #e65c00 !important;
+    border-color: var(--accent) !important;
   }
 
   [data-theme="dark"] .logout-btn:hover {
-    background: #ff6b00 !important;
+    background: var(--accent) !important;
     color: #ffffff !important;
-    border-color: #ff6b00 !important;
+    border-color: var(--accent) !important;
   }
 
   /* Desktop layout alignment: right block aligned to top, no overlap with header */
@@ -2653,9 +2734,9 @@ svg#taiwan-map.dragging {
   gap: 0.3rem;
   padding: 0.4rem 0.9rem;
   margin-top: 0.5rem;
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.2) 0%, rgba(var(--teal-rgb), 0.05) 100%);
-  border: 1px solid rgba(var(--teal-rgb), 0.4);
-  color: var(--teal);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
   border-radius: 20px;
   font-size: 0.76rem;
   font-weight: 700;
@@ -2666,8 +2747,8 @@ svg#taiwan-map.dragging {
 }
 
 .transit-retry-btn:hover {
-  border-color: var(--teal);
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.3) 0%, rgba(var(--teal-rgb), 0.1) 100%);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.2);
   transform: translateY(-1px);
 }
 
@@ -3114,7 +3195,7 @@ svg#taiwan-map.dragging {
   font-size: 0.85rem;
   font-weight: 700;
   margin-bottom: 6px;
-  color: #fff;
+  color: var(--text);
   letter-spacing: 0.03em;
 }
 
@@ -3537,9 +3618,9 @@ svg#taiwan-map.dragging {
 }
 
 .nav-toggle-btn {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.1) 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.4);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
   padding: 0.55rem 1.1rem;
   border-radius: 20px;
   font-size: 0.82rem;
@@ -3556,11 +3637,11 @@ svg#taiwan-map.dragging {
 }
 
 .nav-toggle-btn:hover {
-  border-color: var(--teal);
-  color: var(--teal);
+  border-color: var(--accent);
+  color: var(--accent);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(var(--teal-rgb), 0.25);
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.15) 0%, rgba(var(--gold-rgb), 0.05) 100%);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.25);
+  background: rgba(var(--accent-rgb), 0.2);
 }
 
 .nav-toggle-btn:active {
@@ -3595,12 +3676,9 @@ svg#taiwan-map.dragging {
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   font-size: 2.2rem;
   font-weight: 900;
-  color: var(--text);
+  color: var(--accent);
   margin-bottom: 0.4rem;
   letter-spacing: 0.02em;
-  background: linear-gradient(135deg, var(--text) 30%, var(--gold) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
   text-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
@@ -4001,16 +4079,16 @@ svg#taiwan-map.dragging {
 /* Share Board Direct Publish Trigger Button */
 .board-publish-trigger {
   margin-top: 1.5rem;
-  background: linear-gradient(135deg, var(--gold) 0%, #ffc04d 100%);
+  background: var(--accent);
   border: none;
   border-radius: 30px;
-  color: #000;
+  color: #ffffff;
   padding: 0.75rem 2rem;
   font-size: 0.92rem;
   font-weight: 800;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 0 4px 15px rgba(var(--gold-rgb), 0.3);
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
@@ -4186,10 +4264,10 @@ svg#taiwan-map.dragging {
 }
 
 .login-submit-btn {
-  background: linear-gradient(135deg, var(--gold) 0%, #ffc04d 100%);
+  background: var(--accent);
   border: none;
   border-radius: 8px;
-  color: #000;
+  color: #fff;
   padding: 0.75rem;
   font-size: 0.9rem;
   font-weight: 800;
@@ -4612,15 +4690,15 @@ svg#taiwan-map.dragging {
 }
 
 .alert-item.weather-warning {
-  background: rgba(var(--accent-rgb), 0.06);
-  color: #ffb3b8;
+  background: rgba(var(--accent-rgb), 0.08);
+  color: var(--text);
   border-left-color: var(--accent);
 }
 
 .alert-item.weather-sunny {
-  background: rgba(var(--gold-rgb), 0.05);
-  color: #ffe6a7;
-  border-left-color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.06);
+  color: var(--text);
+  border-left-color: var(--accent);
 }
 
 /* Spinner for loading state */
@@ -5333,8 +5411,8 @@ svg#taiwan-map.dragging {
 
 /* 購票連結快捷區樣式 */
 .ticket-purchase-banner {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.08) 0%, rgba(var(--teal-rgb), 0.04) 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.25);
+  background: rgba(var(--accent-rgb), 0.08);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
   border-radius: 12px;
   padding: 1.2rem;
   display: flex;
@@ -5348,7 +5426,7 @@ svg#taiwan-map.dragging {
 .ticket-purchase-banner .banner-title {
   font-size: 0.82rem;
   font-weight: 700;
-  color: var(--gold);
+  color: var(--accent);
   letter-spacing: 0.05em;
 }
 
@@ -5365,25 +5443,26 @@ svg#taiwan-map.dragging {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--teal);
-  border: 1px solid var(--teal);
-  color: #000 !important;
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: #fff !important;
   font-weight: 700;
   font-size: 0.88rem;
   padding: 0.75rem 1.5rem;
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(var(--teal-rgb), 0.15);
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.15);
   box-sizing: border-box;
   text-align: center;
 }
 
 .ticket-buy-btn-large:hover {
-  background: #05c290;
-  border-color: #05c290;
+  background: var(--accent);
+  border-color: var(--accent);
+  opacity: 0.9;
   transform: translateY(-1px);
-  box-shadow: 0 4px 20px rgba(var(--teal-rgb), 0.25);
+  box-shadow: 0 4px 20px rgba(var(--accent-rgb), 0.25);
 }
 
 .ticket-buy-btn-large:active {
@@ -5391,7 +5470,7 @@ svg#taiwan-map.dragging {
 }
 
 .ticket-info-header {
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.02) 0%, rgba(var(--gold-rgb), 0.02) 100%);
+  background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1.2rem;
@@ -5402,9 +5481,9 @@ svg#taiwan-map.dragging {
 
 .ticket-source-badge {
   display: inline-block;
-  background: rgba(var(--gold-rgb), 0.12);
-  border: 1px solid rgba(var(--gold-rgb), 0.25);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  color: var(--accent);
   font-size: 0.7rem;
   font-weight: 700;
   padding: 0.2rem 0.6rem;
@@ -5443,7 +5522,7 @@ svg#taiwan-map.dragging {
 }
 
 .meta-item .text strong {
-  color: var(--gold);
+  color: var(--accent);
   font-weight: 600;
 }
 
@@ -5460,8 +5539,8 @@ svg#taiwan-map.dragging {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  background: linear-gradient(135deg, var(--teal) 0%, #05a87d 100%);
-  color: #000;
+  background: var(--accent);
+  color: #fff;
   border: none;
   font-weight: 700;
   font-size: 0.88rem;
@@ -5469,13 +5548,14 @@ svg#taiwan-map.dragging {
   border-radius: 8px;
   text-decoration: none;
   transition: all 0.2s ease;
-  box-shadow: 0 4px 15px rgba(var(--teal-rgb), 0.2);
+  box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.2);
 }
 
 .ticket-buy-btn:hover {
   transform: translateY(-1.5px);
-  box-shadow: 0 6px 20px rgba(var(--teal-rgb), 0.35);
-  background: linear-gradient(135deg, #0ce6ad 0%, var(--teal) 100%);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.35);
+  background: var(--accent);
+  opacity: 0.9;
 }
 
 /* Spotify 曲目播放 */
@@ -5501,12 +5581,14 @@ svg#taiwan-map.dragging {
   font-weight: 700;
   color: var(--text);
   margin: 0;
+  white-space: nowrap;
 }
 
 .autoplay-control {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .toggle-switch {
@@ -5514,6 +5596,7 @@ svg#taiwan-map.dragging {
   display: inline-block;
   width: 38px;
   height: 20px;
+  flex-shrink: 0;
 }
 
 .toggle-switch input {
@@ -5559,6 +5642,7 @@ svg#taiwan-map.dragging {
   font-size: 0.76rem;
   color: var(--muted);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .spotify-loader, .spotify-no-tracks {
@@ -5567,15 +5651,19 @@ svg#taiwan-map.dragging {
   text-align: center;
   padding: 1.5rem 0;
   font-style: italic;
+  white-space: nowrap;
 }
 
 .music-player-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 1.2rem;
+  align-items: start;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 850px) {
   .music-player-grid {
     grid-template-columns: 1fr;
   }
@@ -5585,12 +5673,16 @@ svg#taiwan-map.dragging {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .selector-title {
   font-size: 0.75rem;
   color: var(--muted);
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .track-options-list {
@@ -5614,6 +5706,7 @@ svg#taiwan-map.dragging {
   text-align: left;
   font-family: inherit;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .track-option-item:hover {
@@ -5637,12 +5730,16 @@ svg#taiwan-map.dragging {
 .track-info {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .track-name {
   font-size: 0.78rem;
   font-weight: 600;
   color: var(--text);
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -5651,9 +5748,11 @@ svg#taiwan-map.dragging {
 .track-artist {
   font-size: 0.68rem;
   color: var(--muted);
+  line-height: 1.3;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  margin-top: 2px;
 }
 
 .modal-player-visualizer {
@@ -5661,12 +5760,13 @@ svg#taiwan-map.dragging {
   flex-direction: column;
   justify-content: center;
   gap: 0.8rem;
-  background: rgba(255, 255, 255, 0.01);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--border);
   border-radius: 12px;
   padding: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-  align-self: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+  align-self: stretch;
+  min-width: 0;
   width: 100%;
   box-sizing: border-box;
 }
@@ -5675,6 +5775,7 @@ svg#taiwan-map.dragging {
   display: flex;
   align-items: center;
   gap: 0.6rem;
+  white-space: nowrap;
 }
 
 .playing-label {
@@ -5682,6 +5783,7 @@ svg#taiwan-map.dragging {
   font-weight: 700;
   color: var(--teal);
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 /* Equalizer Waves Animation */
@@ -5987,9 +6089,9 @@ svg#taiwan-map.dragging {
 }
 
 .comment-submit-btn {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.15) 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.4);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
   font-weight: 700;
   font-size: 0.8rem;
   padding: 0 1.2rem;
@@ -6003,9 +6105,9 @@ svg#taiwan-map.dragging {
 }
 
 .comment-submit-btn:hover:not(:disabled) {
-  border-color: var(--teal);
-  color: var(--teal);
-  background: rgba(var(--teal-rgb), 0.08);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.2);
 }
 
 .comment-submit-btn:disabled {
@@ -6033,9 +6135,9 @@ svg#taiwan-map.dragging {
 }
 
 .profile-back-btn {
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.15) 0%, rgba(var(--gold-rgb), 0.05) 100%);
-  border: 1px solid rgba(var(--teal-rgb), 0.4);
-  color: var(--teal);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
   padding: 0.55rem 1.2rem;
   border-radius: 20px;
   font-size: 0.82rem;
@@ -6046,9 +6148,9 @@ svg#taiwan-map.dragging {
 }
 
 .profile-back-btn:hover {
-  border-color: var(--gold);
-  color: var(--gold);
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.05) 100%);
+  border-color: var(--accent);
+  color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.2);
 }
 
 .profile-logout-btn {
@@ -7859,25 +7961,25 @@ svg#taiwan-map.dragging {
 }
 
 .calendar-event-pill.personal {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.2) 0%, rgba(var(--gold-rgb), 0.05) 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.4);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.4);
+  color: var(--accent);
 }
 
 .calendar-event-pill.personal:hover {
-  border-color: var(--gold);
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3) 0%, rgba(var(--gold-rgb), 0.1) 100%);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.2);
 }
 
 .calendar-event-pill.remote {
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.15) 0%, rgba(var(--teal-rgb), 0.05) 100%);
-  border: 1px solid rgba(var(--teal-rgb), 0.3);
-  color: var(--teal);
+  background: rgba(var(--accent-rgb), 0.08);
+  border: 1px solid rgba(var(--accent-rgb), 0.25);
+  color: var(--text);
 }
 
 .calendar-event-pill.remote:hover {
-  border-color: var(--teal);
-  background: linear-gradient(135deg, rgba(var(--teal-rgb), 0.25) 0%, rgba(var(--teal-rgb), 0.1) 100%);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.15);
 }
 
 .day-cell-dots-container {
@@ -8240,9 +8342,9 @@ svg#taiwan-map.dragging {
 }
 
 .ticket-log-personal-btn {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.2) 0%, rgba(var(--gold-rgb), 0.05) 100%);
-  border: 1px solid rgba(var(--gold-rgb), 0.5);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.12);
+  border: 1px solid rgba(var(--accent-rgb), 0.5);
+  color: var(--accent);
   padding: 0.6rem 1.2rem;
   border-radius: 20px;
   font-size: 0.82rem;
@@ -8259,10 +8361,10 @@ svg#taiwan-map.dragging {
 }
 
 .ticket-log-personal-btn:hover {
-  border-color: var(--gold);
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.35) 0%, rgba(var(--gold-rgb), 0.1) 100%);
+  border-color: var(--accent);
+  background: rgba(var(--accent-rgb), 0.2);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(var(--gold-rgb), 0.25);
+  box-shadow: 0 6px 20px rgba(var(--accent-rgb), 0.25);
 }
 
 .ticket-log-personal-btn:active {
@@ -8270,10 +8372,31 @@ svg#taiwan-map.dragging {
 }
 
 .nav-toggle-btn.active {
-  background: linear-gradient(135deg, rgba(var(--gold-rgb), 0.3) 0%, rgba(var(--teal-rgb), 0.2) 100%);
-  border-color: var(--gold);
-  color: var(--gold);
+  background: rgba(var(--accent-rgb), 0.2);
+  border-color: var(--accent);
+  color: var(--accent);
 }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .calendar-main-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+  .view-concerts-btn {
+    width: 100%;
+    height: 44px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
+    transition: transform 0.2s;
+  }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
@@ -8924,14 +9047,14 @@ svg#taiwan-map.dragging {
   .view-concerts-btn {
     width: 100%;
     height: 44px;
-    background: linear-gradient(135deg, var(--accent), #ff8a00);
+    background: var(--accent);
     border: none;
     border-radius: 10px;
     color: #fff;
     font-weight: 600;
     font-size: 0.85rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(255, 107, 0, 0.3);
+    box-shadow: 0 4px 15px rgba(var(--accent-rgb), 0.3);
     transition: transform 0.2s;
   }
 
@@ -9533,13 +9656,14 @@ svg#taiwan-map.dragging {
 .suspension-icon {
   font-size: 2.25rem;
   line-height: 1;
+  color: var(--accent);
 }
 
 .suspension-title {
   margin: 0;
   font-size: 1.35rem;
   font-weight: 700;
-  color: #ff4d4f;
+  color: var(--accent);
 }
 
 .suspension-subtitle {
@@ -9578,15 +9702,15 @@ svg#taiwan-map.dragging {
 }
 
 .warning-card {
-  background: rgba(255, 77, 79, 0.1);
-  border-color: rgba(255, 77, 79, 0.2);
-  border-left: 4px solid #ff4d4f;
+  background: rgba(var(--accent-rgb), 0.08);
+  border-color: rgba(var(--accent-rgb), 0.25);
+  border-left: 4px solid var(--accent);
 }
 
 .warning-card .county-name {
   font-weight: 700;
   font-size: 0.95rem;
-  color: #ff4d4f;
+  color: var(--accent);
   margin-bottom: 0.25rem;
 }
 
@@ -9753,9 +9877,136 @@ svg#taiwan-map.dragging {
 }
 
 [data-theme='light'] .map-tooltip {
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(255, 255, 255, 0.95);
   border-color: var(--border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .tooltip-title {
+  color: var(--text);
+}
+
+[data-theme='light'] .tooltip-meta {
+  color: var(--muted);
+}
+
+[data-theme='light'] .alert-item.weather-warning {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+  border-left-color: #ef4444;
+  font-weight: 600;
+}
+
+[data-theme='light'] .alert-item.weather-sunny {
+  background: rgba(var(--accent-rgb), 0.12);
+  color: var(--text);
+  border-left-color: var(--accent);
+  font-weight: 500;
+}
+
+[data-theme='light'] .alert-item.aqi-advice {
+  background: rgba(0, 0, 0, 0.04);
+  color: var(--text);
+  border-left-color: var(--muted);
+}
+
+/* Light Mode Map Markers, Dots, & Cluster Circles (Solid Accent Fill) */
+[data-theme='light'] .shuangbei-cluster-group .cluster-plate {
+  fill: var(--accent);
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.18));
+}
+
+[data-theme='light'] .shuangbei-cluster-group .cluster-text {
+  fill: #ffffff;
+  font-weight: 800;
+}
+
+[data-theme='light'] .shuangbei-cluster-group .cluster-label {
+  fill: var(--text);
+  font-weight: bold;
+}
+
+[data-theme='light'] .shuangbei-cluster-group:hover .cluster-plate {
+  fill: var(--gold);
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 8px var(--gold));
+}
+
+[data-theme='light'] .shuangbei-cluster-group:hover .cluster-text {
+  fill: #ffffff;
+}
+
+[data-theme='light'] .venue-icon-group .placeholder-dot {
+  fill: var(--accent);
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.15));
+}
+
+[data-theme='light'] .venue-icon-group.visited .placeholder-dot {
+  fill: var(--teal);
+  stroke: #ffffff;
+}
+
+[data-theme='light'] .venue-icon-group .icon-plate {
+  fill: var(--accent);
+  stroke: #ffffff;
+  stroke-width: 1.5px;
+}
+
+[data-theme='light'] .venue-icon-group .icon-symbol {
+  fill: #ffffff;
+  stroke: #ffffff;
+}
+
+[data-theme='light'] .venue-icon-group:hover .icon-plate {
+  fill: var(--gold);
+  stroke: #ffffff;
+  filter: drop-shadow(0 0 6px var(--gold));
+}
+
+[data-theme='light'] .venue-icon-group:hover .icon-symbol {
+  fill: #ffffff;
+  stroke: #ffffff;
+}
+
+[data-theme='light'] .mini-venue-icon-group .mini-placeholder-dot {
+  fill: var(--accent);
+  stroke: #ffffff;
+}
+
+[data-theme='light'] .map-legend {
+  background: rgba(255, 255, 255, 0.92);
+  border-color: var(--border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Suspension Modal Light Mode */
+[data-theme='light'] .suspension-modal {
+  background: #ffffff;
+  border-color: var(--border);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12);
+}
+
+[data-theme='light'] .warning-card {
+  background: rgba(var(--accent-rgb), 0.08);
+  border-color: rgba(var(--accent-rgb), 0.25);
+  border-left: 4px solid var(--accent);
+}
+
+[data-theme='light'] .warning-card .county-name {
+  color: var(--accent);
+}
+
+[data-theme='light'] .normal-card {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: var(--border);
+}
+
+[data-theme='light'] .normal-list {
+  background: rgba(0, 0, 0, 0.01);
 }
 
 /* Mobile Bottom Drawer Light Mode */
