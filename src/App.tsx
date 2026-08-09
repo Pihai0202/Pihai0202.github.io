@@ -3765,16 +3765,6 @@ function App() {
               <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
             </button>
             <button
-              className="bottom-nav-item bottom-nav-item-record"
-              type="button"
-              data-utility="true"
-              onClick={() => openAddModal()}
-              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}
-            >
-              <span className="icon"><PlusIcon /></span>
-              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
-            </button>
-            <button
               className="bottom-nav-item tablet-only-nav-item"
               type="button"
               data-utility="true"
