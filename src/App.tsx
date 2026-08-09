@@ -3729,6 +3729,16 @@ function App() {
               <span className="label">{t('tabCalendar')}</span>
             </button>
             <button
+              className="bottom-nav-item bottom-nav-item-record"
+              type="button"
+              data-utility="true"
+              onClick={() => openAddModal()}
+              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트記錄追加' : 'Add Event Log'}
+            >
+              <span className="icon"><PlusIcon /></span>
+              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
+            </button>
+            <button
               className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
               type="button"
               data-view="board"
