@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-08-10T09:26:09.751165+00:00",
+  "updated_at": "2026-08-10T10:46:13.432256+00:00",
   "count": 469,
   "sources": [
     "KKTIX",
@@ -13,27 +13,7 @@
   ],
   "events": [
     {
-      "id": "kham-4870381",
-      "source": "寬宏售票",
-      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
-      "date": "2026-08-10",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
-        }
-      ]
-    },
-    {
-      "id": "kham-13299306",
+      "id": "kham-13848591",
       "source": "寬宏售票",
       "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
       "venue_raw": "Legacy Taipei",
@@ -49,6 +29,26 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3"
+        }
+      ]
+    },
+    {
+      "id": "kham-2801656",
+      "source": "寬宏售票",
+      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
+      "date": "2026-08-10",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
         }
       ]
     },
@@ -73,47 +73,27 @@
       ]
     },
     {
-      "id": "kham-4680453",
+      "id": "kham-10906747",
       "source": "寬宏售票",
-      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
+      "name": "舞台劇〈你來的時候〉",
+      "venue_raw": "歌劇院",
+      "venue_id": "taichung-venue",
+      "venue_name": "歌劇院",
+      "city": "台中",
       "date": "2026-08-11",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
         }
       ]
     },
     {
-      "id": "kham-7314692",
-      "source": "寬宏售票",
-      "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-08-11",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E3_Large.JPG?v=202608031706",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3"
-        }
-      ]
-    },
-    {
-      "id": "kham-7541821",
+      "id": "kham-15295370",
       "source": "寬宏售票",
       "name": "蕭煌奇2026〈BRAVO〉演唱會 台北小巨蛋",
       "venue_raw": "小巨蛋",
@@ -133,22 +113,42 @@
       ]
     },
     {
-      "id": "kham-8278514",
+      "id": "kham-2484489",
       "source": "寬宏售票",
-      "name": "舞台劇〈你來的時候〉",
-      "venue_raw": "歌劇院",
-      "venue_id": "taichung-venue",
-      "venue_name": "歌劇院",
-      "city": "台中",
+      "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
       "date": "2026-08-11",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E3_Large.JPG?v=202608031706",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3"
+        }
+      ]
+    },
+    {
+      "id": "kham-13525049",
+      "source": "寬宏售票",
+      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
+      "date": "2026-08-11",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
         }
       ]
     },
@@ -203,7 +203,7 @@
       ]
     },
     {
-      "id": "kham-3787683",
+      "id": "kham-9222759",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -298,27 +298,27 @@
       ]
     },
     {
-      "id": "kham-2929447",
+      "id": "kham-6639270",
       "source": "寬宏售票",
-      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
+      "name": "舞台劇〈你來的時候〉",
+      "venue_raw": "歌劇院",
+      "venue_id": "taichung-venue",
+      "venue_name": "歌劇院",
+      "city": "台中",
       "date": "2026-08-13",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
         }
       ]
     },
     {
-      "id": "kham-14625668",
+      "id": "kham-2971",
       "source": "寬宏售票",
       "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
       "venue_raw": "Legacy Taipei",
@@ -338,22 +338,22 @@
       ]
     },
     {
-      "id": "kham-4668693",
+      "id": "kham-14310928",
       "source": "寬宏售票",
-      "name": "舞台劇〈你來的時候〉",
-      "venue_raw": "歌劇院",
-      "venue_id": "taichung-venue",
-      "venue_name": "歌劇院",
-      "city": "台中",
+      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
       "date": "2026-08-13",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
         }
       ]
     },
@@ -527,27 +527,27 @@
       ]
     },
     {
-      "id": "kham-4562477",
+      "id": "kham-14188434",
       "source": "寬宏售票",
-      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
+      "name": "舞台劇〈你來的時候〉",
+      "venue_raw": "歌劇院",
+      "venue_id": "taichung-venue",
+      "venue_name": "歌劇院",
+      "city": "台中",
       "date": "2026-08-14",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
         }
       ]
     },
     {
-      "id": "kham-14869052",
+      "id": "kham-11593876",
       "source": "寬宏售票",
       "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
       "venue_raw": "Legacy Taipei",
@@ -567,22 +567,22 @@
       ]
     },
     {
-      "id": "kham-9277711",
+      "id": "kham-13353197",
       "source": "寬宏售票",
-      "name": "舞台劇〈你來的時候〉",
-      "venue_raw": "歌劇院",
-      "venue_id": "taichung-venue",
-      "venue_name": "歌劇院",
-      "city": "台中",
+      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
       "date": "2026-08-14",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P19CQHU9_Large.JPG?v=202607310959",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
         }
       ]
     },
@@ -904,27 +904,7 @@
       ]
     },
     {
-      "id": "kham-4160745",
-      "source": "寬宏售票",
-      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
-      "date": "2026-08-15",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
-        }
-      ]
-    },
-    {
-      "id": "kham-14709073",
+      "id": "kham-9634250",
       "source": "寬宏售票",
       "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
       "venue_raw": "Legacy Taipei",
@@ -940,6 +920,26 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3"
+        }
+      ]
+    },
+    {
+      "id": "kham-663422",
+      "source": "寬宏售票",
+      "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
+      "date": "2026-08-15",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608101549",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
         }
       ]
     },
@@ -1207,7 +1207,7 @@
       ]
     },
     {
-      "id": "kham-15670928",
+      "id": "kham-7337347",
       "source": "寬宏售票",
       "name": "蕭煌奇2026〈BRAVO〉演唱會 台北小巨蛋",
       "venue_raw": "小巨蛋",
@@ -1408,7 +1408,7 @@
       ]
     },
     {
-      "id": "kham-9184897",
+      "id": "kham-7940810",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -1428,7 +1428,7 @@
       ]
     },
     {
-      "id": "kham-1184978",
+      "id": "kham-6218671",
       "source": "寬宏售票",
       "name": "蕭煌奇2026〈BRAVO〉演唱會 台北小巨蛋",
       "venue_raw": "小巨蛋",
@@ -1448,7 +1448,7 @@
       ]
     },
     {
-      "id": "kham-11951711",
+      "id": "kham-16389724",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -1518,7 +1518,7 @@
       ]
     },
     {
-      "id": "kham-13595141",
+      "id": "kham-5903305",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -1633,7 +1633,7 @@
       ]
     },
     {
-      "id": "kham-11328800",
+      "id": "kham-13513194",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -2529,7 +2529,7 @@
       ]
     },
     {
-      "id": "kham-5875003",
+      "id": "kham-12606146",
       "source": "寬宏售票",
       "name": "【VIP Package套票】Everybody YA-HO 雅好 FAN LIVE",
       "venue_raw": "全台場館",
@@ -2538,18 +2538,18 @@
       "city": "",
       "date": "2026-08-24",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1D3G66E_Large.JPG?v=202607231319",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_040.aspx?AGID=P1D3G66E#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_040.aspx?AGID=P1D3G66E",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_040.aspx?AGID=P1D3G66E#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_040.aspx?AGID=P1D3G66E"
         }
       ]
     },
     {
-      "id": "kham-3798352",
+      "id": "kham-7491148",
       "source": "寬宏售票",
       "name": "【VIP Package】Everybody YA-HO 雅好 FAN LIVE",
       "venue_raw": "全台場館",
@@ -2569,7 +2569,7 @@
       ]
     },
     {
-      "id": "kham-15397648",
+      "id": "kham-1276659",
       "source": "寬宏售票",
       "name": "Everybody YA-HO 雅好 FAN LIVE",
       "venue_raw": "全台場館",
@@ -2609,7 +2609,7 @@
       ]
     },
     {
-      "id": "kham-7531224",
+      "id": "kham-1312626",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -2699,27 +2699,7 @@
       ]
     },
     {
-      "id": "kham-15919831",
-      "source": "寬宏售票",
-      "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
-      "date": "2026-08-26",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P17IDZEW_Large.JPG?v=202607310959",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#"
-        }
-      ]
-    },
-    {
-      "id": "kham-13109295",
+      "id": "kham-9381251",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -2735,6 +2715,26 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+        }
+      ]
+    },
+    {
+      "id": "kham-8578331",
+      "source": "寬宏售票",
+      "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
+      "date": "2026-08-26",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P17IDZEW_Large.JPG?v=202607310959",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#"
         }
       ]
     },
@@ -2854,27 +2854,7 @@
       ]
     },
     {
-      "id": "kham-2119429",
-      "source": "寬宏售票",
-      "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
-      "venue_raw": "全台場館",
-      "venue_id": "unknown",
-      "venue_name": "全台場館",
-      "city": "",
-      "date": "2026-08-27",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P17IDZEW_Large.JPG?v=202607310959",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#"
-        }
-      ]
-    },
-    {
-      "id": "kham-8708977",
+      "id": "kham-15670842",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -2890,6 +2870,26 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+        }
+      ]
+    },
+    {
+      "id": "kham-10350086",
+      "source": "寬宏售票",
+      "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
+      "venue_raw": "全台場館",
+      "venue_id": "unknown",
+      "venue_name": "全台場館",
+      "city": "",
+      "date": "2026-08-27",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P17IDZEW_Large.JPG?v=202607310959",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P17IDZEW#"
         }
       ]
     },
@@ -2941,7 +2941,7 @@
       ]
     },
     {
-      "id": "kham-13095609",
+      "id": "kham-1929461",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -3138,7 +3138,7 @@
       ]
     },
     {
-      "id": "kham-7673745",
+      "id": "kham-6597235",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -3363,7 +3363,7 @@
       ]
     },
     {
-      "id": "kham-9945338",
+      "id": "kham-3956430",
       "source": "寬宏售票",
       "name": "李國修紀念作品《半里長城》笑噴版 2026台北加演場",
       "venue_raw": "全台場館",
@@ -3736,7 +3736,7 @@
       ]
     },
     {
-      "id": "kham-705351",
+      "id": "kham-6021522",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -3756,7 +3756,7 @@
       ]
     },
     {
-      "id": "kham-4039311",
+      "id": "kham-7564574",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -3826,7 +3826,7 @@
       ]
     },
     {
-      "id": "kham-9529445",
+      "id": "kham-8007641",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -3921,7 +3921,7 @@
       ]
     },
     {
-      "id": "kham-3866130",
+      "id": "kham-4117640",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -4697,7 +4697,7 @@
       ]
     },
     {
-      "id": "kham-8723916",
+      "id": "kham-5784589",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -4767,7 +4767,7 @@
       ]
     },
     {
-      "id": "kham-3658899",
+      "id": "kham-9289036",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -4862,7 +4862,7 @@
       ]
     },
     {
-      "id": "kham-9381756",
+      "id": "kham-9925653",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -4927,7 +4927,7 @@
       ]
     },
     {
-      "id": "kham-3333825",
+      "id": "kham-2505318",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -5248,7 +5248,7 @@
       ]
     },
     {
-      "id": "kham-14596684",
+      "id": "kham-2279069",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -5505,47 +5505,7 @@
       ]
     },
     {
-      "id": "kham-8793616",
-      "source": "寬宏售票",
-      "name": "【10/25場次】MUSIC EXPO LIVE 2026 in TAIPEI",
-      "venue_raw": "小巨蛋",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
-      "date": "2026-09-13",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXXK2O_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#"
-        }
-      ]
-    },
-    {
-      "id": "kham-701318",
-      "source": "寬宏售票",
-      "name": "【10/24場次】MUSIC EXPO LIVE 2026 in TAIPEI",
-      "venue_raw": "小巨蛋",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
-      "date": "2026-09-13",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXNJEX_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#"
-        }
-      ]
-    },
-    {
-      "id": "kham-14437842",
+      "id": "kham-5285317",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -5561,6 +5521,46 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P19CQHU9"
+        }
+      ]
+    },
+    {
+      "id": "kham-5467686",
+      "source": "寬宏售票",
+      "name": "【10/25場次】MUSIC EXPO LIVE 2026 in TAIPEI",
+      "venue_raw": "小巨蛋",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-13",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXXK2O_Large.JPG?v=202608101135",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O"
+        }
+      ]
+    },
+    {
+      "id": "kham-3426454",
+      "source": "寬宏售票",
+      "name": "【10/24場次】MUSIC EXPO LIVE 2026 in TAIPEI",
+      "venue_raw": "小巨蛋",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-13",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXNJEX_Large.JPG?v=202608101135",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX"
         }
       ]
     },
@@ -5720,7 +5720,7 @@
       ]
     },
     {
-      "id": "kham-7740942",
+      "id": "kham-9166753",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -5810,7 +5810,7 @@
       ]
     },
     {
-      "id": "kham-6799841",
+      "id": "kham-15987483",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -6034,7 +6034,7 @@
       ]
     },
     {
-      "id": "kham-7899275",
+      "id": "kham-8094611",
       "source": "寬宏售票",
       "name": "【10/25場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -6043,18 +6043,18 @@
       "city": "台北",
       "date": "2026-09-18",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXXK2O_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O"
         }
       ]
     },
     {
-      "id": "kham-6426827",
+      "id": "kham-13633812",
       "source": "寬宏售票",
       "name": "【10/24場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -6063,13 +6063,13 @@
       "city": "台北",
       "date": "2026-09-18",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXNJEX_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX"
         }
       ]
     },
@@ -6351,7 +6351,7 @@
       ]
     },
     {
-      "id": "kham-6177167",
+      "id": "kham-12789948",
       "source": "寬宏售票",
       "name": "【10/25場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -6360,18 +6360,18 @@
       "city": "台北",
       "date": "2026-09-19",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXXK2O_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O"
         }
       ]
     },
     {
-      "id": "kham-7897108",
+      "id": "kham-4211655",
       "source": "寬宏售票",
       "name": "【10/24場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -6380,13 +6380,13 @@
       "city": "台北",
       "date": "2026-09-19",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXNJEX_Large.JPG?v=202608101135",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXNJEX"
         }
       ]
     },
@@ -6857,7 +6857,7 @@
       ]
     },
     {
-      "id": "kham-4266718",
+      "id": "kham-933554",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -6897,7 +6897,7 @@
       ]
     },
     {
-      "id": "kham-8237934",
+      "id": "kham-10229085",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -7187,7 +7187,7 @@
       ]
     },
     {
-      "id": "kham-12879905",
+      "id": "kham-14528866",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
