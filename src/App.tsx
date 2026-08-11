@@ -636,7 +636,7 @@ function App() {
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
-  const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport'>('all')
+  const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport' | 'today'>('all')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [isEditingZoom, setIsEditingZoom] = useState(false)
   const [tempZoomInput, setTempZoomInput] = useState('')
@@ -1064,13 +1064,37 @@ function App() {
     const all = sortedRemoteConcerts.length
     const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒').length
     const concert = all - sport
-    return { all, sport, concert }
+    const d = new Date()
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000
+    const taipeiTime = new Date(utc + 3600000 * 8)
+    const yyyy = taipeiTime.getFullYear()
+    const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+    const dd = String(taipeiTime.getDate()).padStart(2, '0')
+    const todayStr = `${yyyy}-${mm}-${dd}`
+    const today = sortedRemoteConcerts.filter((c) => {
+      if (!c.date) return false
+      const clean = c.date.trim().replace(/\//g, '-')
+      return clean.startsWith(todayStr)
+    }).length
+    return { all, sport, concert, today }
   }, [sortedRemoteConcerts])
   const filteredRemoteConcerts = useMemo(() => {
     let list = sortedRemoteConcerts
 
     if (categoryFilter !== 'all') {
       list = list.filter((c) => {
+        if (categoryFilter === 'today') {
+          const d = new Date()
+          const utc = d.getTime() + d.getTimezoneOffset() * 60000
+          const taipeiTime = new Date(utc + 3600000 * 8)
+          const yyyy = taipeiTime.getFullYear()
+          const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+          const dd = String(taipeiTime.getDate()).padStart(2, '0')
+          const todayStr = `${yyyy}-${mm}-${dd}`
+          if (!c.date) return false
+          const clean = c.date.trim().replace(/\//g, '-')
+          return clean.startsWith(todayStr)
+        }
         const isSport = c.source === '中華職棒'
         return categoryFilter === 'sport' ? isSport : !isSport
       })
@@ -2336,7 +2360,7 @@ function App() {
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedVenueId(null);
-                          setMobileDrawerState('collapsed');
+                          setMobileDrawerState('half');
                         }}
                       >
                         ✕
@@ -2381,23 +2405,60 @@ function App() {
 
               {/* Drawer Body */}
               <div className="drawer-body">
-                {/* 1. Collapsed Preview */}
-                {mobileDrawerState === 'collapsed' && selectedVenue && (
-                  <div className="drawer-collapsed-preview" onClick={() => setMobileDrawerState('half')}>
-                    <div className="venue-preview-info">
-                      <span className="city-tag">{selectedVenue.city}</span>
-                      <span className="preview-capacity">
-                        <UserIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />{selectedVenue.capacity} {lang === 'zh-TW' ? '人' : lang === 'ja' ? '人' : lang === 'ko' ? '명' : 'ppl'}
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 2. Expanded Content */}
+                {/* Expanded Content */}
                 {mobileDrawerState !== 'collapsed' && (
                   <div className="drawer-scroll-content">
                     {selectedVenue ? (
                       <div className="drawer-venue-detail">
+                        {selectedVenueTodayConcerts.length > 0 && (
+                          <div className="drawer-section venue-today-drawer-section">
+                            <div className="drawer-section-header">
+                              <span className="live-pulse-dot" style={{ marginRight: '6px', verticalAlign: 'middle', display: 'inline-block' }} />
+                              <span className="drawer-section-title">
+                                {lang === 'zh-TW' ? '今日演出' : lang === 'en' ? "Today's Show" : lang === 'ja' ? '本日開催の公演' : '오늘의 공연'}
+                              </span>
+                            </div>
+                            <div className="venue-today-list">
+                              {selectedVenueTodayConcerts.map((concert) => (
+                                <div
+                                  key={concert.id}
+                                  className="venue-today-item"
+                                  style={{ cursor: 'pointer' }}
+                                  onClick={() => setSelectedTicket(concert)}
+                                >
+                                  <div className="venue-today-item-header">
+                                    <span className="venue-today-source">{concert.source}</span>
+                                    {concert.price && <span className="venue-today-price">{concert.price}</span>}
+                                  </div>
+                                  <div className="venue-today-name">{concert.name}</div>
+                                  {getCitySuspensionStatus(selectedVenue.city, suspensionData?.items) && (
+                                    <div className="typhoon-warning-badge">
+                                      <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
+                                      {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+                                    </div>
+                                  )}
+                                  {concert.ticket_links && concert.ticket_links.length > 0 && (
+                                    <div className="venue-today-links">
+                                      {concert.ticket_links.slice(0, 2).map((link) => (
+                                        <a
+                                          key={`${concert.id}-${link.platform}`}
+                                          href={link.url}
+                                          target="_blank"
+                                          rel="noopener noreferrer"
+                                          className="venue-today-link-btn"
+                                          onClick={(e) => e.stopPropagation()}
+                                        >
+                                          {link.name}
+                                        </a>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+
                         <div className="drawer-section">
                           <VenueWeather
                             latitude={selectedVenue.latitude}
@@ -3840,9 +3901,9 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
   hasSelectedVenue?: boolean
   onClearVenue?: () => void
   onSelectTicket: (ticket: RemoteConcert) => void
-  categoryFilter: 'all' | 'concert' | 'sport'
-  onCategoryChange: (category: 'all' | 'concert' | 'sport') => void
-  categoryCounts: { all: number; sport: number; concert: number }
+  categoryFilter: 'all' | 'concert' | 'sport' | 'today'
+  onCategoryChange: (category: 'all' | 'concert' | 'sport' | 'today') => void
+  categoryCounts: { all: number; sport: number; concert: number; today: number }
   suspensionItems?: SuspensionItem[]
 }) {
   const { t, lang } = useTranslation()
@@ -3914,6 +3975,14 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
           onClick={() => onCategoryChange('all')}
         >
           <SparklesIcon style={{ marginRight: '4px' }} /> {t('all')} ({categoryCounts.all})
+        </button>
+        <button
+          type="button"
+          className={`filter-tab-btn${categoryFilter === 'today' ? ' active' : ''}`}
+          onClick={() => onCategoryChange('today')}
+        >
+          <span className="live-pulse-dot" style={{ marginRight: '5px', verticalAlign: 'middle', display: 'inline-block' }} />
+          {t('todayTab')} ({categoryCounts.today})
         </button>
         <button
           type="button"

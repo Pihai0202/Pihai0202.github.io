@@ -216,7 +216,7 @@ interface TaiwanMapProps {
   zoom: number
   onZoomChange: (newZoom: number) => void
   activeVenueIds?: Set<string>
-  categoryFilter?: 'all' | 'concert' | 'sport'
+  categoryFilter?: 'all' | 'concert' | 'sport' | 'today'
 }
 
 function TaiwanMapComponent({

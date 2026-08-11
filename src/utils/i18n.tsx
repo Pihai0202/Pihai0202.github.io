@@ -177,7 +177,8 @@ const translations: Record<Language, Record<string, string>> = {
     sevenDayForecast: '七日天氣預報',
     viewDetails: '查看場館詳情 ➔',
     weatherClose: '關閉',
-    todayConcertsTitle: '🔥 今日在此場館演出：',
+    todayConcertsTitle: '今日在此場館演出：',
+    todayTab: '今日演出',
 
     // Share Board
     socialWallTitle: '樂迷分享牆',
@@ -368,7 +369,8 @@ const translations: Record<Language, Record<string, string>> = {
     sevenDayForecast: '7-Day Forecast',
     viewDetails: 'View Venue Details ➔',
     weatherClose: 'Close',
-    todayConcertsTitle: '🔥 Performing here today:',
+    todayConcertsTitle: 'Performing here today:',
+    todayTab: "Today's Shows",
 
     // Share Board
     socialWallTitle: 'Fan Community Board',
@@ -559,7 +561,8 @@ const translations: Record<Language, Record<string, string>> = {
     sevenDayForecast: '7日間天気予報',
     viewDetails: '会場の詳細を表示 ➔',
     weatherClose: '閉じる',
-    todayConcertsTitle: '🔥 本日この会場で開催される公演：',
+    todayConcertsTitle: '本日この会場で開催される公演：',
+    todayTab: '本日開催の公演',
 
     // Share Board
     socialWallTitle: 'ファン共有掲示板',
@@ -750,7 +753,8 @@ const translations: Record<Language, Record<string, string>> = {
     sevenDayForecast: '7일 날씨 예보',
     viewDetails: '공연장 세부 정보 보기 ➔',
     weatherClose: '닫기',
-    todayConcertsTitle: '🔥 오늘 이 공연장에서 열리는 공연:',
+    todayConcertsTitle: '오늘 이 공연장에서 열리는 공연:',
+    todayTab: '오늘의 공연',
 
     // Share Board
     socialWallTitle: '팬 공유판',
