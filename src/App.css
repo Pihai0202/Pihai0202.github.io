@@ -1841,23 +1841,17 @@ svg#taiwan-map.dragging {
 }
 
 .category-filter-bar {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.4rem;
   margin: 0.2rem 0 1rem 0;
-  padding: 2px 0;
-  overflow-x: auto;
-  scrollbar-width: none; /* Hide scrollbar for Firefox */
-  -ms-overflow-style: none; /* Hide scrollbar for IE/Edge */
+  padding: 0;
   width: 100%;
   box-sizing: border-box;
 }
 
-.category-filter-bar::-webkit-scrollbar {
-  display: none; /* Hide scrollbar for Chrome/Safari */
-}
-
 .filter-tab-btn {
-  flex: 0 0 auto;
+  width: 100%;
   white-space: nowrap;
   background: var(--card-bg, rgba(255, 255, 255, 0.03));
   border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
@@ -1865,10 +1859,10 @@ svg#taiwan-map.dragging {
   color: var(--muted, #8a8a9e);
   font-size: 0.72rem;
   font-weight: 600;
-  padding: 0.45rem 0.65rem;
+  padding: 0.5rem 0.5rem;
   cursor: pointer;
   transition: all 0.2s ease;
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
   gap: 0.25rem;
