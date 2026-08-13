@@ -71,6 +71,10 @@ export function ShareBoard() {
       const reviewsList: SharedNote[] = []
       querySnapshot.forEach((doc) => {
         const data = doc.data()
+        // Skip documents marked as hidden
+        if (data.hidden === true || data.status === 'hidden' || data.isHided === true || data.isHide === true) {
+          return
+        }
         reviewsList.push({
           id: doc.id,
           artist: data.artist,
@@ -81,7 +85,9 @@ export function ShareBoard() {
           author: data.author,
           notes: data.notes,
           likes: data.likes || 0,
-          createdAt: data.createdAt
+          createdAt: data.createdAt,
+          hidden: data.hidden,
+          status: data.status
         })
       })
 

@@ -312,6 +312,9 @@ export function ProfilePage({
         const list: UserReview[] = []
         snapshot.forEach((doc) => {
           const data = doc.data()
+          if (data.hidden === true || data.status === 'hidden' || data.isHided === true || data.isHide === true) {
+            return
+          }
           list.push({
             id: doc.id,
             artist: data.artist || '',

@@ -91,6 +91,8 @@ export type SharedNote = {
   notes: string
   likes: number
   createdAt: string
+  hidden?: boolean
+  status?: string
 }
 
 export interface SuspensionItem {
