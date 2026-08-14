@@ -4345,10 +4345,51 @@ function Modal({
   className?: string
   onClose: () => void
 }) {
+  const modalRef = useRef<HTMLDivElement | null>(null)
+  const [canScrollUp, setCanScrollUp] = useState(false)
+  const [canScrollDown, setCanScrollDown] = useState(false)
   const [dragOffset, setDragOffset] = useState(0)
   const [isDragging, setIsDragging] = useState(false)
   const dragStartY = useRef(0)
   const dragMoved = useRef(false)
+
+  const checkScroll = useCallback(() => {
+    const el = modalRef.current
+    if (!el) return
+
+    const scrollTarget = (el.querySelector('.ticket-detail-container, .modal-card, .spotify-results, .guide-modal-body, .profile-container') as HTMLElement | null) || el
+    const { scrollTop, scrollHeight, clientHeight } = scrollTarget
+
+    setCanScrollUp(scrollTop > 15)
+    setCanScrollDown(scrollTop + clientHeight < scrollHeight - 15)
+  }, [])
+
+  useEffect(() => {
+    const el = modalRef.current
+    if (!el) return
+
+    const scrollTarget = (el.querySelector('.ticket-detail-container, .modal-card, .spotify-results, .guide-modal-body, .profile-container') as HTMLElement | null) || el
+
+    checkScroll()
+    scrollTarget.addEventListener('scroll', checkScroll, { passive: true })
+    window.addEventListener('resize', checkScroll)
+
+    const observer = new MutationObserver(checkScroll)
+    observer.observe(scrollTarget, { childList: true, subtree: true, attributes: true })
+
+    return () => {
+      scrollTarget.removeEventListener('scroll', checkScroll)
+      window.removeEventListener('resize', checkScroll)
+      observer.disconnect()
+    }
+  }, [children, checkScroll])
+
+  const scrollByAmount = (offset: number) => {
+    const el = modalRef.current
+    if (!el) return
+    const scrollTarget = (el.querySelector('.ticket-detail-container, .modal-card, .spotify-results, .guide-modal-body, .profile-container') as HTMLElement | null) || el
+    scrollTarget.scrollBy({ top: offset, behavior: 'smooth' })
+  }
 
   const handleTouchStart = (e: ReactTouchEvent) => {
     if (typeof window === 'undefined' || window.innerWidth > 768) return
@@ -4402,6 +4443,7 @@ function Modal({
   return (
     <div className="modal-overlay active" onClick={onClose}>
       <div 
+        ref={modalRef}
         className={`modal ${className}`} 
         onClick={(event) => event.stopPropagation()}
         style={style}
@@ -4419,7 +4461,36 @@ function Modal({
         <button className="modal-close" type="button" onClick={onClose}>
           ×
         </button>
+
+        {canScrollUp && (
+          <button
+            className="modal-scroll-arrow top-arrow"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollByAmount(-280)
+            }}
+            title="往上捲動"
+          >
+            ▲
+          </button>
+        )}
+
         {children}
+
+        {canScrollDown && (
+          <button
+            className="modal-scroll-arrow bottom-arrow"
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              scrollByAmount(280)
+            }}
+            title="往下捲動"
+          >
+            ▼
+          </button>
+        )}
       </div>
     </div>
   )
