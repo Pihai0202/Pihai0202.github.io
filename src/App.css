@@ -13377,3 +13377,122 @@ body:has(.main-layout) {
   color: var(--text) !important;
   transform: translateY(-1px) !important;
 }
+
+/* Event Visual Poster Card Styles */
+.venue-today-item-body {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.venue-today-thumb,
+.venue-today-fallback {
+  width: 52px;
+  height: 52px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  object-fit: cover;
+  border: 1px solid var(--border);
+}
+
+.venue-today-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface);
+  color: var(--accent);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+.venue-today-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.ticket-poster-container {
+  width: 100%;
+  max-height: 240px;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 0.9rem;
+  background: rgba(0, 0, 0, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid var(--border);
+}
+
+.ticket-poster-hero {
+  width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.ticket-poster-fallback {
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.concert-card.has-cover {
+  display: flex;
+  flex-direction: row;
+  gap: 0.85rem;
+  align-items: flex-start;
+}
+
+.concert-card-cover {
+  width: 72px;
+  height: 90px;
+  border-radius: 6px;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.concert-card-cover-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.concert-card-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.timeline-card-thumb {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.drawer-card-body {
+  display: flex;
+  gap: 0.65rem;
+  align-items: flex-start;
+}
+
+.drawer-card-thumb {
+  width: 52px;
+  height: 66px;
+  border-radius: 6px;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1px solid var(--border);
+}
+
+.drawer-card-info {
+  flex: 1;
+  min-width: 0;
+}
+

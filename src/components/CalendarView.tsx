@@ -1,6 +1,7 @@
 import { useState, useMemo } from 'react'
 import type { Concert, RemoteConcert } from '../types'
 import { useTranslation } from '../utils/i18n.tsx'
+import { LazyImage } from './LazyImage'
 import {
   CloseIcon,
   SearchIcon,
@@ -233,6 +234,7 @@ export function CalendarView({
       subtitle: string
       venue: string
       city: string
+      image?: string
       rawObject: any
     }> = []
 
@@ -245,6 +247,7 @@ export function CalendarView({
         subtitle: c.concertName,
         venue: c.venueName,
         city: c.venueCity,
+        image: c.coverUrl || (c.media && c.media[0] ? c.media[0].dataUrl : ''),
         rawObject: c
       })
     })
@@ -258,6 +261,7 @@ export function CalendarView({
         subtitle: c.source ? `${lang === 'zh-TW' ? '售票來源' : 'Ticket Source'}: ${c.source}` : '',
         venue: c.venue_name || c.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD'),
         city: c.city,
+        image: c.image || '',
         rawObject: c
       })
     })
@@ -482,13 +486,30 @@ export function CalendarView({
                     </div>
 
                     <div className="card-main-content">
-                      <div className="card-type-icon">
-                        {event.type === 'personal' ? (
-                          <StarIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
-                        ) : (
-                          <TicketIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
-                        )}
-                      </div>
+                      {(event.image) ? (
+                        <LazyImage
+                          src={event.image}
+                          alt=""
+                          className="timeline-card-thumb"
+                          fallback={
+                            <div className="card-type-icon">
+                              {event.type === 'personal' ? (
+                                <StarIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                              ) : (
+                                <TicketIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                              )}
+                            </div>
+                          }
+                        />
+                      ) : (
+                        <div className="card-type-icon">
+                          {event.type === 'personal' ? (
+                            <StarIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                          ) : (
+                            <TicketIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+                          )}
+                        </div>
+                      )}
                       <div className="card-details">
                         <h3 className="card-title">{event.title}</h3>
                         {event.subtitle && <p className="card-subtitle">{event.subtitle}</p>}
@@ -559,28 +580,42 @@ export function CalendarView({
               </div>
             ) : (
               <div className="drawer-cards-grid">
-                {selectedDateEvents.personal.map((event) => (
+                {selectedDateEvents.personal.map((event) => {
+                  const cover = event.coverUrl || (event.media && event.media[0] ? event.media[0].dataUrl : '')
+                  return (
                   <div
                     key={`drawer-personal-${event.id}`}
                     className="drawer-event-card personal"
                     onClick={() => onOpenConcertDetail(event.id)}
                   >
-                    <div className="card-badge">
-                      <StarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {lang === 'zh-TW' ? '我的自訂記錄' : 'My Custom Log'}
+                    <div className="drawer-card-body">
+                      {cover && (
+                        <LazyImage
+                          src={cover}
+                          alt=""
+                          className="drawer-card-thumb"
+                          fallback={null}
+                        />
+                      )}
+                      <div className="drawer-card-info">
+                        <div className="card-badge">
+                          <StarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {lang === 'zh-TW' ? '我的自訂記錄' : 'My Custom Log'}
+                        </div>
+                        <h4 className="event-title">{event.artist}</h4>
+                        {event.concertName && <p className="event-name">{event.concertName}</p>}
+                        <p className="event-venue">
+                          <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {event.venueCity} · {event.venueName}
+                        </p>
+                        {event.seat && (
+                          <p className="event-seat">
+                            <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                            {lang === 'zh-TW' ? `位置：${event.seat}` : `Seat: ${event.seat}`}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="event-title">{event.artist}</h4>
-                    {event.concertName && <p className="event-name">{event.concertName}</p>}
-                    <p className="event-venue">
-                      <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {event.venueCity} · {event.venueName}
-                    </p>
-                    {event.seat && (
-                      <p className="event-seat">
-                        <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                        {lang === 'zh-TW' ? `位置：${event.seat}` : `Seat: ${event.seat}`}
-                      </p>
-                    )}
                     
                     <div className="card-footer">
                       <span className="card-more-action">{lang === 'zh-TW' ? '查看心得筆記 >' : 'View Notes >'}</span>
@@ -593,7 +628,8 @@ export function CalendarView({
                       </button>
                     </div>
                   </div>
-                ))}
+                  )
+                })}
 
                 {selectedDateEvents.remote.map((event) => (
                   <div
@@ -601,21 +637,33 @@ export function CalendarView({
                     className="drawer-event-card remote"
                     onClick={() => onOpenTicketDetail(event)}
                   >
-                    <div className="card-badge">
-                      <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {lang === 'zh-TW' ? `公開售票活動 (${event.source})` : `Ticketing (${event.source})`}
+                    <div className="drawer-card-body">
+                      {event.image && (
+                        <LazyImage
+                          src={event.image}
+                          alt=""
+                          className="drawer-card-thumb"
+                          fallback={null}
+                        />
+                      )}
+                      <div className="drawer-card-info">
+                        <div className="card-badge">
+                          <TicketIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {lang === 'zh-TW' ? `公開售票活動 (${event.source})` : `Ticketing (${event.source})`}
+                        </div>
+                        <h4 className="event-title">{event.name}</h4>
+                        <p className="event-venue">
+                          <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                          {event.city} · {event.venue_name || event.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}
+                        </p>
+                        {event.price && (
+                          <p className="event-price">
+                            <DollarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                            {lang === 'zh-TW' ? `票價：${event.price}` : `Price: ${event.price}`}
+                          </p>
+                        )}
+                      </div>
                     </div>
-                    <h4 className="event-title">{event.name}</h4>
-                    <p className="event-venue">
-                      <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                      {event.city} · {event.venue_name || event.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}
-                    </p>
-                    {event.price && (
-                      <p className="event-price">
-                        <DollarIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                        {lang === 'zh-TW' ? `票價：${event.price}` : `Price: ${event.price}`}
-                      </p>
-                    )}
                     
                     <div className="card-footer">
                       <span className="card-more-action">{lang === 'zh-TW' ? '查看售票詳情 >' : 'View Tickets >'}</span>

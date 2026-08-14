@@ -81,6 +81,7 @@ const EMPTY_FORM: ConcertForm = {
   seat: '',
   notes: '',
   spotifyUrl: '',
+  coverUrl: '',
 }
 
 const SPOTIFY_CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID || 'cf537ab8a23b4365876e09a0071554df'
@@ -1238,6 +1239,7 @@ function App() {
       seat: String(c.seat || ''),
       notes: String(c.notes || ''),
       spotifyUrl: String(c.spotifyUrl || ''),
+      coverUrl: String(c.coverUrl || ''),
       media: (c.media || []).map((m) => ({
         id: String(m.id || `${Date.now()}-${Math.random().toString(36).substring(2, 7)}`),
         name: String(m.name || 'photo.jpg'),
@@ -1519,7 +1521,8 @@ function App() {
       date: concert.date || '',
       seat: concert.seat || '',
       notes: concert.notes || '',
-      spotifyUrl: concert.spotifyUrl || ''
+      spotifyUrl: concert.spotifyUrl || '',
+      coverUrl: concert.coverUrl || ''
     })
     setFormVenueId(concert.venueId)
     setFormVenueName(concert.venueName)
@@ -1769,6 +1772,7 @@ function App() {
         seat: (form.seat || '').trim(),
         notes: (form.notes || '').trim(),
         spotifyUrl: (form.spotifyUrl || '').trim(),
+        coverUrl: (form.coverUrl || '').trim(),
         media: (pendingMedia || []).map((m) => ({
           id: m.id || `${Date.now()}-${Math.random().toString(36).substring(2, 9)}`,
           name: m.name || 'photo.jpg',
@@ -3210,7 +3214,8 @@ function App() {
                 date: ticket.date || '',
                 seat: '',
                 notes: '',
-                spotifyUrl: ''
+                spotifyUrl: '',
+                coverUrl: ticket.image || ''
               })
               
               if (matchedVenue) {
@@ -4153,35 +4158,49 @@ const ConcertCard = memo(function ConcertCard({
   onDelete?: (concertId: string, event: MouseEvent<HTMLButtonElement>) => void
 }) {
   const { t, lang } = useTranslation()
+  const coverImage = concert.coverUrl || (concert.media && concert.media[0] && concert.media[0].type.startsWith('image') ? concert.media[0].dataUrl : '')
+
   return (
-    <div className="concert-card" onClick={() => onOpenDetail(concert.id)}>
-      <div className="concert-card-header">
-        <div className="concert-artist">{concert.artist}</div>
-        <div className="concert-card-header-right">
-          <div className="concert-date">{concert.date || (lang === 'zh-TW' ? '日期未知' : 'Date TBD')}</div>
-          {onDelete && (
-            <button
-              className="concert-card-delete-btn"
-              type="button"
-              title={t('deleteBtn')}
-              onClick={(event) => {
-                event.stopPropagation()
-                onDelete(concert.id, event)
-              }}
-            >
-              <TrashIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
-            </button>
-          )}
-        </div>
-      </div>
-      {showVenue && (
-        <div className="concert-venue-tag">
-          <PinIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.venueName} · {concert.venueCity}
+    <div className={`concert-card${coverImage ? ' has-cover' : ''}`} onClick={() => onOpenDetail(concert.id)}>
+      {coverImage && (
+        <div className="concert-card-cover">
+          <LazyImage
+            src={coverImage}
+            alt={concert.concertName || concert.artist}
+            className="concert-card-cover-img"
+            fallback={null}
+          />
         </div>
       )}
-      {concert.concertName && <div className="concert-venue-tag">{concert.concertName}</div>}
-      {concert.seat && <div className="concert-venue-tag seat-tag">{lang === 'zh-TW' ? `座位：${concert.seat}` : `Seat: ${concert.seat}`}</div>}
-      <MediaStrip media={concert.media} />
+      <div className="concert-card-content">
+        <div className="concert-card-header">
+          <div className="concert-artist">{concert.artist}</div>
+          <div className="concert-card-header-right">
+            <div className="concert-date">{concert.date || (lang === 'zh-TW' ? '日期未知' : 'Date TBD')}</div>
+            {onDelete && (
+              <button
+                className="concert-card-delete-btn"
+                type="button"
+                title={t('deleteBtn')}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  onDelete(concert.id, event)
+                }}
+              >
+                <TrashIcon size="0.95em" style={{ verticalAlign: 'middle' }} />
+              </button>
+            )}
+          </div>
+        </div>
+        {showVenue && (
+          <div className="concert-venue-tag">
+            <PinIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {concert.venueName} · {concert.venueCity}
+          </div>
+        )}
+        {concert.concertName && <div className="concert-venue-tag">{concert.concertName}</div>}
+        {concert.seat && <div className="concert-venue-tag seat-tag">{lang === 'zh-TW' ? `座位：${concert.seat}` : `Seat: ${concert.seat}`}</div>}
+        <MediaStrip media={concert.media} />
+      </div>
     </div>
   )
 })

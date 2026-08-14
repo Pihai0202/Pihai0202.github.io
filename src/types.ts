@@ -30,6 +30,7 @@ export type Concert = {
   seat: string
   notes: string
   spotifyUrl?: string
+  coverUrl?: string
   media: ConcertMedia[]
   createdAt: string
 }
@@ -69,6 +70,7 @@ export type ConcertForm = {
   seat: string
   notes: string
   spotifyUrl: string
+  coverUrl?: string
 }
 
 export type SpotifyItem = {

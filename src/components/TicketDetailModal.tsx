@@ -405,6 +405,16 @@ export function TicketDetailModal({
     <div className="ticket-detail-container">
       {/* 頂部售票資訊介紹 */}
       <div className="ticket-info-header">
+        {ticket.image && (
+          <div className="ticket-poster-container">
+            <LazyImage
+              src={ticket.image}
+              alt={ticket.name}
+              className="ticket-poster-hero"
+              fallback={<div className="ticket-poster-fallback">LIVE</div>}
+            />
+          </div>
+        )}
         <div className="ticket-source-badge">
           {ticket.source ? translateSource(ticket.source) : (lang === 'zh-TW' ? '售票資訊' : lang === 'en' ? 'Ticketing Info' : lang === 'ja' ? 'チケット情報' : '티켓팅 정보')}
         </div>

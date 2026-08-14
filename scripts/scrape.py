@@ -1234,10 +1234,14 @@ def parse_indievox_cards(html, base_url):
             title_str = re.sub(r'<[^>]+>', ' ', title_match.group(1))
             title_str = ' '.join(title_str.split()).strip()
             
-        # Image
-        img_match = re.search(r'<img[^>]+src=["\']([^"\']+)["\']', chunk)
+        # Image (use non-greedy matching to catch real src before onerror fallback)
+        img_match = re.search(r'<img\s+[^>]*?src=["\'](https?://[^"\']+)["\']', chunk)
+        if not img_match:
+            img_match = re.search(r'<img\s+[^>]*?src=["\']([^"\']+)["\']', chunk)
         image = img_match.group(1) if img_match else ""
-        if image and image.startswith("/"):
+        if image and "no-image" in image:
+            image = ""
+        elif image and image.startswith("/"):
             image = urljoin(base_url, image)
             
         cards.append({

@@ -5,6 +5,7 @@ import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, Warning
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
 import { SafeIframe } from './SafeIframe'
+import { LazyImage } from './LazyImage'
 
 interface VenueInfoProps {
   venue: Venue | null
@@ -115,33 +116,43 @@ export function VenueInfo({
                     style={{ cursor: 'pointer' }}
                     onClick={() => onSelectTicket?.(concert)}
                   >
-                    <div className="venue-today-item-header">
-                      <span className="venue-today-source">{concert.source}</span>
-                      {concert.price && <span className="venue-today-price">{concert.price}</span>}
+                    <div className="venue-today-item-body">
+                      <LazyImage
+                        src={concert.image}
+                        alt=""
+                        className="venue-today-thumb"
+                        fallback={<div className="venue-today-fallback">LIVE</div>}
+                      />
+                      <div className="venue-today-info">
+                        <div className="venue-today-item-header">
+                          <span className="venue-today-source">{concert.source}</span>
+                          {concert.price && <span className="venue-today-price">{concert.price}</span>}
+                        </div>
+                        <div className="venue-today-name">{concert.name}</div>
+                        {getCitySuspensionStatus(venue.city, suspensionItems) && (
+                          <div className="typhoon-warning-badge">
+                            <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
+                            {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+                          </div>
+                        )}
+                        {concert.ticket_links && concert.ticket_links.length > 0 && (
+                          <div className="venue-today-links">
+                            {concert.ticket_links.slice(0, 2).map((link) => (
+                              <a
+                                key={`${concert.id}-${link.platform}`}
+                                href={link.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="venue-today-link-btn"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                {link.name}
+                              </a>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="venue-today-name">{concert.name}</div>
-                    {getCitySuspensionStatus(venue.city, suspensionItems) && (
-                      <div className="typhoon-warning-badge">
-                        <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
-                        {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
-                      </div>
-                    )}
-                    {concert.ticket_links && concert.ticket_links.length > 0 && (
-                      <div className="venue-today-links">
-                        {concert.ticket_links.slice(0, 2).map((link) => (
-                          <a
-                            key={`${concert.id}-${link.platform}`}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="venue-today-link-btn"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            {link.name}
-                          </a>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 ))}
               </div>
