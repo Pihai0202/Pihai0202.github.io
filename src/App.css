@@ -47,6 +47,9 @@
   --search-focus-bg: rgba(var(--accent-rgb), 0.22);
   --legend-bg: rgba(var(--surface-rgb), 0.9);
   --mobile-nav-bg: rgba(var(--surface-rgb), 0.95);
+  --scrollbar-track: rgba(0, 0, 0, 0.18);
+  --scrollbar-thumb: rgba(var(--accent-rgb), 0.45);
+  --scrollbar-thumb-hover: var(--accent);
 }
 
 [data-theme="light"],
@@ -83,6 +86,9 @@
   --search-focus-bg: rgba(var(--accent-rgb), 0.15);
   --legend-bg: rgba(255, 255, 255, 0.95);
   --mobile-nav-bg: rgba(255, 255, 255, 0.95);
+  --scrollbar-track: rgba(0, 0, 0, 0.06);
+  --scrollbar-thumb: rgba(var(--accent-rgb), 0.5);
+  --scrollbar-thumb-hover: var(--accent);
 }
 
 /* 🌋 Scheme B: Volcanic Amber Gold & Black Orange (經典黑橘風格) */
@@ -120,6 +126,9 @@
   --search-focus-bg: rgba(var(--accent-rgb), 0.22);
   --legend-bg: rgba(var(--surface-rgb), 0.9);
   --mobile-nav-bg: rgba(var(--surface-rgb), 0.95);
+  --scrollbar-track: rgba(0, 0, 0, 0.25);
+  --scrollbar-thumb: rgba(var(--accent-rgb), 0.45);
+  --scrollbar-thumb-hover: var(--accent);
 }
 
 [data-theme="light"][data-palette="volcano"] {
@@ -155,6 +164,9 @@
   --search-focus-bg: rgba(var(--accent-rgb), 0.15);
   --legend-bg: rgba(255, 255, 255, 0.95);
   --mobile-nav-bg: rgba(255, 255, 255, 0.95);
+  --scrollbar-track: rgba(0, 0, 0, 0.06);
+  --scrollbar-thumb: rgba(var(--accent-rgb), 0.5);
+  --scrollbar-thumb-hover: var(--accent);
 }
 
 *,
@@ -163,6 +175,36 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+}
+
+/* 全域隨主題變化的客製化滾動條 (Global Theme-adaptive Scrollbar) */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
+}
+
+::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 html {
@@ -1185,28 +1227,44 @@ svg#taiwan-map.dragging {
 
 .concert-list-area::-webkit-scrollbar,
 .venue-panel-content::-webkit-scrollbar,
-.modal::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+.modal::-webkit-scrollbar,
+.modal-card::-webkit-scrollbar,
+.modal-content::-webkit-scrollbar,
+.ticket-detail-container::-webkit-scrollbar,
+.spotify-results::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
 }
 
 .concert-list-area::-webkit-scrollbar-track,
 .venue-panel-content::-webkit-scrollbar-track,
-.modal::-webkit-scrollbar-track {
-  background: transparent;
+.modal::-webkit-scrollbar-track,
+.modal-card::-webkit-scrollbar-track,
+.modal-content::-webkit-scrollbar-track,
+.ticket-detail-container::-webkit-scrollbar-track,
+.spotify-results::-webkit-scrollbar-track {
+  background: var(--scrollbar-track);
 }
 
 .concert-list-area::-webkit-scrollbar-thumb,
 .venue-panel-content::-webkit-scrollbar-thumb,
-.modal::-webkit-scrollbar-thumb {
-  background: rgba(51, 39, 30, 0.5);
-  border-radius: 4px;
+.modal::-webkit-scrollbar-thumb,
+.modal-card::-webkit-scrollbar-thumb,
+.modal-content::-webkit-scrollbar-thumb,
+.ticket-detail-container::-webkit-scrollbar-thumb,
+.spotify-results::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 999px;
 }
 
 .concert-list-area::-webkit-scrollbar-thumb:hover,
 .venue-panel-content::-webkit-scrollbar-thumb:hover,
-.modal::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 190, 11, 0.5);
+.modal::-webkit-scrollbar-thumb:hover,
+.modal-card::-webkit-scrollbar-thumb:hover,
+.modal-content::-webkit-scrollbar-thumb:hover,
+.ticket-detail-container::-webkit-scrollbar-thumb:hover,
+.spotify-results::-webkit-scrollbar-thumb:hover {
+  background: var(--scrollbar-thumb-hover);
 }
 
 .section-title {
