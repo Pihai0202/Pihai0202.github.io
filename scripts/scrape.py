@@ -846,16 +846,37 @@ def scrape_kham():
             if not vid:
                 vid, vname = match_venue(ht)
 
-            # 抓取日期 (YYYY/MM/DD 或 YYYY.MM.DD)
-            dates = re.findall(r'(\d{4}[/\.-]\d{1,2}[/\.-]\d{1,2})', ht)
+            # 抓取真實演出日期 (優先從 meta description 抽取，避免抓到取票/退票/開賣日期)
             valid_dates = []
-            for d in dates:
-                norm_d = d.replace('/', '-').replace('.', '-')
-                parts = norm_d.split('-')
-                if len(parts) == 3:
-                    formatted_d = f"{parts[0]}-{int(parts[1]):02d}-{int(parts[2]):02d}"
+            meta_descs = re.findall(r'<meta\s+(?:name|property)=[\x22\x27](?:og:)?description[\x22\x27]\s+content=[\x22\x27](.*?)[\x22\x27]', ht, re.IGNORECASE)
+            for desc in meta_descs:
+                cn_matches = re.findall(r'(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?', desc)
+                for y, m, d in cn_matches:
+                    formatted_d = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
                     if formatted_d >= today_str() and formatted_d not in valid_dates:
                         valid_dates.append(formatted_d)
+                slash_matches = re.findall(r'\b(\d{4})[/\.-](\d{1,2})[/\.-](\d{1,2})\b', desc)
+                for y, m, d in slash_matches:
+                    formatted_d = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+                    if formatted_d >= today_str() and formatted_d not in valid_dates:
+                        valid_dates.append(formatted_d)
+
+            if not valid_dates:
+                # 備用：逐行搜尋，排除取票/退票/開賣/客服等提示行
+                ignore_kw = ["開賣", "售票時間", "取票", "寄送", "退票", "截止", "訂購", "客服", "條款"]
+                for line in ht.splitlines():
+                    if any(kw in line for kw in ignore_kw):
+                        continue
+                    cn_matches = re.findall(r'(\d{4})\s*年\s*(\d{1,2})\s*月\s*(\d{1,2})\s*日?', line)
+                    for y, m, d in cn_matches:
+                        formatted_d = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+                        if formatted_d >= today_str() and formatted_d not in valid_dates:
+                            valid_dates.append(formatted_d)
+                    slash_matches = re.findall(r'\b(\d{4})[/\.-](\d{1,2})[/\.-](\d{1,2})\b', line)
+                    for y, m, d in slash_matches:
+                        formatted_d = f"{int(y):04d}-{int(m):02d}-{int(d):02d}"
+                        if formatted_d >= today_str() and formatted_d not in valid_dates:
+                            valid_dates.append(formatted_d)
 
             if not valid_dates:
                 continue

@@ -1202,11 +1202,14 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
-      const response = await fetch(
-        `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
-        { cache: 'no-store' }
-      )
-      if (!response.ok) throw new Error('concerts.json not found')
+      let response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
+      if (!response || !response.ok) {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
+          { cache: 'no-store' }
+        )
+      }
+      if (!response || !response.ok) throw new Error('concerts.json not found')
 
       const data = (await response.json()) as RemoteConcertPayload
       const rawEvents = Array.isArray(data.events) ? data.events : []
