@@ -13,6 +13,7 @@ import {
   CalendarIcon,
   DollarIcon
 } from './SvgIcon'
+import { shortenCpblTeamName } from '../utils/cpblUtils'
 
 interface CalendarViewProps {
   concerts: Concert[]
@@ -699,7 +700,7 @@ export function CalendarView({
                           <div className={`cpbl-score-badge ${event.game_score.status || 'scheduled'}`}>
                             <span className="cpbl-status-tag">{event.game_score.status_text || '賽事'}</span>
                             <span className="cpbl-score-numbers">
-                              {event.game_score.visiting_team || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {event.game_score.home_team || '主隊'}
+                              {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
                             </span>
                           </div>
                         )}

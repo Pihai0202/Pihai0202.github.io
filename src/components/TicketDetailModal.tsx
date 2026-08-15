@@ -18,6 +18,7 @@ import {
   RocketIcon
 } from './Icons'
 import { BaseballIcon, TrophyIcon } from './SvgIcon'
+import { shortenCpblTeamName } from '../utils/cpblUtils'
 
 interface TicketDetailModalProps {
   ticket: RemoteConcert
@@ -459,7 +460,7 @@ export function TicketDetailModal({
             <div className="scoreboard-teams-row">
               <div className="team-box visiting">
                 <span className="team-label">客隊</span>
-                <span className="team-name">{ticket.game_score.visiting_team || '客隊'}</span>
+                <span className="team-name">{shortenCpblTeamName(ticket.game_score.visiting_team) || '客隊'}</span>
                 {ticket.game_score.status !== 'scheduled' && (
                   <span className="team-score">{ticket.game_score.visiting_score ?? '-'}</span>
                 )}
@@ -473,7 +474,7 @@ export function TicketDetailModal({
                 {ticket.game_score.status !== 'scheduled' && (
                   <span className="team-score">{ticket.game_score.home_score ?? '-'}</span>
                 )}
-                <span className="team-name">{ticket.game_score.home_team || '主隊'}</span>
+                <span className="team-name">{shortenCpblTeamName(ticket.game_score.home_team) || '主隊'}</span>
                 <span className="team-label">主隊</span>
               </div>
             </div>

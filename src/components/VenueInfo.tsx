@@ -4,6 +4,7 @@ import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
+import { shortenCpblTeamName } from '../utils/cpblUtils'
 import { SafeIframe } from './SafeIframe'
 import { LazyImage } from './LazyImage'
 
@@ -137,14 +138,14 @@ export function VenueInfo({
                             </span>
                             {concert.game_score.status === 'scheduled' ? (
                               <span className="cpbl-score-numbers">
-                                {concert.game_score.visiting_team || '客隊'} vs {concert.game_score.home_team || '主隊'}
+                                {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
                                 <small className="pitchers-preview">
                                   {' '}(先發: {concert.game_score.visiting_pitcher || '待公告'} vs {concert.game_score.home_pitcher || '待公告'})
                                 </small>
                               </span>
                             ) : (
                               <span className="cpbl-score-numbers">
-                                {concert.game_score.visiting_team || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {concert.game_score.home_team || '主隊'}
+                                {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
                               </span>
                             )}
                           </div>
