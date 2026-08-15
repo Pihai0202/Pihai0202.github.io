@@ -135,9 +135,18 @@ export function VenueInfo({
                               {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
                               {concert.game_score.status_text || '賽事'}
                             </span>
-                            <span className="cpbl-score-numbers">
-                              {concert.game_score.visiting_team || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {concert.game_score.home_team || '主隊'}
-                            </span>
+                            {concert.game_score.status === 'scheduled' ? (
+                              <span className="cpbl-score-numbers">
+                                {concert.game_score.visiting_team || '客隊'} vs {concert.game_score.home_team || '主隊'}
+                                {(concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
+                                  <small className="pitchers-preview"> (先發: {concert.game_score.visiting_pitcher || '未定'} vs {concert.game_score.home_pitcher || '未定'})</small>
+                                )}
+                              </span>
+                            ) : (
+                              <span className="cpbl-score-numbers">
+                                {concert.game_score.visiting_team || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {concert.game_score.home_team || '主隊'}
+                              </span>
+                            )}
                           </div>
                         )}
                         {getCitySuspensionStatus(venue.city, suspensionItems) && (

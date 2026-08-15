@@ -459,7 +459,9 @@ export function TicketDetailModal({
               <div className="team-box visiting">
                 <span className="team-label">客隊</span>
                 <span className="team-name">{ticket.game_score.visiting_team || '客隊'}</span>
-                <span className="team-score">{ticket.game_score.visiting_score ?? '-'}</span>
+                {ticket.game_score.status !== 'scheduled' && (
+                  <span className="team-score">{ticket.game_score.visiting_score ?? '-'}</span>
+                )}
               </div>
 
               <div className="scoreboard-vs-divider">
@@ -467,24 +469,35 @@ export function TicketDetailModal({
               </div>
 
               <div className="team-box home">
-                <span className="team-score">{ticket.game_score.home_score ?? '-'}</span>
+                {ticket.game_score.status !== 'scheduled' && (
+                  <span className="team-score">{ticket.game_score.home_score ?? '-'}</span>
+                )}
                 <span className="team-name">{ticket.game_score.home_team || '主隊'}</span>
                 <span className="team-label">主隊</span>
               </div>
             </div>
 
-            {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
-              <div className="scoreboard-details-footer">
-                {ticket.game_score.winning_pitcher && (
-                  <span className="detail-item">勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
-                )}
-                {ticket.game_score.losing_pitcher && (
-                  <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
-                )}
-                {ticket.game_score.mvp && (
-                  <span className="detail-item mvp">MVP: <strong>{ticket.game_score.mvp}</strong></span>
-                )}
-              </div>
+            {ticket.game_score.status === 'scheduled' ? (
+              (ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher) && (
+                <div className="scoreboard-details-footer pitchers-footer">
+                  <span className="detail-item">客隊先發: <strong>{ticket.game_score.visiting_pitcher || '未定'}</strong></span>
+                  <span className="detail-item">主隊先發: <strong>{ticket.game_score.home_pitcher || '未定'}</strong></span>
+                </div>
+              )
+            ) : (
+              (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
+                <div className="scoreboard-details-footer">
+                  {ticket.game_score.winning_pitcher && (
+                    <span className="detail-item">勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
+                  )}
+                  {ticket.game_score.losing_pitcher && (
+                    <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
+                  )}
+                  {ticket.game_score.mvp && (
+                    <span className="detail-item mvp">MVP: <strong>{ticket.game_score.mvp}</strong></span>
+                  )}
+                </div>
+              )
             )}
           </div>
         )}

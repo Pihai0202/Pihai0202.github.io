@@ -46,11 +46,14 @@ export type GameScore = {
   home_team?: string
   visiting_score?: number | string
   home_score?: number | string
+  visiting_pitcher?: string
+  home_pitcher?: string
   status?: 'scheduled' | 'live' | 'finished' | 'postponed'
   status_text?: string
   mvp?: string
   winning_pitcher?: string
   losing_pitcher?: string
+  closer?: string
 }
 
 export type RemoteConcert = {
