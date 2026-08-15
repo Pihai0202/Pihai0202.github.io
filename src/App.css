@@ -13632,6 +13632,7 @@ body:has(.main-layout) {
   border-radius: 6px;
   font-size: 0.78rem;
   color: var(--text);
+  flex-wrap: wrap;
 }
 
 .cpbl-score-badge.live {
@@ -13649,12 +13650,16 @@ body:has(.main-layout) {
 .cpbl-score-badge .cpbl-status-tag {
   font-weight: 700;
   font-size: 0.72rem;
-  padding: 1px 6px;
+  padding: 2px 7px;
   border-radius: 4px;
   background: rgba(0, 0, 0, 0.3);
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  word-break: keep-all !important;
+  writing-mode: horizontal-tb !important;
 }
 
 .live-pulsing-dot {
