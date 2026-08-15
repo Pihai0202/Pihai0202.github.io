@@ -444,6 +444,50 @@ export function TicketDetailModal({
             </div>
           )}
         </div>
+
+        {ticket.game_score && (
+          <div className={`cpbl-scoreboard-card ${ticket.game_score.status || 'scheduled'}`}>
+            <div className="scoreboard-status-header">
+              <span className="status-badge">
+                {ticket.game_score.status === 'live' && <span className="live-pulsing-dot" />}
+                {ticket.game_score.status_text || '職棒賽事'}
+              </span>
+              <span className="game-type-label">中華職棒 CPBL</span>
+            </div>
+
+            <div className="scoreboard-teams-row">
+              <div className="team-box visiting">
+                <span className="team-label">客隊</span>
+                <span className="team-name">{ticket.game_score.visiting_team || '客隊'}</span>
+                <span className="team-score">{ticket.game_score.visiting_score ?? '-'}</span>
+              </div>
+
+              <div className="scoreboard-vs-divider">
+                <span className="vs-text">VS</span>
+              </div>
+
+              <div className="team-box home">
+                <span className="team-score">{ticket.game_score.home_score ?? '-'}</span>
+                <span className="team-name">{ticket.game_score.home_team || '主隊'}</span>
+                <span className="team-label">主隊</span>
+              </div>
+            </div>
+
+            {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
+              <div className="scoreboard-details-footer">
+                {ticket.game_score.winning_pitcher && (
+                  <span className="detail-item">勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
+                )}
+                {ticket.game_score.losing_pitcher && (
+                  <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
+                )}
+                {ticket.game_score.mvp && (
+                  <span className="detail-item mvp">MVP: <strong>{ticket.game_score.mvp}</strong></span>
+                )}
+              </div>
+            )}
+          </div>
+        )}
         
         {linksToRender.length > 0 && (
           <div className="ticket-link-buttons">

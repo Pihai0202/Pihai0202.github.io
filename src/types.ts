@@ -41,6 +41,18 @@ export type TicketLink = {
   url: string
 }
 
+export type GameScore = {
+  visiting_team?: string
+  home_team?: string
+  visiting_score?: number | string
+  home_score?: number | string
+  status?: 'scheduled' | 'live' | 'finished' | 'postponed'
+  status_text?: string
+  mvp?: string
+  winning_pitcher?: string
+  losing_pitcher?: string
+}
+
 export type RemoteConcert = {
   id: string
   source: string
@@ -53,6 +65,8 @@ export type RemoteConcert = {
   image: string
   url: string
   price: string
+  category?: string
+  game_score?: GameScore
   ticket_links: TicketLink[]
 }
 

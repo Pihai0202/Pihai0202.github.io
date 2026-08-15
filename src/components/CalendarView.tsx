@@ -652,6 +652,14 @@ export function CalendarView({
                           {lang === 'zh-TW' ? `公開售票活動 (${event.source})` : `Ticketing (${event.source})`}
                         </div>
                         <h4 className="event-title">{event.name}</h4>
+                        {event.game_score && (
+                          <div className={`cpbl-score-badge ${event.game_score.status || 'scheduled'}`}>
+                            <span className="cpbl-status-tag">{event.game_score.status_text || '賽事'}</span>
+                            <span className="cpbl-score-numbers">
+                              {event.game_score.visiting_team || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {event.game_score.home_team || '主隊'}
+                            </span>
+                          </div>
+                        )}
                         <p className="event-venue">
                           <PinIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
                           {event.city} · {event.venue_name || event.venue_raw || (lang === 'zh-TW' ? '地點待確認' : 'Venue TBD')}

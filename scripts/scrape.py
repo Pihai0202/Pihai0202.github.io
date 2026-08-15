@@ -1854,14 +1854,10 @@ def scrape_cpbl():
         }
         
         for g in games:
-            # Get Date and check if past
-            # Format: "2026-03-28T17:06:00"
             start_dt = g.get("GameDateTimeS")
             if not start_dt:
                 continue
             date_str = start_dt[:10]
-            if date_str < today_str():
-                continue
             
             # Extract Teams
             visiting = g.get("VisitingTeamName", "").strip()
@@ -1874,7 +1870,7 @@ def scrape_cpbl():
             
             game_no = g.get("GameSno", "")
             
-            name = f"中華職棒例行賽：{visiting} vs {home}"
+            name = f"中華職棒例行賽 G{game_no}：{visiting} vs {home}"
             
             field_abbe = g.get("FieldAbbe", "").strip()
             venue_id = field_mapping.get(field_abbe)
@@ -1906,6 +1902,38 @@ def scrape_cpbl():
                 image_url = urljoin("https://www.cpbl.com.tw", logo_path)
             else:
                 image_url = ""
+
+            # Determine game score and status
+            visiting_score = g.get("VisitingScore")
+            home_score = g.get("HomeScore")
+            is_play_ball = g.get("IsPlayBall", "N")
+            is_game_stop = g.get("IsGameStop", "0")
+
+            if is_game_stop == "1":
+                status = "postponed"
+                status_text = "因雨延賽"
+            elif visiting_score is not None and home_score is not None:
+                if is_play_ball == "Y":
+                    status = "live"
+                    status_text = "比賽中"
+                else:
+                    status = "finished"
+                    status_text = "已完賽"
+            else:
+                status = "scheduled"
+                status_text = "未開打"
+
+            game_score = {
+                "visiting_team": visiting,
+                "home_team": home,
+                "visiting_score": visiting_score if visiting_score is not None else "-",
+                "home_score": home_score if home_score is not None else "-",
+                "status": status,
+                "status_text": status_text,
+                "mvp": g.get("MvpName") or "",
+                "winning_pitcher": g.get("WinningPitcherName") or "",
+                "losing_pitcher": g.get("LoserPitcherName") or ""
+            }
             
             # Dynamic ticketing URL based on home team
             team_tickets = {
@@ -1970,9 +1998,10 @@ def scrape_cpbl():
                 "url": "https://www.cpbl.com.tw/schedule",
                 "price": "依官網/主隊公告為準",
                 "category": "sport",
+                "game_score": game_score,
                 "ticket_links": ticket_links
             })
-        print(f"  CPBL 賽程得到 {len(events)} 筆未來賽事", file=sys.stderr)
+        print(f"  CPBL 賽程得到 {len(events)} 筆賽事 (含過去與即時比分)", file=sys.stderr)
         return events
     except Exception as e:
         print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)

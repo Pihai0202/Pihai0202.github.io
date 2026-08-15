@@ -2886,30 +2886,30 @@ svg#taiwan-map.dragging {
 
 .search-input-wrapper input {
   width: 100%;
-  height: 34px;
+  height: 36px;
   padding: 0 32px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
+  background: rgba(var(--surface-rgb), 0.5);
+  border: 1px solid var(--border);
+  border-radius: 18px;
   color: var(--text);
   font-size: 0.82rem;
   outline: none;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .search-input-wrapper input:hover {
-  border-color: rgba(var(--gold-rgb), 0.4);
+  border-color: var(--accent);
 }
 
 .search-input-wrapper input:focus {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: var(--gold);
-  box-shadow: 0 0 0 2px rgba(var(--gold-rgb), 0.25);
+  background: var(--surface);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px rgba(var(--accent-rgb), 0.2);
 }
 
 .search-input-wrapper .search-icon {
   position: absolute;
-  left: 10px;
+  left: 12px;
   color: var(--muted);
   display: flex;
   align-items: center;
@@ -2923,7 +2923,7 @@ svg#taiwan-map.dragging {
 
 .search-input-wrapper .search-clear-btn {
   position: absolute;
-  right: 8px;
+  right: 10px;
   background: none;
   border: none;
   color: var(--muted);
@@ -2939,21 +2939,24 @@ svg#taiwan-map.dragging {
 }
 
 .panel-toggle-btn {
-  background: none;
-  border: none;
+  background: rgba(var(--surface-rgb), 0.5);
+  border: 1px solid var(--border);
   color: var(--text);
   cursor: pointer;
-  width: 34px;
-  height: 34px;
+  height: 36px;
+  padding: 0 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  transition: background 0.2s;
+  border-radius: 18px;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
 }
 
 .panel-toggle-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(var(--accent-rgb), 0.12);
+  border-color: var(--accent);
+  color: var(--accent);
 }
 
 .venue-panel-container.collapsed .panel-toggle-btn {
@@ -9002,11 +9005,17 @@ svg#taiwan-map.dragging {
   }
 
   .drawer-state-indicator {
-    font-size: 0.72rem;
-    color: var(--muted);
-    background: rgba(255, 255, 255, 0.05);
-    padding: 2px 8px;
-    border-radius: 10px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--text);
+    background: rgba(var(--surface-rgb), 0.6);
+    border: 1px solid var(--border);
+    padding: 3px 10px;
+    border-radius: 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
   }
 
   /* Body Content */
@@ -9029,11 +9038,6 @@ svg#taiwan-map.dragging {
   .search-preview-box {
     width: 100%;
     height: 38px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
     padding: 0 16px;
     color: var(--muted);
     font-size: 0.8rem;
@@ -13614,6 +13618,180 @@ body:has(.main-layout) {
   display: none !important;
   width: 0 !important;
   height: 0 !important;
+}
+
+/* CPBL Baseball Game Score Badge (Inline list view) */
+.cpbl-score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 6px 0 2px;
+  padding: 4px 10px;
+  background: rgba(var(--surface-rgb), 0.7);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  font-size: 0.78rem;
+  color: var(--text);
+}
+
+.cpbl-score-badge.live {
+  background: rgba(229, 115, 115, 0.15);
+  border-color: rgba(229, 115, 115, 0.5);
+  color: #ff8a80;
+}
+
+.cpbl-score-badge.finished {
+  background: rgba(var(--accent-rgb), 0.12);
+  border-color: rgba(var(--accent-rgb), 0.35);
+  color: var(--accent);
+}
+
+.cpbl-score-badge .cpbl-status-tag {
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.live-pulsing-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #ff5252;
+  box-shadow: 0 0 8px #ff5252;
+  animation: livePulse 1.2s infinite ease-in-out;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(1.4); }
+}
+
+.cpbl-score-numbers strong {
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+/* CPBL Baseball Hero Scoreboard Widget (TicketDetailModal) */
+.cpbl-scoreboard-card {
+  width: 100%;
+  background: linear-gradient(135deg, rgba(var(--surface-rgb), 0.9) 0%, rgba(20, 20, 20, 0.95) 100%);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  margin: 0.8rem 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  box-sizing: border-box;
+}
+
+.cpbl-scoreboard-card.live {
+  border-color: rgba(255, 82, 82, 0.4);
+  box-shadow: 0 4px 24px rgba(255, 82, 82, 0.15);
+}
+
+.scoreboard-status-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.scoreboard-status-header .status-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.scoreboard-status-header .game-type-label {
+  font-size: 0.72rem;
+  color: var(--muted);
+  letter-spacing: 0.05em;
+}
+
+.scoreboard-teams-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.4rem 0;
+}
+
+.scoreboard-teams-row .team-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.scoreboard-teams-row .team-box.visiting {
+  justify-content: flex-start;
+}
+
+.scoreboard-teams-row .team-box.home {
+  justify-content: flex-end;
+}
+
+.scoreboard-teams-row .team-label {
+  font-size: 0.68rem;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.scoreboard-teams-row .team-name {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.scoreboard-teams-row .team-score {
+  font-size: 1.8rem;
+  font-weight: 900;
+  font-family: monospace, monospace;
+  color: var(--accent);
+  padding: 0 4px;
+}
+
+.scoreboard-vs-divider {
+  padding: 0 16px;
+  text-align: center;
+}
+
+.scoreboard-vs-divider .vs-text {
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+
+.scoreboard-details-footer {
+  margin-top: 0.8rem;
+  padding-top: 0.6rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.scoreboard-details-footer .detail-item strong {
+  color: var(--text);
+  margin-left: 2px;
+}
+
+.scoreboard-details-footer .detail-item.mvp strong {
+  color: var(--gold, #ffbe0b);
 }
 
 

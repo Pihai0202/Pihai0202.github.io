@@ -129,6 +129,17 @@ export function VenueInfo({
                           {concert.price && <span className="venue-today-price">{concert.price}</span>}
                         </div>
                         <div className="venue-today-name">{concert.name}</div>
+                        {concert.game_score && (
+                          <div className={`cpbl-score-badge ${concert.game_score.status || 'scheduled'}`}>
+                            <span className="cpbl-status-tag">
+                              {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
+                              {concert.game_score.status_text || '賽事'}
+                            </span>
+                            <span className="cpbl-score-numbers">
+                              {concert.game_score.visiting_team || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {concert.game_score.home_team || '主隊'}
+                            </span>
+                          </div>
+                        )}
                         {getCitySuspensionStatus(venue.city, suspensionItems) && (
                           <div className="typhoon-warning-badge">
                             <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
