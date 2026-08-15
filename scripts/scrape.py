@@ -1908,17 +1908,21 @@ def scrape_cpbl():
             home_score = g.get("HomeScore")
             is_play_ball = g.get("IsPlayBall", "N")
             is_game_stop = g.get("IsGameStop", "0")
+            win_pitcher = g.get("WinningPitcherName") or ""
+            lose_pitcher = g.get("LoserPitcherName") or ""
+            mvp = g.get("MvpName") or ""
+            v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or ""
+            h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or ""
 
             if is_game_stop == "1":
                 status = "postponed"
                 status_text = "因雨延賽"
-            elif visiting_score is not None and home_score is not None:
-                if is_play_ball == "Y":
-                    status = "live"
-                    status_text = "比賽中"
-                else:
-                    status = "finished"
-                    status_text = "已完賽"
+            elif is_play_ball == "Y":
+                status = "live"
+                status_text = "比賽中"
+            elif win_pitcher != "" or mvp != "" or (date_str < today_str() and (visiting_score or 0) + (home_score or 0) > 0):
+                status = "finished"
+                status_text = "已完賽"
             else:
                 status = "scheduled"
                 status_text = "未開打"
@@ -1926,13 +1930,15 @@ def scrape_cpbl():
             game_score = {
                 "visiting_team": visiting,
                 "home_team": home,
-                "visiting_score": visiting_score if visiting_score is not None else "-",
-                "home_score": home_score if home_score is not None else "-",
+                "visiting_score": visiting_score if status in ["finished", "live"] and visiting_score is not None else "-",
+                "home_score": home_score if status in ["finished", "live"] and home_score is not None else "-",
+                "visiting_pitcher": v_pitcher,
+                "home_pitcher": h_pitcher,
                 "status": status,
                 "status_text": status_text,
-                "mvp": g.get("MvpName") or "",
-                "winning_pitcher": g.get("WinningPitcherName") or "",
-                "losing_pitcher": g.get("LoserPitcherName") or ""
+                "mvp": mvp,
+                "winning_pitcher": win_pitcher,
+                "losing_pitcher": lose_pitcher
             }
             
             # Dynamic ticketing URL based on home team

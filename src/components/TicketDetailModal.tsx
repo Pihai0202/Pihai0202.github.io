@@ -478,14 +478,16 @@ export function TicketDetailModal({
             </div>
 
             {/* 先發投手資訊 (Starting Pitchers) */}
-            <div className="scoreboard-details-footer pitchers-footer">
-              <span className="detail-item">
-                ⚾ 客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
-              </span>
-              <span className="detail-item">
-                ⚾ 主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
-              </span>
-            </div>
+            {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled') && (
+              <div className="scoreboard-details-footer pitchers-footer">
+                <span className="detail-item">
+                  ⚾ 客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
+                </span>
+                <span className="detail-item">
+                  ⚾ 主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
+                </span>
+              </div>
+            )}
 
             {/* 完賽勝敗投與 MVP */}
             {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
