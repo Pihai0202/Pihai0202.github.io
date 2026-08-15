@@ -1807,6 +1807,30 @@ CPBL_PLAYER_CACHE = {
     "0000006555": "梅賽鍶", "0000000368": "游霆崴", "0000007276": "伍立辰"
 }
 
+def get_cpbl_player_name(acnt):
+    if not acnt:
+        return ""
+    acnt_str = str(acnt).strip()
+    if not acnt_str:
+        return ""
+    if acnt_str in CPBL_PLAYER_CACHE:
+        return CPBL_PLAYER_CACHE[acnt_str]
+    try:
+        res = cffi_requests.get(f"https://www.cpbl.com.tw/team/person?acnt={acnt_str}", impersonate="safari15_5", timeout=5)
+        if res.status_code == 200:
+            soup = BeautifulSoup(res.text, "html.parser")
+            for el in soup.select("div, span, h1, h2, h3"):
+                txt = el.get_text(strip=True)
+                m = re.match(r"^([\u4e00-\u9fa5A-Za-z·\.\-\s]+)\s*\d+$", txt)
+                if m:
+                    name = m.group(1).strip()
+                    if name and name not in ["CPBL", "U-Lions", "Guardians", "Monkeys", "Hawks", "Dragons", "Brothers"]:
+                        CPBL_PLAYER_CACHE[acnt_str] = name
+                        return name
+    except Exception:
+        pass
+    return ""
+
 def scrape_cpbl():
     """
     Scrape CPBL games schedule from cpbl.com.tw using cffi_requests Session.
@@ -1928,10 +1952,10 @@ def scrape_cpbl():
             win_pitcher = g.get("WinningPitcherName") or ""
             lose_pitcher = g.get("LoserPitcherName") or ""
             mvp = g.get("MvpName") or ""
-            v_acnt = g.get("VisitingPitcherAcnt") or ""
-            h_acnt = g.get("HomePitcherAcnt") or ""
-            v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or CPBL_PLAYER_CACHE.get(v_acnt, "")
-            h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or CPBL_PLAYER_CACHE.get(h_acnt, "")
+            v_acnt = g.get("VisitingPitcherAcnt") or g.get("VisitingFirstMover") or ""
+            h_acnt = g.get("HomePitcherAcnt") or g.get("HomeFirstMover") or ""
+            v_pitcher = g.get("VisitingPitcherName") or get_cpbl_player_name(v_acnt)
+            h_pitcher = g.get("HomePitcherName") or get_cpbl_player_name(h_acnt)
 
             if is_game_stop == "1":
                 status = "postponed"
