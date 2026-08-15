@@ -2813,7 +2813,7 @@ function App() {
         <main className="calendar-main-layout">
           <CalendarView
             concerts={concerts}
-            remoteConcerts={remoteConcerts}
+            remoteConcerts={resolvedRemoteConcerts}
             onAddEventClick={(date) => openAddModal(date, null)}
             onOpenConcertDetail={openConcertDetail}
             onOpenTicketDetail={(ticket) => setSelectedTicket(ticket)}

@@ -104,6 +104,40 @@ export function CalendarView({
     setIsMobileDrawerOpen(true)
   }
 
+  // Dynamic list of available years (e.g. 2024, 2025, 2026, 2027)
+  const availableYears = useMemo(() => {
+    const yearsSet = new Set<number>()
+    yearsSet.add(2024)
+    yearsSet.add(2025)
+    yearsSet.add(2026)
+    yearsSet.add(2027)
+
+    concerts.forEach(c => {
+      const y = parseInt(c.date ? c.date.substring(0, 4) : '', 10)
+      if (y && !isNaN(y) && y >= 2000 && y <= 2100) yearsSet.add(y)
+    })
+    remoteConcerts.forEach(c => {
+      const y = parseInt(c.date ? c.date.substring(0, 4) : '', 10)
+      if (y && !isNaN(y) && y >= 2000 && y <= 2100) yearsSet.add(y)
+    })
+
+    return Array.from(yearsSet).sort((a, b) => a - b)
+  }, [concerts, remoteConcerts])
+
+  const handleYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newYear = parseInt(e.target.value, 10)
+    const maxDays = new Date(newYear, month + 1, 0).getDate()
+    const clampedDay = Math.min(selectedDayNum, maxDays)
+    
+    // Update viewed year
+    setCurrentDate(new Date(newYear, month, 1))
+    // Update selected date string
+    const dateStr = `${newYear}-${String(month + 1).padStart(2, '0')}-${String(clampedDay).padStart(2, '0')}`
+    setSelectedDateStr(dateStr)
+    // Open mobile details drawer
+    setIsMobileDrawerOpen(true)
+  }
+
   // 2. Normalize date string from events (convert YYYY/MM/DD or other to YYYY-MM-DD)
   const normalizeDate = (dStr: string | undefined): string => {
     if (!dStr) return ''
@@ -299,7 +333,16 @@ export function CalendarView({
               &lt;
             </button>
             <div className="current-month-selects">
-              <span className="cal-year-label">{lang === 'zh-TW' ? `${year} 年` : year}</span>
+              <select 
+                value={year} 
+                onChange={handleYearChange} 
+                className="cal-select cal-select-year"
+                title={lang === 'zh-TW' ? '選擇年份' : 'Select Year'}
+              >
+                {availableYears.map(y => (
+                  <option key={y} value={y}>{lang === 'zh-TW' ? `${y} 年` : y}</option>
+                ))}
+              </select>
               <select 
                 value={month} 
                 onChange={handleMonthChange} 
