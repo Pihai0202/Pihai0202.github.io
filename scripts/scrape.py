@@ -236,7 +236,7 @@ def fetch(url, as_json=False, headers=None):
     req_headers = headers if headers is not None else HEADERS
     if HAS_CURL_CFFI:
         try:
-            res = cffi_requests.get(url, headers=req_headers, impersonate='chrome', timeout=15)
+            res = cffi_requests.get(url, headers=req_headers, impersonate='safari15_5', timeout=15)
             if res.status_code == 200:
                 return res.json() if as_json else res.text
             else:
@@ -1799,7 +1799,7 @@ def scrape_cpbl():
     
     try:
         session = cffi_requests.Session()
-        res = session.get("https://www.cpbl.com.tw/schedule", impersonate="chrome", timeout=15)
+        res = session.get("https://www.cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
         if res.status_code != 200:
             print(f"  ⚠ 獲取 CPBL 賽程頁面 HTTP 狀態碼非 200: {res.status_code}", file=sys.stderr)
             return []
@@ -1823,7 +1823,7 @@ def scrape_cpbl():
                 "X-Requested-With": "XMLHttpRequest",
                 "RequestVerificationToken": token
             },
-            impersonate="chrome",
+            impersonate="safari15_5",
             timeout=15
         )
         
