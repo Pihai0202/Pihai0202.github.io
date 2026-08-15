@@ -62,6 +62,7 @@ jobs:
           git add public/concerts.json public/transit-status.json public/suspension.json
           if ! git diff --staged --quiet; then
             git commit -m "🎵 自動更新演唱會、交通及停班停課資料 $(date -u '+%Y-%m-%d %H:%M UTC')"
-            git pull --rebase origin main
+            git fetch origin main
+            git rebase -X ours origin/main || { git rebase --abort && git pull origin main --no-rebase -X ours; }
             git push origin HEAD:main
           fi

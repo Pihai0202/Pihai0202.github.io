@@ -3897,7 +3897,8 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
   onSelectTicket,
   categoryFilter,
   onCategoryChange,
-  categoryCounts,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  categoryCounts: _categoryCounts,
   suspensionItems = [],
 }: {
   concerts: RemoteConcert[]
@@ -3982,7 +3983,7 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
           className={`filter-tab-btn${categoryFilter === 'all' ? ' active' : ''}`}
           onClick={() => onCategoryChange('all')}
         >
-          <SparklesIcon style={{ marginRight: '4px' }} /> {t('all')} ({categoryCounts.all})
+          <SparklesIcon style={{ marginRight: '4px' }} /> {t('all')}
         </button>
         <button
           type="button"
@@ -3990,27 +3991,27 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
           onClick={() => onCategoryChange('today')}
         >
           <span className="live-pulse-dot" style={{ marginRight: '5px', verticalAlign: 'middle', display: 'inline-block' }} />
-          {t('todayTab')} ({categoryCounts.today})
+          {t('todayTab')}
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'concert' ? ' active' : ''}`}
           onClick={() => onCategoryChange('concert')}
         >
-          <MusicIcon style={{ marginRight: '4px' }} /> {t('statConcerts')} ({categoryCounts.concert})
+          <MusicIcon style={{ marginRight: '4px' }} /> {t('statConcerts')}
         </button>
         <button
           type="button"
           className={`filter-tab-btn${categoryFilter === 'sport' ? ' active' : ''}`}
           onClick={() => onCategoryChange('sport')}
         >
-          <BaseballIcon style={{ marginRight: '4px' }} /> {lang === 'zh-TW' ? '中華職棒' : 'CPBL'} ({categoryCounts.sport})
+          <BaseballIcon style={{ marginRight: '4px' }} /> {lang === 'zh-TW' ? '中華職棒' : 'CPBL'}
         </button>
       </div>
 
       {searchQuery && searchQuery.trim() && (
         <div className="search-info-tip">
-          <SearchIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {lang === 'zh-TW' ? `搜尋「${searchQuery}」：共 ${concerts.length} 筆` : `Search "${searchQuery}": ${concerts.length} found`}
+          <SearchIcon style={{ marginRight: '4px', verticalAlign: 'middle' }} /> {lang === 'zh-TW' ? `搜尋「${searchQuery}」` : `Search "${searchQuery}"`}
           {hasSelectedVenue && onClearVenue && (
             <button
               type="button"

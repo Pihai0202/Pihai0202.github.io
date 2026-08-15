@@ -2216,8 +2216,8 @@ def main():
             cpbl_events = old_cpbl
     all_events.extend(cpbl_events)
 
-    # 過濾過期活動 (保留今日及未來的活動)
-    all_events = [ev for ev in all_events if ev.get("date", "") >= today_str()]
+    # 過濾過期活動 (保留今日及未來的活動，並完整保留所有中華職棒歷史與未來賽事)
+    all_events = [ev for ev in all_events if ev.get("date", "") >= today_str() or ev.get("source") == "中華職棒"]
 
     # 優先解析通用售票 URL 為特定活動 URL
     resolve_generic_urls(all_events)
