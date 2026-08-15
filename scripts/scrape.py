@@ -1956,8 +1956,13 @@ def scrape_cpbl():
             mvp = g.get("MvpName") or ""
             v_acnt = g.get("VisitingPitcherAcnt") or g.get("VisitingFirstMover") or ""
             h_acnt = g.get("HomePitcherAcnt") or g.get("HomeFirstMover") or ""
-            v_pitcher = g.get("VisitingPitcherName") or get_cpbl_player_name(v_acnt)
-            h_pitcher = g.get("HomePitcherName") or get_cpbl_player_name(h_acnt)
+            v_pitcher = g.get("VisitingPitcherName") or ""
+            h_pitcher = g.get("HomePitcherName") or ""
+
+            if not v_pitcher and date_str >= today_str():
+                v_pitcher = get_cpbl_player_name(v_acnt)
+            if not h_pitcher and date_str >= today_str():
+                h_pitcher = get_cpbl_player_name(h_acnt)
 
             if is_game_stop == "1":
                 status = "postponed"
