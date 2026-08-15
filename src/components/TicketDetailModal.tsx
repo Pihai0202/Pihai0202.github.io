@@ -17,6 +17,7 @@ import {
   CommentIcon,
   RocketIcon
 } from './Icons'
+import { BaseballIcon, TrophyIcon } from './SvgIcon'
 
 interface TicketDetailModalProps {
   ticket: RemoteConcert
@@ -481,10 +482,12 @@ export function TicketDetailModal({
             {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled') && (
               <div className="scoreboard-details-footer pitchers-footer">
                 <span className="detail-item">
-                  ⚾ 客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
+                  <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
+                  客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
                 </span>
                 <span className="detail-item">
-                  ⚾ 主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
+                  <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
+                  主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
                 </span>
               </div>
             )}
@@ -493,13 +496,21 @@ export function TicketDetailModal({
             {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
               <div className="scoreboard-details-footer finished-results-footer">
                 {ticket.game_score.winning_pitcher && (
-                  <span className="detail-item">🏆 勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
+                  <span className="detail-item">
+                    <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
+                    勝投: <strong>{ticket.game_score.winning_pitcher}</strong>
+                  </span>
                 )}
                 {ticket.game_score.losing_pitcher && (
-                  <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
+                  <span className="detail-item">
+                    敗投: <strong>{ticket.game_score.losing_pitcher}</strong>
+                  </span>
                 )}
                 {ticket.game_score.mvp && (
-                  <span className="detail-item mvp">🌟 MVP: <strong>{ticket.game_score.mvp}</strong></span>
+                  <span className="detail-item mvp">
+                    <StarIcon style={{ width: '0.95em', height: '0.95em', marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
+                    MVP: <strong>{ticket.game_score.mvp}</strong>
+                  </span>
                 )}
               </div>
             )}

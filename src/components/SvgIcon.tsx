@@ -583,3 +583,14 @@ export const RockIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
     <path d="M6 13a4 4 0 0 1 4 4" />
   </svg>
 );
+
+// 🏆 Trophy Icon
+export const TrophyIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
+    <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18" />
+    <path d="M4 22h16" />
+    <path d="M10 14.66V17c0 .55-.45 1-1 1H8v4h8v-4h-1c-.55 0-1-.45-1-1v-2.34" />
+    <path d="M18 4H6v7a6 6 0 0 0 12 0V4z" />
+  </svg>
+);

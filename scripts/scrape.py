@@ -1702,6 +1702,8 @@ def merge_ticket_links(events):
     url_date_index = {}   # (specific_url, date) -> index
 
     def normalize(s):
+        s = re.sub(r'[\(\（【\[].*?[\)\］】\]]', '', s or '')
+        s = re.sub(r'(?:登記抽選|會員優先購票|一般開賣|加場|VIP PASS|VIP Upgrade|升級VIP|加購福利|加購|售票網|場次)', '', s)
         return re.sub(r'[\s\-_【】「」（）()【】、，,!！]', '', s or '').lower()
 
     def get_specific_urls(ev):
@@ -2213,6 +2215,9 @@ def main():
             print(f"  ⚠ 中華職棒爬取為 0 筆，從舊檔案恢復 {len(old_cpbl)} 筆未來活動", file=sys.stderr)
             cpbl_events = old_cpbl
     all_events.extend(cpbl_events)
+
+    # 過濾過期活動 (保留今日及未來的活動)
+    all_events = [ev for ev in all_events if ev.get("date", "") >= today_str()]
 
     # 優先解析通用售票 URL 為特定活動 URL
     resolve_generic_urls(all_events)

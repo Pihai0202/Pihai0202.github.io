@@ -13790,6 +13790,12 @@ body:has(.main-layout) {
   color: var(--muted);
 }
 
+.scoreboard-details-footer .detail-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
 .scoreboard-details-footer .detail-item strong {
   color: var(--text);
   margin-left: 2px;
