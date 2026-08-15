@@ -477,27 +477,29 @@ export function TicketDetailModal({
               </div>
             </div>
 
-            {ticket.game_score.status === 'scheduled' ? (
-              (ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher) && (
-                <div className="scoreboard-details-footer pitchers-footer">
-                  <span className="detail-item">客隊先發: <strong>{ticket.game_score.visiting_pitcher || '未定'}</strong></span>
-                  <span className="detail-item">主隊先發: <strong>{ticket.game_score.home_pitcher || '未定'}</strong></span>
-                </div>
-              )
-            ) : (
-              (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
-                <div className="scoreboard-details-footer">
-                  {ticket.game_score.winning_pitcher && (
-                    <span className="detail-item">勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
-                  )}
-                  {ticket.game_score.losing_pitcher && (
-                    <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
-                  )}
-                  {ticket.game_score.mvp && (
-                    <span className="detail-item mvp">MVP: <strong>{ticket.game_score.mvp}</strong></span>
-                  )}
-                </div>
-              )
+            {/* 先發投手資訊 (Starting Pitchers) */}
+            <div className="scoreboard-details-footer pitchers-footer">
+              <span className="detail-item">
+                ⚾ 客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
+              </span>
+              <span className="detail-item">
+                ⚾ 主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
+              </span>
+            </div>
+
+            {/* 完賽勝敗投與 MVP */}
+            {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
+              <div className="scoreboard-details-footer finished-results-footer">
+                {ticket.game_score.winning_pitcher && (
+                  <span className="detail-item">🏆 勝投: <strong>{ticket.game_score.winning_pitcher}</strong></span>
+                )}
+                {ticket.game_score.losing_pitcher && (
+                  <span className="detail-item">敗投: <strong>{ticket.game_score.losing_pitcher}</strong></span>
+                )}
+                {ticket.game_score.mvp && (
+                  <span className="detail-item mvp">🌟 MVP: <strong>{ticket.game_score.mvp}</strong></span>
+                )}
+              </div>
             )}
           </div>
         )}

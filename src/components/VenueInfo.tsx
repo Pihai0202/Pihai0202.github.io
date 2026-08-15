@@ -138,9 +138,9 @@ export function VenueInfo({
                             {concert.game_score.status === 'scheduled' ? (
                               <span className="cpbl-score-numbers">
                                 {concert.game_score.visiting_team || '客隊'} vs {concert.game_score.home_team || '主隊'}
-                                {(concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
-                                  <small className="pitchers-preview"> (先發: {concert.game_score.visiting_pitcher || '未定'} vs {concert.game_score.home_pitcher || '未定'})</small>
-                                )}
+                                <small className="pitchers-preview">
+                                  {' '}(先發: {concert.game_score.visiting_pitcher || '待公告'} vs {concert.game_score.home_pitcher || '待公告'})
+                                </small>
                               </span>
                             ) : (
                               <span className="cpbl-score-numbers">
