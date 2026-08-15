@@ -1790,6 +1790,23 @@ def merge_ticket_links(events):
 
 
 
+CPBL_PLAYER_CACHE = {
+    "0000007782": "威戈神", "0000007789": "麥斯威尼", "0000002274": "黃子鵬", "0000001260": "郭俊麟",
+    "0000006833": "陳宇宏", "0000007049": "林暉盛", "0000006848": "林詔恩", "0000007053": "艾速特",
+    "0000007303": "黃子豪", "0000006237": "林子崴", "0000007778": "喬登", "0000005731": "布雷克",
+    "0000007074": "曾家輝", "0000007290": "張宥謙", "0000005541": "郭郁政", "0000007228": "鈴木駿輔",
+    "0000006295": "銳力獅", "0000007063": "周彥農", "0000006771": "陳正毅", "0000007804": "瑪帝斯",
+    "0000004624": "陳克羿", "0000001603": "王維中", "0000005604": "勝騎士", "0000007299": "陳品宏",
+    "0000007264": "魔神龍", "0000003608": "曾仁和", "0000005479": "江國豪", "0000007560": "菲力士",
+    "0000001719": "胡智爲", "0000002679": "江承諺", "0000005572": "魏碩成", "0000007783": "阿部雄大",
+    "0000000363": "陳仕朋", "0000006860": "劉家翔", "0000006749": "魔力藍", "0000007281": "游竣宥",
+    "0000007787": "黎克", "0000007062": "威能帝", "0000006906": "艾菩樂", "0000007779": "蔣銲",
+    "0000006739": "李東洺", "0000002345": "鄭浩均", "0000001412": "江少慶", "0000006507": "後勁",
+    "0000007790": "魔爾曼", "0000000762": "伍鐸", "0000007570": "坎南", "0000007793": "榊原元稀",
+    "0000006497": "鋼龍", "0000007597": "獅帝芬", "0000006006": "德保拉", "0000005151": "羅戈",
+    "0000006555": "梅賽鍶", "0000000368": "游霆崴", "0000007276": "伍立辰"
+}
+
 def scrape_cpbl():
     """
     Scrape CPBL games schedule from cpbl.com.tw using cffi_requests Session.
@@ -1911,8 +1928,10 @@ def scrape_cpbl():
             win_pitcher = g.get("WinningPitcherName") or ""
             lose_pitcher = g.get("LoserPitcherName") or ""
             mvp = g.get("MvpName") or ""
-            v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or ""
-            h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or ""
+            v_acnt = g.get("VisitingPitcherAcnt") or ""
+            h_acnt = g.get("HomePitcherAcnt") or ""
+            v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or CPBL_PLAYER_CACHE.get(v_acnt, "")
+            h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or CPBL_PLAYER_CACHE.get(h_acnt, "")
 
             if is_game_stop == "1":
                 status = "postponed"
