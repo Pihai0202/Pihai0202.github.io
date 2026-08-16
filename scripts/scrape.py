@@ -1760,15 +1760,19 @@ def merge_ticket_links(events):
                 existing["venue_name"] = ev["venue_name"]
                 existing["city"] = ev["city"]
                 existing["price"] = ev["price"]
+                if ev.get("game_score"):
+                    existing["game_score"] = ev["game_score"]
                 if ev.get("category"):
                     existing["category"] = ev["category"]
                 if ev["image"]:
                     existing["image"] = ev["image"]
             else:
                 # If either is CPBL, ensure source is marked as 中華職棒 and category as sport
-                if ev["source"] == "中華職棒":
+                if ev.get("source") == "中華職棒":
                     existing["source"] = "中華職棒"
                     existing["category"] = "sport"
+                    if ev.get("game_score"):
+                        existing["game_score"] = ev["game_score"]
                 if not existing.get("category") and ev.get("category"):
                     existing["category"] = ev["category"]
                 if not existing["image"] and ev["image"]:
@@ -1951,9 +1955,12 @@ def scrape_cpbl():
             home_score = g.get("HomeScore")
             is_play_ball = g.get("IsPlayBall", "N")
             is_game_stop = g.get("IsGameStop", "0")
-            win_pitcher = g.get("WinningPitcherName") or ""
-            lose_pitcher = g.get("LoserPitcherName") or ""
-            mvp = g.get("MvpName") or ""
+            win_acnt = g.get("WinningPitcherAcnt") or ""
+            lose_acnt = g.get("LoserPitcherAcnt") or ""
+            mvp_acnt = g.get("MvpAcnt") or ""
+            win_pitcher = g.get("WinningPitcherName") or get_cpbl_player_name(win_acnt)
+            lose_pitcher = g.get("LoserPitcherName") or get_cpbl_player_name(lose_acnt)
+            mvp = g.get("MvpName") or get_cpbl_player_name(mvp_acnt)
             v_acnt = g.get("VisitingPitcherAcnt") or g.get("VisitingFirstMover") or ""
             h_acnt = g.get("HomePitcherAcnt") or g.get("HomeFirstMover") or ""
             v_pitcher = g.get("VisitingPitcherName") or ""
@@ -1964,13 +1971,16 @@ def scrape_cpbl():
             if not h_pitcher and date_str >= today_str():
                 h_pitcher = get_cpbl_player_name(h_acnt)
 
+            game_during = g.get("GameDuringTime") or ""
+            game_end = g.get("GameDateTimeE")
+
             if is_game_stop == "1":
                 status = "postponed"
                 status_text = "因雨延賽"
             elif is_play_ball == "Y":
                 status = "live"
                 status_text = "比賽中"
-            elif win_pitcher != "" or mvp != "" or (date_str < today_str() and (visiting_score or 0) + (home_score or 0) > 0):
+            elif win_pitcher != "" or mvp != "" or game_during != "" or game_end or (visiting_score is not None and home_score is not None and (visiting_score > 0 or home_score > 0)):
                 status = "finished"
                 status_text = "已完賽"
             else:
