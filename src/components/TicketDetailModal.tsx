@@ -496,22 +496,28 @@ export function TicketDetailModal({
             {/* 完賽勝敗投與 MVP */}
             {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
               <div className="scoreboard-details-footer finished-results-footer">
-                {ticket.game_score.winning_pitcher && (
-                  <span className="detail-item">
-                    <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                    勝投: <strong>{ticket.game_score.winning_pitcher}</strong>
-                  </span>
-                )}
-                {ticket.game_score.losing_pitcher && (
-                  <span className="detail-item">
-                    敗投: <strong>{ticket.game_score.losing_pitcher}</strong>
-                  </span>
+                {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher) && (
+                  <div className="pitchers-row">
+                    {ticket.game_score.winning_pitcher && (
+                      <span className="detail-item">
+                        <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
+                        勝投: <strong>{ticket.game_score.winning_pitcher}</strong>
+                      </span>
+                    )}
+                    {ticket.game_score.losing_pitcher && (
+                      <span className="detail-item">
+                        敗投: <strong>{ticket.game_score.losing_pitcher}</strong>
+                      </span>
+                    )}
+                  </div>
                 )}
                 {ticket.game_score.mvp && (
-                  <span className="detail-item mvp">
-                    <StarIcon style={{ width: '0.95em', height: '0.95em', marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                    MVP: <strong>{ticket.game_score.mvp}</strong>
-                  </span>
+                  <div className="mvp-row">
+                    <span className="detail-item mvp">
+                      <StarIcon style={{ width: '0.95em', height: '0.95em', marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
+                      MVP: <strong>{ticket.game_score.mvp}</strong>
+                    </span>
+                  </div>
                 )}
               </div>
             )}
