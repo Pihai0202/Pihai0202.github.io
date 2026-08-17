@@ -1839,51 +1839,72 @@ def get_cpbl_player_name(acnt):
 
 def scrape_cpbl():
     """
-    Scrape CPBL games schedule from cpbl.com.tw using cffi_requests Session.
+    Scrape CPBL games schedule from cpbl.com.tw using cffi_requests Session with retries.
     """
     print("→ 爬取中華職棒 CPBL 賽程...", file=sys.stderr)
     events = []
     
+    impersonate_targets = ["safari15_5", "chrome120", "chrome110"]
+    max_retries = 3
+    games = None
+
+    for attempt in range(max_retries):
+        target = impersonate_targets[attempt % len(impersonate_targets)]
+        try:
+            session = cffi_requests.Session()
+            res = session.get("https://www.cpbl.com.tw/schedule", impersonate=target, timeout=20)
+            if res.status_code != 200:
+                print(f"  ⚠ 獲取 CPBL 賽程頁面 HTTP 狀態碼非 200 (嘗試 {attempt+1}/{max_retries}): {res.status_code}", file=sys.stderr)
+                time.sleep(2 * (attempt + 1))
+                continue
+                
+            tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
+            if not tokens:
+                print(f"  ⚠ 找不到 RequestVerificationToken (嘗試 {attempt+1}/{max_retries})", file=sys.stderr)
+                time.sleep(2 * (attempt + 1))
+                continue
+                
+            token = tokens[0]
+            current_year = datetime.now().year
+            
+            post_res = session.post(
+                "https://www.cpbl.com.tw/schedule/getgamedatas",
+                data={
+                    "calendar": f"{current_year}/01/01",
+                    "location": "",
+                    "kindCode": "A"
+                },
+                headers={
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token
+                },
+                impersonate=target,
+                timeout=20
+            )
+            
+            if post_res.status_code != 200:
+                print(f"  ⚠ CPBL 賽程 API HTTP 狀態碼 (嘗試 {attempt+1}/{max_retries}): {post_res.status_code}", file=sys.stderr)
+                time.sleep(2 * (attempt + 1))
+                continue
+                
+            resp_json = post_res.json()
+            if not resp_json.get("Success"):
+                print(f"  ⚠ CPBL 賽程 API 回傳 Success=False (嘗試 {attempt+1}/{max_retries})", file=sys.stderr)
+                time.sleep(2 * (attempt + 1))
+                continue
+                
+            games = json.loads(resp_json["GameDatas"])
+            if games:
+                break
+        except Exception as e:
+            print(f"  ⚠ CPBL 賽程爬取連線異常 (嘗試 {attempt+1}/{max_retries}): {e}", file=sys.stderr)
+            time.sleep(2 * (attempt + 1))
+            
+    if not games:
+        print("  ⚠ CPBL 重試失敗，將回傳空列表並使用備份賽事快取", file=sys.stderr)
+        return []
+        
     try:
-        session = cffi_requests.Session()
-        res = session.get("https://www.cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
-        if res.status_code != 200:
-            print(f"  ⚠ 獲取 CPBL 賽程頁面 HTTP 狀態碼非 200: {res.status_code}", file=sys.stderr)
-            return []
-            
-        tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
-        if not tokens:
-            print("  ⚠ 找不到 RequestVerificationToken，無法爬取 CPBL 賽程", file=sys.stderr)
-            return []
-            
-        token = tokens[0]
-        current_year = datetime.now().year
-        
-        post_res = session.post(
-            "https://www.cpbl.com.tw/schedule/getgamedatas",
-            data={
-                "calendar": f"{current_year}/01/01",
-                "location": "",
-                "kindCode": "A"
-            },
-            headers={
-                "X-Requested-With": "XMLHttpRequest",
-                "RequestVerificationToken": token
-            },
-            impersonate="safari15_5",
-            timeout=15
-        )
-        
-        if post_res.status_code != 200:
-            print(f"  ⚠ CPBL 賽程 API HTTP 狀態碼: {post_res.status_code}", file=sys.stderr)
-            return []
-            
-        resp_json = post_res.json()
-        if not resp_json.get("Success"):
-            print("  ⚠ CPBL 賽程 API 回傳 Success=False", file=sys.stderr)
-            return []
-            
-        games = json.loads(resp_json["GameDatas"])
         
         # Map FieldAbbe to our venue IDs
         field_mapping = {
@@ -2224,11 +2245,34 @@ def main():
     except Exception as e:
         print(f"  ⚠ 爬取 CPBL 賽程失敗: {e}", file=sys.stderr)
         cpbl_events = []
+
+    # Smart CPBL merge & preservation logic:
+    # Build dictionary of existing CPBL games from concerts.json
+    old_cpbl_dict = { ev["id"]: ev for ev in existing_events if ev.get("source") == "中華職棒" }
+    
     if not cpbl_events:
-        old_cpbl = [ev for ev in existing_events if ev.get("source") == "中華職棒" and ev.get("date", "") >= today_str()]
-        if old_cpbl:
-            print(f"  ⚠ 中華職棒爬取為 0 筆，從舊檔案恢復 {len(old_cpbl)} 筆未來活動", file=sys.stderr)
-            cpbl_events = old_cpbl
+        print(f"  ⚠ 中華職棒最新爬取為 0 筆，全數保留舊檔案中 {len(old_cpbl_dict)} 筆全季賽事資料", file=sys.stderr)
+        cpbl_events = list(old_cpbl_dict.values())
+    else:
+        new_game_ids = set()
+        for new_ev in cpbl_events:
+            ev_id = new_ev["id"]
+            new_game_ids.add(ev_id)
+            old_ev = old_cpbl_dict.get(ev_id)
+            if old_ev:
+                # If new game score has missing pitcher names, preserve old pitcher names if available
+                new_score = new_ev.get("game_score")
+                old_score = old_ev.get("game_score")
+                if new_score and old_score:
+                    if not new_score.get("visiting_pitcher") and old_score.get("visiting_pitcher"):
+                        new_score["visiting_pitcher"] = old_score["visiting_pitcher"]
+                    if not new_score.get("home_pitcher") and old_score.get("home_pitcher"):
+                        new_score["home_pitcher"] = old_score["home_pitcher"]
+            old_cpbl_dict[ev_id] = new_ev
+        
+        cpbl_events = list(old_cpbl_dict.values())
+        print(f"  ✅ 中華職棒賽程合併完成，共維持 {len(cpbl_events)} 筆賽事資料（最新更新 {len(new_game_ids)} 筆）", file=sys.stderr)
+
     all_events.extend(cpbl_events)
 
     # 過濾過期活動 (保留今日及未來的活動，並完整保留所有中華職棒歷史與未來賽事)
