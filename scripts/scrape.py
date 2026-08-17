@@ -1982,14 +1982,15 @@ def scrape_cpbl():
             win_pitcher = g.get("WinningPitcherName") or get_cpbl_player_name(win_acnt)
             lose_pitcher = g.get("LoserPitcherName") or get_cpbl_player_name(lose_acnt)
             mvp = g.get("MvpName") or get_cpbl_player_name(mvp_acnt)
-            v_acnt = g.get("VisitingPitcherAcnt") or g.get("VisitingFirstMover") or ""
-            h_acnt = g.get("HomePitcherAcnt") or g.get("HomeFirstMover") or ""
-            v_pitcher = g.get("VisitingPitcherName") or ""
-            h_pitcher = g.get("HomePitcherName") or ""
+            v_acnt = g.get("VisitingPitcherAcnt") or ""
+            h_acnt = g.get("HomePitcherAcnt") or ""
 
-            if not v_pitcher and date_str >= today_str():
+            v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or ""
+            if not v_pitcher and v_acnt:
                 v_pitcher = get_cpbl_player_name(v_acnt)
-            if not h_pitcher and date_str >= today_str():
+
+            h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or ""
+            if not h_pitcher and h_acnt:
                 h_pitcher = get_cpbl_player_name(h_acnt)
 
             game_during = g.get("GameDuringTime") or ""
