@@ -699,9 +699,18 @@ export function CalendarView({
                         {event.game_score && (
                           <div className={`cpbl-score-badge ${event.game_score.status || 'scheduled'}`}>
                             <span className="cpbl-status-tag">{event.game_score.status_text || '賽事'}</span>
-                            <span className="cpbl-score-numbers">
-                              {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
-                            </span>
+                            {event.game_score.status === 'scheduled' ? (
+                              <span className="cpbl-score-numbers">
+                                {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
+                                <small className="pitchers-preview">
+                                  {' '}(先發: {event.game_score.visiting_pitcher || '待公告'} vs {event.game_score.home_pitcher || '待公告'})
+                                </small>
+                              </span>
+                            ) : (
+                              <span className="cpbl-score-numbers">
+                                {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
+                              </span>
+                            )}
                           </div>
                         )}
                         <p className="event-venue">

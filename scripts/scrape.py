@@ -2074,7 +2074,7 @@ def scrape_cpbl():
             })
                 
             events.append({
-                "id": f"cpbl-{current_year}-{game_no}",
+                "id": f"cpbl-{current_year}-{game_no}-{date_str}",
                 "source": "中華職棒",
                 "name": name,
                 "venue_raw": field_abbe,
@@ -2248,18 +2248,22 @@ def main():
         cpbl_events = []
 
     # Smart CPBL merge & preservation logic:
-    # Build dictionary of existing CPBL games from concerts.json
-    old_cpbl_dict = { ev["id"]: ev for ev in existing_events if ev.get("source") == "中華職棒" }
+    # Build dictionary of existing CPBL games from concerts.json keyed by (Name, Date)
+    old_cpbl_dict = {}
+    for ev in existing_events:
+        if ev.get("source") == "中華職棒":
+            key = (ev.get("name"), ev.get("date"))
+            old_cpbl_dict[key] = ev
     
     if not cpbl_events:
         print(f"  ⚠ 中華職棒最新爬取為 0 筆，全數保留舊檔案中 {len(old_cpbl_dict)} 筆全季賽事資料", file=sys.stderr)
         cpbl_events = list(old_cpbl_dict.values())
     else:
-        new_game_ids = set()
+        new_game_keys = set()
         for new_ev in cpbl_events:
-            ev_id = new_ev["id"]
-            new_game_ids.add(ev_id)
-            old_ev = old_cpbl_dict.get(ev_id)
+            key = (new_ev.get("name"), new_ev.get("date"))
+            new_game_keys.add(key)
+            old_ev = old_cpbl_dict.get(key)
             if old_ev:
                 # If new game score has missing pitcher names, preserve old pitcher names if available
                 new_score = new_ev.get("game_score")
@@ -2269,10 +2273,10 @@ def main():
                         new_score["visiting_pitcher"] = old_score["visiting_pitcher"]
                     if not new_score.get("home_pitcher") and old_score.get("home_pitcher"):
                         new_score["home_pitcher"] = old_score["home_pitcher"]
-            old_cpbl_dict[ev_id] = new_ev
+            old_cpbl_dict[key] = new_ev
         
         cpbl_events = list(old_cpbl_dict.values())
-        print(f"  ✅ 中華職棒賽程合併完成，共維持 {len(cpbl_events)} 筆賽事資料（最新更新 {len(new_game_ids)} 筆）", file=sys.stderr)
+        print(f"  ✅ 中華職棒賽程合併完成，共維持 {len(cpbl_events)} 筆賽事資料（最新更新 {len(new_game_keys)} 筆）", file=sys.stderr)
 
     all_events.extend(cpbl_events)
 
