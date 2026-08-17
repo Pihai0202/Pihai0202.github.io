@@ -13867,4 +13867,86 @@ body:has(.main-layout) {
   color: var(--gold, #ffbe0b);
 }
 
+/* ==========================================================================
+   Mobile RWD Fix: Calendar Date Selector & Today Button Overflow Prevention
+   ========================================================================== */
+@media (max-width: 600px) {
+  .calendar-header-panel {
+    padding: 0.75rem 0.6rem !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+  }
+
+  .calendar-title-nav {
+    width: 100% !important;
+    overflow: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .month-selector-buttons {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    width: 100% !important;
+    gap: 2px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+  }
+
+  .cal-nav-btn {
+    width: 26px !important;
+    height: 26px !important;
+    min-width: 26px !important;
+    font-size: 0.75rem !important;
+    padding: 0 !important;
+    flex-shrink: 0 !important;
+  }
+
+  .current-month-selects {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 2px !important;
+    flex: 1 !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .cal-select {
+    height: 28px !important;
+    line-height: 26px !important;
+    padding: 0 4px !important;
+    font-size: 0.76rem !important;
+    border-radius: 10px !important;
+    flex-shrink: 1 !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .cal-select-year {
+    max-width: 72px !important;
+  }
+
+  .cal-select-month {
+    max-width: 52px !important;
+  }
+
+  .cal-select-day {
+    max-width: 52px !important;
+  }
+
+  .cal-today-btn {
+    height: 28px !important;
+    line-height: 26px !important;
+    padding: 0 6px !important;
+    font-size: 0.74rem !important;
+    white-space: nowrap !important;
+    flex-shrink: 0 !important;
+    border-radius: 10px !important;
+    box-sizing: border-box !important;
+  }
+}
+
 
