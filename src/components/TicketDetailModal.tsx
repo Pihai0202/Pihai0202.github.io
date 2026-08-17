@@ -480,33 +480,38 @@ export function TicketDetailModal({
             </div>
 
             {/* 先發投手資訊 (Starting Pitchers) */}
-            {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled') && (
+            {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled' || ticket.game_score.status === 'live') && (
               <div className="scoreboard-details-footer pitchers-footer">
                 <span className="detail-item">
                   <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  客隊先發: <strong>{ticket.game_score.visiting_pitcher || '賽前公告'}</strong>
+                  客隊先發: <strong>{ticket.game_score.visiting_pitcher || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
                 </span>
                 <span className="detail-item">
                   <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  主隊先發: <strong>{ticket.game_score.home_pitcher || '賽前公告'}</strong>
+                  主隊先發: <strong>{ticket.game_score.home_pitcher || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
                 </span>
               </div>
             )}
 
-            {/* 完賽勝敗投與 MVP */}
-            {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.mvp) && (
+            {/* 完賽勝敗投、救援與 MVP (Game Results) */}
+            {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.closer || ticket.game_score.mvp) && (
               <div className="scoreboard-details-footer finished-results-footer">
-                {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher) && (
+                {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.closer) && (
                   <div className="pitchers-row">
                     {ticket.game_score.winning_pitcher && (
-                      <span className="detail-item">
+                      <span className="detail-item win-pitcher">
                         <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
                         勝投: <strong>{ticket.game_score.winning_pitcher}</strong>
                       </span>
                     )}
                     {ticket.game_score.losing_pitcher && (
-                      <span className="detail-item">
+                      <span className="detail-item lose-pitcher">
                         敗投: <strong>{ticket.game_score.losing_pitcher}</strong>
+                      </span>
+                    )}
+                    {ticket.game_score.closer && (
+                      <span className="detail-item closer-pitcher">
+                        救援: <strong>{ticket.game_score.closer}</strong>
                       </span>
                     )}
                   </div>

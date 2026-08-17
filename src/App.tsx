@@ -1226,6 +1226,74 @@ function App() {
     }
   }, [])
 
+  // ── CPBL 即時比分輪詢 (每 45 秒在有賽事時背景向 Cloudflare Worker / 代理請求最新比分) ──
+  const pollCpblLiveScores = useCallback(async () => {
+    const proxyBase = (import.meta.env.VITE_TDX_PROXY_URL || '').replace(/\/+$/, '')
+    if (!proxyBase) return
+
+    try {
+      const res = await fetch(`${proxyBase}/api/cpbl/live?_t=${Date.now()}`, {
+        cache: 'no-store'
+      }).catch(() => null)
+
+      if (!res || !res.ok) return
+      const data = await res.json()
+      if (!Array.isArray(data.games) || data.games.length === 0) return
+
+      setRemoteConcerts((prev) => {
+        let hasChanges = false
+        const nextList = prev.map((event) => {
+          if (event.source !== '中華職棒' || !event.game_score) return event
+
+          const matched = data.games.find((g: any) => {
+            const dateMatch = !g.date || !event.date || g.date === event.date
+            const teamMatch =
+              (event.name.includes(g.visiting_team) || g.visiting_team.includes(event.game_score?.visiting_team || '')) &&
+              (event.name.includes(g.home_team) || g.home_team.includes(event.game_score?.home_team || ''))
+            return dateMatch && teamMatch
+          })
+
+          if (matched) {
+            const oldGs = event.game_score
+            if (
+              oldGs.visiting_score !== matched.visiting_score ||
+              oldGs.home_score !== matched.home_score ||
+              oldGs.status !== matched.status ||
+              oldGs.visiting_pitcher !== matched.visiting_pitcher ||
+              oldGs.home_pitcher !== matched.home_pitcher ||
+              oldGs.winning_pitcher !== matched.winning_pitcher ||
+              oldGs.losing_pitcher !== matched.losing_pitcher ||
+              oldGs.closer !== matched.closer ||
+              oldGs.mvp !== matched.mvp
+            ) {
+              hasChanges = true
+              return {
+                ...event,
+                game_score: {
+                  ...oldGs,
+                  visiting_score: matched.visiting_score,
+                  home_score: matched.home_score,
+                  visiting_pitcher: matched.visiting_pitcher || oldGs.visiting_pitcher,
+                  home_pitcher: matched.home_pitcher || oldGs.home_pitcher,
+                  winning_pitcher: matched.winning_pitcher || oldGs.winning_pitcher,
+                  losing_pitcher: matched.losing_pitcher || oldGs.losing_pitcher,
+                  closer: matched.closer || oldGs.closer,
+                  mvp: matched.mvp || oldGs.mvp,
+                  status: matched.status || oldGs.status,
+                  status_text: matched.status_text || oldGs.status_text
+                }
+              }
+            }
+          }
+          return event
+        })
+        return hasChanges ? nextList : prev
+      })
+    } catch {
+      // Ignore background poll errors silently
+    }
+  }, [])
+
   const updateConcertsList = async (updatedList: Concert[]) => {
     // 1. Immediately update React state
     setConcerts(updatedList)
@@ -1472,12 +1540,15 @@ function App() {
 
   useEffect(() => {
     loadRemoteConcerts()
+    pollCpblLiveScores()
     const timer = window.setInterval(loadRemoteConcerts, REMOTE_CONCERT_REFRESH_MS)
+    const cpblTimer = window.setInterval(pollCpblLiveScores, 30_000) // 每 30 秒向代理請求最新比分
 
     return () => {
       window.clearInterval(timer)
+      window.clearInterval(cpblTimer)
     }
-  }, [loadRemoteConcerts])
+  }, [loadRemoteConcerts, pollCpblLiveScores])
 
   useEffect(() => {
     document.body.classList.toggle('player-open', isMusicBarVisible)

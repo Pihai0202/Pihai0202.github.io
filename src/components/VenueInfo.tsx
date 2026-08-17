@@ -139,13 +139,25 @@ export function VenueInfo({
                             {concert.game_score.status === 'scheduled' ? (
                               <span className="cpbl-score-numbers">
                                 {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
-                                <small className="pitchers-preview">
-                                  {' '}(先發: {concert.game_score.visiting_pitcher || '待公告'} vs {concert.game_score.home_pitcher || '待公告'})
-                                </small>
+                                {(concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
+                                  <small className="pitchers-preview">
+                                    {' '}(先發: {concert.game_score.visiting_pitcher || '待公告'} vs {concert.game_score.home_pitcher || '待公告'})
+                                  </small>
+                                )}
                               </span>
                             ) : (
                               <span className="cpbl-score-numbers">
                                 {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
+                                {concert.game_score.status === 'finished' && (concert.game_score.winning_pitcher || concert.game_score.mvp) && (
+                                  <small className="pitchers-preview finished-preview">
+                                    {' '}({concert.game_score.winning_pitcher ? `勝投: ${concert.game_score.winning_pitcher}` : ''}{concert.game_score.winning_pitcher && concert.game_score.mvp ? ' · ' : ''}{concert.game_score.mvp ? `MVP: ${concert.game_score.mvp}` : ''})
+                                  </small>
+                                )}
+                                {concert.game_score.status === 'live' && (concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
+                                  <small className="pitchers-preview">
+                                    {' '}(先發: {concert.game_score.visiting_pitcher || '-'} vs {concert.game_score.home_pitcher || '-'})
+                                  </small>
+                                )}
                               </span>
                             )}
                           </div>

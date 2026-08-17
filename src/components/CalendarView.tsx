@@ -702,13 +702,25 @@ export function CalendarView({
                             {event.game_score.status === 'scheduled' ? (
                               <span className="cpbl-score-numbers">
                                 {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
-                                <small className="pitchers-preview">
-                                  {' '}(先發: {event.game_score.visiting_pitcher || '待公告'} vs {event.game_score.home_pitcher || '待公告'})
-                                </small>
+                                {(event.game_score.visiting_pitcher || event.game_score.home_pitcher) && (
+                                  <small className="pitchers-preview">
+                                    {' '}(先發: {event.game_score.visiting_pitcher || '待公告'} vs {event.game_score.home_pitcher || '待公告'})
+                                  </small>
+                                )}
                               </span>
                             ) : (
                               <span className="cpbl-score-numbers">
                                 {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
+                                {event.game_score.status === 'finished' && (event.game_score.winning_pitcher || event.game_score.mvp) && (
+                                  <small className="pitchers-preview finished-preview">
+                                    {' '}({event.game_score.winning_pitcher ? `勝投: ${event.game_score.winning_pitcher}` : ''}{event.game_score.winning_pitcher && event.game_score.mvp ? ' · ' : ''}{event.game_score.mvp ? `MVP: ${event.game_score.mvp}` : ''})
+                                  </small>
+                                )}
+                                {event.game_score.status === 'live' && (event.game_score.visiting_pitcher || event.game_score.home_pitcher) && (
+                                  <small className="pitchers-preview">
+                                    {' '}(先發: {event.game_score.visiting_pitcher || '-'} vs {event.game_score.home_pitcher || '-'})
+                                  </small>
+                                )}
                               </span>
                             )}
                           </div>

@@ -13833,10 +13833,11 @@ body:has(.main-layout) {
 
 .scoreboard-details-footer .pitchers-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   width: 100%;
-  gap: 6px;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .scoreboard-details-footer .mvp-row {
@@ -13850,10 +13851,22 @@ body:has(.main-layout) {
 .scoreboard-details-footer .detail-item {
   display: inline-flex;
   align-items: center;
-  gap: 2px;
+  gap: 3px;
   font-size: clamp(0.7rem, 2.9vw, 0.78rem);
   white-space: nowrap !important;
   word-break: keep-all !important;
+}
+
+.scoreboard-details-footer .detail-item.win-pitcher strong {
+  color: var(--gold, #ffbe0b);
+}
+
+.scoreboard-details-footer .detail-item.lose-pitcher strong {
+  color: var(--text-secondary, #a0aec0);
+}
+
+.scoreboard-details-footer .detail-item.closer-pitcher strong {
+  color: var(--teal, #4ecdc4);
 }
 
 .scoreboard-details-footer .detail-item strong {
@@ -13861,6 +13874,12 @@ body:has(.main-layout) {
   margin-left: 2px;
   white-space: nowrap !important;
   word-break: keep-all !important;
+}
+
+.pitchers-preview.finished-preview {
+  color: var(--gold, #ffbe0b);
+  opacity: 0.9;
+  margin-left: 4px;
 }
 
 .scoreboard-details-footer .detail-item.mvp strong {

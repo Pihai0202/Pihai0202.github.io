@@ -1825,6 +1825,13 @@ def get_cpbl_player_name(acnt):
         res = cffi_requests.get(f"https://www.cpbl.com.tw/team/person?acnt={acnt_str}", impersonate="safari15_5", timeout=5)
         if res.status_code == 200:
             soup = BeautifulSoup(res.text, "html.parser")
+            name_el = soup.select_one(".name, .player_name, h2, h3")
+            if name_el:
+                txt = name_el.get_text(strip=True)
+                clean_name = re.sub(r"\d+$", "", txt).strip()
+                if clean_name and clean_name not in ["CPBL", "U-Lions", "Guardians", "Monkeys", "Hawks", "Dragons", "Brothers"]:
+                    CPBL_PLAYER_CACHE[acnt_str] = clean_name
+                    return clean_name
             for el in soup.select("div, span, h1, h2, h3"):
                 txt = el.get_text(strip=True)
                 m = re.match(r"^([\u4e00-\u9fa5A-Za-z·\.\-\s]+)\s*\d+$", txt)
@@ -1978,10 +1985,14 @@ def scrape_cpbl():
             is_game_stop = g.get("IsGameStop", "0")
             win_acnt = g.get("WinningPitcherAcnt") or ""
             lose_acnt = g.get("LoserPitcherAcnt") or ""
+            closer_acnt = g.get("CloserAcnt") or ""
             mvp_acnt = g.get("MvpAcnt") or ""
+
             win_pitcher = g.get("WinningPitcherName") or get_cpbl_player_name(win_acnt)
             lose_pitcher = g.get("LoserPitcherName") or get_cpbl_player_name(lose_acnt)
+            closer = g.get("CloserName") or get_cpbl_player_name(closer_acnt)
             mvp = g.get("MvpName") or get_cpbl_player_name(mvp_acnt)
+
             v_acnt = g.get("VisitingPitcherAcnt") or ""
             h_acnt = g.get("HomePitcherAcnt") or ""
 
@@ -2020,7 +2031,8 @@ def scrape_cpbl():
                 "status_text": status_text,
                 "mvp": mvp,
                 "winning_pitcher": win_pitcher,
-                "losing_pitcher": lose_pitcher
+                "losing_pitcher": lose_pitcher,
+                "closer": closer
             }
             
             # Dynamic ticketing URL based on home team
@@ -2265,7 +2277,7 @@ def main():
             new_game_keys.add(key)
             old_ev = old_cpbl_dict.get(key)
             if old_ev:
-                # If new game score has missing pitcher names, preserve old pitcher names if available
+                # If new game score has missing fields, preserve old fields if available
                 new_score = new_ev.get("game_score")
                 old_score = old_ev.get("game_score")
                 if new_score and old_score:
@@ -2273,6 +2285,14 @@ def main():
                         new_score["visiting_pitcher"] = old_score["visiting_pitcher"]
                     if not new_score.get("home_pitcher") and old_score.get("home_pitcher"):
                         new_score["home_pitcher"] = old_score["home_pitcher"]
+                    if not new_score.get("winning_pitcher") and old_score.get("winning_pitcher"):
+                        new_score["winning_pitcher"] = old_score["winning_pitcher"]
+                    if not new_score.get("losing_pitcher") and old_score.get("losing_pitcher"):
+                        new_score["losing_pitcher"] = old_score["losing_pitcher"]
+                    if not new_score.get("closer") and old_score.get("closer"):
+                        new_score["closer"] = old_score["closer"]
+                    if not new_score.get("mvp") and old_score.get("mvp"):
+                        new_score["mvp"] = old_score["mvp"]
             old_cpbl_dict[key] = new_ev
         
         cpbl_events = list(old_cpbl_dict.values())

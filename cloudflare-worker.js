@@ -87,6 +87,154 @@ async function fetchWithRetry(url, options, maxRetries = 2) {
   throw lastError ?? new Error("fetchWithRetry: 所有重試均失敗");
 }
 
+// ─── CPBL 即時比分快取 ────────────────────────────────────────────────────────
+let cachedCpblResponse = null;
+let cpblCacheExpiry = 0;
+
+const CPBL_PLAYER_MAP = {
+  "0000007782": "威戈神", "0000007789": "麥斯威尼", "0000002274": "黃子鵬", "0000001260": "郭俊麟",
+  "0000006833": "陳宇宏", "0000007049": "林暉盛", "0000006848": "林詔恩", "0000007053": "艾速特",
+  "0000007303": "黃子豪", "0000006237": "林子崴", "0000007778": "喬登", "0000005731": "布雷克",
+  "0000007074": "曾家輝", "0000007290": "張宥謙", "0000005541": "郭郁政", "0000007228": "鈴木駿輔",
+  "0000006295": "銳力獅", "0000007063": "周彥農", "0000006771": "陳正毅", "0000007804": "瑪帝斯",
+  "0000004624": "陳克羿", "0000001603": "王維中", "0000005604": "勝騎士", "0000007299": "陳品宏",
+  "0000007264": "魔神龍", "0000003608": "曾仁和", "0000005479": "江國豪", "0000007560": "菲力士",
+  "0000001719": "胡智爲", "0000002679": "江承諺", "0000005572": "魏碩成", "0000007783": "阿部雄大",
+  "0000000363": "陳仕朋", "0000006860": "劉家翔", "0000006749": "魔力藍", "0000007281": "游竣宥",
+  "0000007787": "黎克", "0000007062": "威能帝", "0000006906": "艾菩樂", "0000007779": "蔣銲",
+  "0000006739": "李東洺", "0000002345": "鄭浩均", "0000001412": "江少慶", "0000006507": "後勁",
+  "0000007790": "魔爾曼", "0000000762": "伍鐸", "0000007570": "坎南", "0000007793": "榊原元稀",
+  "0000006497": "鋼龍", "0000007597": "獅帝芬", "0000006006": "德保拉", "0000005151": "羅戈",
+  "0000006555": "梅賽鍶", "0000000368": "游霆崴", "0000007276": "伍立辰"
+};
+
+async function handleCpblLiveScores() {
+  const now = Date.now();
+  if (cachedCpblResponse && now < cpblCacheExpiry) {
+    return new Response(JSON.stringify(cachedCpblResponse), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Cache": "HIT",
+        "Cache-Control": "public, max-age=20",
+        ...corsHeaders,
+      },
+    });
+  }
+
+  try {
+    const scheduleRes = await fetch("https://www.cpbl.com.tw/schedule", {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      },
+    });
+    const html = await scheduleRes.text();
+    const tokenMatch = html.match(/RequestVerificationToken:\s*'([^']+)'/);
+    const token = tokenMatch ? tokenMatch[1] : "";
+
+    const today = new Date();
+    const twDate = new Date(today.getTime() + 8 * 3600 * 1000);
+    const year = twDate.getUTCFullYear();
+    const month = String(twDate.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(twDate.getUTCDate()).padStart(2, "0");
+    const dateStr = `${year}/${month}/${day}`;
+
+    const formBody = new URLSearchParams({
+      calendar: dateStr,
+      location: "",
+      kindCode: "A",
+    });
+
+    const headers = {
+      "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+      "X-Requested-With": "XMLHttpRequest",
+      "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+    };
+    if (token) headers["RequestVerificationToken"] = token;
+
+    const postRes = await fetch("https://www.cpbl.com.tw/schedule/getgamedatas", {
+      method: "POST",
+      headers,
+      body: formBody.toString(),
+    });
+
+    if (!postRes.ok) throw new Error(`CPBL API error: ${postRes.status}`);
+
+    const data = await postRes.json();
+    if (!data.Success) throw new Error("CPBL API returned Success=false");
+
+    const games = JSON.parse(data.GameDatas || "[]");
+    const parsedGames = games.map((g) => {
+      const isPlayBall = g.IsPlayBall === "Y";
+      const isGameStop = g.IsGameStop === "1";
+      const winPitcher = g.WinningPitcherName || CPBL_PLAYER_MAP[g.WinningPitcherAcnt] || "";
+      const losePitcher = g.LoserPitcherName || CPBL_PLAYER_MAP[g.LoserPitcherAcnt] || "";
+      const closer = g.CloserName || CPBL_PLAYER_MAP[g.CloserAcnt] || "";
+      const mvp = g.MvpName || CPBL_PLAYER_MAP[g.MvpAcnt] || "";
+      const visitingPitcher = g.VisitingPitcherName || g.VisitingFirstMover || CPBL_PLAYER_MAP[g.VisitingPitcherAcnt] || "";
+      const homePitcher = g.HomePitcherName || g.HomeFirstMover || CPBL_PLAYER_MAP[g.HomePitcherAcnt] || "";
+
+      let status = "scheduled";
+      let statusText = "未開打";
+      if (isGameStop) {
+        status = "postponed";
+        statusText = "因雨延賽";
+      } else if (isPlayBall) {
+        status = "live";
+        statusText = "比賽中";
+      } else if (winPitcher || mvp || g.GameDuringTime || g.GameDateTimeE || (g.VisitingScore > 0 || g.HomeScore > 0)) {
+        status = "finished";
+        statusText = "已完賽";
+      }
+
+      return {
+        game_no: String(g.GameSno || ""),
+        date: (g.GameDateTimeS || "").substring(0, 10),
+        visiting_team: (g.VisitingTeamName || "").replace(/\u200B/g, "").trim(),
+        home_team: (g.HomeTeamName || "").replace(/\u200B/g, "").trim(),
+        visiting_score: (status === "finished" || status === "live") ? (g.VisitingScore ?? "-") : "-",
+        home_score: (status === "finished" || status === "live") ? (g.HomeScore ?? "-") : "-",
+        visiting_pitcher: visitingPitcher,
+        home_pitcher: homePitcher,
+        winning_pitcher: winPitcher,
+        losing_pitcher: losePitcher,
+        closer: closer,
+        mvp: mvp,
+        status,
+        status_text: statusText,
+      };
+    });
+
+    const result = {
+      updated_at: new Date().toISOString(),
+      date: dateStr.replace(/\//g, "-"),
+      games: parsedGames,
+    };
+
+    cachedCpblResponse = result;
+    cpblCacheExpiry = Date.now() + 20 * 1000; // 20s cache
+
+    return new Response(JSON.stringify(result), {
+      status: 200,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        "X-Cache": "MISS",
+        "Cache-Control": "public, max-age=20",
+        ...corsHeaders,
+      },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message, games: [] }), {
+      status: 500,
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        ...corsHeaders,
+      },
+    });
+  }
+}
+
 // ─── 主要 Handler ────────────────────────────────────────────────────────────────
 export default {
   async fetch(request, env, ctx) {
@@ -98,6 +246,13 @@ export default {
         status: 405,
         headers: { "Content-Type": "application/json", ...corsHeaders },
       });
+    }
+
+    const url = new URL(request.url);
+
+    // ── 支援 CPBL 即時比分端點 ───────────────────────────────────────────────
+    if (url.pathname.startsWith("/api/cpbl") || url.pathname.startsWith("/cpbl")) {
+      return await handleCpblLiveScores();
     }
 
     try {
@@ -113,7 +268,6 @@ export default {
       }
 
       // 解析請求路徑 → 建立 TDX 目標 URL
-      const url = new URL(request.url);
       let targetPath = url.pathname;
       if (targetPath.startsWith("/api/tdx")) targetPath = targetPath.substring(8);
       if (!targetPath.startsWith("/"))        targetPath = "/" + targetPath;

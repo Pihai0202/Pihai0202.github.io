@@ -2,8 +2,8 @@ name: 每日更新演唱會資料
 
 on:
   schedule:
-    # 每 30 分鐘更新一次；GitHub Actions 排程可能會有幾分鐘延遲
-    - cron: '*/30 * * * *'
+    # 每 20 分鐘更新一次；GitHub Actions 排程可能會有幾分鐘延遲
+    - cron: '*/20 * * * *'
   workflow_dispatch:   # 也可以手動點按鈕觸發
   push:
     branches: [ main ]
