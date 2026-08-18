@@ -1,40 +1,40 @@
 {
-  "updated_at": "2026-08-18T21:42:10.082995+00:00",
+  "updated_at": "2026-08-18T21:58:30.117404+00:00",
   "statuses": {
+    "trtc": {
+      "name": "台北捷運",
+      "status": "🟢 營運正常",
+      "isNormal": true,
+      "detail": "目前正常營運",
+      "updatedAt": "2026-08-18T21:58:31.287148+00:00"
+    },
+    "krtc": {
+      "name": "高雄捷運",
+      "status": "🟢 營運正常",
+      "isNormal": true,
+      "detail": "目前全線營運正常。",
+      "updatedAt": "2026-08-18T21:58:32.758544+00:00"
+    },
     "tmrt": {
       "name": "台中捷運",
       "status": "🟢 營運正常",
       "isNormal": true,
       "detail": "全線正常營運",
-      "updatedAt": "2026-08-18T21:42:26.364230+00:00"
+      "updatedAt": "2026-08-18T21:58:34.394102+00:00"
     },
     "thsr": {
       "name": "台灣高鐵",
       "status": "🟢 營運正常",
       "isNormal": true,
       "detail": "目前全線正常營運。",
-      "updatedAt": "2026-08-18T21:42:26.963306+00:00"
+      "updatedAt": "2026-08-18T21:58:35.110015+00:00"
     },
     "tra": {
       "name": "台灣鐵路",
       "status": "🟢 營運正常",
       "isNormal": true,
       "detail": "目前各線列車正常運行。",
-      "updatedAt": "2026-08-18T21:42:28.348222+00:00"
-    },
-    "trtc": {
-      "name": "台北捷運",
-      "status": "🟢 營運正常 (預估)",
-      "isNormal": true,
-      "detail": "全線正常營運。",
-      "updatedAt": "2026-08-18T21:42:28.348244+00:00"
-    },
-    "krtc": {
-      "name": "高雄捷運",
-      "status": "🟢 營運正常 (預估)",
-      "isNormal": true,
-      "detail": "目前全線營運正常。",
-      "updatedAt": "2026-08-18T21:42:28.348301+00:00"
+      "updatedAt": "2026-08-18T21:58:36.905972+00:00"
     }
   }
 }
