@@ -180,10 +180,13 @@ async function handleCpblLiveScores() {
       if (isGameStop) {
         status = "postponed";
         statusText = "因雨延賽";
+      } else if (g.GameDateTimeE || g.GameDuringTime || (winPitcher && losePitcher)) {
+        status = "finished";
+        statusText = "已完賽";
       } else if (isPlayBall) {
         status = "live";
         statusText = "比賽中";
-      } else if (winPitcher || mvp || g.GameDuringTime || g.GameDateTimeE || (g.VisitingScore > 0 || g.HomeScore > 0)) {
+      } else if (winPitcher || mvp || (g.VisitingScore > 0 || g.HomeScore > 0)) {
         status = "finished";
         statusText = "已完賽";
       }

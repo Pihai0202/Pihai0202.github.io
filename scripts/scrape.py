@@ -2010,10 +2010,13 @@ def scrape_cpbl():
             if is_game_stop == "1":
                 status = "postponed"
                 status_text = "因雨延賽"
+            elif game_end or game_during or (win_pitcher != "" and lose_pitcher != ""):
+                status = "finished"
+                status_text = "已完賽"
             elif is_play_ball == "Y":
                 status = "live"
                 status_text = "比賽中"
-            elif win_pitcher != "" or mvp != "" or game_during != "" or game_end or (visiting_score is not None and home_score is not None and (visiting_score > 0 or home_score > 0)):
+            elif win_pitcher != "" or mvp != "" or (visiting_score is not None and home_score is not None and (visiting_score > 0 or home_score > 0)):
                 status = "finished"
                 status_text = "已完賽"
             else:

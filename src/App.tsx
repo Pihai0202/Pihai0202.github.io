@@ -1202,12 +1202,14 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
-      let response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
+      // 優先從 GitHub Raw 取得 GitHub Actions 最新爬取的 concerts.json，確保比分與賽事即時同步
+      let response = await fetch(
+        `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
+        { cache: 'no-store' }
+      ).catch(() => null)
+
       if (!response || !response.ok) {
-        response = await fetch(
-          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
-          { cache: 'no-store' }
-        )
+        response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
       }
       if (!response || !response.ok) throw new Error('concerts.json not found')
 
