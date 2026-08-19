@@ -1810,7 +1810,7 @@ CPBL_PLAYER_CACHE = {
     "0000006739": "李東洺", "0000002345": "鄭浩均", "0000001412": "江少慶", "0000006507": "後勁",
     "0000007790": "魔爾曼", "0000000762": "伍鐸", "0000007570": "坎南", "0000007793": "榊原元稀",
     "0000006497": "鋼龍", "0000007597": "獅帝芬", "0000006006": "德保拉", "0000005151": "羅戈",
-    "0000006555": "梅賽鍶", "0000000368": "游霆崴", "0000007276": "伍立辰"
+    "0000006555": "梅賽鍶", "0000000368": "游霆崴", "0000007276": "伍立辰", "0000006720": "邱駿威"
 }
 
 def get_cpbl_player_name(acnt):
@@ -1822,10 +1822,10 @@ def get_cpbl_player_name(acnt):
     if acnt_str in CPBL_PLAYER_CACHE:
         return CPBL_PLAYER_CACHE[acnt_str]
     try:
-        res = cffi_requests.get(f"https://www.cpbl.com.tw/team/person?acnt={acnt_str}", impersonate="safari15_5", timeout=5)
+        res = cffi_requests.get(f"https://www.cpbl.com.tw/team/person?acnt={acnt_str}", impersonate="safari15_5", timeout=6)
         if res.status_code == 200:
             soup = BeautifulSoup(res.text, "html.parser")
-            name_el = soup.select_one(".name, .player_name, h2, h3")
+            name_el = soup.select_one("div.name, span.name, .player_name, .player-name")
             if name_el:
                 txt = name_el.get_text(strip=True)
                 clean_name = re.sub(r"\d+$", "", txt).strip()
@@ -1837,7 +1837,7 @@ def get_cpbl_player_name(acnt):
                 m = re.match(r"^([\u4e00-\u9fa5A-Za-z·\.\-\s]+)\s*\d+$", txt)
                 if m:
                     name = m.group(1).strip()
-                    if name and name not in ["CPBL", "U-Lions", "Guardians", "Monkeys", "Hawks", "Dragons", "Brothers"]:
+                    if name and name not in ["CPBL", "U-Lions", "Guardians", "Monkeys", "Hawks", "Dragons", "Brothers"] and "二軍" not in name:
                         CPBL_PLAYER_CACHE[acnt_str] = name
                         return name
     except Exception:
