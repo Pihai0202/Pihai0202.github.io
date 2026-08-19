@@ -32,5 +32,9 @@ functions/node_modules
 *.sw?
 scratch/
 functions/.env
+__pycache__/
+*.pyc
+.firebase/
+
 
 

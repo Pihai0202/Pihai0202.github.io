@@ -299,6 +299,7 @@ function App() {
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
   const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
   const [isRemoteRefreshing, setIsRemoteRefreshing] = useState(false)
+  const [isCpblRefreshing, setIsCpblRefreshing] = useState(false)
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
   const drawerHeaderRef = useRef<HTMLDivElement | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
@@ -1228,11 +1229,12 @@ function App() {
     }
   }, [])
 
-  // ── CPBL 即時比分輪詢 (每 45 秒在有賽事時背景向 Cloudflare Worker / 代理請求最新比分) ──
+  // ── CPBL 即時比分輪詢 (在有賽事時背景向 Cloudflare Worker / 代理請求最新比分) ──
   const pollCpblLiveScores = useCallback(async () => {
     const proxyBase = (import.meta.env.VITE_TDX_PROXY_URL || '').replace(/\/+$/, '')
     if (!proxyBase) return
 
+    setIsCpblRefreshing(true)
     try {
       const res = await fetch(`${proxyBase}/api/cpbl/live?_t=${Date.now()}`, {
         cache: 'no-store'
@@ -1289,12 +1291,29 @@ function App() {
           }
           return event
         })
-        return hasChanges ? nextList : prev
+
+        if (hasChanges) {
+          // 若目前有正在開啟的比分 Modal，同步更新比分卡片資料
+          setSelectedTicket((prevModal) => {
+            if (!prevModal || prevModal.source !== '中華職棒') return prevModal
+            const updatedModal = nextList.find((e) => e.id === prevModal.id)
+            return updatedModal || prevModal
+          })
+          return nextList
+        }
+        return prev
       })
     } catch {
       // Ignore background poll errors silently
+    } finally {
+      setIsCpblRefreshing(false)
     }
   }, [])
+
+  // 同時刷新售票活動與 CPBL 即時比分
+  const handleRefreshAllEventsAndScores = useCallback(async () => {
+    await Promise.allSettled([loadRemoteConcerts(), pollCpblLiveScores()])
+  }, [loadRemoteConcerts, pollCpblLiveScores])
 
   const updateConcertsList = async (updatedList: Concert[]) => {
     // 1. Immediately update React state
@@ -2577,8 +2596,8 @@ function App() {
                               concerts={filteredRemoteConcerts}
                               status={remoteStatus}
                               updatedAt={remoteUpdatedAt}
-                              isRefreshing={isRemoteRefreshing}
-                              onRefresh={loadRemoteConcerts}
+                              isRefreshing={isRemoteRefreshing || isCpblRefreshing}
+                              onRefresh={handleRefreshAllEventsAndScores}
                               searchQuery={searchQuery}
                               hasSelectedVenue={!!selectedVenueId}
                               onClearVenue={() => {
@@ -2665,8 +2684,8 @@ function App() {
                               concerts={filteredRemoteConcerts}
                               status={remoteStatus}
                               updatedAt={remoteUpdatedAt}
-                              isRefreshing={isRemoteRefreshing}
-                              onRefresh={loadRemoteConcerts}
+                              isRefreshing={isRemoteRefreshing || isCpblRefreshing}
+                              onRefresh={handleRefreshAllEventsAndScores}
                               searchQuery={searchQuery}
                               hasSelectedVenue={false}
                               onClearVenue={() => setSelectedVenueId(null)}
@@ -2736,8 +2755,8 @@ function App() {
                     concerts={filteredRemoteConcerts}
                     status={remoteStatus}
                     updatedAt={remoteUpdatedAt}
-                    isRefreshing={isRemoteRefreshing}
-                    onRefresh={loadRemoteConcerts}
+                    isRefreshing={isRemoteRefreshing || isCpblRefreshing}
+                    onRefresh={handleRefreshAllEventsAndScores}
                     searchQuery={searchQuery}
                     hasSelectedVenue={!!selectedVenueId}
                     onClearVenue={() => setSelectedVenueId(null)}
@@ -2809,8 +2828,8 @@ function App() {
                         concerts={filteredRemoteConcerts}
                         status={remoteStatus}
                         updatedAt={remoteUpdatedAt}
-                        isRefreshing={isRemoteRefreshing}
-                        onRefresh={loadRemoteConcerts}
+                        isRefreshing={isRemoteRefreshing || isCpblRefreshing}
+                        onRefresh={handleRefreshAllEventsAndScores}
                         searchQuery={searchQuery}
                         hasSelectedVenue={!!selectedVenueId}
                         onClearVenue={() => setSelectedVenueId(null)}
@@ -3279,6 +3298,8 @@ function App() {
               setMusicBarUrl(url)
               setIsMusicBarVisible(true)
             }}
+            onRefreshScore={pollCpblLiveScores}
+            isScoreRefreshing={isCpblRefreshing}
             onLogAsPersonal={(ticket) => {
               setSelectedTicket(null)
               const extractedArtist = extractArtistFromTitle(ticket.name)

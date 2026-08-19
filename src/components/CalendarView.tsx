@@ -13,7 +13,7 @@ import {
   CalendarIcon,
   DollarIcon
 } from './SvgIcon'
-import { shortenCpblTeamName } from '../utils/cpblUtils'
+import { shortenCpblTeamName, resolveCpblPlayerName } from '../utils/cpblUtils'
 
 interface CalendarViewProps {
   concerts: Concert[]
@@ -704,7 +704,7 @@ export function CalendarView({
                                 {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
                                 {(event.game_score.visiting_pitcher || event.game_score.home_pitcher) && (
                                   <small className="pitchers-preview">
-                                    {' '}(先發: {event.game_score.visiting_pitcher || '待公告'} vs {event.game_score.home_pitcher || '待公告'})
+                                    {' '}(先發: {resolveCpblPlayerName(event.game_score.visiting_pitcher) || '待公告'} vs {resolveCpblPlayerName(event.game_score.home_pitcher) || '待公告'})
                                   </small>
                                 )}
                               </span>
@@ -713,12 +713,12 @@ export function CalendarView({
                                 {shortenCpblTeamName(event.game_score.visiting_team) || '客隊'} <strong>{event.game_score.visiting_score ?? '-'}</strong> : <strong>{event.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(event.game_score.home_team) || '主隊'}
                                 {event.game_score.status === 'finished' && (event.game_score.winning_pitcher || event.game_score.mvp) && (
                                   <small className="pitchers-preview finished-preview">
-                                    {' '}({event.game_score.winning_pitcher ? `勝投: ${event.game_score.winning_pitcher}` : ''}{event.game_score.winning_pitcher && event.game_score.mvp ? ' · ' : ''}{event.game_score.mvp ? `MVP: ${event.game_score.mvp}` : ''})
+                                    {' '}({event.game_score.winning_pitcher ? `勝投: ${resolveCpblPlayerName(event.game_score.winning_pitcher)}` : ''}{event.game_score.winning_pitcher && event.game_score.mvp ? ' · ' : ''}{event.game_score.mvp ? `MVP: ${resolveCpblPlayerName(event.game_score.mvp)}` : ''})
                                   </small>
                                 )}
                                 {event.game_score.status === 'live' && (event.game_score.visiting_pitcher || event.game_score.home_pitcher) && (
                                   <small className="pitchers-preview">
-                                    {' '}(先發: {event.game_score.visiting_pitcher || '-'} vs {event.game_score.home_pitcher || '-'})
+                                    {' '}(先發: {resolveCpblPlayerName(event.game_score.visiting_pitcher) || '-'} vs {resolveCpblPlayerName(event.game_score.home_pitcher) || '-'})
                                   </small>
                                 )}
                               </span>

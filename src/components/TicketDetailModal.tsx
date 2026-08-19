@@ -17,8 +17,8 @@ import {
   CommentIcon,
   RocketIcon
 } from './Icons'
-import { BaseballIcon, TrophyIcon } from './SvgIcon'
-import { shortenCpblTeamName } from '../utils/cpblUtils'
+import { BaseballIcon, TrophyIcon, RefreshIcon } from './SvgIcon'
+import { shortenCpblTeamName, resolveCpblPlayerName } from '../utils/cpblUtils'
 
 interface TicketDetailModalProps {
   ticket: RemoteConcert
@@ -26,6 +26,8 @@ interface TicketDetailModalProps {
   spotifyTokenFetcher: (forceRefresh?: boolean) => Promise<string | null>
   onPlayMusicBar?: (url: string) => void
   onLogAsPersonal?: (ticket: RemoteConcert) => void
+  onRefreshScore?: () => void
+  isScoreRefreshing?: boolean
 }
 
 interface TicketComment {
@@ -155,7 +157,9 @@ export function TicketDetailModal({
   onClose,
   spotifyTokenFetcher,
   onPlayMusicBar,
-  onLogAsPersonal
+  onLogAsPersonal,
+  onRefreshScore,
+  isScoreRefreshing = false
 }: TicketDetailModalProps) {
   const { lang } = useTranslation()
   const [comments, setComments] = useState<TicketComment[]>([])
@@ -450,10 +454,32 @@ export function TicketDetailModal({
         {ticket.game_score && (
           <div className={`cpbl-scoreboard-card ${ticket.game_score.status || 'scheduled'}`}>
             <div className="scoreboard-status-header">
-              <span className="status-badge">
-                {ticket.game_score.status === 'live' && <span className="live-pulsing-dot" />}
-                {ticket.game_score.status_text || '職棒賽事'}
-              </span>
+              <div className="scoreboard-status-left">
+                <span className="status-badge">
+                  {ticket.game_score.status === 'live' && <span className="live-pulsing-dot" />}
+                  {ticket.game_score.status_text || '職棒賽事'}
+                </span>
+                {(ticket.game_score.status === 'live' || ticket.game_score.status === 'scheduled') && onRefreshScore && (
+                  <button
+                    type="button"
+                    className={`score-refresh-btn ${isScoreRefreshing ? 'spinning' : ''}`}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onRefreshScore()
+                    }}
+                    title={lang === 'zh-TW' ? '刷新即時比分' : 'Refresh Live Score'}
+                    disabled={isScoreRefreshing}
+                    aria-label="Refresh Score"
+                  >
+                    <RefreshIcon size="0.85em" />
+                    <span className="refresh-btn-text">
+                      {isScoreRefreshing
+                        ? (lang === 'zh-TW' ? '更新中...' : 'Updating...')
+                        : (lang === 'zh-TW' ? '刷新比分' : 'Refresh')}
+                    </span>
+                  </button>
+                )}
+              </div>
               <span className="game-type-label">中華職棒 CPBL</span>
             </div>
 
@@ -484,11 +510,11 @@ export function TicketDetailModal({
               <div className="scoreboard-details-footer pitchers-footer">
                 <span className="detail-item">
                   <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  客隊先發: <strong>{ticket.game_score.visiting_pitcher || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
+                  客隊先發: <strong>{resolveCpblPlayerName(ticket.game_score.visiting_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
                 </span>
                 <span className="detail-item">
                   <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  主隊先發: <strong>{ticket.game_score.home_pitcher || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
+                  主隊先發: <strong>{resolveCpblPlayerName(ticket.game_score.home_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
                 </span>
               </div>
             )}
@@ -501,17 +527,17 @@ export function TicketDetailModal({
                     {ticket.game_score.winning_pitcher && (
                       <span className="detail-item win-pitcher">
                         <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                        勝投: <strong>{ticket.game_score.winning_pitcher}</strong>
+                        勝投: <strong>{resolveCpblPlayerName(ticket.game_score.winning_pitcher)}</strong>
                       </span>
                     )}
                     {ticket.game_score.losing_pitcher && (
                       <span className="detail-item lose-pitcher">
-                        敗投: <strong>{ticket.game_score.losing_pitcher}</strong>
+                        敗投: <strong>{resolveCpblPlayerName(ticket.game_score.losing_pitcher)}</strong>
                       </span>
                     )}
                     {ticket.game_score.closer && (
                       <span className="detail-item closer-pitcher">
-                        救援: <strong>{ticket.game_score.closer}</strong>
+                        救援: <strong>{resolveCpblPlayerName(ticket.game_score.closer)}</strong>
                       </span>
                     )}
                   </div>
@@ -520,7 +546,7 @@ export function TicketDetailModal({
                   <div className="mvp-row">
                     <span className="detail-item mvp">
                       <StarIcon style={{ width: '0.95em', height: '0.95em', marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                      MVP: <strong>{ticket.game_score.mvp}</strong>
+                      MVP: <strong>{resolveCpblPlayerName(ticket.game_score.mvp)}</strong>
                     </span>
                   </div>
                 )}

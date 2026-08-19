@@ -4,7 +4,7 @@ import { logCustomEvent } from '../firebase'
 import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
-import { shortenCpblTeamName } from '../utils/cpblUtils'
+import { shortenCpblTeamName, resolveCpblPlayerName } from '../utils/cpblUtils'
 import { SafeIframe } from './SafeIframe'
 import { LazyImage } from './LazyImage'
 
@@ -141,7 +141,7 @@ export function VenueInfo({
                                 {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} vs {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
                                 {(concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
                                   <small className="pitchers-preview">
-                                    {' '}(先發: {concert.game_score.visiting_pitcher || '待公告'} vs {concert.game_score.home_pitcher || '待公告'})
+                                    {' '}(先發: {resolveCpblPlayerName(concert.game_score.visiting_pitcher) || '待公告'} vs {resolveCpblPlayerName(concert.game_score.home_pitcher) || '待公告'})
                                   </small>
                                 )}
                               </span>
@@ -150,12 +150,12 @@ export function VenueInfo({
                                 {shortenCpblTeamName(concert.game_score.visiting_team) || '客隊'} <strong>{concert.game_score.visiting_score ?? '-'}</strong> : <strong>{concert.game_score.home_score ?? '-'}</strong> {shortenCpblTeamName(concert.game_score.home_team) || '主隊'}
                                 {concert.game_score.status === 'finished' && (concert.game_score.winning_pitcher || concert.game_score.mvp) && (
                                   <small className="pitchers-preview finished-preview">
-                                    {' '}({concert.game_score.winning_pitcher ? `勝投: ${concert.game_score.winning_pitcher}` : ''}{concert.game_score.winning_pitcher && concert.game_score.mvp ? ' · ' : ''}{concert.game_score.mvp ? `MVP: ${concert.game_score.mvp}` : ''})
+                                    {' '}({concert.game_score.winning_pitcher ? `勝投: ${resolveCpblPlayerName(concert.game_score.winning_pitcher)}` : ''}{concert.game_score.winning_pitcher && concert.game_score.mvp ? ' · ' : ''}{concert.game_score.mvp ? `MVP: ${resolveCpblPlayerName(concert.game_score.mvp)}` : ''})
                                   </small>
                                 )}
                                 {concert.game_score.status === 'live' && (concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
                                   <small className="pitchers-preview">
-                                    {' '}(先發: {concert.game_score.visiting_pitcher || '-'} vs {concert.game_score.home_pitcher || '-'})
+                                    {' '}(先發: {resolveCpblPlayerName(concert.game_score.visiting_pitcher) || '-'} vs {resolveCpblPlayerName(concert.game_score.home_pitcher) || '-'})
                                   </small>
                                 )}
                               </span>

@@ -13723,6 +13723,14 @@ body:has(.main-layout) {
   margin-bottom: 0.6rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px dashed rgba(255, 255, 255, 0.1);
+  gap: 8px;
+}
+
+.scoreboard-status-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .scoreboard-status-header .status-badge {
@@ -13734,10 +13742,51 @@ body:has(.main-layout) {
   gap: 6px;
 }
 
+.score-refresh-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--accent);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  line-height: 1.4;
+}
+
+.score-refresh-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.16);
+  border-color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.score-refresh-btn:active:not(:disabled) {
+  transform: scale(0.96);
+}
+
+.score-refresh-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.score-refresh-btn.spinning svg {
+  animation: scoreSpin 0.8s linear infinite;
+}
+
+@keyframes scoreSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 .scoreboard-status-header .game-type-label {
   font-size: 0.72rem;
   color: var(--muted);
   letter-spacing: 0.05em;
+  white-space: nowrap;
 }
 
 .scoreboard-teams-row {
