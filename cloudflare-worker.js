@@ -263,8 +263,9 @@ async function handleCpblLiveScores() {
   } catch (err) {
     // 若直連 CPBL 失敗（例如防爬阻擋），從最新 GitHub Raw 快取回傳今日賽事最新狀態
     try {
-      const fallbackRes = await fetch("https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json", {
-        headers: { "User-Agent": "Cloudflare-Worker" }
+      const fallbackRes = await fetch(`https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`, {
+        headers: { "User-Agent": "Cloudflare-Worker", "Cache-Control": "no-cache" },
+        cache: "no-store"
       });
       if (fallbackRes.ok) {
         const payload = await fallbackRes.json();
