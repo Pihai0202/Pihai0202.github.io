@@ -167,6 +167,9 @@ async function handleCpblLiveScores() {
     const day = String(twDate.getUTCDate()).padStart(2, "0");
     const dateStr = `${year}/${month}/${day}`;
 
+    const setCookie = scheduleRes.headers.get("set-cookie") || "";
+    const cookieHeader = setCookie.split(";")[0] || "";
+
     const formBody = new URLSearchParams({
       calendar: dateStr,
       location: "",
@@ -177,7 +180,10 @@ async function handleCpblLiveScores() {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "X-Requested-With": "XMLHttpRequest",
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      "Referer": "https://www.cpbl.com.tw/schedule",
+      "Origin": "https://www.cpbl.com.tw",
     };
+    if (cookieHeader) headers["Cookie"] = cookieHeader;
     if (token) headers["RequestVerificationToken"] = token;
 
     const postRes = await fetch("https://www.cpbl.com.tw/schedule/getgamedatas", {
@@ -255,6 +261,51 @@ async function handleCpblLiveScores() {
       },
     });
   } catch (err) {
+    // 若直連 CPBL 失敗（例如防爬阻擋），從最新 GitHub Raw 快取回傳今日賽事最新狀態
+    try {
+      const fallbackRes = await fetch("https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json", {
+        headers: { "User-Agent": "Cloudflare-Worker" }
+      });
+      if (fallbackRes.ok) {
+        const payload = await fallbackRes.json();
+        const today = new Date();
+        const twDate = new Date(today.getTime() + 8 * 3600 * 1000);
+        const dateStr = twDate.toISOString().substring(0, 10);
+        const todayCpbl = (payload.events || [])
+          .filter((e) => e.source === "中華職棒" && (e.date === dateStr || !e.date) && e.game_score)
+          .map((e) => ({
+            game_no: String(e.id || "").replace(/[^0-9]/g, ""),
+            date: e.date,
+            visiting_team: e.game_score.visiting_team,
+            home_team: e.game_score.home_team,
+            visiting_score: e.game_score.visiting_score,
+            home_score: e.game_score.home_score,
+            visiting_pitcher: e.game_score.visiting_pitcher,
+            home_pitcher: e.game_score.home_pitcher,
+            winning_pitcher: e.game_score.winning_pitcher,
+            losing_pitcher: e.game_score.losing_pitcher,
+            closer: e.game_score.closer,
+            mvp: e.game_score.mvp,
+            status: e.game_score.status,
+            status_text: e.game_score.status_text,
+          }));
+
+        return new Response(JSON.stringify({
+          updated_at: new Date().toISOString(),
+          date: dateStr,
+          games: todayCpbl,
+          fallback: true
+        }), {
+          status: 200,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            "Cache-Control": "public, max-age=15",
+            ...corsHeaders,
+          }
+        });
+      }
+    } catch (_fallbackErr) {}
+
     return new Response(JSON.stringify({ error: err.message, games: [] }), {
       status: 500,
       headers: {
