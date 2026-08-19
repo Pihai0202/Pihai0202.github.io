@@ -1257,18 +1257,25 @@ function App() {
 
           const matched = data.games.find((g: any) => {
             const dateMatch = !g.date || !event.date || g.date === event.date
+            const idMatch = g.game_no && event.id && (event.id.includes(`-${g.game_no}-`) || event.id.endsWith(`-${g.game_no}`))
             const teamMatch =
               (event.name.includes(g.visiting_team) || g.visiting_team.includes(event.game_score?.visiting_team || '')) &&
               (event.name.includes(g.home_team) || g.home_team.includes(event.game_score?.home_team || ''))
-            return dateMatch && teamMatch
+            return idMatch || (dateMatch && teamMatch)
           })
 
           if (matched) {
             const oldGs = event.game_score
+            const newVisScore = matched.visiting_score
+            const newHomeScore = matched.home_score
+            const newStatus = matched.status || oldGs.status
+            const newStatusText = matched.status_text || oldGs.status_text
+
             if (
-              oldGs.visiting_score !== matched.visiting_score ||
-              oldGs.home_score !== matched.home_score ||
-              oldGs.status !== matched.status ||
+              oldGs.visiting_score !== newVisScore ||
+              oldGs.home_score !== newHomeScore ||
+              oldGs.status !== newStatus ||
+              oldGs.status_text !== newStatusText ||
               oldGs.visiting_pitcher !== matched.visiting_pitcher ||
               oldGs.home_pitcher !== matched.home_pitcher ||
               oldGs.winning_pitcher !== matched.winning_pitcher ||
@@ -1281,16 +1288,16 @@ function App() {
                 ...event,
                 game_score: {
                   ...oldGs,
-                  visiting_score: matched.visiting_score,
-                  home_score: matched.home_score,
+                  visiting_score: newVisScore,
+                  home_score: newHomeScore,
                   visiting_pitcher: matched.visiting_pitcher || oldGs.visiting_pitcher,
                   home_pitcher: matched.home_pitcher || oldGs.home_pitcher,
                   winning_pitcher: matched.winning_pitcher || oldGs.winning_pitcher,
                   losing_pitcher: matched.losing_pitcher || oldGs.losing_pitcher,
                   closer: matched.closer || oldGs.closer,
                   mvp: matched.mvp || oldGs.mvp,
-                  status: matched.status || oldGs.status,
-                  status_text: matched.status_text || oldGs.status_text
+                  status: newStatus,
+                  status_text: newStatusText
                 }
               }
             }
@@ -1298,16 +1305,14 @@ function App() {
           return event
         })
 
-        if (hasChanges) {
-          // 若目前有正在開啟的比分 Modal，同步更新比分卡片資料
-          setSelectedTicket((prevModal) => {
-            if (!prevModal || prevModal.source !== '中華職棒') return prevModal
-            const updatedModal = nextList.find((e) => e.id === prevModal.id)
-            return updatedModal || prevModal
-          })
-          return nextList
-        }
-        return prev
+        // 若目前有正在開啟的比分 Modal，同步更新比分卡片資料
+        setSelectedTicket((prevModal) => {
+          if (!prevModal || prevModal.source !== '中華職棒') return prevModal
+          const updatedModal = nextList.find((e) => e.id === prevModal.id)
+          return updatedModal || prevModal
+        })
+
+        return hasChanges ? nextList : prev
       })
     } catch {
       // Ignore background poll errors silently
@@ -1316,9 +1321,10 @@ function App() {
     }
   }, [])
 
-  // 同時刷新售票活動與 CPBL 即時比分
+  // 同時刷新售票活動與 CPBL 即時比分（依序執行，避免競爭條件覆蓋最新比分）
   const handleRefreshAllEventsAndScores = useCallback(async () => {
-    await Promise.allSettled([loadRemoteConcerts(), pollCpblLiveScores()])
+    await loadRemoteConcerts()
+    await pollCpblLiveScores()
   }, [loadRemoteConcerts, pollCpblLiveScores])
 
   const updateConcertsList = async (updatedList: Concert[]) => {
@@ -3304,8 +3310,8 @@ function App() {
               setMusicBarUrl(url)
               setIsMusicBarVisible(true)
             }}
-            onRefreshScore={handleRefreshAllEventsAndScores}
-            isScoreRefreshing={isCpblRefreshing || isRemoteRefreshing}
+            onRefreshScore={pollCpblLiveScores}
+            isScoreRefreshing={isCpblRefreshing}
             onLogAsPersonal={(ticket) => {
               setSelectedTicket(null)
               const extractedArtist = extractArtistFromTitle(ticket.name)

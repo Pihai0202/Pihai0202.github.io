@@ -1874,7 +1874,7 @@ def scrape_cpbl():
         target = impersonate_targets[attempt % len(impersonate_targets)]
         try:
             session = cffi_requests.Session()
-            res = session.get("https://www.cpbl.com.tw/schedule", impersonate=target, timeout=20)
+            res = session.get("https://cpbl.com.tw/schedule", impersonate=target, timeout=20)
             if res.status_code != 200:
                 print(f"  ⚠ 獲取 CPBL 賽程頁面 HTTP 狀態碼非 200 (嘗試 {attempt+1}/{max_retries}): {res.status_code}", file=sys.stderr)
                 time.sleep(2 * (attempt + 1))
@@ -1890,7 +1890,7 @@ def scrape_cpbl():
             current_year = datetime.now().year
             
             post_res = session.post(
-                "https://www.cpbl.com.tw/schedule/getgamedatas",
+                "https://cpbl.com.tw/schedule/getgamedatas",
                 data={
                     "calendar": f"{current_year}/01/01",
                     "location": "",
@@ -2019,8 +2019,8 @@ def scrape_cpbl():
             if not h_pitcher and h_acnt:
                 h_pitcher = get_cpbl_player_name(h_acnt)
 
-            game_during = g.get("GameDuringTime") or ""
-            game_end = g.get("GameDateTimeE")
+            game_during = (g.get("GameDuringTime") or "").strip()
+            game_end = (g.get("GameDateTimeE") or "").strip()
 
             if is_game_stop:
                 status = "postponed"

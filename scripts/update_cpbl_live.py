@@ -50,7 +50,7 @@ def get_player_name(name, acnt):
 
 def update_live_scores():
     session = cffi_requests.Session()
-    res = session.get("https://www.cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
+    res = session.get("https://cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
     tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
     if not tokens:
         print("No token found", file=sys.stderr)
@@ -59,7 +59,7 @@ def update_live_scores():
     current_year = datetime.now().year
     
     post_res = session.post(
-        "https://www.cpbl.com.tw/schedule/getgamedatas",
+        "https://cpbl.com.tw/schedule/getgamedatas",
         data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": "A"},
         headers={"X-Requested-With": "XMLHttpRequest", "RequestVerificationToken": token},
         impersonate="safari15_5",

@@ -459,7 +459,7 @@ export function TicketDetailModal({
                   {ticket.game_score.status === 'live' && <span className="live-pulsing-dot" />}
                   {ticket.game_score.status_text || '職棒賽事'}
                 </span>
-                {(ticket.game_score.status === 'live' || ticket.game_score.status === 'scheduled') && onRefreshScore && (
+                {ticket.game_score && onRefreshScore && (
                   <button
                     type="button"
                     className={`score-refresh-btn ${isScoreRefreshing ? 'spinning' : ''}`}
