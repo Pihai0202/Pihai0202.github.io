@@ -1997,7 +1997,7 @@ def scrape_cpbl():
             visiting_score = g.get("VisitingScore")
             home_score = g.get("HomeScore")
             is_play_ball = g.get("IsPlayBall", "N")
-            is_game_stop = g.get("IsGameStop", "0")
+            is_game_stop = str(g.get("IsGameStop") or "0") in ("1", "true", "True")
             win_acnt = g.get("WinningPitcherAcnt") or ""
             lose_acnt = g.get("LoserPitcherAcnt") or ""
             closer_acnt = g.get("CloserAcnt") or ""
@@ -2022,16 +2022,16 @@ def scrape_cpbl():
             game_during = g.get("GameDuringTime") or ""
             game_end = g.get("GameDateTimeE")
 
-            if is_game_stop == "1":
+            if is_game_stop:
                 status = "postponed"
-                status_text = "因雨延賽"
+                status_text = "延賽"
             elif game_end or game_during or (win_pitcher != "" and lose_pitcher != ""):
                 status = "finished"
                 status_text = "已完賽"
             elif is_play_ball == "Y":
                 status = "live"
                 status_text = "比賽中"
-            elif win_pitcher != "" or mvp != "" or (visiting_score is not None and home_score is not None and (visiting_score > 0 or home_score > 0)):
+            elif win_pitcher != "" or mvp != "":
                 status = "finished"
                 status_text = "已完賽"
             else:
