@@ -1220,6 +1220,12 @@ function App() {
       setRemoteConcerts(events)
       setRemoteUpdatedAt(data.updated_at ?? null)
       setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
+
+      setSelectedTicket((prevModal) => {
+        if (!prevModal) return prevModal
+        const updated = events.find((e) => e.id === prevModal.id)
+        return updated || prevModal
+      })
     } catch {
       setRemoteConcerts([])
       setRemoteUpdatedAt(null)
@@ -3291,15 +3297,15 @@ function App() {
       {selectedTicket && (
         <Modal className="ticket-detail-modal" onClose={() => setSelectedTicket(null)}>
           <TicketDetailModal
-            ticket={selectedTicket}
+            ticket={remoteConcerts.find((e) => e.id === selectedTicket.id) || selectedTicket}
             onClose={() => setSelectedTicket(null)}
             spotifyTokenFetcher={getSpotifyToken}
             onPlayMusicBar={(url) => {
               setMusicBarUrl(url)
               setIsMusicBarVisible(true)
             }}
-            onRefreshScore={pollCpblLiveScores}
-            isScoreRefreshing={isCpblRefreshing}
+            onRefreshScore={handleRefreshAllEventsAndScores}
+            isScoreRefreshing={isCpblRefreshing || isRemoteRefreshing}
             onLogAsPersonal={(ticket) => {
               setSelectedTicket(null)
               const extractedArtist = extractArtistFromTitle(ticket.name)
