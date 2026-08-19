@@ -102,18 +102,21 @@ def update_live_scores():
         v_score = g.get("VisitingScore")
         h_score = g.get("HomeScore")
         
+        during_str = (g.get("GameDuringTime") or "").strip()
+        end_str = (g.get("GameDateTimeE") or "").strip()
+        
         status = "scheduled"
         status_text = "未開打"
         if is_game_stop:
             status = "postponed"
-            status_text = "因雨延賽"
-        elif g.get("GameDateTimeE") or g.get("GameDuringTime") or (win_p and lose_p):
+            status_text = "延賽"
+        elif end_str or during_str or (win_p and lose_p):
             status = "finished"
             status_text = "已完賽"
         elif is_play_ball:
             status = "live"
             status_text = "比賽中"
-        elif win_p or mvp_p or (v_score is not None and v_score > 0) or (h_score is not None and h_score > 0):
+        elif win_p or mvp_p:
             status = "finished"
             status_text = "已完賽"
             

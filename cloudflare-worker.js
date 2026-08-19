@@ -200,26 +200,28 @@ async function handleCpblLiveScores() {
     const games = JSON.parse(data.GameDatas || "[]");
     const parsedGames = games.map((g) => {
       const isPlayBall = g.IsPlayBall === "Y";
-      const isGameStop = g.IsGameStop === "1";
+      const isGameStop = String(g.IsGameStop || "0") === "1";
       const winPitcher = lookupCpblPlayer(g.WinningPitcherName, g.WinningPitcherAcnt);
       const losePitcher = lookupCpblPlayer(g.LoserPitcherName, g.LoserPitcherAcnt);
       const closer = lookupCpblPlayer(g.CloserName, g.CloserAcnt);
       const mvp = lookupCpblPlayer(g.MvpName, g.MvpAcnt);
       const visitingPitcher = lookupCpblPlayer(g.VisitingPitcherName || g.VisitingFirstMover, g.VisitingPitcherAcnt);
       const homePitcher = lookupCpblPlayer(g.HomePitcherName || g.HomeFirstMover, g.HomePitcherAcnt);
+      const gameEnd = String(g.GameDateTimeE || "").trim();
+      const gameDuring = String(g.GameDuringTime || "").trim();
 
       let status = "scheduled";
       let statusText = "未開打";
       if (isGameStop) {
         status = "postponed";
-        statusText = "因雨延賽";
-      } else if (g.GameDateTimeE || g.GameDuringTime || (winPitcher && losePitcher)) {
+        statusText = "延賽";
+      } else if (gameEnd || gameDuring || (winPitcher && losePitcher)) {
         status = "finished";
         statusText = "已完賽";
       } else if (isPlayBall) {
         status = "live";
         statusText = "比賽中";
-      } else if (winPitcher || mvp || (g.VisitingScore > 0 || g.HomeScore > 0)) {
+      } else if (winPitcher || mvp) {
         status = "finished";
         statusText = "已完賽";
       }
