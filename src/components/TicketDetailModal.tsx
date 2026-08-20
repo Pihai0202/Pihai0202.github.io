@@ -455,11 +455,11 @@ export function TicketDetailModal({
           <div className={`cpbl-scoreboard-card ${ticket.game_score.status || 'scheduled'}`}>
             <div className="scoreboard-status-header">
               <div className="scoreboard-status-left">
-                <span className="status-badge">
+                <span className={`status-badge status-${ticket.game_score.status || 'scheduled'}`}>
                   {ticket.game_score.status === 'live' && <span className="live-pulsing-dot" />}
                   {ticket.game_score.status_text || '職棒賽事'}
                 </span>
-                {ticket.game_score && onRefreshScore && (
+                {onRefreshScore && (
                   <button
                     type="button"
                     className={`score-refresh-btn ${isScoreRefreshing ? 'spinning' : ''}`}
@@ -480,74 +480,96 @@ export function TicketDetailModal({
                   </button>
                 )}
               </div>
-              <span className="game-type-label">中華職棒 CPBL</span>
+              <span className="game-type-label">
+                <BaseballIcon size="0.9em" style={{ verticalAlign: 'middle', marginRight: '4px', opacity: 0.85 }} />
+                中華職棒 CPBL
+              </span>
             </div>
 
             <div className="scoreboard-teams-row">
-              <div className="team-box visiting">
-                <span className="team-label">客隊</span>
-                <span className="team-name">{shortenCpblTeamName(ticket.game_score.visiting_team) || '客隊'}</span>
+              <div className={`team-box visiting ${Number(ticket.game_score.visiting_score) > Number(ticket.game_score.home_score) ? 'is-winner' : ''}`}>
+                <div className="team-meta">
+                  <span className="team-label">客隊</span>
+                  <span className="team-name">{shortenCpblTeamName(ticket.game_score.visiting_team) || '客隊'}</span>
+                </div>
                 {ticket.game_score.status !== 'scheduled' && (
                   <span className="team-score">{ticket.game_score.visiting_score ?? '-'}</span>
                 )}
               </div>
 
               <div className="scoreboard-vs-divider">
-                <span className="vs-text">VS</span>
+                <span className="vs-text">
+                  {ticket.game_score.status === 'finished' ? 'FINAL' : ticket.game_score.status === 'live' ? 'LIVE' : 'VS'}
+                </span>
               </div>
 
-              <div className="team-box home">
+              <div className={`team-box home ${Number(ticket.game_score.home_score) > Number(ticket.game_score.visiting_score) ? 'is-winner' : ''}`}>
                 {ticket.game_score.status !== 'scheduled' && (
                   <span className="team-score">{ticket.game_score.home_score ?? '-'}</span>
                 )}
-                <span className="team-name">{shortenCpblTeamName(ticket.game_score.home_team) || '主隊'}</span>
-                <span className="team-label">主隊</span>
+                <div className="team-meta home-meta">
+                  <span className="team-name">{shortenCpblTeamName(ticket.game_score.home_team) || '主隊'}</span>
+                  <span className="team-label">主隊</span>
+                </div>
               </div>
             </div>
 
             {/* 先發投手資訊 (Starting Pitchers) */}
             {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled' || ticket.game_score.status === 'live') && (
-              <div className="scoreboard-details-footer pitchers-footer">
-                <span className="detail-item">
-                  <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  客隊先發: <strong>{resolveCpblPlayerName(ticket.game_score.visiting_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
-                </span>
-                <span className="detail-item">
-                  <BaseballIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.85 }} />
-                  主隊先發: <strong>{resolveCpblPlayerName(ticket.game_score.home_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}</strong>
-                </span>
+              <div className="scoreboard-starting-pitchers">
+                <div className="pitcher-cell">
+                  <span className="pitcher-label">
+                    <BaseballIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.75 }} />
+                    客隊先發
+                  </span>
+                  <strong className="pitcher-name">
+                    {resolveCpblPlayerName(ticket.game_score.visiting_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}
+                  </strong>
+                </div>
+                <div className="pitcher-divider" />
+                <div className="pitcher-cell">
+                  <span className="pitcher-label">
+                    <BaseballIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.75 }} />
+                    主隊先發
+                  </span>
+                  <strong className="pitcher-name">
+                    {resolveCpblPlayerName(ticket.game_score.home_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}
+                  </strong>
+                </div>
               </div>
             )}
 
-            {/* 完賽勝敗投、救援與 MVP (Game Results) */}
+            {/* 完賽勝敗投、救援與 MVP (Game Results Grid) */}
             {ticket.game_score.status === 'finished' && (ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.closer || ticket.game_score.mvp) && (
-              <div className="scoreboard-details-footer finished-results-footer">
-                {(ticket.game_score.winning_pitcher || ticket.game_score.losing_pitcher || ticket.game_score.closer) && (
-                  <div className="pitchers-row">
-                    {ticket.game_score.winning_pitcher && (
-                      <span className="detail-item win-pitcher">
-                        <TrophyIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                        勝投: <strong>{resolveCpblPlayerName(ticket.game_score.winning_pitcher)}</strong>
-                      </span>
-                    )}
-                    {ticket.game_score.losing_pitcher && (
-                      <span className="detail-item lose-pitcher">
-                        敗投: <strong>{resolveCpblPlayerName(ticket.game_score.losing_pitcher)}</strong>
-                      </span>
-                    )}
-                    {ticket.game_score.closer && (
-                      <span className="detail-item closer-pitcher">
-                        救援: <strong>{resolveCpblPlayerName(ticket.game_score.closer)}</strong>
-                      </span>
-                    )}
+              <div className="scoreboard-results-grid">
+                {ticket.game_score.winning_pitcher && (
+                  <div className="result-chip win-chip">
+                    <span className="chip-label">
+                      <TrophyIcon size="0.95em" style={{ color: 'var(--gold, #ffbe0b)' }} />
+                      勝投
+                    </span>
+                    <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.winning_pitcher)}</strong>
+                  </div>
+                )}
+                {ticket.game_score.losing_pitcher && (
+                  <div className="result-chip lose-chip">
+                    <span className="chip-label">敗投</span>
+                    <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.losing_pitcher)}</strong>
+                  </div>
+                )}
+                {ticket.game_score.closer && (
+                  <div className="result-chip closer-chip">
+                    <span className="chip-label">救援</span>
+                    <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.closer)}</strong>
                   </div>
                 )}
                 {ticket.game_score.mvp && (
-                  <div className="mvp-row">
-                    <span className="detail-item mvp">
-                      <StarIcon style={{ width: '0.95em', height: '0.95em', marginRight: '4px', verticalAlign: 'middle', color: 'var(--gold, #ffbe0b)' }} />
-                      MVP: <strong>{resolveCpblPlayerName(ticket.game_score.mvp)}</strong>
+                  <div className="result-chip mvp-chip">
+                    <span className="chip-label">
+                      <StarIcon style={{ width: '0.95em', height: '0.95em', color: 'var(--gold, #ffbe0b)' }} />
+                      MVP
                     </span>
+                    <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.mvp)}</strong>
                   </div>
                 )}
               </div>

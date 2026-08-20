@@ -1256,12 +1256,32 @@ function App() {
           if (event.source !== '中華職棒' || !event.game_score) return event
 
           const matched = data.games.find((g: any) => {
-            const dateMatch = !g.date || !event.date || g.date === event.date
-            const idMatch = g.game_no && event.id && (event.id.includes(`-${g.game_no}-`) || event.id.endsWith(`-${g.game_no}`))
-            const teamMatch =
-              (event.name.includes(g.visiting_team) || g.visiting_team.includes(event.game_score?.visiting_team || '')) &&
-              (event.name.includes(g.home_team) || g.home_team.includes(event.game_score?.home_team || ''))
-            return idMatch || (dateMatch && teamMatch)
+            if (!g || !event.date || !g.date || event.date !== g.date) {
+              return false
+            }
+
+            // 1. 精準對齊比賽場次 Game Sno (例如 cpbl-2026-276-2026-08-20 對應 276)
+            const eventSnoMatch = event.id ? event.id.match(/cpbl-\d{4}-(\d+)-/) : null
+            const eventSno = eventSnoMatch ? String(Number(eventSnoMatch[1])) : ''
+            const gSno = g.game_no ? String(Number(String(g.game_no).replace(/^\d{4}(\d{1,3})\d{8}$/, '$1'))) : ''
+
+            if (eventSno && gSno && eventSno === gSno) {
+              return true
+            }
+
+            // 2. 嚴格比對主客隊名稱 (必須同時匹配兩隊)
+            const vTeam = (g.visiting_team || '').trim()
+            const hTeam = (g.home_team || '').trim()
+            if (!vTeam || !hTeam) return false
+
+            const eventName = event.name || ''
+            const oldVis = (event.game_score?.visiting_team || '').trim()
+            const oldHome = (event.game_score?.home_team || '').trim()
+
+            const vMatch = eventName.includes(vTeam) || (oldVis && (vTeam.includes(oldVis) || oldVis.includes(vTeam)))
+            const hMatch = eventName.includes(hTeam) || (oldHome && (hTeam.includes(oldHome) || oldHome.includes(hTeam)))
+
+            return Boolean(vMatch && hMatch)
           })
 
           if (matched) {
