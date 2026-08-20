@@ -226,8 +226,12 @@ async function handleCpblLiveScores() {
         statusText = "已完賽";
       }
 
+      const rawSno = String(g.GameSno || "").trim();
+      const snoMatch = rawSno.match(/^\d{4}(\d{1,3})\d{8}$/);
+      const cleanGameNo = snoMatch ? String(parseInt(snoMatch[1], 10)) : (/^\d{1,3}$/.test(rawSno) ? rawSno : rawSno);
+
       return {
-        game_no: String(g.GameSno || ""),
+        game_no: cleanGameNo,
         date: (g.GameDateTimeS || "").substring(0, 10),
         visiting_team: (g.VisitingTeamName || "").replace(/\u200B/g, "").trim(),
         home_team: (g.HomeTeamName || "").replace(/\u200B/g, "").trim(),
