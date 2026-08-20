@@ -594,3 +594,10 @@ export const TrophyIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
     <path d="M18 4H6v7a6 6 0 0 0 12 0V4z" />
   </svg>
 );
+
+// 🛡️ Shield Icon
+export const ShieldIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+  </svg>
+);

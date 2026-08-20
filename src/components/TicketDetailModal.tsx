@@ -17,7 +17,7 @@ import {
   CommentIcon,
   RocketIcon
 } from './Icons'
-import { BaseballIcon, TrophyIcon, RefreshIcon } from './SvgIcon'
+import { BaseballIcon, TrophyIcon, RefreshIcon, ShieldIcon } from './SvgIcon'
 import { shortenCpblTeamName, resolveCpblPlayerName } from '../utils/cpblUtils'
 
 interface TicketDetailModalProps {
@@ -519,8 +519,8 @@ export function TicketDetailModal({
               <div className="scoreboard-starting-pitchers">
                 <div className="pitcher-cell">
                   <span className="pitcher-label">
-                    <BaseballIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.75 }} />
-                    客隊先發
+                    <BaseballIcon size="0.85em" style={{ marginRight: '3px', opacity: 0.75 }} />
+                    客先發
                   </span>
                   <strong className="pitcher-name">
                     {resolveCpblPlayerName(ticket.game_score.visiting_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}
@@ -529,8 +529,8 @@ export function TicketDetailModal({
                 <div className="pitcher-divider" />
                 <div className="pitcher-cell">
                   <span className="pitcher-label">
-                    <BaseballIcon size="0.9em" style={{ marginRight: '4px', verticalAlign: 'middle', opacity: 0.75 }} />
-                    主隊先發
+                    <BaseballIcon size="0.85em" style={{ marginRight: '3px', opacity: 0.75 }} />
+                    主先發
                   </span>
                   <strong className="pitcher-name">
                     {resolveCpblPlayerName(ticket.game_score.home_pitcher) || (ticket.game_score.status === 'finished' ? '未登錄' : '賽前公告')}
@@ -553,13 +553,19 @@ export function TicketDetailModal({
                 )}
                 {ticket.game_score.losing_pitcher && (
                   <div className="result-chip lose-chip">
-                    <span className="chip-label">敗投</span>
+                    <span className="chip-label">
+                      <BaseballIcon size="0.85em" style={{ opacity: 0.6 }} />
+                      敗投
+                    </span>
                     <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.losing_pitcher)}</strong>
                   </div>
                 )}
                 {ticket.game_score.closer && (
                   <div className="result-chip closer-chip">
-                    <span className="chip-label">救援</span>
+                    <span className="chip-label">
+                      <ShieldIcon size="0.9em" style={{ color: '#2dd4bf' }} />
+                      救援
+                    </span>
                     <strong className="chip-val">{resolveCpblPlayerName(ticket.game_score.closer)}</strong>
                   </div>
                 )}
