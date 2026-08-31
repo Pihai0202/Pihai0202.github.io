@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-08-31T04:29:08.277598+00:00",
-  "count": 657,
+  "updated_at": "2026-08-31T11:08:28.187872+00:00",
+  "count": 662,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -1434,7 +1434,7 @@
         "home_pitcher": "鄭浩均",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "後勁",
+        "mvp": "＃後勁",
         "winning_pitcher": "後勁",
         "losing_pitcher": "鄭浩均",
         "closer": ""
@@ -1514,7 +1514,7 @@
         "home_pitcher": "羅戈",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "王維中",
+        "mvp": "＃王維中",
         "winning_pitcher": "王維中",
         "losing_pitcher": "羅戈",
         "closer": ""
@@ -3634,7 +3634,7 @@
         "home_pitcher": "鈴木駿輔",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "高國麟",
+        "mvp": "#高國麟",
         "winning_pitcher": "曾峻岳",
         "losing_pitcher": "林鋅杰",
         "closer": ""
@@ -6714,7 +6714,7 @@
         "home_pitcher": "王維中",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "王維中",
+        "mvp": "＃王維中",
         "winning_pitcher": "王維中",
         "losing_pitcher": "伍立辰",
         "closer": ""
@@ -7354,7 +7354,7 @@
         "home_pitcher": "伍立辰",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "許基宏",
+        "mvp": "#許基宏",
         "winning_pitcher": "伍立辰",
         "losing_pitcher": "阿部雄大",
         "closer": "李振昌"
@@ -7434,7 +7434,7 @@
         "home_pitcher": "榊原元稀",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "王翾祐",
+        "mvp": "#王翾祐",
         "winning_pitcher": "林詔恩",
         "losing_pitcher": "榊原元稀",
         "closer": "鍾允華"
@@ -12354,7 +12354,7 @@
         "home_pitcher": "鈴木駿輔",
         "status": "finished",
         "status_text": "已完賽",
-        "mvp": "後勁",
+        "mvp": "＃後勁",
         "winning_pitcher": "後勁",
         "losing_pitcher": "鈴木駿輔",
         "closer": "黃群"
@@ -12750,8 +12750,8 @@
         "home_team": "富邦悍將",
         "visiting_score": "-",
         "home_score": "-",
-        "visiting_pitcher": "",
-        "home_pitcher": "",
+        "visiting_pitcher": "銳力獅",
+        "home_pitcher": "魔力藍",
         "status": "scheduled",
         "status_text": "未開打",
         "mvp": "",
@@ -12790,8 +12790,8 @@
         "home_team": "台鋼雄鷹",
         "visiting_score": "-",
         "home_score": "-",
-        "visiting_pitcher": "",
-        "home_pitcher": "",
+        "visiting_pitcher": "羅戈",
+        "home_pitcher": "坎南",
         "status": "scheduled",
         "status_text": "未開打",
         "mvp": "",
@@ -13297,7 +13297,7 @@
       ]
     },
     {
-      "id": "kham-14126111",
+      "id": "kham-2522773",
       "source": "寬宏售票",
       "name": "2026 HYERI ASIA TOUR FANMEETING〈HYERIDE〉IN TAIPEI",
       "venue_raw": "台北國際會議中心",
@@ -13306,13 +13306,13 @@
       "city": "台北",
       "date": "2026-09-05",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1C5ADO5_Large.JPG?v=202608301119",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1C5ADO5",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1C5ADO5#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1C5ADO5"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1C5ADO5#"
         }
       ]
     },
@@ -13673,7 +13673,27 @@
       ]
     },
     {
-      "id": "kham-2856583",
+      "id": "ibon-5575777",
+      "source": "ibon售票",
+      "name": "Enemies With Benefits 1st Fan meeting in Taipei",
+      "venue_raw": "Zepp New Taipei宏匯廣場",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-09-06",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_bcBCiRlgbCwFkUItvQluD4TXW00hcr.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39736",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39736"
+        }
+      ]
+    },
+    {
+      "id": "kham-14309836",
       "source": "寬宏售票",
       "name": "梁文音 2026《約哪幾點？》讚聲演唱會-台中場",
       "venue_raw": "Legacy Taichung",
@@ -14161,7 +14181,7 @@
       ]
     },
     {
-      "id": "kham-13646661",
+      "id": "kham-5924980",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -14527,7 +14547,7 @@
       ]
     },
     {
-      "id": "ibon-4680875",
+      "id": "ibon-1560525",
       "source": "ibon售票",
       "name": "2026 蔡琴 不要告別 巡迴演唱會〔台北返場〕",
       "venue_raw": "台北國際會議中心",
@@ -14535,7 +14555,7 @@
       "venue_name": "台北國際會議中心",
       "city": "台北",
       "date": "2026-09-12",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_tld4kxZysdFIZWkGfQwBsAbXQXOZxx.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559",
       "price": "",
       "ticket_links": [
@@ -14547,7 +14567,7 @@
       ]
     },
     {
-      "id": "kham-11175818",
+      "id": "kham-14643605",
       "source": "寬宏售票",
       "name": "EPEX 4th CONCERT〈ECHO〉IN TAIPEI",
       "venue_raw": "全台場館",
@@ -14556,13 +14576,13 @@
       "city": "",
       "date": "2026-09-12",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DXEGM5_Large.JPG?v=202608301115",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DXEGM5"
         }
       ]
     },
@@ -14871,7 +14891,7 @@
       ]
     },
     {
-      "id": "ibon-1878037",
+      "id": "ibon-9066874",
       "source": "ibon售票",
       "name": "2026 蔡琴 不要告別 巡迴演唱會〔台北返場〕",
       "venue_raw": "台北國際會議中心",
@@ -14879,7 +14899,7 @@
       "venue_name": "台北國際會議中心",
       "city": "台北",
       "date": "2026-09-13",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_tld4kxZysdFIZWkGfQwBsAbXQXOZxx.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559",
       "price": "",
       "ticket_links": [
@@ -14887,6 +14907,26 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559"
+        }
+      ]
+    },
+    {
+      "id": "ibon-7053192",
+      "source": "ibon售票",
+      "name": "2026 ONF FANMEETING 〔Door To TAIPEI〕\t\t\t\t\t\t\t",
+      "venue_raw": "HANASPACE",
+      "venue_id": "unknown",
+      "venue_name": "HANASPACE",
+      "city": "",
+      "date": "2026-09-13",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_I2WBQjTygXmscQaKOJGVDy1kVBUoTM.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39847",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39847"
         }
       ]
     },
@@ -15515,27 +15555,7 @@
       ]
     },
     {
-      "id": "ibon-15269380",
-      "source": "ibon售票",
-      "name": "歐陸暗黑奇女子Molly Nilsson Live in Taipei 2026",
-      "venue_raw": "台北野地方 Wildlab",
-      "venue_id": "unknown",
-      "venue_name": "台北野地方 Wildlab",
-      "city": "",
-      "date": "2026-09-18",
-      "image": "",
-      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39863",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "ibon",
-          "name": "ibon售票",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39863"
-        }
-      ]
-    },
-    {
-      "id": "ibon-6679102",
+      "id": "ibon-2071620",
       "source": "ibon售票",
       "name": "2026 蔡琴 不要告別 巡迴演唱會〔台北返場〕",
       "venue_raw": "台北國際會議中心",
@@ -15543,7 +15563,7 @@
       "venue_name": "台北國際會議中心",
       "city": "台北",
       "date": "2026-09-18",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_tld4kxZysdFIZWkGfQwBsAbXQXOZxx.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559",
       "price": "",
       "ticket_links": [
@@ -15551,6 +15571,26 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559"
+        }
+      ]
+    },
+    {
+      "id": "ibon-4518749",
+      "source": "ibon售票",
+      "name": "歐陸暗黑奇女子Molly Nilsson Live in Taipei 2026",
+      "venue_raw": "台北野地方 Wildlab",
+      "venue_id": "unknown",
+      "venue_name": "台北野地方 Wildlab",
+      "city": "",
+      "date": "2026-09-18",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_FeAXdBFMasPhXr6qXR2956sFLhwhDC.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39863",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39863"
         }
       ]
     },
@@ -15837,27 +15877,7 @@
       ]
     },
     {
-      "id": "ibon-5901642",
-      "source": "ibon售票",
-      "name": "2026 N.Flying LIVE ‘＆CON5：into REM’ IN TAIPEI",
-      "venue_raw": "新北工商展覽中心",
-      "venue_id": "unknown",
-      "venue_name": "新北工商展覽中心",
-      "city": "",
-      "date": "2026-09-19",
-      "image": "",
-      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39783",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "ibon",
-          "name": "ibon售票",
-          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39783"
-        }
-      ]
-    },
-    {
-      "id": "ibon-7378953",
+      "id": "ibon-12878099",
       "source": "ibon售票",
       "name": "2026 蔡琴 不要告別 巡迴演唱會〔台北返場〕",
       "venue_raw": "台北國際會議中心",
@@ -15865,7 +15885,7 @@
       "venue_name": "台北國際會議中心",
       "city": "台北",
       "date": "2026-09-19",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_tld4kxZysdFIZWkGfQwBsAbXQXOZxx.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39559",
       "price": "",
       "ticket_links": [
@@ -15877,7 +15897,47 @@
       ]
     },
     {
-      "id": "kham-7873337",
+      "id": "ibon-10735256",
+      "source": "ibon售票",
+      "name": "2026 N.Flying LIVE ‘＆CON5：into REM’ IN TAIPEI",
+      "venue_raw": "新北工商展覽中心",
+      "venue_id": "unknown",
+      "venue_name": "新北工商展覽中心",
+      "city": "",
+      "date": "2026-09-19",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_m1FuQjg6rNSPTCMF4K1oJ0FAd6eLEk.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39783",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39783"
+        }
+      ]
+    },
+    {
+      "id": "ibon-12915944",
+      "source": "ibon售票",
+      "name": "FayeAtom 1st fan meeting in Kaohsiung",
+      "venue_raw": "高雄萬豪酒店宴會廳8樓",
+      "venue_id": "unknown",
+      "venue_name": "高雄萬豪酒店宴會廳8樓",
+      "city": "",
+      "date": "2026-09-19",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_5jNpMmjmZ9o6puy77yvPx1UhemwRrN.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39866",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39866"
+        }
+      ]
+    },
+    {
+      "id": "kham-13312846",
       "source": "寬宏售票",
       "name": "【單買門票】漢斯·季默傳奇音樂會《全新境界》HANS ZIMMER LIVE-THE NEXT LEVEL IN KAOHSIUNG＆TAIPEI",
       "venue_raw": "小巨蛋",
@@ -15886,18 +15946,18 @@
       "city": "台北",
       "date": "2026-09-19",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1AQ3JFF_Large.JPG?v=202608301121",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF#"
         }
       ]
     },
     {
-      "id": "kham-4105934",
+      "id": "kham-13218342",
       "source": "寬宏售票",
       "name": "蕭煌奇2026〈BRAVO〉演唱會 台北小巨蛋",
       "venue_raw": "小巨蛋",
@@ -16265,7 +16325,7 @@
       ]
     },
     {
-      "id": "ibon-8933551",
+      "id": "ibon-5066063",
       "source": "ibon售票",
       "name": "2026 N.Flying LIVE ‘＆CON5：into REM’ IN TAIPEI",
       "venue_raw": "新北工商展覽中心",
@@ -16273,7 +16333,7 @@
       "venue_name": "新北工商展覽中心",
       "city": "",
       "date": "2026-09-20",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_m1FuQjg6rNSPTCMF4K1oJ0FAd6eLEk.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39783",
       "price": "",
       "ticket_links": [
@@ -16285,7 +16345,27 @@
       ]
     },
     {
-      "id": "kham-5973369",
+      "id": "kham-241379",
+      "source": "寬宏售票",
+      "name": "【單買門票】漢斯·季默傳奇音樂會《全新境界》HANS ZIMMER LIVE-THE NEXT LEVEL IN KAOHSIUNG＆TAIPEI",
+      "venue_raw": "小巨蛋",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-09-20",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1AQ3JFF_Large.JPG?v=202608301121",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF#"
+        }
+      ]
+    },
+    {
+      "id": "kham-15085104",
       "source": "寬宏售票",
       "name": "【BAND-MAID WORLD TOUR 2026 in Taipei】",
       "venue_raw": "Legacy TERA",
@@ -16301,26 +16381,6 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFM#"
-        }
-      ]
-    },
-    {
-      "id": "kham-15840087",
-      "source": "寬宏售票",
-      "name": "【單買門票】漢斯·季默傳奇音樂會《全新境界》HANS ZIMMER LIVE-THE NEXT LEVEL IN KAOHSIUNG＆TAIPEI",
-      "venue_raw": "小巨蛋",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
-      "date": "2026-09-20",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1AQ3JFF_Large.JPG?v=202608301121",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1AQ3JFF"
         }
       ]
     },
@@ -16869,7 +16929,7 @@
       ]
     },
     {
-      "id": "ibon-14245455",
+      "id": "ibon-5864248",
       "source": "ibon售票",
       "name": "2026 ByeonWooSeok Asia Fanmeeting Tour ＜The Secret Library＞ in Taipei",
       "venue_raw": "國立體育大學綜合體育館（林口體育館）",
@@ -16877,7 +16937,7 @@
       "venue_name": "林口體育館",
       "city": "新北",
       "date": "2026-09-25",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_hgERNlP76MYLHLrqVcbVgNvgAGV39o.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39759",
       "price": "",
       "ticket_links": [
@@ -17089,7 +17149,7 @@
       ]
     },
     {
-      "id": "kham-2302422",
+      "id": "kham-12863767",
       "source": "寬宏售票",
       "name": "舞台劇〈你來的時候〉",
       "venue_raw": "歌劇院",
@@ -17819,7 +17879,7 @@
       ]
     },
     {
-      "id": "ibon-1325574",
+      "id": "ibon-11099758",
       "source": "ibon售票",
       "name": "江美琪《傷心唱出來就沒事了》演唱會 2‧0 台北站",
       "venue_raw": "Zepp New Taipei",
@@ -17827,7 +17887,7 @@
       "venue_name": "Zepp New Taipei",
       "city": "新北",
       "date": "2026-10-02",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_OoDE5co1H3ECk1NZs8sZGnVeYI65cb.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39707",
       "price": "",
       "ticket_links": [
@@ -17839,7 +17899,7 @@
       ]
     },
     {
-      "id": "kham-7265342",
+      "id": "kham-1158614",
       "source": "寬宏售票",
       "name": "【單買門票】FEniX BBM-2026 FAN CONCERT",
       "venue_raw": "Legacy TERA",
@@ -17941,7 +18001,7 @@
       ]
     },
     {
-      "id": "ibon-188780",
+      "id": "ibon-3634650",
       "source": "ibon售票",
       "name": "江美琪《傷心唱出來就沒事了》演唱會 2‧0 台北站",
       "venue_raw": "Zepp New Taipei",
@@ -17949,7 +18009,7 @@
       "venue_name": "Zepp New Taipei",
       "city": "新北",
       "date": "2026-10-03",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_OoDE5co1H3ECk1NZs8sZGnVeYI65cb.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39707",
       "price": "",
       "ticket_links": [
@@ -17961,7 +18021,7 @@
       ]
     },
     {
-      "id": "kham-7462242",
+      "id": "kham-4472674",
       "source": "寬宏售票",
       "name": "國泰世華銀行 彭佳慧《數著時間的日子》巡迴演唱會",
       "venue_raw": "小巨蛋",
@@ -17970,13 +18030,13 @@
       "city": "台北",
       "date": "2026-10-03",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1D3G65D_Large.JPG?v=202608301116",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D#"
         }
       ]
     },
@@ -18223,7 +18283,27 @@
       ]
     },
     {
-      "id": "kham-1576092",
+      "id": "kham-453168",
+      "source": "寬宏售票",
+      "name": "2026吉卜力動畫音樂原唱歌手交響演唱會",
+      "venue_raw": "小巨蛋",
+      "venue_id": "taipei-arena",
+      "venue_name": "小巨蛋",
+      "city": "台北",
+      "date": "2026-10-04",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1D3G65E_Large.JPG?v=202608301116",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65E",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65E"
+        }
+      ]
+    },
+    {
+      "id": "kham-1842860",
       "source": "寬宏售票",
       "name": "2026 KPOP PRIME",
       "venue_raw": "林口體育館",
@@ -18239,26 +18319,6 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1C2RGU6"
-        }
-      ]
-    },
-    {
-      "id": "kham-9768102",
-      "source": "寬宏售票",
-      "name": "2026吉卜力動畫音樂原唱歌手交響演唱會",
-      "venue_raw": "小巨蛋",
-      "venue_id": "taipei-arena",
-      "venue_name": "小巨蛋",
-      "city": "台北",
-      "date": "2026-10-04",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1D3G65E_Large.JPG?v=202608301116",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65E#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65E#"
         }
       ]
     },
@@ -18975,7 +19035,7 @@
       ]
     },
     {
-      "id": "kham-10469209",
+      "id": "kham-7589089",
       "source": "寬宏售票",
       "name": "郭子&浮花樂隊 原來的那首歌 Live in Legacy Taipei",
       "venue_raw": "Legacy Taipei",
@@ -18984,13 +19044,13 @@
       "city": "台北",
       "date": "2026-10-16",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E3_Large.JPG?v=202608301115",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E3"
         }
       ]
     },
@@ -19017,7 +19077,7 @@
       ]
     },
     {
-      "id": "kham-1168933",
+      "id": "kham-12645253",
       "source": "寬宏售票",
       "name": "【單買門票】XG世界巡迴演唱會 THE CORE 台北站 XG WORLD TOUR: THE CORE IN TAIPEI",
       "venue_raw": "小巨蛋",
@@ -19026,13 +19086,13 @@
       "city": "台北",
       "date": "2026-10-17",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P196NO67_Large.JPG?v=202608301122",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P196NO67#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P196NO67",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P196NO67#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P196NO67"
         }
       ]
     },
@@ -19181,6 +19241,26 @@
       ]
     },
     {
+      "id": "ibon-16013459",
+      "source": "ibon售票",
+      "name": "LenaMiu Love Meets You Fan Meeting in Taipei",
+      "venue_raw": "Legacy TERA",
+      "venue_id": "taipei-music-center",
+      "venue_name": "Legacy TERA",
+      "city": "台北",
+      "date": "2026-10-23",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_q98pY5lWtIs0aVs8ytQ7vJWkDBu9F6.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39878",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39878"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-f48ffe293f97e29747fe9f9d384efbf6-75dc7359c8dc281b92441c806bcadb3f",
       "source": "遠大售票",
       "name": "誰說我不在乎　高明駿2026演唱會-台北站",
@@ -19303,7 +19383,7 @@
       ]
     },
     {
-      "id": "kham-11799539",
+      "id": "kham-16235578",
       "source": "寬宏售票",
       "name": "【10/24場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -19429,7 +19509,7 @@
       ]
     },
     {
-      "id": "kham-11790005",
+      "id": "kham-8536626",
       "source": "寬宏售票",
       "name": "【10/25場次】MUSIC EXPO LIVE 2026 in TAIPEI",
       "venue_raw": "小巨蛋",
@@ -19438,13 +19518,13 @@
       "city": "台北",
       "date": "2026-10-25",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1CXXK2O_Large.JPG?v=202608301118",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1CXXK2O#"
         }
       ]
     },
@@ -19635,6 +19715,26 @@
       ]
     },
     {
+      "id": "ibon-220290",
+      "source": "ibon售票",
+      "name": "《暗喻幻想》Metaphor：ReFantazio 交響音樂會",
+      "venue_raw": "高雄文化中心 至德堂",
+      "venue_id": "unknown",
+      "venue_name": "高雄文化中心 至德堂",
+      "city": "",
+      "date": "2026-10-31",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_GPh1YfxnpjS5gKuvPYjJxFrVjWHZON.jpg",
+      "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39692",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "ibon",
+          "name": "ibon售票",
+          "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39692"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv0404354-2026-10-31",
       "source": "iNDIEVOX",
       "name": "X-Formosa 2026 彩虹音樂節",
@@ -19801,7 +19901,7 @@
       ]
     },
     {
-      "id": "ibon-3049357",
+      "id": "ibon-13318775",
       "source": "ibon售票",
       "name": "Blush Blossom Fan Fest 2026 in Kaohsiung",
       "venue_raw": "高雄流行音樂中心 海音館",
@@ -19809,7 +19909,7 @@
       "venue_name": "高雄流行音樂中心",
       "city": "高雄",
       "date": "2026-11-07",
-      "image": "",
+      "image": "https://ticket.ibon.com.tw/image/ActivityImage/ActivityImage_QFLT7sKuL19JfX3mkiRRrsJZDwNsdi.jpg",
       "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39903",
       "price": "",
       "ticket_links": [
@@ -19821,7 +19921,7 @@
       ]
     },
     {
-      "id": "kham-3661266",
+      "id": "kham-16383220",
       "source": "寬宏售票",
       "name": "2026 小宇 宋念宇《不，完美的人》演唱會",
       "venue_raw": "臺北流行音樂中心",
@@ -19830,18 +19930,18 @@
       "city": "台北",
       "date": "2026-11-07",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E2_Large.JPG?v=202608301115",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#"
         }
       ]
     },
     {
-      "id": "kham-1703047",
+      "id": "kham-7871893",
       "source": "寬宏售票",
       "name": "2026玖壹壹南北貳路音樂節",
       "venue_raw": "全台場館",
@@ -19849,7 +19949,7 @@
       "venue_name": "全台場館",
       "city": "",
       "date": "2026-11-07",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1ENTKEA_Large.JPG?v=202608301114",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1ENTKEA_Large.JPG?v=202608311846",
       "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1ENTKEA#",
       "price": "",
       "ticket_links": [
@@ -19861,7 +19961,7 @@
       ]
     },
     {
-      "id": "kham-15977862",
+      "id": "kham-11887559",
       "source": "寬宏售票",
       "name": "2026玖壹壹南北貳路音樂節",
       "venue_raw": "全台場館",
@@ -19869,7 +19969,7 @@
       "venue_name": "全台場館",
       "city": "",
       "date": "2026-11-08",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1ENTKEA_Large.JPG?v=202608301114",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1ENTKEA_Large.JPG?v=202608311846",
       "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1ENTKEA#",
       "price": "",
       "ticket_links": [
@@ -20233,7 +20333,7 @@
       ]
     },
     {
-      "id": "kham-10500748",
+      "id": "kham-12890207",
       "source": "寬宏售票",
       "name": "國泰世華銀行 彭佳慧《數著時間的日子》巡迴演唱會",
       "venue_raw": "小巨蛋",
@@ -20242,13 +20342,13 @@
       "city": "台北",
       "date": "2026-11-21",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1D3G65D_Large.JPG?v=202608301116",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1D3G65D#"
         }
       ]
     },
@@ -20971,7 +21071,7 @@
       ]
     },
     {
-      "id": "kham-6593391",
+      "id": "kham-7556529",
       "source": "寬宏售票",
       "name": "【2/27場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
       "venue_raw": "高雄國家體育場",
@@ -20991,7 +21091,7 @@
       ]
     },
     {
-      "id": "kham-8398044",
+      "id": "kham-8514656",
       "source": "寬宏售票",
       "name": "【2/28場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
       "venue_raw": "高雄國家體育場",
