@@ -57,5 +57,11 @@ service cloud.firestore {
                     && request.resource.data.avatarColor is string;
       allow update, delete: if false;
     }
+
+    // 4. System Venues: Allow anyone to read, allow create/update/delete for venue administration.
+    match /venues/{venueId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

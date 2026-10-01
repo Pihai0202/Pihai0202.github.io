@@ -1,6 +1,19 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
-import { useTranslation, translateCityName } from '../utils/i18n.tsx'
-import { WarningIcon, TrainIcon, BusIcon, RefreshIcon, ChevronDownIcon } from './SvgIcon'
+import type { Venue } from '../types'
+import { useTranslation, translateCityName, translateVenueName } from '../utils/i18n.tsx'
+import { getVenueTransit } from '../utils/venueTransit'
+import {
+  WarningIcon,
+  TrainIcon,
+  BusIcon,
+  RefreshIcon,
+  ChevronDownIcon,
+  PinIcon,
+  CloseIcon,
+  HsrIcon,
+  LightbulbIcon,
+  GreenDotIcon,
+} from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
 
@@ -25,6 +38,7 @@ interface TrainQueryResult {
   duration: string
   isExpress: boolean
   status: string
+  isDelayed?: boolean
 }
 
 interface BusStopInfo {
@@ -182,6 +196,7 @@ const translateTraStation = (st: string, lang: string) => {
     '斗六': { en: 'Douliu', ja: '斗六', ko: '두류' },
     '嘉義': { en: 'Chiayi', ja: '嘉義', ko: '자이' },
     '新營': { en: 'Xinying', ja: '新営', ko: '신잉' },
+    '永康': { en: 'Yongkang', ja: '永康', ko: '융캉' },
     '台南': { en: 'Tainan', ja: '台南', ko: '타이난' },
     '岡山': { en: 'Gangshan', ja: '岡山', ko: '강산' },
     '新左營': { en: 'Xinzuoying', ja: '新左営', ko: '신쭤잉' },
@@ -205,19 +220,69 @@ const THSR_STATION_IDS: Record<string, string> = {
 
 const TRA_STATION_IDS: Record<string, string> = {
   '基隆': '0900', '七堵': '0930', '汐止': '0960', '南港': '0980', '松山': '0990',
-  '台北': '1000', '萬華': '1010', '板橋': '1020', '樹林': '1040', '鶯歌': '1060', '桃園': '1080',
-  '中壢': '1100', '新竹': '1210', '竹南': '1250', '苗栗': '1300', '豐原': '1400',
-  '台中': '1450', '彰化': '1120', '員林': '1150', '斗六': '1210', '嘉義': '1228',
-  '新營': '1238', '台南': '1278', '岡山': '1308', '新左營': '1318', '高雄': '1408',
-  '屏東': '1418', '潮州': '1428', '宜蘭': '1810', '羅東': '1820', '花蓮': '2300', '台東': '6000'
+  '台北': '1000', '萬華': '1010', '板橋': '1020', '樹林': '1040', '鶯歌': '1070', '桃園': '1080',
+  '中壢': '1100', '新竹': '1210', '竹南': '1250', '苗栗': '3160', '豐原': '3230',
+  '台中': '3300', '彰化': '3360', '員林': '3390', '斗六': '3470', '嘉義': '4080',
+  '新營': '4120', '永康': '4200', '台南': '4220', '岡山': '4310', '新左營': '4340', '高雄': '4400',
+  '屏東': '5000', '潮州': '5050', '宜蘭': '7190', '羅東': '7160', '花蓮': '7000', '台東': '6000'
 }
+
+const STATIC_TRA_STATIONS: TdxTraStation[] = [
+  { StationID: '0900', StationName: { Zh_tw: '基隆', En: 'Keelung' }, LocationCity: '基隆市' },
+  { StationID: '0930', StationName: { Zh_tw: '七堵', En: 'Qidu' }, LocationCity: '基隆市' },
+  { StationID: '0960', StationName: { Zh_tw: '汐止', En: 'Xizhi' }, LocationCity: '新北市' },
+  { StationID: '0980', StationName: { Zh_tw: '南港', En: 'Nangang' }, LocationCity: '台北市' },
+  { StationID: '0990', StationName: { Zh_tw: '松山', En: 'Songshan' }, LocationCity: '台北市' },
+  { StationID: '1000', StationName: { Zh_tw: '台北', En: 'Taipei' }, LocationCity: '台北市' },
+  { StationID: '1010', StationName: { Zh_tw: '萬華', En: 'Wanhua' }, LocationCity: '台北市' },
+  { StationID: '1020', StationName: { Zh_tw: '板橋', En: 'Banqiao' }, LocationCity: '新北市' },
+  { StationID: '1040', StationName: { Zh_tw: '樹林', En: 'Shulin' }, LocationCity: '新北市' },
+  { StationID: '1070', StationName: { Zh_tw: '鶯歌', En: 'Yingge' }, LocationCity: '新北市' },
+  { StationID: '1080', StationName: { Zh_tw: '桃園', En: 'Taoyuan' }, LocationCity: '桃園市' },
+  { StationID: '1100', StationName: { Zh_tw: '中壢', En: 'Zhongli' }, LocationCity: '桃園市' },
+  { StationID: '1210', StationName: { Zh_tw: '新竹', En: 'Hsinchu' }, LocationCity: '新竹市' },
+  { StationID: '1250', StationName: { Zh_tw: '竹南', En: 'Zhunan' }, LocationCity: '苗栗縣' },
+  { StationID: '3160', StationName: { Zh_tw: '苗栗', En: 'Miaoli' }, LocationCity: '苗栗縣' },
+  { StationID: '3230', StationName: { Zh_tw: '豐原', En: 'Fengyuan' }, LocationCity: '台中市' },
+  { StationID: '3300', StationName: { Zh_tw: '台中', En: 'Taichung' }, LocationCity: '台中市' },
+  { StationID: '3360', StationName: { Zh_tw: '彰化', En: 'Changhua' }, LocationCity: '彰化縣' },
+  { StationID: '3390', StationName: { Zh_tw: '員林', En: 'Yuanlin' }, LocationCity: '彰化縣' },
+  { StationID: '3470', StationName: { Zh_tw: '斗六', En: 'Douliu' }, LocationCity: '雲林縣' },
+  { StationID: '4080', StationName: { Zh_tw: '嘉義', En: 'Chiayi' }, LocationCity: '嘉義市' },
+  { StationID: '4120', StationName: { Zh_tw: '新營', En: 'Xinying' }, LocationCity: '台南市' },
+  { StationID: '4200', StationName: { Zh_tw: '永康', En: 'Yongkang' }, LocationCity: '台南市' },
+  { StationID: '4220', StationName: { Zh_tw: '台南', En: 'Tainan' }, LocationCity: '台南市' },
+  { StationID: '4310', StationName: { Zh_tw: '岡山', En: 'Gangshan' }, LocationCity: '高雄市' },
+  { StationID: '4340', StationName: { Zh_tw: '新左營', En: 'Xinzuoying' }, LocationCity: '高雄市' },
+  { StationID: '4400', StationName: { Zh_tw: '高雄', En: 'Kaohsiung' }, LocationCity: '高雄市' },
+  { StationID: '5000', StationName: { Zh_tw: '屏東', En: 'Pingtung' }, LocationCity: '屏東縣' },
+  { StationID: '5050', StationName: { Zh_tw: '潮州', En: 'Chaozhou' }, LocationCity: '屏東縣' },
+  { StationID: '7190', StationName: { Zh_tw: '宜蘭', En: 'Yilan' }, LocationCity: '宜蘭縣' },
+  { StationID: '7160', StationName: { Zh_tw: '羅東', En: 'Luodong' }, LocationCity: '宜蘭縣' },
+  { StationID: '7000', StationName: { Zh_tw: '花蓮', En: 'Hualien' }, LocationCity: '花蓮縣' },
+  { StationID: '6000', StationName: { Zh_tw: '台東', En: 'Taitung' }, LocationCity: '台東縣' },
+]
 
 const COUNTIES = [
   { id: 'Taipei', name: '台北市' },
   { id: 'NewTaipei', name: '新北市' },
+  { id: 'Taoyuan', name: '桃園市' },
   { id: 'Taichung', name: '台中市' },
-  { id: 'Kaohsiung', name: '高雄市' },
   { id: 'Tainan', name: '台南市' },
+  { id: 'Kaohsiung', name: '高雄市' },
+  { id: 'Hsinchu', name: '新竹市' },
+  { id: 'HsinchuCounty', name: '新竹縣' },
+  { id: 'ChanghuaCounty', name: '彰化縣' },
+  { id: 'YunlinCounty', name: '雲林縣' },
+  { id: 'Chiayi', name: '嘉義市' },
+  { id: 'ChiayiCounty', name: '嘉義縣' },
+  { id: 'HualienCounty', name: '花蓮縣' },
+  { id: 'TaitungCounty', name: '台東縣' },
+  { id: 'Keelung', name: '基隆市' },
+  { id: 'YilanCounty', name: '宜蘭縣' },
+  { id: 'MiaoliCounty', name: '苗栗縣' },
+  { id: 'NantouCounty', name: '南投縣' },
+  { id: 'PingtungCounty', name: '屏東縣' },
 ]
 
 const METRO_OPERATORS = [
@@ -439,11 +504,11 @@ let traStationCache: TdxTraStation[] | null = null
 
 function getTraStationFromLS(): TdxTraStation[] | null {
   try {
-    const raw = localStorage.getItem('tra_stations_data')
+    const raw = localStorage.getItem('tra_stations_data_v2')
     if (!raw) return null
     const { data, expiry } = JSON.parse(raw) as { data: TdxTraStation[]; expiry: number }
     if (Date.now() > expiry) {
-      localStorage.removeItem('tra_stations_data')
+      localStorage.removeItem('tra_stations_data_v2')
       return null
     }
     return data
@@ -455,7 +520,7 @@ function getTraStationFromLS(): TdxTraStation[] | null {
 function setTraStationToLS(stations: TdxTraStation[]) {
   try {
     localStorage.setItem(
-      'tra_stations_data',
+      'tra_stations_data_v2',
       JSON.stringify({ data: stations, expiry: Date.now() + STATION_LS_TTL_MS })
     )
   } catch { /* ignore */ }
@@ -611,7 +676,12 @@ const convertTmrtStationId = (stationId: string): string => {
   return mapping[stationId] || stationId
 }
 
-export function TransitInfoBoard() {
+export interface TransitInfoBoardProps {
+  selectedVenue?: Venue | null
+  onClearVenue?: () => void
+}
+
+export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoardProps = {}) {
   const { t, lang } = useTranslation()
   const [tdxActive, setTdxActive] = useState(false)
   const [selectedService, setSelectedService] = useState('trtc')
@@ -634,7 +704,7 @@ export function TransitInfoBoard() {
   const [traQueryMode, setTraQueryMode] = useState<'od' | 'live'>('od')
   const [traOriginStationID, setTraOriginStationID] = useState('1000') // 台北
   const [traDestinationStationID, setTraDestinationStationID] = useState('1020') // 板橋
-  const [traStations, setTraStations] = useState<TdxTraStation[]>([])
+  const [traStations, setTraStations] = useState<TdxTraStation[]>(() => traStationCache || getTraStationFromLS() || STATIC_TRA_STATIONS)
   const [traStationsLoading, setTraStationsLoading] = useState(false)
 
   // 公車動態
@@ -876,11 +946,11 @@ export function TransitInfoBoard() {
       }
     }
 
-    if (activeTab === 'train') {
+    if (traStations.length <= STATIC_TRA_STATIONS.length) {
       loadTraStations()
     }
     return () => { active = false }
-  }, [activeTab])
+  }, [])
 
   // 將台鐵車站依縣市分組並排序
   const groupedTraStations = useMemo(() => {
@@ -957,10 +1027,74 @@ export function TransitInfoBoard() {
     }
   }, [])
 
-  // 捷運時刻表查詢：僅在使用者主動按下「重新整理即時資料」按鈕時才發起
-  // 不自動觸發，避免切換 tab 時同時打多個 API 造成 429
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  useEffect(() => { /* 保留 deps 追蹤，queryMetroData 由按鈕主動呼叫 */ }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
+  // 保留 deps 追蹤，queryMetroData 由按鈕主動呼叫
+  useEffect(() => { }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
+
+  const venueTransit = useMemo(() => {
+    if (!selectedVenue) return null
+    return getVenueTransit(selectedVenue.id)
+  }, [selectedVenue])
+
+  // 當點選場館時，自動將捷運、雙鐵（高鐵/台鐵）、縣市公車切換至最近站點
+  useEffect(() => {
+    if (!selectedVenue) return
+    const vt = getVenueTransit(selectedVenue.id)
+    if (!vt) return
+
+    // 1. 同步公車縣市與推薦路線
+    if (vt.county) {
+      setSelectedCounty(vt.county)
+    }
+    if (vt.busRoutes && vt.busRoutes.length > 0) {
+      setBusSearch(vt.busRoutes[0])
+      setBusStops([])
+      setBusRouteDetails(null)
+      setBusError('')
+    }
+
+    // 2. 同步捷運系統與最近車站
+    if (vt.metro) {
+      setMetroOperator(vt.metro.operator)
+      setSelectedMetroStation(vt.metro.stationId)
+      // 若在捷運 Tab，主動查詢該站
+      if (activeTab === 'metro') {
+        queryMetroData(vt.metro.operator, vt.metro.stationId)
+      }
+    }
+
+    // 3. 同步高鐵 (THSR) 最近站為「起程站 (出發站)」
+    if (vt.thsr) {
+      const hsrOrigin = vt.thsr.stationName
+      setOriginStation(hsrOrigin)
+      // 若出發為雙北，抵達預設左營；若在南部/中部，抵達預設台北
+      if (['台北', '南港', '板橋'].includes(hsrOrigin)) {
+        setDestinationStation('左營')
+      } else {
+        setDestinationStation('台北')
+      }
+    }
+
+    // 4. 同步台鐵 (TRA) 最近站為「起程站 (出發站) 與即時看板車站」
+    if (vt.tra) {
+      const traOriginId = vt.tra.stationId
+      setTraOriginStationID(traOriginId)
+      setTraStation(vt.tra.stationName)
+      // 若出發站為雙北，抵達預設高雄/板橋；若在其他縣市，抵達預設台北
+      if (['1000', '0990', '0980'].includes(traOriginId)) {
+        setTraDestinationStationID('1020') // 板橋
+      } else {
+        setTraDestinationStationID('1000') // 台北
+      }
+    }
+
+    // 5. 智慧引導：若原本在「營運通阻」分頁，點擊場館後自動跳轉至最相關的動態分頁（有捷運跳捷運，無捷運跳鐵路）
+    setActiveTab((prevTab) => {
+      if (prevTab === 'status') {
+        return vt.metro ? 'metro' : 'train'
+      }
+      return prevTab
+    })
+  }, [selectedVenue?.id, queryMetroData])
 
   // 取得台北時區的星期幾（英文名稱對應 ServiceDay 欄位）
   const getTodayDayOfWeek = () => {
@@ -1174,13 +1308,15 @@ export function TransitInfoBoard() {
               if (isDeparted) return [] // 排除已駛離的車次
 
               let status = ''
+              let isDelayed = false
               if (delayMap[trainNo] !== undefined) {
                 const delayMin = delayMap[trainNo]
+                isDelayed = delayMin > 0
                 status = delayMin === 0
-                  ? (lang === 'zh-TW' ? '🟢 準點' : lang === 'en' ? '🟢 On time' : lang === 'ja' ? '🟢 定刻' : '🟢 정시')
-                  : (lang === 'zh-TW' ? `🔴 晚 ${delayMin} 分` : lang === 'en' ? `🔴 Delay ${delayMin}m` : lang === 'ja' ? `🔴 遅れ ${delayMin} 分` : `🔴 ${delayMin}분 지연`)
+                  ? (lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시')
+                  : (lang === 'zh-TW' ? `晚 ${delayMin} 分` : lang === 'en' ? `Delay ${delayMin}m` : lang === 'ja' ? `遅れ ${delayMin} 分` : `${delayMin}분 지연`)
               } else {
-                status = '🟢'
+                status = lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시'
               }
 
               return [{
@@ -1190,7 +1326,8 @@ export function TransitInfoBoard() {
                 arrTime,
                 duration: formatDuration(depTime, arrTime, lang),
                 isExpress: trainType.includes('自強') || trainType.includes('普悠瑪') || trainType.includes('太魯閣') || trainType.includes('普優瑪'),
-                status
+                status,
+                isDelayed
               }]
             })
 
@@ -1224,9 +1361,10 @@ export function TransitInfoBoard() {
               const endingStation = item.EndingStationName?.Zh_tw ?? '終點站'
 
               const delayMin = item.DelayTime ?? 0
+              const isDelayed = delayMin > 0
               const delayStatus = delayMin === 0
-                ? (lang === 'zh-TW' ? '🟢 準點' : lang === 'en' ? '🟢 On time' : lang === 'ja' ? '🟢 定刻' : '🟢 정시')
-                : (lang === 'zh-TW' ? `🔴 晚 ${delayMin} 分` : lang === 'en' ? `🔴 Delay ${delayMin}m` : lang === 'ja' ? `🔴 遅れ ${delayMin} 分` : `🔴 ${delayMin}분 지연`)
+                ? (lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시')
+                : (lang === 'zh-TW' ? `晚 ${delayMin} 分` : lang === 'en' ? `Delay ${delayMin}m` : lang === 'ja' ? `遅れ ${delayMin} 分` : `${delayMin}분 지연`)
 
               return {
                 trainType,
@@ -1235,7 +1373,8 @@ export function TransitInfoBoard() {
                 arrTime: endingStation,
                 duration: '',
                 isExpress: trainType.includes('自強') || trainType.includes('普悠瑪') || trainType.includes('太魯閣') || trainType.includes('普優瑪'),
-                status: delayStatus
+                status: delayStatus,
+                isDelayed
               }
             })
 
@@ -1287,7 +1426,8 @@ export function TransitInfoBoard() {
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime, lang),
             isExpress: trainType === '直達',
-            status: '🟢',
+            status: lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시',
+            isDelayed: false
           }]
         })
 
@@ -1326,8 +1466,8 @@ export function TransitInfoBoard() {
   }, [trainMode, originStation, destinationStation, traStation, traQueryMode, traOriginStationID, traDestinationStationID, lang])
 
   // 3. 公車動態查詢（依序查詢：route → stops → eta，避免同時 3 個 API 觸發 429）
-  const handleBusSearch = useCallback(async (directionOverride?: number) => {
-    const queryStr = busSearch.trim()
+  const handleBusSearch = useCallback(async (directionOverride?: number, customRoute?: string) => {
+    const queryStr = (customRoute !== undefined ? customRoute : busSearch).trim()
     if (!queryStr) return
     setIsBusSearching(true)
     setBusError('')
@@ -1387,7 +1527,7 @@ export function TransitInfoBoard() {
     } finally {
       setIsBusSearching(false)
     }
-  }, [busSearch, selectedCounty, busDirection])
+  }, [busSearch, selectedCounty, busDirection, lang])
 
   const handleToggleBusDirection = () => {
     const next = busDirection === 0 ? 1 : 0
@@ -1395,13 +1535,102 @@ export function TransitInfoBoard() {
     handleBusSearch(next)
   }
 
-  // Tab 切換時不再自動觸發查詢（避免 useCallback 重建導致連鎖 429）
-  // 使用者需自行按下查詢按鈕才會發起對 TDX 的呼叫
-
   // ─── JSX ──────────────────────────────────────────────────────────────────
 
   return (
     <section className="transit-board" aria-label={t('transitTitle')}>
+      {/* 場館交通連動橫幅 */}
+      {selectedVenue && (
+        <div className="venue-transit-sync-banner">
+          <div className="venue-transit-sync-header">
+            <div className="venue-transit-sync-title">
+              <span className="venue-transit-pin-icon"><PinIcon size="0.95em" /></span>
+              <span className="venue-transit-name">{translateVenueName(selectedVenue.name, lang)}</span>
+              <span className="venue-transit-tag">
+                {lang === 'zh-TW' ? '鄰近交通已連動' : lang === 'en' ? 'Transit Synced' : lang === 'ja' ? '最寄り交通連動' : '최근 교통 연동'}
+              </span>
+            </div>
+            {onClearVenue && (
+              <button
+                type="button"
+                className="venue-transit-clear-btn"
+                onClick={onClearVenue}
+                title={lang === 'zh-TW' ? '清除場館篩選' : 'Clear venue filter'}
+              >
+                <CloseIcon size="0.85em" />
+              </button>
+            )}
+          </div>
+          <div className="venue-transit-chips">
+            {venueTransit?.metro && (
+              <button
+                type="button"
+                className={`venue-transit-chip${activeTab === 'metro' ? ' active' : ''}`}
+                onClick={() => {
+                  setActiveTab('metro')
+                  if (venueTransit.metro) {
+                    setMetroOperator(venueTransit.metro.operator)
+                    setSelectedMetroStation(venueTransit.metro.stationId)
+                    queryMetroData(venueTransit.metro.operator, venueTransit.metro.stationId)
+                  }
+                }}
+              >
+                <TrainIcon size="0.85em" />
+                <span>{lang === 'zh-TW' ? `捷運：${venueTransit.metro.stationName}` : `Metro: ${venueTransit.metro.stationName}`}</span>
+              </button>
+            )}
+            {venueTransit?.tra && (
+              <button
+                type="button"
+                className={`venue-transit-chip${activeTab === 'train' && trainMode === 'tra' ? ' active' : ''}`}
+                onClick={() => {
+                  setActiveTab('train')
+                  setTrainMode('tra')
+                  if (venueTransit.tra) {
+                    setTraOriginStationID(venueTransit.tra.stationId)
+                    setTraStation(venueTransit.tra.stationName)
+                  }
+                }}
+              >
+                <TrainIcon size="0.85em" />
+                <span>{lang === 'zh-TW' ? `台鐵起程：${venueTransit.tra.stationName}` : `TRA Origin: ${venueTransit.tra.stationName}`}</span>
+              </button>
+            )}
+            {venueTransit?.thsr && (
+              <button
+                type="button"
+                className={`venue-transit-chip${activeTab === 'train' && trainMode === 'thsr' ? ' active' : ''}`}
+                onClick={() => {
+                  setActiveTab('train')
+                  setTrainMode('thsr')
+                  if (venueTransit.thsr) {
+                    setOriginStation(venueTransit.thsr.stationName)
+                  }
+                }}
+              >
+                <HsrIcon size="0.85em" />
+                <span>{lang === 'zh-TW' ? `高鐵起程：${venueTransit.thsr.stationName}` : `HSR Origin: ${venueTransit.thsr.stationName}`}</span>
+              </button>
+            )}
+            {venueTransit?.county && (
+              <button
+                type="button"
+                className={`venue-transit-chip${activeTab === 'bus' ? ' active' : ''}`}
+                onClick={() => {
+                  setActiveTab('bus')
+                  if (venueTransit.county) {
+                    setSelectedCounty(venueTransit.county)
+                  }
+                }}
+              >
+                <BusIcon size="0.85em" />
+                <span>{lang === 'zh-TW' ? `公車：${venueTransit.countyNameZh}` : `Bus: ${venueTransit.countyNameZh}`}</span>
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Tab 按鈕列 */}
       <div className="transit-tabs">
         {(['status', 'metro', 'train', 'bus'] as const).map((tab) => {
@@ -1950,7 +2179,7 @@ export function TransitInfoBoard() {
                 <div className="tra-region-group">
                   <span className="tra-region-label">{lang === 'zh-TW' ? '南部 ▸' : 'South ▸'}</span>
                   <div className="tra-station-pills">
-                    {['嘉義','新營','台南','岡山','新左營','高雄','屏東','潮州'].map(st => (
+                    {['嘉義','新營','永康','台南','岡山','新左營','高雄','屏東','潮州'].map(st => (
                       <button key={st} type="button"
                         className={`tra-pill${traStation === st ? ' active' : ''}`}
                         onClick={() => setTraStation(st)}
@@ -2067,12 +2296,17 @@ export function TransitInfoBoard() {
                     <div className="train-dur-info">
                       {(trainMode === 'thsr' || (trainMode === 'tra' && traQueryMode === 'od')) && <span className="train-dur">{tr.duration}</span>}
                       <span className={`train-status-badge ${
-                        tr.status.includes('🟢')
-                          ? 'status-ontime'
-                          : (tr.status === '已駛離' || tr.status === 'Departed')
-                            ? '' // default gray style
-                            : 'status-delayed'
+                        tr.status === '已駛離' || tr.status === 'Departed'
+                          ? ''
+                          : tr.isDelayed
+                            ? 'status-delayed'
+                            : 'status-ontime'
                       }`}>
+                        {tr.isDelayed ? (
+                          <WarningIcon size="0.8em" style={{ marginRight: '3px', verticalAlign: 'middle' }} />
+                        ) : (tr.status === '已駛離' || tr.status === 'Departed') ? null : (
+                          <GreenDotIcon size="0.6em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                        )}
                         {tr.status}
                       </span>
                     </div>
@@ -2128,6 +2362,30 @@ export function TransitInfoBoard() {
                 {isBusSearching ? (lang === 'zh-TW' ? '查詢中...' : lang === 'en' ? 'Searching...' : lang === 'ja' ? '検索中...' : '검색 중...') : (lang === 'zh-TW' ? '查詢' : lang === 'en' ? 'Search' : lang === 'ja' ? '検索' : '검색')}
               </button>
             </div>
+            {venueTransit?.busRoutes && venueTransit.busRoutes.length > 0 && (
+              <div className="bus-suggest-routes">
+                <span className="bus-suggest-label">
+                  <LightbulbIcon size="0.95em" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
+                  {lang === 'zh-TW' ? '場館推薦：' : lang === 'en' ? 'Venue routes:' : lang === 'ja' ? 'おすすめ路線：' : '추천 노선:'}
+                </span>
+                <div className="bus-suggest-chips">
+                  {venueTransit.busRoutes.map((r) => (
+                    <button
+                      key={r}
+                      type="button"
+                      className={`bus-suggest-chip${busSearch === r ? ' active' : ''}`}
+                      onClick={() => {
+                        setBusSearch(r)
+                        setBusDirection(0)
+                        handleBusSearch(0, r)
+                      }}
+                    >
+                      {r}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* 公車路線方向切換 */}

@@ -56,13 +56,14 @@ interface RegionClusterDef {
   id: string
   name: Record<string, string>
   label: Record<string, string>
-  venueIds: string[]
+  cities: string[]
+  explicitVenueIds?: string[]
   pos: { x: number; y: number }
   viewBox: string
   counties: string[]
 }
 
-const REGION_CLUSTERS: RegionClusterDef[] = [
+const REGION_CLUSTERS_BASE: RegionClusterDef[] = [
   {
     id: 'shuangbei',
     name: {
@@ -77,7 +78,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       ko: '쌍북 공연장',
       en: 'Shuangbei',
     },
-    venueIds: SHUANGBEI_VENUE_IDS,
+    cities: ['台北', '臺北', '新北'],
+    explicitVenueIds: SHUANGBEI_VENUE_IDS,
     pos: { x: 537, y: 247 },
     viewBox: '495 205 125 115',
     counties: ['Taipei', 'New Taipei', 'Keelung', 'Taoyuan'],
@@ -96,7 +98,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       ko: '가오슝 공연장',
       en: 'Kaohsiung',
     },
-    venueIds: [
+    cities: ['高雄'],
+    explicitVenueIds: [
       'kaohsiung-dome',
       'kaohsiung-natl',
       'kaohsiung-music-center',
@@ -122,7 +125,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       ko: '타이남 공연장',
       en: 'Tainan',
     },
-    venueIds: [
+    cities: ['台南', '臺南'],
+    explicitVenueIds: [
       'tainan',
       'asia-pacific-main',
       'tcrc-livehouse',
@@ -146,7 +150,8 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
       ko: '타이중 공연장',
       en: 'Taichung',
     },
-    venueIds: [
+    cities: ['台中', '臺中'],
+    explicitVenueIds: [
       'taichung-dome',
       'taichung-venue',
       'legacy-taichung',
@@ -157,8 +162,6 @@ const REGION_CLUSTERS: RegionClusterDef[] = [
   },
 ]
 
-const ALL_CLUSTERED_VENUE_IDS = new Set(REGION_CLUSTERS.flatMap(r => r.venueIds))
-const SHUANGBEI_SET = new Set(SHUANGBEI_VENUE_IDS)
 const SPORT_SET = new Set(SPORT_VENUE_IDS)
 
 const SORTED_TAIWAN_PATHS = Object.entries(TAIWAN_PATHS).sort(([a], [b]) =>
@@ -183,13 +186,6 @@ const TaiwanMapBackground = memo(function TaiwanMapBackground() {
   )
 })
 
-const PREPROJECTED_VENUES = VENUES.map((venue) => ({
-  ...venue,
-  pos: project(venue.longitude || 0, venue.latitude || 0),
-  isShuangbei: SHUANGBEI_SET.has(venue.id),
-  isSport: SPORT_SET.has(venue.id),
-}))
-
 export function Stat({ number, label }: { number: number; label: string }) {
   return (
     <div className="stat">
@@ -209,6 +205,7 @@ export function LegendItem({ color, label }: { color: string; label: string }) {
 }
 
 interface TaiwanMapProps {
+  venues?: Venue[]
   concerts: Concert[]
   selectedVenueId: string | null
   onSelectVenue: (venueId: string) => void
@@ -220,6 +217,7 @@ interface TaiwanMapProps {
 }
 
 function TaiwanMapComponent({
+  venues = VENUES,
   concerts,
   selectedVenueId,
   onSelectVenue,
@@ -243,9 +241,41 @@ function TaiwanMapComponent({
   const pinchStartMidpointRef = useRef<{ clientX: number; clientY: number } | null>(null)
   const pinchStartMapCenterRef = useRef<{ x: number; y: number } | null>(null)
 
+  const computedClusters = useMemo(() => {
+    return REGION_CLUSTERS_BASE.map((cluster) => {
+      const clusterVenues = venues.filter((v) => {
+        if (cluster.explicitVenueIds && cluster.explicitVenueIds.includes(v.id)) return true
+        return cluster.cities.some((c) => v.city === c || (v.city && v.city.includes(c)))
+      })
+      return {
+        ...cluster,
+        venues: clusterVenues,
+        venueIds: clusterVenues.map((v) => v.id),
+      }
+    })
+  }, [venues])
+
+  const allClusteredVenueIds = useMemo(() => {
+    return new Set(computedClusters.flatMap((r) => r.venueIds))
+  }, [computedClusters])
+
+  const shuangbeiSet = useMemo(() => {
+    const sb = computedClusters.find((c) => c.id === 'shuangbei')
+    return new Set(sb ? sb.venueIds : SHUANGBEI_VENUE_IDS)
+  }, [computedClusters])
+
+  const preprojectedVenues = useMemo(() => {
+    return venues.map((venue) => ({
+      ...venue,
+      pos: project(venue.longitude || 0, venue.latitude || 0),
+      isShuangbei: shuangbeiSet.has(venue.id),
+      isSport: SPORT_SET.has(venue.id),
+    }))
+  }, [venues, shuangbeiSet])
+
   const selectedVenue = useMemo(
-    () => VENUES.find((v) => v.id === selectedVenueId),
-    [selectedVenueId],
+    () => venues.find((v) => v.id === selectedVenueId),
+    [venues, selectedVenueId],
   )
 
   const visitedVenueIds = useMemo(
@@ -641,7 +671,7 @@ function TaiwanMapComponent({
 
         {displayZoom < 1.5 && (
           <g className="region-clusters-layer">
-            {REGION_CLUSTERS.map((cluster) => {
+            {computedClusters.map((cluster) => {
               const isActive = activeClusterId === cluster.id
               const labelText = cluster.label[lang] || cluster.label['zh-TW']
               return (
@@ -660,7 +690,7 @@ function TaiwanMapComponent({
                   <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
                   <circle className="cluster-plate" cx="0" cy="0" r="14" />
                   <text x="0" y="4" textAnchor="middle" className="cluster-text">
-                    {cluster.venueIds.length}
+                    {cluster.venues.length}
                   </text>
                   <text x="0" y="27" textAnchor="middle" className="cluster-label">
                     {labelText}
@@ -672,12 +702,12 @@ function TaiwanMapComponent({
         )}
 
         <g>
-          {PREPROJECTED_VENUES.map((venue) => {
+          {preprojectedVenues.map((venue) => {
             const hasVisits = visitedVenueIds.has(venue.id)
             const isActive = selectedVenueId === venue.id
             const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
             const shouldShowIcon = isActive || hasVisits || (activeVenueIds && activeVenueIds.has(venue.id)) || displayZoom >= 1.5 || (hoveredVenue && hoveredVenue.id === venue.id)
-            if (displayZoom < 1.5 && ALL_CLUSTERED_VENUE_IDS.has(venue.id)) return null
+            if (displayZoom < 1.5 && allClusteredVenueIds.has(venue.id)) return null
 
             return (
               <g
@@ -698,7 +728,7 @@ function TaiwanMapComponent({
                         const dist = Math.sqrt(Math.pow(e.clientX - (r.left + r.width / 2), 2) + Math.pow(e.clientY - (r.top + r.height / 2), 2))
                         return dist < 22
                       })
-                      .map((el) => VENUES.find((v) => v.id === el.getAttribute('data-venue-id')))
+                      .map((el) => venues.find((v) => v.id === el.getAttribute('data-venue-id')))
                       .filter(Boolean) as Venue[]
 
                     if (nearby.length >= 2) {
@@ -756,8 +786,8 @@ function TaiwanMapComponent({
       </svg>
 
       {activeClusterId && (() => {
-        const activeCluster = REGION_CLUSTERS.find(c => c.id === activeClusterId) || REGION_CLUSTERS[0]
-        const clusterVenues = VENUES.filter(v => activeCluster.venueIds.includes(v.id))
+        const activeCluster = computedClusters.find(c => c.id === activeClusterId) || computedClusters[0]
+        const clusterVenues = activeCluster.venues
         const clusterTitle = activeCluster.name[lang] || activeCluster.name['zh-TW']
 
         return (

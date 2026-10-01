@@ -4,6 +4,7 @@ import { marked } from 'marked'
 import './App.css'
 
 import type {
+  Venue,
   Concert,
   ConcertMedia,
   RemoteConcert,
@@ -14,7 +15,7 @@ import type {
   SuspensionItem
 } from './types'
 
-import { VENUES } from './constants/venues'
+import { fetchVenuesFromFirestore, getInitialVenues } from './utils/venueService'
 import { TaiwanMap, LegendItem } from './components/TaiwanMap'
 import { VenueInfo } from './components/VenueInfo'
 import { VenueWeather } from './components/VenueWeather'
@@ -301,6 +302,7 @@ function App() {
   const [isRemoteRefreshing, setIsRemoteRefreshing] = useState(false)
   const [isCpblRefreshing, setIsCpblRefreshing] = useState(false)
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
+  const [venues, setVenues] = useState<Venue[]>(() => getInitialVenues())
   const drawerHeaderRef = useRef<HTMLDivElement | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
@@ -867,7 +869,7 @@ function App() {
   // Log venue selection
   useEffect(() => {
     if (selectedVenueId) {
-      const venue = VENUES.find(v => v.id === selectedVenueId)
+      const venue = venues.find(v => v.id === selectedVenueId)
       if (venue) {
         logCustomEvent('select_venue', {
           venue_id: selectedVenueId,
@@ -876,7 +878,7 @@ function App() {
         })
       }
     }
-  }, [selectedVenueId])
+  }, [selectedVenueId, venues])
 
   // Log search queries (debounced)
   useEffect(() => {
@@ -995,9 +997,26 @@ function App() {
     fetchSuspension()
   }, [])
 
+  // 從 Firebase Firestore 載入動態場館資料（若無資料會自動將預設 38 個場館寫入資料庫）
+  useEffect(() => {
+    let active = true
+    fetchVenuesFromFirestore()
+      .then((fetched) => {
+        if (active && fetched && fetched.length > 0) {
+          setVenues(fetched)
+        }
+      })
+      .catch((err) => {
+        console.warn('Failed to load venues from Firestore:', err)
+      })
+    return () => {
+      active = false
+    }
+  }, [])
+
   const selectedVenue = useMemo(
-    () => VENUES.find((venue) => venue.id === selectedVenueId) ?? null,
-    [selectedVenueId],
+    () => venues.find((venue) => venue.id === selectedVenueId) ?? null,
+    [venues, selectedVenueId],
   )
   const selectedVenueConcerts = useMemo(
     () =>
@@ -1135,14 +1154,14 @@ function App() {
   }, [filteredRemoteConcerts])
 
   const groupedVenues = useMemo(() => {
-    const grouped: Record<string, typeof VENUES> = {
+    const grouped: Record<string, Venue[]> = {
       '北部地區': [],
       '中部地區': [],
       '南部地區': [],
       '東部地區': [],
     }
 
-    const filtered = VENUES.filter((v) => {
+    const filtered = venues.filter((v) => {
       if (categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(v.id)) {
         return false
       }
@@ -1165,7 +1184,7 @@ function App() {
     })
 
     return grouped
-  }, [venueSearchQuery, categoryFilter, activeVenueIds])
+  }, [venues, venueSearchQuery, categoryFilter, activeVenueIds])
 
   useEffect(() => {
     if (venueSearchQuery) {
@@ -1194,7 +1213,7 @@ function App() {
   const lightboxMedia = lightbox && lightboxConcert ? lightboxConcert.media[lightbox.mediaIndex] : null
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
   const musicBarPlayerHeight = musicBarUrl
-    ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 80 : 352)
+    ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 80 : 152)
     : 80
 
   const loadRemoteConcerts = useCallback(async () => {
@@ -1613,7 +1632,7 @@ function App() {
 
 
 
-  const openAddModal = (date?: string, venue?: typeof VENUES[0] | null) => {
+  const openAddModal = (date?: string, venue?: Venue | null) => {
     if (!isLoggedIn || !currentUser) {
       showToast(lang === 'zh-TW' ? '請先登入會員以新增個人演唱會記錄！' : 'Please log in to add concert logs!', 'info')
       setView('login')
@@ -1887,8 +1906,8 @@ function App() {
     try {
       setIsSaving(true)
       const finalVenueId = formVenueId
-      const finalVenueName = formVenueId === 'custom' ? (formVenueName || '').trim() : VENUES.find(v => v.id === formVenueId)?.name || (formVenueName || '').trim() || ''
-      const finalVenueCity = formVenueId === 'custom' ? formVenueCity : VENUES.find(v => v.id === formVenueId)?.city || formVenueCity || '台北'
+      const finalVenueName = formVenueId === 'custom' ? (formVenueName || '').trim() : venues.find(v => v.id === formVenueId)?.name || (formVenueName || '').trim() || ''
+      const finalVenueCity = formVenueId === 'custom' ? formVenueCity : venues.find(v => v.id === formVenueId)?.city || formVenueCity || '台北'
 
       const concertId = editingConcertId || Date.now().toString()
 
@@ -2389,6 +2408,7 @@ function App() {
             </div>
 
             <TaiwanMap
+              venues={venues}
               concerts={concerts}
               selectedVenueId={selectedVenueId}
               onSelectVenue={setSelectedVenueId}
@@ -2626,7 +2646,10 @@ function App() {
                         </div>
 
                         <div className="drawer-section transit-section">
-                          <TransitInfoBoard />
+                          <TransitInfoBoard
+                            selectedVenue={selectedVenue}
+                            onClearVenue={() => setSelectedVenueId(null)}
+                          />
                         </div>
 
                         {mobileDrawerState === 'half' ? (
@@ -2780,6 +2803,9 @@ function App() {
                     todayConcerts={selectedVenueTodayConcerts}
                     onSelectTicket={setSelectedTicket}
                     suspensionItems={suspensionData?.items}
+                    onViewTransit={() => {
+                      setSidebarTab('transit')
+                    }}
                   />
                 )}
                 <div className="concert-list-area">
@@ -2803,7 +2829,12 @@ function App() {
                       )}
                     </div>
                   )}
-                  {mobileTab !== 'search' && <TransitInfoBoard />}
+                  {mobileTab !== 'search' && (
+                    <TransitInfoBoard
+                      selectedVenue={selectedVenue}
+                      onClearVenue={() => setSelectedVenueId(null)}
+                    />
+                  )}
                   <UpcomingConcerts
                     key={selectedVenueId || 'all'}
                     concerts={filteredRemoteConcerts}
@@ -2870,10 +2901,16 @@ function App() {
                       todayConcerts={selectedVenueTodayConcerts}
                       onSelectTicket={setSelectedTicket}
                       suspensionItems={suspensionData?.items}
+                      onViewTransit={() => setSidebarTab('transit')}
                     />
                   )}
 
-                  {sidebarTab === 'transit' && <TransitInfoBoard />}
+                  {sidebarTab === 'transit' && (
+                    <TransitInfoBoard
+                      selectedVenue={selectedVenue}
+                      onClearVenue={() => setSelectedVenueId(null)}
+                    />
+                  )}
 
                   {sidebarTab === 'tickets' && (
                     <div className="tickets-tab-scroll-wrapper">
@@ -2902,55 +2939,6 @@ function App() {
                     </div>
                   )}
                 </div>
-
-                {/* Spotify Player nested at the bottom of the right panel */}
-                {isMusicBarVisible && (
-                  <div className="right-panel-spotify-player">
-                    <div className="spotify-player-header">
-                      <span className="sp-title"><MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />{t('spotifyPlayerTitle')}</span>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        {musicBarUrl && (
-                          <a
-                            href={musicBarUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ fontSize: '0.72rem', color: 'var(--teal)', textDecoration: 'none' }}
-                            title="在 Spotify 開啟"
-                          >
-                            ↗ Spotify
-                          </a>
-                        )}
-                        {musicBarEmbedUrl && (
-                          <button
-                            type="button"
-                            onClick={handleReloadPlayer}
-                            style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer', fontSize: '0.8rem', padding: '0 2px', display: 'inline-flex', alignItems: 'center' }}
-                            title="重新載入播放器"
-                          >
-                            <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
-                          </button>
-                        )}
-                        <button className="sp-close-btn" type="button" onClick={() => setIsMusicBarVisible(false)}>✕</button>
-                      </div>
-                    </div>
-                    <div className="spotify-player-body">
-                      {musicBarEmbedUrl ? (
-                        <SafeIframe
-                          key={`${musicBarEmbedUrl}-${playerReloadKey}`}
-                          src={musicBarEmbedUrl}
-                          height={musicBarPlayerHeight}
-                          allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-                          loading="lazy"
-                          title="Spotify player"
-                        />
-                      ) : (
-                        <div className="music-bar-placeholder">
-                          <span>{t('spotifyPlayerPlaceholder')}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                )}
               </div>
             )}
           </aside>
@@ -3102,7 +3090,7 @@ function App() {
                 const val = event.target.value
                 setFormVenueId(val)
                 if (val !== 'custom') {
-                  const matched = VENUES.find((v) => v.id === val)
+                  const matched = venues.find((v) => v.id === val)
                   if (matched) {
                     setFormVenueName(matched.name)
                     setFormVenueCity(matched.city)
@@ -3114,7 +3102,7 @@ function App() {
               }}
             >
               <option value="" disabled>{t('selectVenuePlaceholder')}</option>
-              {VENUES.map((v) => (
+              {venues.map((v) => (
                 <option key={v.id} value={v.id}>
                   {v.name} ({v.city})
                 </option>
@@ -3375,7 +3363,7 @@ function App() {
               }
               setSelectedTicket(null)
               const extractedArtist = extractArtistFromTitle(ticket.name)
-              const matchedVenue = VENUES.find(v => v.id === ticket.venue_id || (ticket.venue_name && v.name.includes(ticket.venue_name))) || null
+              const matchedVenue = venues.find(v => v.id === ticket.venue_id || (ticket.venue_name && v.name.includes(ticket.venue_name))) || null
               
               setForm({
                 artist: extractedArtist,
@@ -3684,7 +3672,10 @@ function App() {
 
       {/* Global Keep-Alive Spotify Player for both desktop and mobile */}
       {isMusicBarVisible && musicBarEmbedUrl && (
-        <div className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+        <div
+          className={`global-spotify-player ${view} ${isSidebarCollapsed ? 'sidebar-collapsed' : ''}`}
+          style={{ '--player-content-height': `${musicBarPlayerHeight}px` } as React.CSSProperties}
+        >
           <div className="spotify-player-header">
             <span className="sp-title">
               <MusicIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
@@ -3697,7 +3688,7 @@ function App() {
                   target="_blank"
                   rel="noopener noreferrer"
                   className="sp-open-link"
-                  title="在 Spotify 開啟"
+                  title={lang === 'zh-TW' ? '在 Spotify 開啟' : 'Open in Spotify'}
                 >
                   ↗ Spotify
                 </a>
@@ -3706,17 +3697,17 @@ function App() {
                 type="button"
                 className="sp-reload-btn"
                 onClick={handleReloadPlayer}
-                title="重新載入播放器"
+                title={lang === 'zh-TW' ? '重新載入播放器' : 'Reload Player'}
               >
-                <RefreshIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
+                <RefreshIcon size="1em" style={{ verticalAlign: 'middle' }} />
               </button>
               <button 
                 className="sp-close-btn desktop-close-btn" 
                 type="button" 
                 onClick={() => setIsMusicBarVisible(false)}
-                title="關閉播放器"
+                title={lang === 'zh-TW' ? '關閉播放器' : 'Close Player'}
               >
-                ✕
+                <CloseIcon size="0.85em" style={{ verticalAlign: 'middle' }} />
               </button>
             </div>
           </div>
@@ -3735,9 +3726,9 @@ function App() {
             className="sp-close-btn mobile-side-close-btn" 
             type="button" 
             onClick={() => setIsMusicBarVisible(false)}
-            title="關閉播放器"
+            title={lang === 'zh-TW' ? '關閉播放器' : 'Close Player'}
           >
-            ✕
+            <CloseIcon size="1em" />
           </button>
         </div>
       )}

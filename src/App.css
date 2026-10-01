@@ -2742,6 +2742,32 @@ svg#taiwan-map.dragging {
   transform: translateY(-1px);
 }
 
+.venue-transit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.65rem;
+  background: rgba(59, 130, 246, 0.12);
+  border: 1px solid rgba(59, 130, 246, 0.35);
+  color: #60a5fa;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  letter-spacing: 0.05em;
+  text-align: center;
+}
+
+.venue-transit-btn:hover {
+  background: rgba(59, 130, 246, 0.22);
+  border-color: #60a5fa;
+  color: #93c5fd;
+  transform: translateY(-1px);
+}
+
 /* 大眾運輸即時動態 (Transit Info Board) */
 .transit-board {
   margin-bottom: 1.2rem;
@@ -2751,6 +2777,143 @@ svg#taiwan-map.dragging {
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+}
+
+/* 場館大眾交通連動橫幅 */
+.venue-transit-sync-banner {
+  background: linear-gradient(135deg, rgba(234, 179, 8, 0.12), rgba(217, 119, 6, 0.06));
+  border: 1px solid rgba(234, 179, 8, 0.3);
+  border-radius: 10px;
+  padding: 0.65rem 0.85rem;
+  margin-bottom: 0.85rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.venue-transit-sync-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.venue-transit-sync-title {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color, #fff);
+}
+
+.venue-transit-tag {
+  font-size: 0.7rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 4px;
+  background: rgba(234, 179, 8, 0.2);
+  color: #fbbf24;
+  font-weight: 500;
+}
+
+.venue-transit-clear-btn {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+
+.venue-transit-clear-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+}
+
+.venue-transit-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.venue-transit-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 6px;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+  color: #cbd5e1;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.venue-transit-chip:hover {
+  border-color: rgba(234, 179, 8, 0.5);
+  background: rgba(234, 179, 8, 0.15);
+  color: #fff;
+}
+
+.venue-transit-chip.active {
+  border-color: #fbbf24;
+  background: rgba(234, 179, 8, 0.25);
+  color: #fbbf24;
+  font-weight: 600;
+}
+
+/* 公車推薦路線 */
+.bus-suggest-routes {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.bus-suggest-label {
+  color: rgba(255, 255, 255, 0.75);
+  font-size: 0.76rem;
+  font-weight: 500;
+}
+
+.bus-suggest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.bus-suggest-chip {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #e2e8f0;
+  border-radius: 4px;
+  padding: 0.18rem 0.45rem;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: 500;
+}
+
+.bus-suggest-chip:hover {
+  background: rgba(234, 179, 8, 0.2);
+  border-color: #fbbf24;
+  color: #fff;
+}
+
+.bus-suggest-chip.active {
+  background: #fbbf24;
+  color: #0f172a;
+  border-color: #fbbf24;
+  font-weight: 600;
 }
 
 .transit-board:hover {
@@ -12361,6 +12524,8 @@ body:has(.main-layout) {
     color: var(--teal);
     text-decoration: none;
     font-weight: 600;
+    display: inline-flex;
+    align-items: center;
     transition: opacity 0.2s;
   }
 
@@ -12418,15 +12583,15 @@ body:has(.main-layout) {
 
   .global-spotify-player .spotify-player-body {
     width: 100%;
-    height: 80px !important;
-    overflow: hidden !important;
+    height: var(--player-content-height, 80px);
+    overflow: hidden;
     line-height: 0;
   }
 
   .global-spotify-player .spotify-player-body iframe {
     width: 100% !important;
     min-width: 100% !important;
-    height: 80px !important;
+    height: var(--player-content-height, 80px) !important;
     border-radius: 8px !important;
     border: none !important;
     display: block !important;
@@ -12454,7 +12619,7 @@ body:has(.main-layout) {
     max-width: 100% !important;
     margin: 0 !important;
     padding: 0 !important;
-    height: 80px !important;
+    height: var(--player-content-height, 80px) !important;
     border-radius: 0 !important;
     z-index: 998 !important;
     display: flex !important;
@@ -12468,14 +12633,14 @@ body:has(.main-layout) {
 
   .global-spotify-player .spotify-player-body {
     flex: 1;
-    height: 80px !important;
+    height: var(--player-content-height, 80px) !important;
     overflow: hidden !important;
     line-height: 0;
   }
 
   .global-spotify-player .spotify-player-body iframe {
     width: 100% !important;
-    height: 80px !important;
+    height: var(--player-content-height, 80px) !important;
     border-radius: 0 !important;
     border: none !important;
     display: block !important;
@@ -12483,7 +12648,7 @@ body:has(.main-layout) {
 
   .global-spotify-player .mobile-side-close-btn {
     width: 44px !important;
-    height: 80px !important;
+    height: var(--player-content-height, 80px) !important;
     background: rgba(0, 0, 0, 0.4) !important;
     color: var(--muted) !important;
     border: none !important;

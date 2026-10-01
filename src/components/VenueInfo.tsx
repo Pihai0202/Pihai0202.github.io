@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import type { Venue, RemoteConcert, SuspensionItem } from '../types'
 import { logCustomEvent } from '../firebase'
-import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon } from './SvgIcon'
+import { MapIcon, CloseIcon, CheckIcon, PinIcon, CompassIcon, TrainIcon, WarningIcon, PlusIcon, ChevronDownIcon } from './SvgIcon'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n'
 import { getCitySuspensionStatus } from '../utils/suspensionHelper'
 import { shortenCpblTeamName, resolveCpblPlayerName } from '../utils/cpblUtils'
@@ -16,6 +16,7 @@ interface VenueInfoProps {
   todayConcerts?: RemoteConcert[]
   onSelectTicket?: (ticket: RemoteConcert) => void
   suspensionItems?: SuspensionItem[]
+  onViewTransit?: () => void
 }
 
 export function VenueInfo({
@@ -26,6 +27,7 @@ export function VenueInfo({
   todayConcerts = [],
   onSelectTicket,
   suspensionItems = [],
+  onViewTransit,
 }: VenueInfoProps) {
   const { lang } = useTranslation()
   const [isCollapsed, setIsCollapsed] = useState(false)
@@ -62,9 +64,18 @@ export function VenueInfo({
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
           >
+            <ChevronDownIcon
+              size="0.85em"
+              style={{
+                marginRight: '4px',
+                verticalAlign: 'middle',
+                transform: isCollapsed ? 'rotate(0deg)' : 'rotate(180deg)',
+                transition: 'transform 0.2s ease',
+              }}
+            />
             {isCollapsed 
-              ? (lang === 'zh-TW' ? '▼ 展開' : lang === 'ja' ? '▼ 展開' : lang === 'ko' ? '▼ 펼치기' : '▼ Expand') 
-              : (lang === 'zh-TW' ? '▲ 收起' : lang === 'ja' ? '▲ 折りたたむ' : lang === 'ko' ? '▲ 접기' : '▲ Collapse')}
+              ? (lang === 'zh-TW' ? '展開' : lang === 'ja' ? '展開' : lang === 'ko' ? '펼치기' : 'Expand') 
+              : (lang === 'zh-TW' ? '收起' : lang === 'ja' ? '折りたたむ' : lang === 'ko' ? '접기' : 'Collapse')}
           </button>
           <button className="clear-venue-btn" type="button" onClick={onClearVenue}>
             <CloseIcon size="0.85em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
@@ -238,8 +249,15 @@ export function VenueInfo({
 
           <div className="venue-actions">
             <button className="add-concert-btn" type="button" onClick={onAddConcert}>
-              {lang === 'zh-TW' ? '＋ 新增演唱會記錄' : lang === 'en' ? '＋ Add Concert Record' : lang === 'ja' ? '＋ コンサート記録を追加' : '＋ 콘서트 기록 추가'}
+              <PlusIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+              {lang === 'zh-TW' ? '新增演唱會記錄' : lang === 'en' ? 'Add Concert Record' : lang === 'ja' ? 'コンサート記録を追加' : '콘서트 기록 추가'}
             </button>
+            {onViewTransit && (
+              <button className="venue-transit-btn" type="button" onClick={onViewTransit}>
+                <TrainIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+                {lang === 'zh-TW' ? '交通動態' : lang === 'en' ? 'Transit Info' : lang === 'ja' ? '交通情報' : '교통 안내'}
+              </button>
+            )}
             {showMap && (
               <a
                 className="nav-map-btn"

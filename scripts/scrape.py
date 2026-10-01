@@ -160,6 +160,38 @@ VENUE_CITY = {
     "live-warehouse": "高雄",
 }
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+try:
+    from venue_manager import venue_manager
+except Exception as e:
+    print(f"Warning: Failed to import venue_manager: {e}", file=sys.stderr)
+    venue_manager = None
+
+# Populate initial venue_manager with static mapping
+if venue_manager:
+    for kw, vid in VENUE_MAP.items():
+        venue_manager.register_keyword(kw, vid)
+    for vid, city in VENUE_CITY.items():
+        if vid not in venue_manager.venue_city:
+            venue_manager.venue_city[vid] = city
+
+class VenueCityMap(dict):
+    def __getitem__(self, key):
+        if key in self:
+            return super().__getitem__(key)
+        if venue_manager and key in venue_manager.venue_city:
+            return venue_manager.venue_city[key]
+        return ""
+
+    def get(self, key, default=""):
+        if key in self:
+            return super().get(key, default)
+        if venue_manager and key in venue_manager.venue_city:
+            return venue_manager.venue_city[key]
+        return default
+
+VENUE_CITY = VenueCityMap(VENUE_CITY)
+
 # 售票網資訊
 TICKET_PLATFORMS = {
     "kktix":    {"name": "KKTIX",    "color": "#e63946"},
@@ -256,11 +288,32 @@ def fetch(url, as_json=False, headers=None):
         return None
 
 
-def match_venue(text):
-    """Return (venue_id, venue_name) or (None, None)"""
-    for keyword, vid in VENUE_MAP.items():
-        if keyword in (text or ""):
-            return vid, keyword
+def match_venue(text, venue_raw=None):
+    """
+    Return (venue_id, venue_name) or (None, None).
+    If unknown venue is encountered, automatically geocodes and registers to Firestore.
+    """
+    if venue_manager:
+        # 1. Match in text or venue_raw
+        vid, vname, _ = venue_manager.match_venue(text)
+        if vid:
+            return vid, vname
+        if venue_raw and venue_raw != text:
+            vid, vname, _ = venue_manager.match_venue(venue_raw)
+            if vid:
+                return vid, vname
+
+        # 2. Try auto-creation if venue_raw exists
+        target = venue_raw or text
+        if target:
+            vid, vname, _ = venue_manager.auto_create_venue(target, context_text=text)
+            if vid:
+                return vid, vname
+    else:
+        for keyword, vid in VENUE_MAP.items():
+            if keyword in (text or ""):
+                return vid, keyword
+
     return None, None
 
 

@@ -601,3 +601,26 @@ export const ShieldIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
+
+// 🚄 HsrIcon (High Speed Rail)
+export const HsrIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M4 14V9a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v5" />
+    <path d="M4 14h16" />
+    <path d="M4 14v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3" />
+    <line x1="8" y1="8" x2="16" y2="8" />
+    <circle cx="8" cy="14" r="1" fill="currentColor" />
+    <circle cx="16" cy="14" r="1" fill="currentColor" />
+    <line x1="6" y1="21" x2="4" y2="23" />
+    <line x1="18" y1="21" x2="20" y2="23" />
+  </svg>
+);
+
+// 💡 LightbulbIcon
+export const LightbulbIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M9 18h6" />
+    <path d="M10 22h4" />
+    <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z" />
+  </svg>
+);
