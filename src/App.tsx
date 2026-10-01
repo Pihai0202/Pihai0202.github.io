@@ -32,6 +32,7 @@ import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { isTargetEventCategory } from './utils/eventFilterHelper'
+import { shortenCpblTeamName } from './utils/cpblUtils'
 import { collection, addDoc, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
@@ -1078,13 +1079,21 @@ function App() {
     const todayStr = `${yyyy}-${mm}-${dd}`
 
     return [...resolvedRemoteConcerts]
-      .filter((c) => !c.date || c.date.trim() >= todayStr)
-      .sort((a, b) => Date.parse(a.date || '9999') - Date.parse(b.date || '9999'))
+      .filter((c) => {
+        // 演唱會類別：過濾已過期活動（僅保留今日及未來）
+        // 體育賽事 / 中華職棒：保留所有賽程與賽事結果（包含已完賽），方便球迷查看各場比分與 Box Score
+        if (c.category === 'sport' || c.source === '中華職棒') {
+          return true
+        }
+        return !c.date || c.date.trim() >= todayStr
+      })
+      .sort((a, b) => {
+        const dateA = a.date ? a.date.trim().substring(0, 10) : '9999'
+        const dateB = b.date ? b.date.trim().substring(0, 10) : '9999'
+        return Date.parse(dateA) - Date.parse(dateB)
+      })
   }, [resolvedRemoteConcerts])
   const categoryCounts = useMemo(() => {
-    const all = sortedRemoteConcerts.length
-    const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒').length
-    const concert = all - sport
     const d = new Date()
     const utc = d.getTime() + d.getTimezoneOffset() * 60000
     const taipeiTime = new Date(utc + 3600000 * 8)
@@ -1092,6 +1101,10 @@ function App() {
     const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
     const dd = String(taipeiTime.getDate()).padStart(2, '0')
     const todayStr = `${yyyy}-${mm}-${dd}`
+
+    const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒' || c.category === 'sport').length
+    const concert = sortedRemoteConcerts.filter((c) => c.source !== '中華職棒' && c.category !== 'sport').length
+    const all = concert + sortedRemoteConcerts.filter((c) => (c.source === '中華職棒' || c.category === 'sport') && (!c.date || c.date.substring(0, 10) >= todayStr)).length
     const today = sortedRemoteConcerts.filter((c) => {
       if (!c.date) return false
       const clean = c.date.trim().replace(/\//g, '-')
@@ -1116,8 +1129,31 @@ function App() {
           const clean = c.date.trim().replace(/\//g, '-')
           return clean.startsWith(todayStr)
         }
-        const isSport = c.source === '中華職棒'
+        const isSport = c.source === '中華職棒' || c.category === 'sport'
         return categoryFilter === 'sport' ? isSport : !isSport
+      })
+    } else {
+      // 在「全部」類別：顯示所有即將登場演唱會，以及近期（近 7 天內～未來）的中華職棒賽事，避免首頁過度冗長
+      const d = new Date()
+      const utc = d.getTime() + d.getTimezoneOffset() * 60000
+      const taipeiTime = new Date(utc + 3600000 * 8)
+      const yyyy = taipeiTime.getFullYear()
+      const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+      const dd = String(taipeiTime.getDate()).padStart(2, '0')
+      const todayStr = `${yyyy}-${mm}-${dd}`
+
+      const sevenDaysAgo = new Date(taipeiTime.getTime() - 7 * 24 * 60 * 60 * 1000)
+      const prevY = sevenDaysAgo.getFullYear()
+      const prevM = String(sevenDaysAgo.getMonth() + 1).padStart(2, '0')
+      const prevD = String(sevenDaysAgo.getDate()).padStart(2, '0')
+      const recentThreshold = `${prevY}-${prevM}-${prevD}`
+
+      list = list.filter((c) => {
+        const isSport = c.source === '中華職棒' || c.category === 'sport'
+        if (isSport) {
+          return !c.date || c.date.trim().substring(0, 10) >= recentThreshold
+        }
+        return !c.date || c.date.trim().substring(0, 10) >= todayStr
       })
     }
 
@@ -4226,6 +4262,12 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
               <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
+            {concert.game_score && concert.game_score.status === 'finished' && (
+              <div className="card-game-score-pill">
+                ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score} - {concert.game_score.home_score} {shortenCpblTeamName(concert.game_score.home_team)}
+                <span className="game-status-pill finished">已完賽</span>
+              </div>
+            )}
             {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
               <div className="typhoon-warning-badge">
                 <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
