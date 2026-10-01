@@ -52,7 +52,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Calendar Panel
     myRecords: '我的記錄',
-    upcomingTickets: '近期售票',
+    upcomingTickets: '售票資訊',
     all: '全部',
     searchCalendar: '搜尋日期、演出或場館...',
     gridMode: '行事曆',
@@ -66,8 +66,8 @@ const translations: Record<Language, Record<string, string>> = {
     time: '時間',
     deleteBtn: '刪除',
     confirmDelete: '確認要刪除此筆演唱會記錄嗎？',
-    loadingTickets: '正在讀取近期售票活動...',
-    noTicketsFound: '目前沒有近期售票資料',
+    loadingTickets: '正在讀取售票資訊...',
+    noTicketsFound: '目前沒有售票資料',
     ticketUpdate: '更新：{time}',
     clearVenueFilter: '(清除場館看全台)',
     showAllTickets: '顯示所有售票資訊 (還有 {count} 筆) ▾',
@@ -244,7 +244,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Calendar Panel
     myRecords: 'My Logs',
-    upcomingTickets: 'Upcoming Tickets',
+    upcomingTickets: 'Ticket Info',
     all: 'All',
     searchCalendar: 'Search dates, artists, or venues...',
     gridMode: 'Calendar',
@@ -436,7 +436,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Calendar Panel
     myRecords: 'マイログ',
-    upcomingTickets: '近日発売チケット',
+    upcomingTickets: 'チケット情報',
     all: 'すべて',
     searchCalendar: '日付、アーティスト、会場を検索...',
     gridMode: 'カレンダー',
@@ -628,7 +628,7 @@ const translations: Record<Language, Record<string, string>> = {
 
     // Calendar Panel
     myRecords: '내 기록',
-    upcomingTickets: '최근 예매 티켓',
+    upcomingTickets: '티켓 정보',
     all: '전체',
     searchCalendar: '날짜, 아티스트, 공연장 검색...',
     gridMode: '캘린더',

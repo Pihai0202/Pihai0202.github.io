@@ -297,7 +297,7 @@ function App() {
   const [concerts, setConcerts] = useState<Concert[]>(loadInitialConcerts)
   const [remoteConcerts, setRemoteConcerts] = useState<RemoteConcert[]>([])
   const [remoteUpdatedAt, setRemoteUpdatedAt] = useState<string | null>(null)
-  const [remoteStatus, setRemoteStatus] = useState('正在讀取近期售票活動...')
+  const [remoteStatus, setRemoteStatus] = useState('正在讀取售票資訊...')
   const [isRemoteRefreshing, setIsRemoteRefreshing] = useState(false)
   const [isCpblRefreshing, setIsCpblRefreshing] = useState(false)
   const [selectedVenueId, setSelectedVenueId] = useState<string | null>(null)
@@ -1219,7 +1219,7 @@ function App() {
       const events = rawEvents.filter(isTargetEventCategory)
       setRemoteConcerts(events)
       setRemoteUpdatedAt(data.updated_at ?? null)
-      setRemoteStatus(events.length ? '' : '目前沒有抓到近期售票活動')
+      setRemoteStatus(events.length ? '' : '目前沒有抓到售票資訊')
 
       setSelectedTicket((prevModal) => {
         if (!prevModal) return prevModal
@@ -1229,7 +1229,7 @@ function App() {
     } catch {
       setRemoteConcerts([])
       setRemoteUpdatedAt(null)
-      setRemoteStatus('近期售票活動暫時讀取失敗')
+      setRemoteStatus('售票資訊暫時讀取失敗')
     } finally {
       setIsRemoteRefreshing(false)
     }
@@ -2825,7 +2825,7 @@ function App() {
                     onClick={() => setSidebarTab('tickets')}
                   >
                     <TicketIcon size="1.1em" />
-                    {lang === 'zh-TW' ? '近期售票' : lang === 'en' ? 'Upcoming Tickets' : lang === 'ja' ? '近日発売チケット' : '최근 티켓 예매'}
+                    {t('upcomingTickets')}
                   </button>
                   <button
                     className={`sidebar-tab-btn${sidebarTab === 'transit' ? ' active' : ''}`}
@@ -4093,47 +4093,48 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
 
   return (
     <section className="upcoming-section" aria-label="售票資訊">
-      <div className="section-row">
-        <div>
-          <div className="section-title">— {t('upcomingTickets')} —</div>
-          {updatedAt && <div className="remote-updated">{t('ticketUpdate', { time: formatRemoteDate(updatedAt) })}</div>}
+      <div className="upcoming-toolbar">
+        <div className="category-filter-select-wrapper">
+          <div className="category-filter-icon" aria-hidden="true">
+            {categoryFilter === 'all' && <SparklesIcon size="1.05em" />}
+            {categoryFilter === 'today' && <span className="live-pulse-dot" />}
+            {categoryFilter === 'concert' && <MusicIcon size="1.05em" />}
+            {categoryFilter === 'sport' && <BaseballIcon size="1.05em" />}
+          </div>
+          <select
+            id="category-filter-select"
+            className="category-filter-select"
+            value={categoryFilter}
+            onChange={(e) => onCategoryChange(e.target.value as 'all' | 'concert' | 'sport' | 'today')}
+            aria-label={lang === 'zh-TW' ? '活動類別篩選' : 'Category filter'}
+          >
+            <option value="all">{t('all')}</option>
+            <option value="today">{t('todayTab')}</option>
+            <option value="concert">{t('statConcerts')}</option>
+            <option value="sport">{lang === 'zh-TW' ? '中華職棒' : lang === 'ja' ? '中華職棒 (台湾プロ野球)' : lang === 'ko' ? '대만 프로야구 (CPBL)' : 'CPBL'}</option>
+          </select>
+          <div className="category-filter-arrow" aria-hidden="true">
+            <ChevronDownIcon size="0.9em" />
+          </div>
         </div>
-        <button className="refresh-events-btn" type="button" onClick={onRefresh} disabled={isRefreshing}>
-          {isRefreshing ? (lang === 'zh-TW' ? '更新中' : 'Updating...') : (lang === 'zh-TW' ? '更新' : 'Refresh')}
+
+        <button
+          className={`refresh-events-btn${isRefreshing ? ' refreshing' : ''}`}
+          type="button"
+          onClick={onRefresh}
+          disabled={isRefreshing}
+          title={updatedAt ? t('ticketUpdate', { time: formatRemoteDate(updatedAt) }) : ''}
+        >
+          <RefreshIcon size="0.95em" className={isRefreshing ? 'spin-icon' : ''} />
+          <span>{isRefreshing ? (lang === 'zh-TW' ? '更新中' : 'Updating...') : (lang === 'zh-TW' ? '更新' : 'Refresh')}</span>
         </button>
       </div>
 
-      <div className="category-filter-bar">
-        <button
-          type="button"
-          className={`filter-tab-btn${categoryFilter === 'all' ? ' active' : ''}`}
-          onClick={() => onCategoryChange('all')}
-        >
-          <SparklesIcon style={{ marginRight: '4px' }} /> {t('all')}
-        </button>
-        <button
-          type="button"
-          className={`filter-tab-btn${categoryFilter === 'today' ? ' active' : ''}`}
-          onClick={() => onCategoryChange('today')}
-        >
-          <span className="live-pulse-dot" style={{ marginRight: '5px', verticalAlign: 'middle', display: 'inline-block' }} />
-          {t('todayTab')}
-        </button>
-        <button
-          type="button"
-          className={`filter-tab-btn${categoryFilter === 'concert' ? ' active' : ''}`}
-          onClick={() => onCategoryChange('concert')}
-        >
-          <MusicIcon style={{ marginRight: '4px' }} /> {t('statConcerts')}
-        </button>
-        <button
-          type="button"
-          className={`filter-tab-btn${categoryFilter === 'sport' ? ' active' : ''}`}
-          onClick={() => onCategoryChange('sport')}
-        >
-          <BaseballIcon style={{ marginRight: '4px' }} /> {lang === 'zh-TW' ? '中華職棒' : 'CPBL'}
-        </button>
-      </div>
+      {updatedAt && (
+        <div className="remote-updated">
+          {t('ticketUpdate', { time: formatRemoteDate(updatedAt) })}
+        </div>
+      )}
 
       {searchQuery && searchQuery.trim() && (
         <div className="search-info-tip">

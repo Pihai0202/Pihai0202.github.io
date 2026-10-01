@@ -1846,7 +1846,7 @@ svg#taiwan-map.dragging {
 
 .upcoming-section {
   margin-bottom: 1.2rem;
-  padding: 1.25rem;
+  padding: 1rem 1.1rem;
   background: rgba(var(--surface-rgb), 0.3);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -1859,43 +1859,66 @@ svg#taiwan-map.dragging {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.section-row {
+.upcoming-toolbar {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0.1rem 0 0.35rem 0;
+  box-sizing: border-box;
 }
 
-.remote-updated {
-  margin: -0.4rem 0 0.7rem;
-  padding: 0 0.5rem;
-  color: var(--muted);
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.66rem;
+.upcoming-toolbar .category-filter-select-wrapper {
+  flex: 1;
+  min-width: 0;
 }
 
 .refresh-events-btn {
-  margin-top: 0.2rem;
-  background: var(--surface);
-  border: 1px solid rgba(var(--gold-rgb), 0.28);
-  border-radius: 6px;
-  color: var(--gold);
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.68rem;
-  padding: 0.35rem 0.55rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  height: 38px;
+  background: var(--surface2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  color: var(--gold, #ffd166);
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  padding: 0 0.8rem;
   white-space: nowrap;
-  transition: border-color 0.2s, background 0.2s;
+  cursor: pointer;
+  margin: 0;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+  flex-shrink: 0;
 }
 
 .refresh-events-btn:hover {
-  border-color: var(--gold);
+  border-color: var(--gold, #ffd166);
   background: rgba(var(--gold-rgb), 0.08);
+  box-shadow: 0 0 10px rgba(var(--gold-rgb), 0.15);
 }
 
 .refresh-events-btn:disabled {
   color: var(--muted);
   border-color: var(--border);
+  background: transparent;
   cursor: wait;
+}
+
+.refresh-events-btn svg.spin-icon {
+  animation: spin 1s linear infinite;
+}
+
+.remote-updated {
+  margin: 0.15rem 0 0.8rem 0.2rem;
+  padding: 0;
+  color: var(--muted, #8a8a9e);
+  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  font-size: 0.68rem;
+  letter-spacing: 0.02em;
 }
 
 .category-filter-bar {
@@ -1938,6 +1961,91 @@ svg#taiwan-map.dragging {
   border-color: var(--gold, #ffd166);
   color: var(--gold, #ffd166);
   box-shadow: 0 0 12px rgba(var(--gold-rgb), 0.15);
+}
+
+/* ── 活動類別下拉式選單 (Category Filter Dropdown) ── */
+.category-filter-dropdown-container {
+  width: 100%;
+  margin: 0.35rem 0 0.85rem 0;
+  box-sizing: border-box;
+}
+
+.category-filter-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  background: var(--surface2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.category-filter-select-wrapper:hover {
+  background: rgba(var(--gold-rgb), 0.05);
+  border-color: rgba(var(--gold-rgb), 0.4);
+}
+
+.category-filter-select-wrapper:focus-within {
+  border-color: var(--gold, #ffd166);
+  background: rgba(var(--gold-rgb), 0.08);
+  box-shadow: 0 0 12px rgba(var(--gold-rgb), 0.18);
+}
+
+.category-filter-icon {
+  position: absolute;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--gold, #ffd166);
+  z-index: 1;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.category-filter-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text, #ffffff);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  padding: 0.55rem 2.2rem 0.55rem 2.3rem;
+  cursor: pointer;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.category-filter-select option {
+  background: var(--surface, #181920);
+  color: var(--text, #f0f0f5);
+  padding: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.category-filter-arrow {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--muted, #8a8a9e);
+  transition: transform 0.2s ease, color 0.2s ease;
+  z-index: 1;
+}
+
+.category-filter-select-wrapper:focus-within .category-filter-arrow {
+  color: var(--gold, #ffd166);
+  transform: rotate(180deg);
 }
 
 .show-more-btn {
