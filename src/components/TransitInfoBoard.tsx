@@ -107,6 +107,7 @@ interface TdxMetroLiveBoard {
 interface TdxMetroStationTimeTable {
   StationID: string
   Direction?: number
+  DestinationStationName?: { Zh_tw?: string; En?: string }
   ServiceDay?: {
     Monday?: boolean | number
     Tuesday?: boolean | number
@@ -321,7 +322,7 @@ const TDX_OFFICIAL_QUERY_URL = 'https://tdx.transportdata.tw/maas'
 const TDX_SWAGGER_URL = 'https://tdx.transportdata.tw/api-service/swagger'
 
 // TDX API 代理端點。若使用 Cloudflare Workers，可在 .env 中設定 VITE_TDX_PROXY_URL（如 https://xxxx.workers.dev，結尾不加斜線）
-const TDX_PROXY_BASE = import.meta.env.VITE_TDX_PROXY_URL || '/api/tdx'
+const TDX_PROXY_BASE = import.meta.env.VITE_TDX_PROXY_URL || 'https://snowy-lake-8832.a0902113173.workers.dev'
 
 // ─── 工具函式 ────────────────────────────────────────────────────────────────
 
@@ -1118,10 +1119,10 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
     }).format(new Date())
   }
 
-  // 過濾今日時刻表（捷運 API 不回傳終點站，改用方向分群）
+  // 過濾今日時刻表（以終點站名稱分群）
   const getFilteredTimetables = () => {
     const todayDay = getTodayDayOfWeek()
-    const todayTimetableList: Array<{ departureTime: string; direction: number }> = []
+    const todayTimetableList: Array<{ departureTime: string; destination: string; direction: number }> = []
 
     metroTimetables.forEach((item) => {
       const serviceDay = item.ServiceDay as Record<string, boolean | number | undefined>
@@ -1129,10 +1130,12 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
       const isServiceDay = serviceDay && (serviceDay[todayDay] === true || serviceDay[todayDay] === 1)
       if (isServiceDay) {
         const trainTimes = item.Timetables || item.TimeTables || []
+        const destName = item.DestinationStationName?.Zh_tw || (item.Direction === 0 ? '去程' : '回程')
         trainTimes.forEach((t) => {
           if (t.DepartureTime) {
             todayTimetableList.push({
               departureTime: t.DepartureTime.slice(0, 5),
+              destination: destName,
               direction: item.Direction ?? 0,
             })
           }
@@ -1142,14 +1145,15 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
 
     todayTimetableList.sort((a, b) => a.departureTime.localeCompare(b.departureTime))
 
-    // 以方向（去程/回程）分群
+    // 以終點站名稱分群
     const grouped: Record<string, string[]> = {}
     todayTimetableList.forEach((t) => {
-      const dirLabel = t.direction === 0 ? '去程' : '回程'
-      if (!grouped[dirLabel]) {
-        grouped[dirLabel] = []
+      if (!grouped[t.destination]) {
+        grouped[t.destination] = []
       }
-      grouped[dirLabel].push(t.departureTime)
+      if (!grouped[t.destination].includes(t.departureTime)) {
+        grouped[t.destination].push(t.departureTime)
+      }
     })
 
     return grouped
@@ -1546,6 +1550,20 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
     setBusDirection(next)
     handleBusSearch(next)
   }
+
+  // 進入鐵路 Tab 或切換起訖站時自動觸發查詢
+  useEffect(() => {
+    if (activeTab === 'train') {
+      handleTrainSearch()
+    }
+  }, [activeTab, trainMode, originStation, destinationStation, traStation, traQueryMode, traOriginStationID, traDestinationStationID, handleTrainSearch])
+
+  // 進入公車 Tab 或切換路線/縣市時自動觸發查詢
+  useEffect(() => {
+    if (activeTab === 'bus' && busSearch.trim()) {
+      handleBusSearch()
+    }
+  }, [activeTab, busSearch, selectedCounty, handleBusSearch])
 
   // ─── JSX ──────────────────────────────────────────────────────────────────
 
@@ -1960,9 +1978,12 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
                     ) : (
                       Object.entries(getFilteredTimetables()).map(([dest, times]) => {
                         const nowTime = getTaipeiTimeStr()
+                        const futureTimes = times.filter(t => t >= nowTime)
                         const displayedTimes = showAllMetroTimes 
                           ? times 
-                          : times.filter(t => t >= nowTime)
+                          : futureTimes.length > 0 
+                            ? futureTimes 
+                            : times // 若今日班次已過，自動顯示全日班表，避免空白
 
                         const displayDest = dest === '去程'
                           ? (lang === 'zh-TW' ? '去程' : lang === 'en' ? 'Outbound' : lang === 'ja' ? '下り' : '하행')
@@ -1985,12 +2006,13 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
                                 <div className="metro-no-data-small">{lang === 'zh-TW' ? '今日後續無發車班次' : lang === 'en' ? 'No more trains today' : lang === 'ja' ? '本日の運行は終了しました' : '오늘 남은 열차가 없습니다'}</div>
                               ) : (
                                 displayedTimes.map((time, tIdx) => {
-                                  const isNext = time >= nowTime && times.filter(t => t >= nowTime)[0] === time
+                                  const isNext = time >= nowTime && futureTimes[0] === time
+                                  const isDeparted = time < nowTime
                                   return (
                                     <span 
-                                      className={`metro-time-chip${isNext ? ' next-train' : ''}`} 
+                                      className={`metro-time-chip${isNext ? ' next-train' : ''}${isDeparted ? ' departed' : ''}`} 
                                       key={tIdx}
-                                      title={isNext ? (lang === 'zh-TW' ? '最接近的下一班車' : lang === 'en' ? 'Next Train' : lang === 'ja' ? '次の発車列車' : '가장 가까운 다음 열차') : undefined}
+                                      title={isNext ? (lang === 'zh-TW' ? '最接近的下一班車' : lang === 'en' ? 'Next Train' : lang === 'ja' ? '次の発車列車' : '가장 가까운 다음 열차') : isDeparted ? (lang === 'zh-TW' ? '已發車' : 'Departed') : undefined}
                                     >
                                       {time}
                                     </span>

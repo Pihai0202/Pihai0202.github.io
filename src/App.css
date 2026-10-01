@@ -11651,6 +11651,11 @@ header {
   box-shadow: 0 0 5px rgba(var(--gold-rgb), 0.2);
 }
 
+.metro-time-chip.departed {
+  opacity: 0.45;
+  color: var(--muted);
+}
+
 /* Custom scrollbars for transit boards */
 .train-board-rows::-webkit-scrollbar,
 .metro-live-list::-webkit-scrollbar,
