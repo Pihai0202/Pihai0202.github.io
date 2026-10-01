@@ -14558,6 +14558,182 @@ body:has(.main-layout) {
   gap: 12px;
 }
 
+/* Baseball Line Score Table (Rebas Open Data) */
+.baseball-linescore-container {
+  margin: 0.65rem 0;
+  width: 100%;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  overflow: hidden;
+}
+
+.baseball-linescore-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.baseball-linescore-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.72rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.baseball-linescore-table th,
+.baseball-linescore-table td {
+  padding: 4px 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.baseball-linescore-table th {
+  color: var(--muted, #94a3b8);
+  font-weight: 600;
+  font-size: 0.68rem;
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.baseball-linescore-table .team-col,
+.baseball-linescore-table .team-name-cell {
+  text-align: left;
+  padding-left: 8px;
+  font-weight: 600;
+  color: var(--text, #f1f5f9);
+  position: sticky;
+  left: 0;
+  background: rgba(20, 26, 36, 0.95);
+  z-index: 1;
+  min-width: 80px;
+}
+
+.baseball-linescore-table .stat-header,
+.baseball-linescore-table .stat-cell {
+  background: rgba(255, 255, 255, 0.02);
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.baseball-linescore-table .r-header,
+.baseball-linescore-table .r-cell {
+  color: var(--gold, #ffbe0b);
+  font-weight: 700;
+}
+
+.baseball-linescore-table .h-header,
+.baseball-linescore-table .h-cell {
+  color: #38bdf8;
+}
+
+.baseball-linescore-table .e-header,
+.baseball-linescore-table .e-cell {
+  color: #f87171;
+}
+
+/* Rebas BoxScore Dropdown & Tables */
+.rebas-boxscore-details {
+  margin-top: 0.65rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 0.5rem;
+}
+
+.rebas-boxscore-summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  padding: 4px 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: var(--accent, #38bdf8);
+  border-radius: 6px;
+  user-select: none;
+  transition: background 0.2s ease;
+}
+
+.rebas-boxscore-summary:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rebas-boxscore-content {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.boxscore-section-title {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text, #f1f5f9);
+  margin: 0 0 0.35rem 0;
+}
+
+.boxscore-team-group {
+  margin-bottom: 0.45rem;
+}
+
+.boxscore-team-header {
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--gold, #ffbe0b);
+  margin-bottom: 0.25rem;
+  padding-left: 2px;
+}
+
+.boxscore-table-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.boxscore-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.68rem;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.boxscore-table th {
+  padding: 3px 5px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--muted, #94a3b8);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.boxscore-table td {
+  padding: 3px 5px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.boxscore-table .player-name-cell {
+  text-align: left;
+  padding-left: 6px;
+  font-weight: 600;
+  color: var(--text, #f1f5f9);
+}
+
+.rebas-attribution-footer {
+  margin-top: 0.6rem;
+  padding-top: 0.35rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.06);
+  font-size: 0.64rem;
+  color: var(--muted, #94a3b8);
+  text-align: right;
+}
+
+.rebas-attribution-footer a {
+  color: var(--accent, #38bdf8);
+  text-decoration: none;
+}
+
+.rebas-attribution-footer a:hover {
+  text-decoration: underline;
+}
+
 /* ==========================================================================
    Mobile RWD Fix: Calendar Date Selector & Today Button Overflow Prevention
    ========================================================================== */
