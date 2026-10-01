@@ -1032,13 +1032,13 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
 
   const venueTransit = useMemo(() => {
     if (!selectedVenue) return null
-    return getVenueTransit(selectedVenue.id)
+    return getVenueTransit(selectedVenue)
   }, [selectedVenue])
 
   // 當點選場館時，自動將捷運、雙鐵（高鐵/台鐵）、縣市公車切換至最近站點
   useEffect(() => {
     if (!selectedVenue) return
-    const vt = getVenueTransit(selectedVenue.id)
+    const vt = getVenueTransit(selectedVenue)
     if (!vt) return
 
     // 1. 同步公車縣市與推薦路線

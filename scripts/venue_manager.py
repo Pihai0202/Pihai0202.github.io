@@ -273,6 +273,64 @@ class VenueManager:
 
         return None
 
+    def generate_transit_description(self, lat, lon, city):
+        """Generate clean, human-readable transit instructions (like existing venues) based on nearest MRT/TRA."""
+        if not (lat and lon):
+            return ""
+
+        import math
+        mrt_stations = [
+            ("捷運板南線「國父紀念館站」", 25.0413, 121.5578),
+            ("捷運板南線「忠孝復興站」", 25.0418, 121.5438),
+            ("捷運板南線「忠孝新生站」", 25.0423, 121.5332),
+            ("捷運板南線「台北車站」", 25.0463, 121.5175),
+            ("捷運板南線「西門站」", 25.0421, 121.5083),
+            ("捷運板南線「市政府站」", 25.0411, 121.5654),
+            ("捷運板南線「昆陽站」", 25.0503, 121.5932),
+            ("捷運板南線/文湖線「南港展覽館站」", 25.0553, 121.6174),
+            ("捷運松山新店線「台北小巨蛋站」", 25.0518, 121.5501),
+            ("捷運松山新店線/淡水信義線「中山站」", 25.0528, 121.5204),
+            ("捷運松山新店線「公館站」", 25.0136, 121.5342),
+            ("捷運淡水信義線「台北101/世貿站」", 25.0332, 121.5641),
+            ("捷運淡水信義線「象山站」", 25.0329, 121.5714),
+            ("捷運淡水信義線「大安站」", 25.0329, 121.5435),
+            ("捷運淡水信義線「圓山站」", 25.0712, 121.5201),
+            ("捷運中和新蘆線「頂溪站」", 25.0136, 121.5152),
+            ("捷運中和新蘆線「新莊站」", 25.0364, 121.4533),
+            ("捷運環狀線「板橋站」", 25.0139, 121.4632),
+            ("捷運環狀線/松山新店線「大坪林站」", 24.9829, 121.5414),
+            ("捷運文湖線「劍南路站」", 25.0849, 121.5558),
+            ("機場捷運「新莊副都心站」", 25.0592, 121.4447),
+            ("機場捷運「體育大學站」", 25.0339, 121.3897),
+            ("台中捷運「市政府站」", 24.1611, 120.6472),
+            ("台中捷運「文心中清站」", 24.1728, 120.6728),
+            ("高雄捷運紅線「巨蛋站」", 22.6658, 120.3025),
+            ("高雄捷運紅線「世運站」", 22.6989, 120.3025),
+            ("高雄捷運紅線「左營站」", 22.6875, 120.3075),
+            ("高雄捷運橘線「哈瑪星站」", 22.6219, 120.2758),
+            ("高雄輕軌「駁二大義站」", 22.6194, 120.2831),
+            ("高雄輕軌「真愛碼頭站」", 22.6206, 120.2872),
+        ]
+
+        def dist_km(lat1, lon1, lat2, lon2):
+            dlat = (lat2 - lat1) * 111.0
+            dlon = (lon2 - lon1) * 111.0 * math.cos(math.radians(lat1))
+            return math.sqrt(dlat * dlat + dlon * dlon)
+
+        best_mrt = None
+        min_dist = 2.0  # within 2km
+        for name, mlat, mlon in mrt_stations:
+            d = dist_km(lat, lon, mlat, mlon)
+            if d < min_dist:
+                min_dist = d
+                best_mrt = name
+
+        if best_mrt:
+            walk_min = max(2, round((min_dist * 1000) / 75))
+            return f"{best_mrt}步行約 {walk_min} 分鐘"
+
+        return f"鄰近大眾運輸站點，可搭乘市區公車或火車前往"
+
     def auto_create_venue(self, venue_raw, context_text=""):
         """
         Geocode unknown venue and automatically create it in Firestore ONLY if strictly valid.
@@ -304,6 +362,7 @@ class VenueManager:
         venue_id = slug
         city = geo.get("city") or self.extract_city(context_text + " " + clean_name)
         address = extracted_addr or geo.get("address", "")
+        transit_desc = self.generate_transit_description(geo["latitude"], geo["longitude"], city)
 
         # Payload for Firestore REST API
         doc_payload = {
@@ -315,7 +374,7 @@ class VenueManager:
                 "latitude": {"doubleValue": geo["latitude"]},
                 "longitude": {"doubleValue": geo["longitude"]},
                 "capacity": {"stringValue": "未知"},
-                "transit": {"stringValue": ""},
+                "transit": {"stringValue": transit_desc},
                 "x": {"integerValue": "0"},
                 "y": {"integerValue": "0"},
             }
@@ -331,7 +390,7 @@ class VenueManager:
                 method="PATCH"
             )
             with urllib.request.urlopen(req, timeout=10) as res:
-                print(f"[VenueManager] ✨ Successfully created new venue in Firestore: '{clean_name}' (ID: {venue_id}, City: {city}, Coords: {geo['latitude']:.4f}, {geo['longitude']:.4f})", file=sys.stderr)
+                print(f"[VenueManager] ✨ Successfully created new venue in Firestore: '{clean_name}' (ID: {venue_id}, City: {city}, Transit: {transit_desc})", file=sys.stderr)
         except Exception as e:
             print(f"[VenueManager] ⚠ Failed to write new venue '{venue_id}' to Firestore: {e}", file=sys.stderr)
 
