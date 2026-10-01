@@ -291,7 +291,7 @@ def fetch(url, as_json=False, headers=None):
 def match_venue(text, venue_raw=None):
     """
     Return (venue_id, venue_name) or (None, None).
-    If unknown venue is encountered, automatically geocodes and registers to Firestore.
+    If unknown venue is encountered, automatically geocodes and registers to Firestore ONLY with explicit venue_raw.
     """
     if venue_manager:
         # 1. Match in text or venue_raw
@@ -303,10 +303,9 @@ def match_venue(text, venue_raw=None):
             if vid:
                 return vid, vname
 
-        # 2. Try auto-creation if venue_raw exists
-        target = venue_raw or text
-        if target:
-            vid, vname, _ = venue_manager.auto_create_venue(target, context_text=text)
+        # 2. Try auto-creation ONLY when explicit venue_raw is provided
+        if venue_raw and len(venue_raw.strip()) >= 3:
+            vid, vname, _ = venue_manager.auto_create_venue(venue_raw, context_text=text)
             if vid:
                 return vid, vname
     else:

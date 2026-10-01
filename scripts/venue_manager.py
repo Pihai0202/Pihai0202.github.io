@@ -3,7 +3,7 @@
 Venue Manager for Concert Crawler (Auto-sync & Auto-register with Firestore)
 - Syncs known venues dynamically from Firebase Firestore.
 - Performs fuzzy matching on venue names.
-- Automatically geocodes and adds unknown venues to Firestore with coordinates.
+- Automatically geocodes and adds unknown venues to Firestore with coordinates ONLY when strictly validated.
 """
 
 import re
@@ -46,11 +46,22 @@ TAIWAN_CITIES = [
     ("連江", ["連江", "馬祖", "Matsu"]),
 ]
 
-# Blacklisted/Ignored venue terms (e.g. online events, placeholder names)
-IGNORED_VENUE_KEYWORDS = [
+# Blacklisted terms that indicate non-venues or event titles
+IGNORED_TERMS = [
     "線上", "online", "待定", "tba", "tbd", "尚未公布", "各大影城", "影城", "直播",
     "依活動頁面為主", "請依活動頁面為主", "全台", "全省", "超商", "ibon", "7-eleven",
-    "全家", "famimax", "博客來", "line", "zoom", "youtube", "meet"
+    "全家", "famimax", "博客來", "line", "zoom", "youtube", "meet",
+    "演唱會", "音樂會", "巡迴", "見面會", "粉絲見面會", "公演", "加場",
+    "台北場", "高雄場", "台中場", "售票", "開賣", "首演", "彩排", "工作坊", "講座",
+    "入場券", "單人票", "雙人票", "早鳥票", "vip"
+]
+
+# Positive keywords that indicate a real venue / facility
+VENUE_INDICATORS = [
+    "館", "場", "中心", "house", "堂", "店", "特區", "園區", "廳", "劇場", "巨蛋",
+    "live", "room", "studio", "hall", "arena", "dome", "center", "club", "bar",
+    "space", "hub", "公園", "學校", "活動中心", "文創", "stage", "展演", "禮堂",
+    "廣場", "基地", "倉庫", "體育館", "音樂廳", "音樂中心", "文化中心", "美術館", "博物館"
 ]
 
 class VenueManager:
@@ -131,36 +142,69 @@ class VenueManager:
         return None, None, None
 
     def clean_venue_raw(self, raw_text):
-        """Extract clean venue name and optional address from raw venue text."""
+        """
+        Extract clean venue name and address from raw venue text.
+        Returns (clean_name, address) or ("", "") if invalid.
+        """
         if not raw_text:
             return "", ""
 
         text = raw_text.strip()
-        # Remove markdown/HTML tags
+        # Remove HTML tags & markdown
         text = re.sub(r"<[^>]+>", " ", text)
         text = re.sub(r"\[.*?\]", " ", text)
-        
-        # Check blacklist
-        lower = text.lower()
-        if any(ign in lower for ign in IGNORED_VENUE_KEYWORDS):
+
+        # Extract address if contained in parentheses, e.g. "Corner Max (台北市大安區光復南路102號)"
+        addr_match = re.search(r"[\(（]([^）\)]*(?:市|縣)[^）\)]*(?:路|街|大道|段)[^）\)]*)[\)）]", text)
+        extracted_addr = addr_match.group(1).strip() if addr_match else ""
+
+        # Remove bracketed text like 【...】, [...], 「...」, etc.
+        clean = re.sub(r"【[^】]*】", " ", text)
+        clean = re.sub(r"\[[^\]]*\]", " ", clean)
+        clean = re.sub(r"[\(（][^）\)]*[\)）]", " ", clean)
+        clean = re.sub(r"[「」『』《》〈〉]", " ", clean)
+
+        # Remove noise prefixes
+        clean = re.sub(r"^(地點|場地|演出地點|活動地點|場館|活動地址|地址)[：:\s]*", "", clean)
+        # Remove dates / times e.g. "2025/05/20", "19:30"
+        clean = re.sub(r"\b\d{4}[/-]\d{1,2}[/-]\d{1,2}\b", " ", clean)
+        clean = re.sub(r"\b\d{1,2}[/-]\d{1,2}\b", " ", clean)
+        clean = re.sub(r"\b\d{1,2}:\d{2}\b", " ", clean)
+        clean = re.sub(r"\s+", " ", clean).strip()
+
+        # If clean text has multiple lines or separators, take first segment
+        if len(clean) > 30:
+            parts = re.split(r"[\n\r/|／]", clean)
+            if parts and len(parts[0].strip()) >= 2:
+                clean = parts[0].strip()
+
+        # Final sanity checks on candidate name
+        if len(clean) < 3 or len(clean) > 35:
             return "", ""
 
-        # Extract address if contained in parentheses, e.g. "Corner Max (台北市大安區光復南路...)"
-        addr_match = re.search(r"[\(（]([^）\)]*(?:市|縣|區|路|街|段|號)[^）\)]*)[\)）]", text)
-        extracted_addr = addr_match.group(1).strip() if addr_match else ""
-        clean_name = re.sub(r"[\(（][^）\)]*[\)）]", " ", text).strip()
+        # Check blacklist
+        clean_lower = clean.lower()
+        if any(ign in clean_lower for ign in IGNORED_TERMS):
+            return "", ""
 
-        # Remove extra whitespace and noise prefixes
-        clean_name = re.sub(r"^(地點|場地|演出地點|活動地點|場館)[：:\s]*", "", clean_name)
-        clean_name = re.sub(r"\s+", " ", clean_name).strip()
+        # Reject pure numbers/symbols or names starting with numbers
+        if re.match(r"^[\d\W_]+$", clean) or re.match(r"^\d+[\s/-]", clean):
+            return "", ""
 
-        # If clean name is too long (e.g. whole paragraph), take the first line or first segment
-        if len(clean_name) > 40:
-            parts = re.split(r"[\n\r/|／]", clean_name)
-            if parts and len(parts[0].strip()) >= 2:
-                clean_name = parts[0].strip()
+        # Must have at least 2 Chinese characters OR at least one English word >= 3 chars
+        chinese_count = len(re.findall(r"[\u4e00-\u9fa5]", clean))
+        has_english_word = bool(re.search(r"[a-zA-Z]{3,}", clean))
+        if chinese_count < 2 and not has_english_word:
+            return "", ""
 
-        return clean_name, extracted_addr
+        # Must have a venue indicator OR a full Taiwan street address structure
+        has_venue_kw = any(vk.lower() in clean_lower for vk in VENUE_INDICATORS)
+        has_address_structure = bool(re.search(r"(?:市|縣).{1,5}(?:區|鄉|鎮|市).{1,10}(?:路|街|大道)", clean + " " + extracted_addr))
+
+        if not (has_venue_kw or has_address_structure):
+            return "", ""
+
+        return clean, extracted_addr
 
     def extract_city(self, text):
         """Infer Taiwan city name from text."""
@@ -168,7 +212,7 @@ class VenueManager:
             for alias in aliases:
                 if alias in text:
                     return city_standard
-        return "台北" # Default fallback
+        return "台北"
 
     def geocode(self, name, address=""):
         """
@@ -176,7 +220,7 @@ class VenueManager:
         Returns: {lat, lon, address, city} or None
         """
         search_queries = []
-        if address and len(address) >= 5:
+        if address and len(address) >= 6:
             search_queries.append(address)
         if name:
             search_queries.append(f"{name} 台灣")
@@ -188,10 +232,10 @@ class VenueManager:
                     return self.geocode_cache[query]
                 continue
 
-            # Respect OSM Nominatim usage policy: min 1 sec between requests
+            # Respect OSM Nominatim usage policy: min 1.1 sec between requests
             elapsed = time.time() - self.last_geocode_time
-            if elapsed < 1.0:
-                time.sleep(1.0 - elapsed)
+            if elapsed < 1.1:
+                time.sleep(1.1 - elapsed)
 
             encoded = urllib.parse.quote(query)
             url = f"https://nominatim.openstreetmap.org/search?q={encoded}&format=json&limit=1&countrycodes=tw"
@@ -202,9 +246,15 @@ class VenueManager:
                 with urllib.request.urlopen(req, timeout=8) as res:
                     data = json.loads(res.read().decode("utf-8"))
                     if data and len(data) > 0:
-                        lat = float(data[0]["lat"])
-                        lon = float(data[0]["lon"])
-                        display_name = data[0].get("display_name", "")
+                        item = data[0]
+                        lat = float(item["lat"])
+                        lon = float(item["lon"])
+                        display_name = item.get("display_name", "")
+                        osm_type = item.get("type", "")
+
+                        # Reject results that are just arbitrary residential house numbers for a non-address query
+                        if not address and osm_type in ("house", "yes", "unclassified") and len(name) < 4:
+                            continue
 
                         # Verify Taiwan bounds
                         if TW_LAT_MIN <= lat <= TW_LAT_MAX and TW_LON_MIN <= lon <= TW_LON_MAX:
@@ -225,11 +275,11 @@ class VenueManager:
 
     def auto_create_venue(self, venue_raw, context_text=""):
         """
-        Geocode unknown venue and automatically create it in Firestore.
+        Geocode unknown venue and automatically create it in Firestore ONLY if strictly valid.
         Returns: (venue_id, venue_name, city) or (None, None, None)
         """
         clean_name, extracted_addr = self.clean_venue_raw(venue_raw)
-        if not clean_name or len(clean_name) < 2:
+        if not clean_name:
             return None, None, None
 
         # Double check match with clean name
@@ -237,7 +287,7 @@ class VenueManager:
         if matched_id:
             return matched_id, matched_name, matched_city
 
-        print(f"[VenueManager] 🔍 Found new potential venue: '{clean_name}' (raw: '{venue_raw}')", file=sys.stderr)
+        print(f"[VenueManager] 🔍 Validated new potential venue: '{clean_name}' (raw: '{venue_raw}')", file=sys.stderr)
 
         # Geocode
         geo = self.geocode(clean_name, extracted_addr)
