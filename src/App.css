@@ -4756,7 +4756,7 @@ svg#taiwan-map.dragging {
   background: var(--surface2);
   border: 1px solid var(--border);
   border-radius: 8px;
-  padding: 1.2rem;
+  padding: 1rem 1.1rem;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   transition: all 0.3s ease;
   position: relative;
@@ -4792,19 +4792,31 @@ svg#taiwan-map.dragging {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.9rem;
   padding-bottom: 0.6rem;
   border-bottom: 1px dashed var(--border);
+  gap: 0.5rem;
+  white-space: nowrap;
 }
 
 .weather-title {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.45rem;
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
   letter-spacing: 0.05em;
+  white-space: nowrap;
+  flex: 1;
+  min-width: 0;
+}
+
+.weather-title > span:first-child {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .fallback-badge {
@@ -4815,6 +4827,8 @@ svg#taiwan-map.dragging {
   padding: 0.1rem 0.4rem;
   border-radius: 4px;
   cursor: help;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .cwa-badge {
@@ -4822,13 +4836,15 @@ svg#taiwan-map.dragging {
   background: rgba(56, 189, 248, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.35);
   color: #38bdf8;
-  padding: 0.1rem 0.45rem;
+  padding: 0.12rem 0.45rem;
   border-radius: 4px;
   font-weight: 600;
   display: inline-flex;
   align-items: center;
   gap: 3px;
   letter-spacing: 0.02em;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .weather-summary-banner {
@@ -4875,15 +4891,16 @@ svg#taiwan-map.dragging {
 
 .weather-main {
   display: grid;
-  grid-template-columns: 1.2fr 1fr;
+  grid-template-columns: auto 1fr;
   align-items: center;
-  gap: 1rem;
+  gap: 0.9rem;
 }
 
 .weather-temp-section {
   display: flex;
   align-items: center;
-  gap: 0.8rem;
+  gap: 0.6rem;
+  white-space: nowrap;
 }
 
 .weather-emoji {
@@ -4894,6 +4911,7 @@ svg#taiwan-map.dragging {
 .weather-temp-wrap {
   display: flex;
   flex-direction: column;
+  white-space: nowrap;
 }
 
 .temp-val {
@@ -4902,32 +4920,46 @@ svg#taiwan-map.dragging {
   font-weight: 700;
   color: var(--text);
   line-height: 1.1;
+  white-space: nowrap;
 }
 
 .weather-desc {
   font-size: 0.8rem;
   color: var(--muted);
+  white-space: nowrap;
 }
 
 .weather-details {
   display: flex;
   flex-direction: column;
-  gap: 0.3rem;
-  font-size: 0.72rem;
+  gap: 0.35rem;
+  font-size: 0.73rem;
   border-left: 1px solid var(--border);
   padding-left: 0.8rem;
+  min-width: 0;
 }
 
 .detail-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   color: var(--muted);
+  white-space: nowrap;
+  gap: 0.5rem;
+}
+
+.detail-item .label {
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .detail-item .value {
   color: var(--text);
   font-weight: 600;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  white-space: nowrap;
+  flex-shrink: 0;
+  text-align: right;
 }
 
 /* AQI Section */
@@ -5063,7 +5095,8 @@ svg#taiwan-map.dragging {
   position: absolute;
   top: 5rem;
   right: 1.5rem;
-  width: 330px;
+  width: 350px;
+  max-width: calc(100vw - 2rem);
   max-height: calc(100% - 6.5rem);
   overflow-y: auto;
   z-index: 10;
@@ -5686,15 +5719,16 @@ svg#taiwan-map.dragging {
 }
 
 .forecast-item {
-  flex: 0 0 76px;
+  flex: 0 0 84px;
   display: flex;
   flex-direction: column;
   align-items: center;
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.03);
   border-radius: 6px;
-  padding: 0.5rem 0.2rem;
+  padding: 0.5rem 0.25rem;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .forecast-item:hover {
@@ -5707,6 +5741,7 @@ svg#taiwan-map.dragging {
   font-weight: 600;
   color: var(--text);
   margin-bottom: 0.2rem;
+  white-space: nowrap;
 }
 
 .forecast-emoji {
@@ -5715,9 +5750,14 @@ svg#taiwan-map.dragging {
 }
 
 .forecast-desc {
-  font-size: 0.7rem;
+  font-size: 0.68rem;
   color: var(--muted);
   margin-bottom: 0.2rem;
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: center;
 }
 
 .forecast-temp {
@@ -5725,6 +5765,7 @@ svg#taiwan-map.dragging {
   font-weight: 700;
   color: var(--text);
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  white-space: nowrap;
 }
 
 .forecast-rain {
@@ -5732,6 +5773,7 @@ svg#taiwan-map.dragging {
   color: #38bdf8;
   margin-top: 2px;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 /* ==========================================================================

@@ -705,11 +705,15 @@ export function VenueWeather({ latitude, longitude, cityName, address, onClose, 
               {dailyForecast.map((day) => {
                 const info = parseWeatherCode(day.weatherCode, lang, day.desc)
                 const dayLabel = getDayLabel(day.date)
+                const displayDesc = lang === 'zh-TW' && info.desc.length > 4
+                  ? info.desc.replace(/短暫陣雨/g, '短暫雨').replace(/短暫雷陣雨/g, '雷雨').replace(/時多雲/g, '').replace(/時陰/g, '')
+                  : info.desc
+
                 return (
                   <div className="forecast-item" key={day.date}>
                     <span className="forecast-day">{dayLabel}</span>
                     <span className="forecast-emoji" title={info.desc}>{info.icon}</span>
-                    <span className="forecast-desc">{info.desc}</span>
+                    <span className="forecast-desc" title={info.desc}>{displayDesc}</span>
                     <span className="forecast-temp">{day.tempMin}°~{day.tempMax}°C</span>
                     {day.rain && day.rain !== '-' && (
                       <span className="forecast-rain" title="降雨機率">💧{day.rain}%</span>
