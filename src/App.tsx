@@ -15,7 +15,7 @@ import type {
 } from './types'
 
 import { VENUES } from './constants/venues'
-import { TaiwanMap, Stat, LegendItem } from './components/TaiwanMap'
+import { TaiwanMap, LegendItem } from './components/TaiwanMap'
 import { VenueInfo } from './components/VenueInfo'
 import { VenueWeather } from './components/VenueWeather'
 import { ConcertDetail } from './components/ConcertDetail'
@@ -1192,8 +1192,6 @@ function App() {
   const detailConcert = concerts.find((concert) => concert.id === detailConcertId) ?? null
   const lightboxConcert = lightbox ? concerts.find((concert) => concert.id === lightbox.concertId) : null
   const lightboxMedia = lightbox && lightboxConcert ? lightboxConcert.media[lightbox.mediaIndex] : null
-  const visitedVenueCount = new Set(concerts.map((concert) => concert.venueId)).size
-  const totalMedia = concerts.reduce((sum, concert) => sum + concert.media.length, 0)
   const musicBarEmbedUrl = parseSpotifyEmbedUrl(musicBarUrl)
   const musicBarPlayerHeight = musicBarUrl
     ? (musicBarUrl.includes('/track/') || musicBarUrl.includes('/episode/') ? 80 : 352)
@@ -2156,12 +2154,6 @@ function App() {
         </div>
 
         <div className="header-right">
-          <div className="stats-bar">
-            <Stat number={concerts.length} label={t('statConcerts')} />
-            <Stat number={visitedVenueCount} label={t('statVenues')} />
-            <Stat number={remoteConcerts.length} label={t('statTickets')} />
-            <Stat number={totalMedia} label={t('statMedia')} />
-          </div>
           <button
             className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
             type="button"
