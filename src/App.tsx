@@ -1614,6 +1614,11 @@ function App() {
 
 
   const openAddModal = (date?: string, venue?: typeof VENUES[0] | null) => {
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員以新增個人演唱會記錄！' : 'Please log in to add concert logs!', 'info')
+      setView('login')
+      return
+    }
     const activeVenue = venue !== undefined ? venue : selectedVenue
     setForm({
       ...EMPTY_FORM,
@@ -1640,6 +1645,11 @@ function App() {
   }
 
   const openEditModal = (concert: Concert) => {
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員以編輯個人演唱會記錄！' : 'Please log in to edit concert logs!', 'info')
+      setView('login')
+      return
+    }
     setForm({
       artist: concert.artist,
       concertName: concert.concertName || '',
@@ -1847,6 +1857,13 @@ function App() {
   }
 
   const saveConcert = async () => {
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員以儲存演唱會記錄！' : 'Please log in to save concert logs!', 'info')
+      setIsAddModalOpen(false)
+      setView('login')
+      return
+    }
+
     if (pendingMedia.some((m) => m.isUploading)) {
       showToast(lang === 'zh-TW' ? '照片仍在儲存/上傳中，請稍候。' : 'Photos are still uploading, please wait.', 'info')
       return
@@ -1936,6 +1953,11 @@ function App() {
 
   const deleteConcert = (id: string, event: MouseEvent<HTMLButtonElement>) => {
     event.stopPropagation()
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員！' : 'Please log in first!', 'info')
+      setView('login')
+      return
+    }
     if (!confirm(t('confirmDelete'))) return
     
     // Clean up IndexedDB media
@@ -1954,7 +1976,13 @@ function App() {
 
   const handlePublishToBoard = async (authorName: string) => {
     if (!publishingConcert) return
-    const author = authorName.trim() || t('anonymousAuthor')
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員以發布心得至公開社群！' : 'Please log in to share review with community!', 'info')
+      setIsPublishModalOpen(false)
+      setView('login')
+      return
+    }
+    const author = authorName.trim() || currentUser?.nickname || t('anonymousAuthor')
     localStorage.setItem('tw-nickname', author)
     setNickname(author)
 
@@ -2937,7 +2965,14 @@ function App() {
           />
         </main>
       ) : view === 'board' ? (
-        <ShareBoard />
+        <ShareBoard
+          isLoggedIn={isLoggedIn}
+          currentUser={currentUser}
+          onRequireLogin={(msg) => {
+            showToast(msg || (lang === 'zh-TW' ? '請先登入會員以使用社群功能！' : 'Please log in to use community features!'), 'info')
+            setView('login')
+          }}
+        />
       ) : view === 'profile' && isLoggedIn && currentUser ? (
         <ProfilePage
           user={currentUser}
@@ -3298,6 +3333,11 @@ function App() {
             concert={detailConcert}
             onOpenLightbox={(mediaIndex) => setLightbox({ concertId: detailConcert.id, mediaIndex })}
             onPublishToBoard={() => {
+              if (!isLoggedIn || !currentUser) {
+                showToast(lang === 'zh-TW' ? '請先登入會員以發布心得至公開社群！' : 'Please log in to share review with community!', 'info')
+                setView('login')
+                return
+              }
               setPublishingConcert(detailConcert)
               setIsPublishModalOpen(true)
               setDetailConcertId(null) // Close detail modal immediately
@@ -3325,6 +3365,12 @@ function App() {
             onRefreshScore={pollCpblLiveScores}
             isScoreRefreshing={isCpblRefreshing}
             onLogAsPersonal={(ticket) => {
+              if (!isLoggedIn || !currentUser) {
+                showToast(lang === 'zh-TW' ? '請先登入會員以收錄活動至我的記錄！' : 'Please log in to save to your personal records!', 'info')
+                setSelectedTicket(null)
+                setView('login')
+                return
+              }
               setSelectedTicket(null)
               const extractedArtist = extractArtistFromTitle(ticket.name)
               const matchedVenue = VENUES.find(v => v.id === ticket.venue_id || (ticket.venue_name && v.name.includes(ticket.venue_name))) || null

@@ -22,7 +22,13 @@ import { db, logCustomEvent } from '../firebase'
 
 const LIKED_STORAGE_KEY = 'tw-liked-notes'
 
-export function ShareBoard() {
+interface ShareBoardProps {
+  isLoggedIn?: boolean
+  currentUser?: { nickname: string; email?: string; avatarUrl?: string; spotifyUrl?: string } | null
+  onRequireLogin?: (message?: string) => void
+}
+
+export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLogin }: ShareBoardProps = {}) {
   const { t, lang } = useTranslation()
   const [notes, setNotes] = useState<SharedNote[]>([])
   const [likedIds, setLikedIds] = useState<Record<string, boolean>>({})
@@ -37,7 +43,7 @@ export function ShareBoard() {
     venueName: '',
     venueCity: '台北',
     date: '',
-    author: localStorage.getItem('tw-nickname') || '',
+    author: currentUser?.nickname || localStorage.getItem('tw-nickname') || '',
     notes: '',
   })
 
@@ -45,13 +51,20 @@ export function ShareBoard() {
   const [selectedNote, setSelectedNote] = useState<SharedNote | null>(null)
   const [replies, setReplies] = useState<any[]>([])
   const [replyForm, setReplyForm] = useState({
-    author: localStorage.getItem('tw-nickname') || '',
+    author: currentUser?.nickname || localStorage.getItem('tw-nickname') || '',
     content: ''
   })
   const [replyActiveTab, setReplyActiveTab] = useState<'edit' | 'preview'>('edit')
   const [isPublishingReply, setIsPublishingReply] = useState(false)
   const [likedReplies, setLikedReplies] = useState<Record<string, boolean>>({})
   const [replyTo, setReplyTo] = useState<{ id: string; author: string } | null>(null)
+
+  useEffect(() => {
+    if (currentUser?.nickname) {
+      setForm(prev => ({ ...prev, author: currentUser.nickname }))
+      setReplyForm(prev => ({ ...prev, author: currentUser.nickname }))
+    }
+  }, [currentUser?.nickname])
 
   const notesPreviewHtml = useMemo(() => {
     if (!form.notes) return `<p style="color: var(--muted); font-style: italic; font-size: 0.85rem; padding: 1rem 0;">${lang === 'zh-TW' ? '（輸入心得後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing reviews)'}</p>`
@@ -186,7 +199,11 @@ export function ShareBoard() {
   const handleAddReply = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selectedNote) return
-    const author = replyForm.author.trim() || t('anonymousAuthor')
+    if (!isLoggedIn || !currentUser) {
+      onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員以發表回覆！' : 'Please log in to reply!')
+      return
+    }
+    const author = replyForm.author.trim() || currentUser?.nickname || t('anonymousAuthor')
     const content = replyForm.content.trim()
 
     if (!content) {
@@ -240,6 +257,10 @@ export function ShareBoard() {
 
   // Trigger Reply to another reply
   const handleTriggerReplyTo = (replyId: string, author: string) => {
+    if (!isLoggedIn || !currentUser) {
+      onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員以回覆留言！' : 'Please log in to reply!')
+      return
+    }
     setReplyTo({ id: replyId, author })
     
     // Focus reply input
@@ -260,6 +281,10 @@ export function ShareBoard() {
   // Handle delete of a reply
   const handleReplyDelete = async (replyId: string) => {
     if (!selectedNote) return
+    if (!isLoggedIn || !currentUser) {
+      onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員！' : 'Please log in first!')
+      return
+    }
     if (!confirm(lang === 'zh-TW' ? '確定要刪除這則回覆嗎？' : 'Are you sure you want to delete this reply?')) return
     try {
       await deleteDoc(doc(db, 'reviews', selectedNote.id, 'replies', replyId))
@@ -312,11 +337,15 @@ export function ShareBoard() {
 
   const handlePublish = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (!isLoggedIn || !currentUser) {
+      onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員以發布心得貼文！' : 'Please log in to publish a review!')
+      return
+    }
     const artist = form.artist.trim()
     const concertName = form.concertName.trim()
     const venueName = form.venueName.trim()
     const venueCity = form.venueCity.trim()
-    const author = form.author.trim() || t('anonymousAuthor')
+    const author = form.author.trim() || currentUser?.nickname || t('anonymousAuthor')
     const notesContent = form.notes.trim()
 
     if (!artist) {
@@ -377,6 +406,10 @@ export function ShareBoard() {
   }
 
   const handleNoteDelete = async (noteId: string) => {
+    if (!isLoggedIn || !currentUser) {
+      onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員！' : 'Please log in first!')
+      return
+    }
     if (!confirm(lang === 'zh-TW' ? '確定要刪除這筆分享記錄嗎？' : 'Are you sure you want to delete this shared review?')) return
     try {
       await deleteDoc(doc(db, 'reviews', noteId))
@@ -445,7 +478,11 @@ export function ShareBoard() {
           className="board-publish-trigger"
           type="button"
           onClick={() => {
-            setForm((prev) => ({ ...prev, author: localStorage.getItem('tw-nickname') || '' }))
+            if (!isLoggedIn || !currentUser) {
+              onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員以發布心得貼文！' : 'Please log in to publish a review!')
+              return
+            }
+            setForm((prev) => ({ ...prev, author: currentUser?.nickname || localStorage.getItem('tw-nickname') || '' }))
             setIsModalOpen(true)
           }}
         >
@@ -870,89 +907,128 @@ export function ShareBoard() {
                   <EditIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
                   {lang === 'zh-TW' ? '發表回覆' : 'Post Reply'}
                 </h4>
-                {replyTo && (
-                  <div className="reply-to-info-banner">
-                    <span>
-                      {lang === 'zh-TW' ? `正在回覆 @${replyTo.author}` : `Replying to @${replyTo.author}`}
-                    </span>
+                {!isLoggedIn || !currentUser ? (
+                  <div className="reply-login-prompt" style={{
+                    padding: '1.4rem 1rem',
+                    textAlign: 'center',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    borderRadius: '12px',
+                    border: '1px dashed rgba(255, 255, 255, 0.15)',
+                    marginTop: '0.75rem',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    gap: '0.75rem'
+                  }}>
+                    <p style={{ color: 'var(--muted)', fontSize: '0.88rem', margin: 0 }}>
+                      {lang === 'zh-TW' ? '💬 登入會員後即可參與討論與發表回覆' : '💬 Log in to participate in the conversation and post replies'}
+                    </p>
                     <button
                       type="button"
-                      className="cancel-reply-to-btn"
-                      onClick={() => setReplyTo(null)}
+                      className="login-redirect-btn"
+                      onClick={() => onRequireLogin?.(lang === 'zh-TW' ? '請先登入會員以發表回覆！' : 'Please log in to reply!')}
+                      style={{
+                        padding: '0.45rem 1.3rem',
+                        borderRadius: '20px',
+                        background: 'linear-gradient(135deg, var(--primary), #e0484d)',
+                        color: '#fff',
+                        border: 'none',
+                        fontWeight: 600,
+                        fontSize: '0.85rem',
+                        cursor: 'pointer',
+                        boxShadow: '0 4px 12px rgba(255, 90, 95, 0.25)'
+                      }}
                     >
-                      ✕
+                      {lang === 'zh-TW' ? '立即登入' : 'Log In Now'}
                     </button>
                   </div>
-                )}
-                <form onSubmit={handleAddReply}>
-                  <div className="form-group">
-                    <label htmlFor="reply-author">{t('nicknameForm')}</label>
-                    <input
-                      id="reply-author"
-                      type="text"
-                      value={replyForm.author}
-                      onChange={(e) => setReplyForm({ ...replyForm, author: e.target.value })}
-                      placeholder={t('shareNicknamePlaceholder')}
-                      maxLength={20}
-                    />
-                  </div>
-                  <div className="form-group">
-                    <div className="notes-label-row">
-                      <label htmlFor="reply-content">{lang === 'zh-TW' ? '回覆內容 * (支援 Markdown)' : 'Reply Content * (Markdown)'}</label>
-                      <div className="notes-tabs">
+                ) : (
+                  <>
+                    {replyTo && (
+                      <div className="reply-to-info-banner">
+                        <span>
+                          {lang === 'zh-TW' ? `正在回覆 @${replyTo.author}` : `Replying to @${replyTo.author}`}
+                        </span>
                         <button
                           type="button"
-                          className={`notes-tab-btn${replyActiveTab === 'edit' ? ' active' : ''}`}
-                          onClick={() => setReplyActiveTab('edit')}
+                          className="cancel-reply-to-btn"
+                          onClick={() => setReplyTo(null)}
                         >
-                          {lang === 'zh-TW' ? '編輯' : 'Edit'}
-                        </button>
-                        <button
-                          type="button"
-                          className={`notes-tab-btn${replyActiveTab === 'preview' ? ' active' : ''}`}
-                          onClick={() => setReplyActiveTab('preview')}
-                        >
-                          {lang === 'zh-TW' ? '預覽' : 'Preview'}
+                          ✕
                         </button>
                       </div>
-                    </div>
-                    {replyActiveTab === 'edit' ? (
-                      <textarea
-                        id="reply-content"
-                        value={replyForm.content}
-                        required
-                        placeholder={lang === 'zh-TW' ? '寫下您的回覆... (支援 Markdown 語法)' : 'Write your reply... (Supports Markdown)'}
-                        onChange={(e) => setReplyForm({ ...replyForm, content: e.target.value })}
-                        style={{
-                          width: '100%',
-                          height: '90px',
-                          background: 'var(--surface)',
-                          border: '1px solid var(--border)',
-                          borderRadius: '8px',
-                          padding: '0.6rem 0.8rem',
-                          color: 'var(--text)',
-                          fontSize: '0.85rem',
-                          fontFamily: 'inherit',
-                          outline: 'none',
-                          resize: 'vertical'
-                        }}
-                      />
-                    ) : (
-                      <div
-                        className="notes-preview-box markdown-body"
-                        style={{ height: '90px', padding: '0.6rem 0.8rem', fontSize: '0.85rem' }}
-                        dangerouslySetInnerHTML={{ 
-                          __html: replyForm.content.trim() 
-                            ? (marked.parse(replyForm.content) as string) 
-                            : `<p style="color: var(--muted); font-style: italic; font-size: 0.8rem;">${lang === 'zh-TW' ? '（輸入內容後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing)'}</p>` 
-                        }}
-                      />
                     )}
-                  </div>
-                  <button className="reply-submit-btn" type="submit" disabled={isPublishingReply}>
-                    {isPublishingReply ? (lang === 'zh-TW' ? '發表中...' : 'Posting...') : (lang === 'zh-TW' ? '發表回覆' : 'Post Reply')}
-                  </button>
-                </form>
+                    <form onSubmit={handleAddReply}>
+                      <div className="form-group">
+                        <label htmlFor="reply-author">{t('nicknameForm')}</label>
+                        <input
+                          id="reply-author"
+                          type="text"
+                          value={replyForm.author}
+                          onChange={(e) => setReplyForm({ ...replyForm, author: e.target.value })}
+                          placeholder={t('shareNicknamePlaceholder')}
+                          maxLength={20}
+                        />
+                      </div>
+                      <div className="form-group">
+                        <div className="notes-label-row">
+                          <label htmlFor="reply-content">{lang === 'zh-TW' ? '回覆內容 * (支援 Markdown)' : 'Reply Content * (Markdown)'}</label>
+                          <div className="notes-tabs">
+                            <button
+                              type="button"
+                              className={`notes-tab-btn${replyActiveTab === 'edit' ? ' active' : ''}`}
+                              onClick={() => setReplyActiveTab('edit')}
+                            >
+                              {lang === 'zh-TW' ? '編輯' : 'Edit'}
+                            </button>
+                            <button
+                              type="button"
+                              className={`notes-tab-btn${replyActiveTab === 'preview' ? ' active' : ''}`}
+                              onClick={() => setReplyActiveTab('preview')}
+                            >
+                              {lang === 'zh-TW' ? '預覽' : 'Preview'}
+                            </button>
+                          </div>
+                        </div>
+                        {replyActiveTab === 'edit' ? (
+                          <textarea
+                            id="reply-content"
+                            value={replyForm.content}
+                            required
+                            placeholder={lang === 'zh-TW' ? '寫下您的回覆... (支援 Markdown 語法)' : 'Write your reply... (Supports Markdown)'}
+                            onChange={(e) => setReplyForm({ ...replyForm, content: e.target.value })}
+                            style={{
+                              width: '100%',
+                              height: '90px',
+                              background: 'var(--surface)',
+                              border: '1px solid var(--border)',
+                              borderRadius: '8px',
+                              padding: '0.6rem 0.8rem',
+                              color: 'var(--text)',
+                              fontSize: '0.85rem',
+                              fontFamily: 'inherit',
+                              outline: 'none',
+                              resize: 'vertical'
+                            }}
+                          />
+                        ) : (
+                          <div
+                            className="notes-preview-box markdown-body"
+                            style={{ height: '90px', padding: '0.6rem 0.8rem', fontSize: '0.85rem' }}
+                            dangerouslySetInnerHTML={{ 
+                              __html: replyForm.content.trim() 
+                                ? (marked.parse(replyForm.content) as string) 
+                                : `<p style="color: var(--muted); font-style: italic; font-size: 0.8rem;">${lang === 'zh-TW' ? '（輸入內容後可在此預覽 Markdown 效果）' : '(Preview Markdown output here after typing)'}</p>` 
+                            }}
+                          />
+                        )}
+                      </div>
+                      <button className="reply-submit-btn" type="submit" disabled={isPublishingReply}>
+                        {isPublishingReply ? (lang === 'zh-TW' ? '發表中...' : 'Posting...') : (lang === 'zh-TW' ? '發表回覆' : 'Post Reply')}
+                      </button>
+                    </form>
+                  </>
+                )}
               </div>
             </div>
           </div>
