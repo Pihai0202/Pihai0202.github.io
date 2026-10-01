@@ -214,6 +214,43 @@ class VenueManager:
                     return city_standard
         return "台北"
 
+    def format_taiwan_address(self, addr_dict, raw_display=""):
+        """Format OpenStreetMap address dictionary into standard Taiwan address structure."""
+        if not isinstance(addr_dict, dict):
+            return raw_display
+
+        city = addr_dict.get("city") or addr_dict.get("county") or addr_dict.get("state") or ""
+        city = city.replace("臺", "台")
+
+        # District / Town
+        dist = (
+            addr_dict.get("suburb") or
+            addr_dict.get("district") or
+            addr_dict.get("town") or
+            addr_dict.get("city_district") or
+            ""
+        )
+
+        # Road / Street
+        road = (
+            addr_dict.get("road") or
+            addr_dict.get("street") or
+            addr_dict.get("pedestrian") or
+            ""
+        )
+
+        # House number (clean semicolons e.g. "3;5" -> "3號")
+        house_num = addr_dict.get("house_number", "").strip()
+        if house_num:
+            house_num = re.sub(r";.*", "", house_num)  # Take primary number
+            if not house_num.endswith("號"):
+                house_num += "號"
+
+        if city and (dist or road):
+            return f"{city}{dist}{road}{house_num}".strip()
+
+        return raw_display
+
     def geocode(self, name, address=""):
         """
         Query OpenStreetMap Nominatim with rate limiting.
@@ -238,7 +275,7 @@ class VenueManager:
                 time.sleep(1.1 - elapsed)
 
             encoded = urllib.parse.quote(query)
-            url = f"https://nominatim.openstreetmap.org/search?q={encoded}&format=json&limit=1&countrycodes=tw"
+            url = f"https://nominatim.openstreetmap.org/search?q={encoded}&format=json&limit=1&countrycodes=tw&addressdetails=1"
             req = urllib.request.Request(url, headers={"User-Agent": "ConcertMapApp/1.0 (contact: concert-admin)"})
 
             try:
@@ -256,13 +293,15 @@ class VenueManager:
                         if not address and osm_type in ("house", "yes", "unclassified") and len(name) < 4:
                             continue
 
+                        formatted_addr = self.format_taiwan_address(item.get("address", {}), display_name)
+
                         # Verify Taiwan bounds
                         if TW_LAT_MIN <= lat <= TW_LAT_MAX and TW_LON_MIN <= lon <= TW_LON_MAX:
                             result = {
                                 "latitude": lat,
                                 "longitude": lon,
-                                "address": display_name,
-                                "city": self.extract_city(display_name + " " + query),
+                                "address": formatted_addr,
+                                "city": self.extract_city(formatted_addr + " " + query),
                             }
                             self.geocode_cache[query] = result
                             return result
