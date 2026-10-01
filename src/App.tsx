@@ -2405,6 +2405,7 @@ function App() {
                   latitude={selectedVenue.latitude}
                   longitude={selectedVenue.longitude}
                   cityName={selectedVenue.city}
+                  address={selectedVenue.address}
                   onClose={() => setSelectedVenueId(null)}
                   onViewDetails={() => setMobileTab('list')}
                 />
@@ -2615,6 +2616,7 @@ function App() {
                             latitude={selectedVenue.latitude}
                             longitude={selectedVenue.longitude}
                             cityName={selectedVenue.city}
+                            address={selectedVenue.address}
                             onClose={() => {
                               setSelectedVenueId(null)
                               setMobileDrawerState('collapsed')

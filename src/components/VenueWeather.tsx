@@ -20,6 +20,7 @@ interface VenueWeatherProps {
   latitude?: number
   longitude?: number
   cityName: string
+  address?: string
   onClose?: () => void
   onViewDetails?: () => void
 }
@@ -30,6 +31,11 @@ interface WeatherData {
   humidity: number
   weatherCode: number
   windSpeed: number
+  pop?: number // 降雨機率 %
+  cwaDesc?: string // CWA 原文天氣現象描述
+  cwaSummary?: string // CWA 綜合預報描述
+  uvIndex?: number // 紫外線指數
+  uvLevel?: string // 紫外線等級
 }
 
 interface AqiData {
@@ -43,60 +49,123 @@ interface DailyForecast {
   tempMax: number
   tempMin: number
   weatherCode: number
+  desc?: string
+  rain?: string
 }
 
 // Module-level cache to store weather responses for 5 minutes
-const weatherCache = new Map<string, { data: { weather: WeatherData; aqi: AqiData; daily: DailyForecast[] }; timestamp: number }>()
+const weatherCache = new Map<string, { data: { weather: WeatherData; aqi: AqiData; daily: DailyForecast[]; isCwa: boolean }; timestamp: number }>()
 const CACHE_EXPIRY_MS = 5 * 60 * 1000 // 5 minutes
 
-// Map WMO Weather Codes to Description and SVG Icon
-function parseWeatherCode(code: number, lang: string = 'zh-TW'): { desc: string; icon: React.ReactNode } {
+// Central Weather Administration (CWA) API Key
+const CWA_API_KEY = import.meta.env.VITE_CWA_API_KEY || 'CWA-B04957E8-910E-4E55-BC61-A01FFF86B1AE'
+
+/**
+ * 依據場館城市名稱或地址，對應到中央氣象署 (CWA) 的 22 個法定縣市名稱
+ */
+export function getCwaLocationName(cityName: string, address?: string): string {
+  const text = (address || cityName || '').trim()
+  if (text.includes('臺北') || text.includes('台北')) return '臺北市'
+  if (text.includes('新北')) return '新北市'
+  if (text.includes('桃園')) return '桃園市'
+  if (text.includes('臺中') || text.includes('台中')) return '臺中市'
+  if (text.includes('臺南') || text.includes('台南')) return '臺南市'
+  if (text.includes('高雄')) return '高雄市'
+  if (text.includes('基隆')) return '基隆市'
+  if (text.includes('新竹縣')) return '新竹縣'
+  if (text.includes('新竹')) return '新竹市'
+  if (text.includes('嘉義縣')) return '嘉義縣'
+  if (text.includes('嘉義')) return '嘉義市'
+  if (text.includes('苗栗')) return '苗栗縣'
+  if (text.includes('彰化')) return '彰化縣'
+  if (text.includes('南投')) return '南投縣'
+  if (text.includes('雲林')) return '雲林縣'
+  if (text.includes('屏東')) return '屏東縣'
+  if (text.includes('宜蘭')) return '宜蘭縣'
+  if (text.includes('花蓮')) return '花蓮縣'
+  if (text.includes('臺東') || text.includes('台東')) return '臺東縣'
+  if (text.includes('澎湖')) return '澎湖縣'
+  if (text.includes('金門')) return '金門縣'
+  if (text.includes('連江') || text.includes('馬祖')) return '連江縣'
+  return '臺北市'
+}
+
+/**
+ * 解析天氣現象代碼 (相容 CWA 與 WMO) 並回傳描述與圖示
+ */
+function parseWeatherCode(code: number, lang: string = 'zh-TW', rawDesc?: string): { desc: string; icon: React.ReactNode } {
   const isZh = lang === 'zh-TW'
-  switch (code) {
-    case 0:
-      return { desc: isZh ? '晴朗' : lang === 'ja' ? '快晴' : lang === 'ko' ? '맑음' : 'Clear Sky', icon: <SunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 1:
-      return { desc: isZh ? '晴間多雲' : lang === 'ja' ? '晴れ時々曇り' : lang === 'ko' ? '구름 조금' : 'Partly Cloudy', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 2:
-      return { desc: isZh ? '多雲' : lang === 'ja' ? '曇り' : lang === 'ko' ? '구름 많음' : 'Cloudy', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 3:
-      return { desc: isZh ? '陰天' : lang === 'ja' ? '曇天' : lang === 'ko' ? '흐림' : 'Overcast', icon: <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 45:
-    case 48:
-      return { desc: isZh ? '有霧' : lang === 'ja' ? '霧' : lang === 'ko' ? '안개' : 'Foggy', icon: <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 51:
-    case 53:
-    case 55:
-    case 56:
-    case 57:
-    case 61:
-    case 63:
-    case 65:
-    case 66:
-    case 67:
-      return { desc: isZh ? '雨天' : lang === 'ja' ? '雨' : lang === 'ko' ? '비' : 'Rainy', icon: <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 71:
-    case 73:
-    case 75:
-    case 77:
-      return { desc: isZh ? '雪天' : lang === 'ja' ? '雪' : lang === 'ko' ? '눈' : 'Snowy', icon: <SnowflakeIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 80:
-      return { desc: isZh ? '小陣雨' : lang === 'ja' ? '小雨' : lang === 'ko' ? '소나기' : 'Light Showers', icon: <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 81:
-      return { desc: isZh ? '陣雨' : lang === 'ja' ? 'にわか雨' : lang === 'ko' ? '소나기' : 'Showers', icon: <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 82:
-      return { desc: isZh ? '暴陣雨' : lang === 'ja' ? '豪雨' : lang === 'ko' ? '폭우' : 'Heavy Showers', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 85:
-    case 86:
-      return { desc: isZh ? '陣雪' : lang === 'ja' ? 'にわか雪' : lang === 'ko' ? '눈보라' : 'Snow Showers', icon: <SnowflakeIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 95:
-      return { desc: isZh ? '雷陣雨' : lang === 'ja' ? '雷雨' : lang === 'ko' ? '뇌우' : 'Thunderstorms', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    case 96:
-    case 99:
-      return { desc: isZh ? '雷雨伴有冰雹' : lang === 'ja' ? '雹を伴う雷雨' : lang === 'ko' ? '우박을 동반한 뇌우' : 'Thunderstorms with Hail', icon: <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
-    default:
-      return { desc: isZh ? '未知天氣' : lang === 'ja' ? '不明な天気' : lang === 'ko' ? '알 수 없는 날씨' : 'Unknown', icon: <ThermometerIcon size="1.2em" style={{ verticalAlign: 'middle' }} /> }
+  let desc = rawDesc || ''
+  let icon: React.ReactNode = <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+
+  // 晴天
+  if (code === 1 || code === 0) {
+    icon = <SunIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? '晴朗' : lang === 'ja' ? '快晴' : lang === 'ko' ? '맑음' : 'Clear Sky'
+    }
   }
+  // 晴時多雲、多雲時晴、多雲
+  else if (code >= 2 && code <= 4) {
+    icon = <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? (code === 4 ? '多雲' : '晴時多雲') : lang === 'ja' ? '晴れ時々曇り' : lang === 'ko' ? '구름 조금' : 'Partly Cloudy'
+    }
+  }
+  // 多雲時陰、陰天
+  else if ((code >= 5 && code <= 7) || code === 3) {
+    icon = <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? (code === 7 ? '陰天' : '多雲時陰') : lang === 'ja' ? '曇天' : lang === 'ko' ? '흐림' : 'Overcast'
+    }
+  }
+  // 陣雨、短暫陣雨、雨天
+  else if (
+    (code >= 8 && code <= 14) ||
+    code === 19 || code === 20 ||
+    [51, 53, 55, 56, 57, 61, 63, 65, 66, 67, 80, 81, 82].includes(code)
+  ) {
+    icon = <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? '短暫陣雨' : lang === 'ja' ? 'にわか雨' : lang === 'ko' ? '소나기' : 'Showers'
+    }
+  }
+  // 雷陣雨、雷雨
+  else if (
+    (code >= 15 && code <= 18) ||
+    code === 21 || code === 22 ||
+    (code >= 29 && code <= 42) ||
+    [95, 96, 99].includes(code)
+  ) {
+    icon = <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? '雷陣雨' : lang === 'ja' ? '雷雨' : lang === 'ko' ? '뇌우' : 'Thunderstorms'
+    }
+  }
+  // 霧、雪
+  else if ((code >= 23 && code <= 28) || [45, 48, 71, 73, 75, 77, 85, 86].includes(code)) {
+    icon = (code === 23 || code === 45 || code === 48)
+      ? <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      : <SnowflakeIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    if (!desc || !isZh) {
+      desc = isZh ? (code === 23 ? '有霧' : '降雪') : lang === 'ja' ? '霧/雪' : lang === 'ko' ? '안개/눈' : 'Fog/Snow'
+    }
+  }
+  // 其他/文字輔助判斷
+  else {
+    if (rawDesc) {
+      if (rawDesc.includes('雷')) icon = <CloudLightningIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      else if (rawDesc.includes('雨')) icon = <UmbrellaIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      else if (rawDesc.includes('陰')) icon = <CloudIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      else if (rawDesc.includes('晴')) icon = <SunIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      else icon = <CloudSunIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+    } else {
+      icon = <ThermometerIcon size="1.2em" style={{ verticalAlign: 'middle' }} />
+      desc = isZh ? '晴間多雲' : 'Partly Cloudy'
+    }
+  }
+
+  return { desc: desc || (isZh ? '晴間多雲' : 'Partly Cloudy'), icon }
 }
 
 // Get AQI category details
@@ -158,29 +227,30 @@ function getWeatherWarnings(weather: WeatherData, lang: string = 'zh-TW'): strin
   const warnings: string[] = []
   const isZh = lang === 'zh-TW'
 
-  // Rain alerts based on WMO codes
-  const heavyRainCodes = [65, 82, 95, 96, 99]
-  const lightRainCodes = [51, 53, 55, 56, 57, 61, 63, 66, 67, 80, 81]
+  // Rain alerts based on CWA / WMO codes
+  const heavyRainCodes = [15, 16, 17, 18, 21, 22, 29, 30, 31, 32, 33, 34, 35, 36, 65, 82, 95, 96, 99]
+  const lightRainCodes = [8, 9, 10, 11, 12, 13, 14, 19, 20, 51, 53, 55, 56, 57, 61, 63, 66, 67, 80, 81]
 
   if (heavyRainCodes.includes(weather.weatherCode)) {
     warnings.push(
       isZh 
-        ? '劇烈降雨警告：目前降雨強烈，請攜帶雨具，避開積水路段，注意安全！' 
+        ? '劇烈降雨/雷雨警告：目前有強降雨或雷陣雨，請務必攜帶雨具，避開低窪積水路段，注意安全！' 
         : lang === 'ja' 
-          ? '豪雨警告：強い雨が降っています。雨具を持参し、冠水道路を避けて安全に注意してください！' 
+          ? '豪雨・雷雨警告：強い雨や雷雨が予想されます。雨具を持参し、冠水道路を避けて安全に注意してください！' 
           : lang === 'ko' 
-            ? '호우 경보: 강한 비가 내리고 있습니다. 우산을 준비하고 침수된 도로를 피해 안전에 유의하세요!' 
-            : 'Heavy rain warning: Strong rainfall, please bring rain gear, avoid flooded roads and stay safe!'
+            ? '호우/뇌우 경보: 강한 비나 뇌우가 발생 중입니다. 우산을 준비하고 침수된 도로를 피해 안전에 유의하세요!' 
+            : 'Heavy rain/thunderstorm warning: Strong rainfall or thunderstorm, please bring rain gear, avoid flooded roads and stay safe!'
     )
-  } else if (lightRainCodes.includes(weather.weatherCode)) {
+  } else if (lightRainCodes.includes(weather.weatherCode) || (weather.pop !== undefined && weather.pop >= 40)) {
+    const popMsg = weather.pop !== undefined ? `（降雨機率 ${weather.pop}%）` : ''
     warnings.push(
       isZh 
-        ? '降雨提醒：目前有降雨，若屬半戶外/戶外場地請備妥雨傘或雨衣。' 
+        ? `降雨提醒：目前有降雨或預報降雨${popMsg}，若屬半戶外/戶外場地請備妥雨傘或雨衣。` 
         : lang === 'ja' 
           ? '降水注意：雨が降っています。半屋外・屋外会場の場合は傘やレインコートをご用意ください。' 
           : lang === 'ko' 
             ? '강수 안내: 비가 내리고 있습니다. 반야외/야외 공연장인 경우 우산이나 우비를 준비하세요.' 
-            : 'Rain notice: Light rain falling, please prepare umbrellas or raincoats if it is an outdoor venue.'
+            : 'Rain notice: Light rain likely, please prepare umbrellas or raincoats if it is an outdoor venue.'
     )
   }
 
@@ -188,7 +258,7 @@ function getWeatherWarnings(weather: WeatherData, lang: string = 'zh-TW'): strin
   if (weather.feelsLike >= 35) {
     warnings.push(
       isZh 
-        ? '高溫警報：體感溫度偏高，請多補水、防曬，防範熱傷害。' 
+        ? '高溫警報：體感溫度偏高（≧35°C），請多補水、防曬，防範熱傷害。' 
         : lang === 'ja' 
           ? '高温警報：体感温度が非常に高いです。水分補給と日焼け対策を怠らず、熱中症に注意してください。' 
           : lang === 'ko' 
@@ -207,7 +277,7 @@ function getWeatherWarnings(weather: WeatherData, lang: string = 'zh-TW'): strin
     )
   }
 
-  // Wind speed alert (wind speed from Open-Meteo is in km/h)
+  // Wind speed alert (in km/h)
   if (weather.windSpeed >= 20) {
     warnings.push(
       isZh 
@@ -220,10 +290,19 @@ function getWeatherWarnings(weather: WeatherData, lang: string = 'zh-TW'): strin
     )
   }
 
+  // UV alert
+  if (weather.uvIndex && weather.uvIndex >= 8) {
+    warnings.push(
+      isZh
+        ? `紫外線警報：紫外線指數達 ${weather.uvIndex}（${weather.uvLevel || '過量級'}），戶外活動請做好防曬與水分補充。`
+        : `UV Warning: UV Index is ${weather.uvIndex} (${weather.uvLevel || 'Very High'}), please apply sunscreen and drink water.`
+    )
+  }
+
   return warnings
 }
 
-export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDetails }: VenueWeatherProps) {
+export function VenueWeather({ latitude, longitude, cityName, address, onClose, onViewDetails }: VenueWeatherProps) {
   const { t, lang } = useTranslation()
   const [weather, setWeather] = useState<WeatherData | null>(null)
   const [aqi, setAqi] = useState<AqiData | null>(null)
@@ -231,6 +310,9 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isFallback, setIsFallback] = useState(false)
+  const [isCwa, setIsCwa] = useState(false)
+
+  const cwaLocationName = getCwaLocationName(cityName, address)
 
   const getDayLabel = (dateStr: string): string => {
     try {
@@ -264,18 +346,20 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
   }
 
   const fetchWeather = useCallback(async (forceRefresh = false) => {
-    if (!latitude || !longitude) {
-      setError('此場地暫無座標資訊')
+    if (!cityName && (!latitude || !longitude)) {
+      setError('此場地暫無位置資訊')
       return
     }
 
-    const cacheKey = `${latitude.toFixed(4)},${longitude.toFixed(4)}`
+    const cwaLocation = getCwaLocationName(cityName, address)
+    const cacheKey = `${cwaLocation}_${(latitude || 0).toFixed(3)},${(longitude || 0).toFixed(3)}`
     const cached = weatherCache.get(cacheKey)
 
     if (!forceRefresh && cached && Date.now() - cached.timestamp < CACHE_EXPIRY_MS) {
       setWeather(cached.data.weather)
       setAqi(cached.data.aqi)
       setDailyForecast(cached.data.daily)
+      setIsCwa(cached.data.isCwa)
       setIsFallback(false)
       setError(null)
       return
@@ -284,111 +368,206 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
     setLoading(true)
     setError(null)
 
+    // Air quality data (from Open-Meteo Air Quality API, as CWA does not host AQI)
+    let fetchedAqi: AqiData = { aqi: 42, pm25: 11, pm10: 18 }
+    if (latitude && longitude) {
+      try {
+        const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi,pm2_5,pm10`
+        const aqiRes = await fetch(aqiUrl)
+        if (aqiRes.ok) {
+          const aqiJson = await aqiRes.json()
+          if (aqiJson?.current) {
+            fetchedAqi = {
+              aqi: Math.round(aqiJson.current.us_aqi ?? 42),
+              pm25: Math.round(aqiJson.current.pm2_5 ?? 11),
+              pm10: Math.round(aqiJson.current.pm10 ?? 18)
+            }
+          }
+        }
+      } catch (err) {
+        console.warn('AQI fetch failed, using fallback values.', err)
+      }
+    }
+
     try {
-      // Fetch both weather and AQI concurrently
-      const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`
-      const aqiUrl = `https://air-quality-api.open-meteo.com/v1/air-quality?latitude=${latitude}&longitude=${longitude}&current=us_aqi,pm2_5,pm10`
+      // 1. Primary: Central Weather Administration (中央氣象署) API
+      const cwaUrl = `https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=${CWA_API_KEY}&LocationName=${encodeURIComponent(cwaLocation)}`
+      const cwaRes = await fetch(cwaUrl)
 
-      const [weatherRes, aqiRes] = await Promise.all([
-        fetch(weatherUrl),
-        fetch(aqiUrl)
-      ])
-
-      if (!weatherRes.ok || !aqiRes.ok) {
-        throw new Error('API request failed')
+      if (!cwaRes.ok) {
+        throw new Error(`CWA API responded with status ${cwaRes.status}`)
       }
 
-      const weatherJson = await weatherRes.json()
-      const aqiJson = await aqiRes.json()
+      const cwaJson = await cwaRes.json()
+      const loc = cwaJson.records?.Locations?.[0]?.Location?.[0]
+      if (!loc) {
+        throw new Error('Location not found in CWA data')
+      }
+
+      const getEl = (name: string) => loc.WeatherElement?.find((e: any) => e.ElementName === name)?.Time?.[0]?.ElementValue?.[0]
+
+      const temp = parseInt(getEl('平均溫度')?.Temperature || '26')
+      const maxApp = parseInt(getEl('最高體感溫度')?.MaxApparentTemperature || String(temp))
+      const minApp = parseInt(getEl('最低體感溫度')?.MinApparentTemperature || String(temp))
+      const feelsLike = Math.round((maxApp + minApp) / 2)
+      const humidity = parseInt(getEl('平均相對濕度')?.RelativeHumidity || '70')
+      const windMps = parseFloat(getEl('風速')?.WindSpeed || '2')
+      const windSpeed = Math.round(windMps * 3.6) // m/s to km/h
+      const wx = getEl('天氣現象')
+      const weatherCode = parseInt(wx?.WeatherCode || '1')
+      const cwaDesc = wx?.Weather || '晴'
+      const popRaw = getEl('12小時降雨機率')?.ProbabilityOfPrecipitation
+      const pop = popRaw && popRaw !== '-' ? parseInt(popRaw) : undefined
+      const uvEl = getEl('紫外線指數')
+      const uvIndex = uvEl?.UVIndex ? parseInt(uvEl.UVIndex) : undefined
+      const uvLevel = uvEl?.UVExposureLevel
+      const cwaSummary = getEl('天氣預報綜合描述')?.WeatherDescription
 
       const newWeather: WeatherData = {
-        temp: Math.round(weatherJson.current.temperature_2m),
-        feelsLike: Math.round(weatherJson.current.apparent_temperature),
-        humidity: Math.round(weatherJson.current.relative_humidity_2m),
-        weatherCode: weatherJson.current.weather_code,
-        windSpeed: Math.round(weatherJson.current.wind_speed_10m)
-      }
-
-      const newAqi: AqiData = {
-        aqi: Math.round(aqiJson.current.us_aqi),
-        pm25: Math.round(aqiJson.current.pm2_5),
-        pm10: Math.round(aqiJson.current.pm10)
-      }
-
-      const dailyData = weatherJson.daily
-      const newDaily: DailyForecast[] = []
-      if (dailyData && dailyData.time) {
-        for (let i = 0; i < 7 && i < dailyData.time.length; i++) {
-          newDaily.push({
-            date: dailyData.time[i],
-            tempMax: Math.round(dailyData.temperature_2m_max[i]),
-            tempMin: Math.round(dailyData.temperature_2m_min[i]),
-            weatherCode: dailyData.weather_code[i]
-          })
-        }
-      }
-
-      setWeather(newWeather)
-      setAqi(newAqi)
-      setDailyForecast(newDaily)
-      setIsFallback(false)
-
-      // Store in cache
-      weatherCache.set(cacheKey, {
-        data: { weather: newWeather, aqi: newAqi, daily: newDaily },
-        timestamp: Date.now()
-      })
-    } catch (err) {
-      console.warn('Unable to load real-time weather from Open-Meteo, using offline simulated data.', err)
-      // Generates elegant fallback simulated data based on season (June) and location
-      const month = new Date().getMonth() + 1
-      const isSummer = month >= 6 && month <= 9
-      const isWinter = month === 12 || month <= 2
-      const baseTemp = isSummer ? 30 : isWinter ? 16 : 24
-      const baseHumidity = 75
-
-      // Add a small deterministic deviation based on city name length
-      const offset = (cityName.length % 5) - 2
-      const temp = baseTemp + offset
-      const feelsLike = temp + (isSummer ? 3 : -1)
-
-      const fallbackWeather: WeatherData = {
         temp,
         feelsLike,
-        humidity: baseHumidity + (cityName.length * 3) % 15,
-        weatherCode: 2, // default partly cloudy
-        windSpeed: 8 + (cityName.length * 2) % 12
+        humidity,
+        weatherCode,
+        windSpeed,
+        pop,
+        cwaDesc,
+        cwaSummary,
+        uvIndex,
+        uvLevel
       }
 
-      const fallbackAqi: AqiData = {
-        aqi: 40 + (cityName.length * 7) % 35,
-        pm25: 12 + (cityName.length * 2) % 15,
-        pm10: 22 + (cityName.length * 4) % 20
-      }
+      // Group 14 time periods into 7 daily forecasts
+      const wxEl = loc.WeatherElement.find((e: any) => e.ElementName === '天氣現象')
+      const maxTEl = loc.WeatherElement.find((e: any) => e.ElementName === '最高溫度')
+      const minTEl = loc.WeatherElement.find((e: any) => e.ElementName === '最低溫度')
+      const popEl = loc.WeatherElement.find((e: any) => e.ElementName === '12小時降雨機率')
 
-      const fallbackDaily: DailyForecast[] = []
-      const today = new Date()
-      for (let i = 0; i < 7; i++) {
-        const nextDay = new Date()
-        nextDay.setDate(today.getDate() + i)
-        const dateStr = nextDay.toISOString().split('T')[0]
-        
-        fallbackDaily.push({
-          date: dateStr,
-          tempMax: temp + 2 - (i % 2),
-          tempMin: temp - 4 - (i % 3),
-          weatherCode: (2 + i) % 4
+      const dailyMap = new Map<string, DailyForecast>()
+      const times = wxEl?.Time || []
+      for (let i = 0; i < times.length; i++) {
+        const start = times[i].StartTime
+        const date = start.split('T')[0]
+        const max = parseInt(maxTEl?.Time?.[i]?.ElementValue?.[0]?.MaxTemperature || '0')
+        const min = parseInt(minTEl?.Time?.[i]?.ElementValue?.[0]?.MinTemperature || '0')
+        const code = parseInt(times[i].ElementValue?.[0]?.WeatherCode || '1')
+        const desc = times[i].ElementValue?.[0]?.Weather || ''
+        const rain = popEl?.Time?.[i]?.ElementValue?.[0]?.ProbabilityOfPrecipitation
+
+        if (!dailyMap.has(date)) {
+          dailyMap.set(date, {
+            date,
+            tempMax: max,
+            tempMin: min,
+            weatherCode: code,
+            desc,
+            rain: rain !== '-' ? rain : undefined
+          })
+        } else {
+          const item = dailyMap.get(date)!
+          item.tempMax = Math.max(item.tempMax, max)
+          item.tempMin = Math.min(item.tempMin, min)
+          if (start.includes('06:00') || start.includes('12:00')) {
+            item.weatherCode = code
+            item.desc = desc
+          }
+          if (!item.rain && rain && rain !== '-') {
+            item.rain = rain
+          }
+        }
+      }
+      const newDaily = Array.from(dailyMap.values()).slice(0, 7)
+
+      setWeather(newWeather)
+      setAqi(fetchedAqi)
+      setDailyForecast(newDaily)
+      setIsCwa(true)
+      setIsFallback(false)
+
+      weatherCache.set(cacheKey, {
+        data: { weather: newWeather, aqi: fetchedAqi, daily: newDaily, isCwa: true },
+        timestamp: Date.now()
+      })
+    } catch (cwaErr) {
+      console.warn('CWA API unavailable, falling back to Open-Meteo...', cwaErr)
+
+      try {
+        if (!latitude || !longitude) throw new Error('No coordinates for fallback')
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto`
+        const weatherRes = await fetch(weatherUrl)
+        if (!weatherRes.ok) throw new Error('Open-Meteo failed')
+
+        const weatherJson = await weatherRes.json()
+        const newWeather: WeatherData = {
+          temp: Math.round(weatherJson.current.temperature_2m),
+          feelsLike: Math.round(weatherJson.current.apparent_temperature),
+          humidity: Math.round(weatherJson.current.relative_humidity_2m),
+          weatherCode: weatherJson.current.weather_code,
+          windSpeed: Math.round(weatherJson.current.wind_speed_10m)
+        }
+
+        const dailyData = weatherJson.daily
+        const newDaily: DailyForecast[] = []
+        if (dailyData && dailyData.time) {
+          for (let i = 0; i < 7 && i < dailyData.time.length; i++) {
+            newDaily.push({
+              date: dailyData.time[i],
+              tempMax: Math.round(dailyData.temperature_2m_max[i]),
+              tempMin: Math.round(dailyData.temperature_2m_min[i]),
+              weatherCode: dailyData.weather_code[i]
+            })
+          }
+        }
+
+        setWeather(newWeather)
+        setAqi(fetchedAqi)
+        setDailyForecast(newDaily)
+        setIsCwa(false)
+        setIsFallback(false)
+
+        weatherCache.set(cacheKey, {
+          data: { weather: newWeather, aqi: fetchedAqi, daily: newDaily, isCwa: false },
+          timestamp: Date.now()
         })
-      }
+      } catch (fallbackErr) {
+        console.warn('Using offline simulated weather data.', fallbackErr)
+        const month = new Date().getMonth() + 1
+        const isSummer = month >= 6 && month <= 9
+        const isWinter = month === 12 || month <= 2
+        const baseTemp = isSummer ? 30 : isWinter ? 16 : 24
+        const offset = (cityName.length % 5) - 2
+        const temp = baseTemp + offset
 
-      setWeather(fallbackWeather)
-      setAqi(fallbackAqi)
-      setDailyForecast(fallbackDaily)
-      setIsFallback(true)
+        const fallbackWeather: WeatherData = {
+          temp,
+          feelsLike: temp + (isSummer ? 3 : -1),
+          humidity: 75 + (cityName.length * 3) % 15,
+          weatherCode: 2,
+          windSpeed: 8 + (cityName.length * 2) % 12,
+          cwaDesc: '晴時多雲'
+        }
+
+        const fallbackDaily: DailyForecast[] = []
+        for (let i = 0; i < 7; i++) {
+          const nextDay = new Date()
+          nextDay.setDate(new Date().getDate() + i)
+          fallbackDaily.push({
+            date: nextDay.toISOString().split('T')[0],
+            tempMax: temp + 2 - (i % 2),
+            tempMin: temp - 4 - (i % 3),
+            weatherCode: (2 + i) % 4
+          })
+        }
+
+        setWeather(fallbackWeather)
+        setAqi(fetchedAqi)
+        setDailyForecast(fallbackDaily)
+        setIsCwa(false)
+        setIsFallback(true)
+      }
     } finally {
       setLoading(false)
     }
-  }, [latitude, longitude, cityName])
+  }, [latitude, longitude, cityName, address])
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -404,7 +583,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
   if (loading && !weather) {
     return (
       <div className="weather-widget loading">
-        <span className="spinner" /> {lang === 'zh-TW' ? '讀取天氣資訊中...' : lang === 'en' ? 'Loading weather...' : lang === 'ja' ? '天気情報を読み込み中...' : '날씨 정보를 불러오는 중...'}
+        <span className="spinner" /> {lang === 'zh-TW' ? '讀取中央氣象署資訊中...' : lang === 'en' ? 'Loading weather...' : lang === 'ja' ? '天気情報を読み込み中...' : '날씨 정보를 불러오는 중...'}
       </div>
     )
   }
@@ -413,7 +592,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
     return null
   }
 
-  const weatherInfo = parseWeatherCode(weather.weatherCode, lang)
+  const weatherInfo = parseWeatherCode(weather.weatherCode, lang, weather.cwaDesc)
   const aqiInfo = getAqiDetails(aqi.aqi, lang)
   const warnings = getWeatherWarnings(weather, lang)
 
@@ -425,7 +604,12 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
             <CloudSunIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
             {t('weatherTitle')}
           </span>
-          {isFallback && <span className="fallback-badge" title="暫時無法連接中央氣象服務，顯示模擬氣候資訊">{lang === 'zh-TW' ? '模擬數據' : lang === 'en' ? 'Simulated' : lang === 'ja' ? 'シミュレーション' : '시뮬레이션'}</span>}
+          {isCwa && (
+            <span className="cwa-badge" title={`資料來源：交通部中央氣象署 (${cwaLocationName})`}>
+              中央氣象署 CWA
+            </span>
+          )}
+          {isFallback && <span className="fallback-badge" title="暫時無法連接氣象服務，顯示模擬氣候資訊">{lang === 'zh-TW' ? '模擬數據' : lang === 'en' ? 'Simulated' : lang === 'ja' ? 'シミュレーション' : '시뮬레이션'}</span>}
         </div>
         <div className="weather-header-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
           <button
@@ -476,12 +660,25 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
               <span className="label">{lang === 'zh-TW' ? '相對濕度' : lang === 'en' ? 'Humidity' : lang === 'ja' ? '相対湿度' : '상대 습도'}</span>
               <span className="value">{weather.humidity}%</span>
             </div>
+            {weather.pop !== undefined && (
+              <div className="detail-item">
+                <span className="label">{lang === 'zh-TW' ? '降雨機率' : lang === 'en' ? 'Rain Chance' : lang === 'ja' ? '降水確率' : '강수 확률'}</span>
+                <span className="value" style={{ color: weather.pop >= 40 ? '#38bdf8' : 'inherit' }}>{weather.pop}%</span>
+              </div>
+            )}
             <div className="detail-item">
               <span className="label">{lang === 'zh-TW' ? '目前風速' : lang === 'en' ? 'Wind Speed' : lang === 'ja' ? '現在の風速' : '현재 풍속'}</span>
               <span className="value">{weather.windSpeed} km/h</span>
             </div>
           </div>
         </div>
+
+        {/* CWA Weather Summary text */}
+        {weather.cwaSummary && (
+          <div className="weather-summary-banner" title={weather.cwaSummary}>
+            {weather.cwaSummary}
+          </div>
+        )}
 
         {/* Air Quality section */}
         <div className="weather-aqi-section">
@@ -506,7 +703,7 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
             </div>
             <div className="forecast-grid">
               {dailyForecast.map((day) => {
-                const info = parseWeatherCode(day.weatherCode, lang)
+                const info = parseWeatherCode(day.weatherCode, lang, day.desc)
                 const dayLabel = getDayLabel(day.date)
                 return (
                   <div className="forecast-item" key={day.date}>
@@ -514,6 +711,9 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
                     <span className="forecast-emoji" title={info.desc}>{info.icon}</span>
                     <span className="forecast-desc">{info.desc}</span>
                     <span className="forecast-temp">{day.tempMin}°~{day.tempMax}°C</span>
+                    {day.rain && day.rain !== '-' && (
+                      <span className="forecast-rain" title="降雨機率">💧{day.rain}%</span>
+                    )}
                   </div>
                 )
               })}
@@ -542,16 +742,16 @@ export function VenueWeather({ latitude, longitude, cityName, onClose, onViewDet
                 {warning}
               </div>
             ))}
-            {warnings.length === 0 && weather.weatherCode === 0 && (
+            {warnings.length === 0 && weather.weatherCode <= 2 && (
               <div className="alert-item weather-sunny">
                 <SunIcon size="0.95em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
                 {lang === 'zh-TW' 
-                  ? '天氣晴朗炎熱，若前往戶外排隊請做好防曬，適時補充水分喔！' 
+                  ? '天氣舒適宜人，若前往戶外排隊請做好防曬，適時補充水分喔！' 
                   : lang === 'ja'
-                    ? '快晴で暑い天気です。屋外で並ぶ際は日焼け対策を行い、適度に水分を補給してください！'
+                    ? '快適な天気です。屋外で並ぶ際は日焼け対策を行い、適度に水分を補給してください！'
                     : lang === 'ko'
-                      ? '날씨가 맑고 덥습니다. 야외 대기 시 자외선 차단에 신경 쓰시고 수분을 충분히 섭취하세요!'
-                      : 'It is sunny and hot, please wear sunscreen and drink plenty of water if queueing outdoors!'}
+                      ? '날씨가 쾌적합니다. 야외 대기 시 자외선 차단에 신경 쓰시고 수분을 충분히 섭취하세요!'
+                      : 'Pleasant weather, please wear sunscreen and drink plenty of water if queueing outdoors!'}
               </div>
             )}
           </div>

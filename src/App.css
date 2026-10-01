@@ -4817,6 +4817,31 @@ svg#taiwan-map.dragging {
   cursor: help;
 }
 
+.cwa-badge {
+  font-size: 0.65rem;
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  padding: 0.1rem 0.45rem;
+  border-radius: 4px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  letter-spacing: 0.02em;
+}
+
+.weather-summary-banner {
+  margin: 0.5rem 0 0.8rem 0;
+  padding: 0.45rem 0.7rem;
+  background: rgba(56, 189, 248, 0.06);
+  border-left: 3px solid #38bdf8;
+  border-radius: 0 6px 6px 0;
+  font-size: 0.75rem;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
 .weather-refresh-btn {
   background: none;
   border: none;
@@ -5700,6 +5725,13 @@ svg#taiwan-map.dragging {
   font-weight: 700;
   color: var(--text);
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+}
+
+.forecast-rain {
+  font-size: 0.65rem;
+  color: #38bdf8;
+  margin-top: 2px;
+  font-weight: 600;
 }
 
 /* ==========================================================================
