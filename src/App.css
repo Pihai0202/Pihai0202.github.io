@@ -2742,10 +2742,10 @@ svg#taiwan-map.dragging {
   transform: translateY(-1px);
 }
 
-/* 大眾運輸即時動態 */
+/* 大眾運輸即時動態 (Transit Info Board) */
 .transit-board {
   margin-bottom: 1.2rem;
-  padding: 1.25rem;
+  padding: 1rem 1.1rem;
   background: rgba(var(--surface-rgb), 0.3);
   border: 1px solid var(--border);
   border-radius: 12px;
@@ -2758,47 +2758,135 @@ svg#taiwan-map.dragging {
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
 }
 
-.transit-selector-row {
-  margin-bottom: 0.8rem;
-  padding: 0 0.5rem;
+/* 交通動態工具列 (Toolbar: Select + Refresh) */
+.transit-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  margin: 0.1rem 0 0.85rem 0;
+  box-sizing: border-box;
 }
 
+.transit-select-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+  background: var(--surface2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  border-radius: 8px;
+  box-sizing: border-box;
+  transition: all 0.2s ease;
+}
+
+.transit-select-wrapper:hover {
+  background: rgba(var(--gold-rgb), 0.05);
+  border-color: rgba(var(--gold-rgb), 0.4);
+}
+
+.transit-select-wrapper:focus-within {
+  border-color: var(--gold, #ffd166);
+  background: rgba(var(--gold-rgb), 0.08);
+  box-shadow: 0 0 12px rgba(var(--gold-rgb), 0.18);
+}
+
+.transit-select-icon {
+  position: absolute;
+  left: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--gold, #ffd166);
+  z-index: 1;
+  width: 1.2rem;
+  height: 1.2rem;
+}
+
+.transit-select-wrapper .transit-select {
+  width: 100%;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text, #ffffff);
+  font-family: inherit;
+  font-size: 0.84rem;
+  font-weight: 600;
+  padding: 0.55rem 2.2rem 0.55rem 2.3rem;
+  cursor: pointer;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.transit-select-arrow {
+  position: absolute;
+  right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  color: var(--muted, #8a8a9e);
+  transition: transform 0.2s ease, color 0.2s ease;
+  z-index: 1;
+}
+
+.transit-select-wrapper:focus-within .transit-select-arrow {
+  color: var(--gold, #ffd166);
+  transform: rotate(180deg);
+}
+
+/* 預設的 transit-select (給捷運/火車查詢頁籤使用) */
 .transit-select {
   width: 100%;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 0.6rem 0.8rem;
+  background: var(--surface2, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.12));
+  color: var(--text, #ffffff);
+  padding: 0.55rem 0.8rem;
   border-radius: 8px;
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   outline: none;
   cursor: pointer;
-  transition: border-color 0.2s;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
+}
+
+.transit-select:hover {
+  border-color: rgba(var(--gold-rgb), 0.4);
 }
 
 .transit-select:focus {
-  border-color: var(--gold);
+  border-color: var(--gold, #ffd166);
+  box-shadow: 0 0 10px rgba(var(--gold-rgb), 0.15);
 }
 
 .transit-select option {
-  background: var(--surface2);
-  color: var(--text);
+  background: var(--surface, #181920);
+  color: var(--text, #f0f0f5);
+  padding: 0.5rem;
+  font-size: 0.85rem;
 }
 
+/* 營運通阻卡片 (Transit Card) */
 .transit-card {
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.9rem;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.04) 0%, rgba(255, 255, 255, 0.01) 100%);
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.1));
+  border-radius: 12px;
+  padding: 1.1rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
-  transition: all 0.25s;
+  gap: 0.8rem;
+  transition: all 0.25s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
 }
 
 .transit-card:hover {
-  border-color: rgba(var(--gold-rgb), 0.25);
-  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(var(--gold-rgb), 0.3);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
 }
 
 .transit-card-header {
@@ -2806,71 +2894,124 @@ svg#taiwan-map.dragging {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
-.transit-service-name {
+.transit-service-info {
   display: flex;
   align-items: center;
-  gap: 0.4rem;
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text);
+  gap: 0.5rem;
 }
 
-.transit-icon {
-  font-size: 1.1rem;
+.transit-card-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text, #ffffff);
+  letter-spacing: 0.02em;
 }
 
-.transit-badge {
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.72rem;
-  font-weight: 700;
-  padding: 0.2rem 0.5rem;
+.transit-chip {
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.15rem 0.45rem;
   border-radius: 4px;
-  text-align: center;
-  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
-.transit-badge.normal {
+.transit-chip.live {
   background: rgba(var(--teal-rgb), 0.12);
-  border: 1px solid rgba(var(--teal-rgb), 0.25);
+  border: 1px solid rgba(var(--teal-rgb), 0.3);
   color: var(--teal);
-  animation: pulse-green-badge 2s ease-in-out infinite;
 }
 
-.transit-badge.warning {
-  background: rgba(var(--gold-rgb), 0.12);
-  border: 1px solid rgba(var(--gold-rgb), 0.25);
-  color: var(--gold);
-}
-
-.transit-badge.loading {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid var(--border);
+.transit-chip.static {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.15);
   color: var(--muted);
 }
 
-@keyframes pulse-green-badge {
+.transit-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 0.3rem 0.65rem;
+  border-radius: 20px;
+  letter-spacing: 0.02em;
+}
+
+.transit-status-pill.normal {
+  background: rgba(16, 185, 129, 0.12);
+  border: 1px solid rgba(16, 185, 129, 0.35);
+  color: #34d399;
+}
+
+.transit-status-pill.warning {
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  color: #fbbf24;
+}
+
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+.status-dot.normal {
+  background-color: #10b981;
+  box-shadow: 0 0 8px #10b981;
+  animation: pulseGreen 1.8s infinite;
+}
+
+.status-dot.warning {
+  background-color: #f59e0b;
+  box-shadow: 0 0 8px #f59e0b;
+  animation: pulseOrange 1.8s infinite;
+}
+
+@keyframes pulseOrange {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(var(--teal-rgb), 0.2);
+    transform: scale(0.9);
+    opacity: 0.6;
   }
   50% {
-    box-shadow: 0 0 10px 2px rgba(var(--teal-rgb), 0.1);
+    transform: scale(1.2);
+    opacity: 1;
+    box-shadow: 0 0 10px #f59e0b;
   }
+}
+
+.transit-detail-box {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  padding: 0.75rem 0.85rem;
+  border: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 .transit-detail {
-  font-size: 0.78rem;
-  color: var(--muted);
-  line-height: 1.55;
+  font-size: 0.82rem;
+  color: var(--text-secondary, #d1d1e0);
+  line-height: 1.6;
   margin: 0;
 }
 
+.transit-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 0.2rem;
+}
+
 .transit-updated {
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.65rem;
-  color: var(--muted);
-  opacity: 0.8;
+  font-size: 0.68rem;
+  color: var(--muted, #8a8a9e);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: inherit;
 }
 
 .transit-link-btn {
@@ -2879,23 +3020,23 @@ svg#taiwan-map.dragging {
   justify-content: center;
   gap: 0.4rem;
   width: 100%;
-  padding: 0.5rem;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  color: var(--text);
-  border-radius: 6px;
-  font-size: 0.76rem;
+  height: 38px;
+  background: rgba(var(--gold-rgb), 0.06);
+  border: 1px solid rgba(var(--gold-rgb), 0.25);
+  color: var(--gold, #ffd166);
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-decoration: none;
-  transition: all 0.2s;
-  letter-spacing: 0.05em;
-  text-align: center;
-  margin-top: 0.2rem;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .transit-link-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: var(--gold);
-  color: var(--gold);
+  background: rgba(var(--gold-rgb), 0.14);
+  border-color: var(--gold, #ffd166);
+  box-shadow: 0 0 12px rgba(var(--gold-rgb), 0.2);
+  transform: translateY(-1px);
 }
 
 .transit-retry-btn {
@@ -6798,15 +6939,15 @@ svg#taiwan-map.dragging {
    Transit Info Board Styles
    ========================================================================== */
 .transit-tabs {
-  display: flex;
-  gap: 0.2rem;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  padding: 0.2rem;
-  margin-bottom: 0.8rem;
-  overflow-x: auto;
-  scrollbar-width: none;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.25rem;
+  background: var(--surface2, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border, rgba(255, 255, 255, 0.08));
+  border-radius: 10px;
+  padding: 0.25rem;
+  margin-bottom: 0.85rem;
+  box-sizing: border-box;
 }
 
 .transit-tabs::-webkit-scrollbar {
@@ -6814,29 +6955,34 @@ svg#taiwan-map.dragging {
 }
 
 .transit-tab-btn {
-  flex: 1;
-  background: none;
-  border: none;
-  color: var(--muted);
-  font-size: 0.72rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.3rem;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--muted, #8a8a9e);
+  font-size: 0.74rem;
   font-weight: 600;
-  padding: 0.45rem 0.2rem;
-  border-radius: 6px;
+  padding: 0.55rem 0.2rem;
+  border-radius: 7px;
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.2s ease;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   font-family: inherit;
+  box-sizing: border-box;
 }
 
 .transit-tab-btn:hover {
-  color: var(--text);
-  background: rgba(255, 255, 255, 0.02);
+  color: var(--text, #ffffff);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .transit-tab-btn.active {
-  background: var(--surface);
-  color: var(--gold);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  background: rgba(var(--gold-rgb), 0.12);
+  border-color: rgba(var(--gold-rgb), 0.35);
+  color: var(--gold, #ffd166);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
 .transit-tab-btn:disabled {

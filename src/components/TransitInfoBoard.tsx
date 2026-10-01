@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslation, translateCityName } from '../utils/i18n.tsx'
-import { WarningIcon, TrainIcon, BusIcon, RefreshIcon } from './SvgIcon'
+import { WarningIcon, TrainIcon, BusIcon, RefreshIcon, ChevronDownIcon } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
 
@@ -1402,65 +1402,41 @@ export function TransitInfoBoard() {
 
   return (
     <section className="transit-board" aria-label={t('transitTitle')}>
-      {/* 標題與重整按鈕 */}
-      <div className="section-row" style={{ marginBottom: '0.6rem' }}>
-        <div className="section-title" style={{ padding: '0.2rem 0.5rem 0' }}>— {t('transitTitle')} —</div>
-        {activeTab === 'status' && (
-          <button
-            className="refresh-events-btn"
-            type="button"
-            disabled={loading}
-            onClick={fetchStatus}
-          >
-            {loading ? (
-              lang === 'zh-TW' ? '讀取中' : 'Loading...'
-            ) : (
-              <>
-                <RefreshIcon size="0.95em" style={{ marginRight: '4px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '重新整理' : 'Refresh'}
-              </>
-            )}
-          </button>
-        )}
-      </div>
-
       {/* Tab 按鈕列 */}
       <div className="transit-tabs">
         {(['status', 'metro', 'train', 'bus'] as const).map((tab) => {
           const labels: Record<string, React.ReactNode> = {
             status: (
               <>
-                <WarningIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '營運通阻' : lang === 'en' ? 'Status' : lang === 'ja' ? '運行状況' : '운행 상태'}
+                <WarningIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '營運通阻' : lang === 'en' ? 'Status' : lang === 'ja' ? '運行状況' : '운행 상태'}</span>
               </>
             ),
             metro: (
               <>
-                <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '捷運時刻表' : lang === 'en' ? 'Metro' : lang === 'ja' ? 'メトロ' : '지하철'}
+                <TrainIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '捷運時刻' : lang === 'en' ? 'Metro' : lang === 'ja' ? 'メトロ' : '지하철'}</span>
               </>
             ),
             train: (
               <>
-                <TrainIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '鐵路動態' : lang === 'en' ? 'Railway' : lang === 'ja' ? '鉄道運行' : '철도 안내'}
+                <TrainIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '鐵路動態' : lang === 'en' ? 'Railway' : lang === 'ja' ? '鉄道運行' : '철도 안내'}</span>
               </>
             ),
             bus: (
               <>
-                <BusIcon size="1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
-                {lang === 'zh-TW' ? '公車動態' : lang === 'en' ? 'Bus' : lang === 'ja' ? 'バス' : '버스'}
+                <BusIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '公車動態' : lang === 'en' ? 'Bus' : lang === 'ja' ? 'バス' : '버스'}</span>
               </>
             ),
           }
-          const isDisabled = false
           return (
             <button
               key={tab}
               type="button"
               className={`transit-tab-btn${activeTab === tab ? ' active' : ''}`}
               onClick={() => setActiveTab(tab)}
-              disabled={isDisabled}
             >
               {labels[tab]}
             </button>
@@ -1471,44 +1447,72 @@ export function TransitInfoBoard() {
       {/* ── Tab 1：營運通阻 ── */}
       {activeTab === 'status' && (
         <div className="transit-tab-content">
-          <div className="transit-selector-row" style={{ padding: 0 }}>
-            <select
-              value={selectedService}
-              onChange={(e) => setSelectedService(e.target.value)}
-              className="transit-select"
+          <div className="transit-toolbar">
+            <div className="transit-select-wrapper">
+              <div className="transit-select-icon" aria-hidden="true">
+                {info.icon}
+              </div>
+              <select
+                value={selectedService}
+                onChange={(e) => setSelectedService(e.target.value)}
+                className="transit-select"
+                aria-label={lang === 'zh-TW' ? '選擇運輸系統' : 'Select Transit System'}
+              >
+                <option value="trtc">{lang === 'zh-TW' ? '台北捷運' : lang === 'en' ? 'Taipei MRT' : lang === 'ja' ? '台北メトロ' : '타이베이 지하철'}</option>
+                <option value="krtc">{lang === 'zh-TW' ? '高雄捷運' : lang === 'en' ? 'Kaohsiung MRT' : lang === 'ja' ? '高雄メトロ' : '가오슝 지하철'}</option>
+                <option value="tmrt">{lang === 'zh-TW' ? '台中捷運' : lang === 'en' ? 'Taichung MRT' : lang === 'ja' ? '台中メトロ' : '타이중 지하철'}</option>
+                <option value="thsr">{lang === 'zh-TW' ? '台灣高鐵' : lang === 'en' ? 'Taiwan HSR' : lang === 'ja' ? '台湾高鉄' : '대만 고속철도'}</option>
+                <option value="tra">{lang === 'zh-TW' ? '台灣鐵路' : lang === 'en' ? 'Taiwan Railway' : lang === 'ja' ? '台湾鉄道' : '대만 철도'}</option>
+              </select>
+              <div className="transit-select-arrow" aria-hidden="true">
+                <ChevronDownIcon size="0.9em" />
+              </div>
+            </div>
+
+            <button
+              className={`refresh-events-btn${loading ? ' refreshing' : ''}`}
+              type="button"
+              disabled={loading}
+              onClick={fetchStatus}
+              title={lang === 'zh-TW' ? '重新整理通阻動態' : 'Refresh transit status'}
             >
-              <option value="trtc">{lang === 'zh-TW' ? '台北捷運' : lang === 'en' ? 'Taipei MRT' : lang === 'ja' ? '台北メトロ' : '타이베이 지하철'}</option>
-              <option value="krtc">{lang === 'zh-TW' ? '高雄捷運' : lang === 'en' ? 'Kaohsiung MRT' : lang === 'ja' ? '高雄メトロ' : '가오슝 지하철'}</option>
-              <option value="tmrt">{lang === 'zh-TW' ? '台中捷運' : lang === 'en' ? 'Taichung MRT' : lang === 'ja' ? '台中メトロ' : '타이중 지하철'}</option>
-              <option value="thsr">{lang === 'zh-TW' ? '台灣高鐵' : lang === 'en' ? 'Taiwan HSR' : lang === 'ja' ? '台湾高鉄' : '대만 고속철도'}</option>
-              <option value="tra">{lang === 'zh-TW' ? '台灣鐵路' : lang === 'en' ? 'Taiwan Railway' : lang === 'ja' ? '台湾鉄道' : '대만 철도'}</option>
-            </select>
+              <RefreshIcon size="0.95em" className={loading ? 'spin-icon' : ''} />
+              <span>{loading ? (lang === 'zh-TW' ? '讀取中' : 'Loading...') : (lang === 'zh-TW' ? '重新整理' : 'Refresh')}</span>
+            </button>
           </div>
 
           <div className="transit-card">
             <div className="transit-card-header">
-              <div className="transit-service-name">
-                <span className="transit-icon">{info.icon}</span>
-                <span>{info.name}</span>
+              <div className="transit-service-info">
+                <span className="transit-card-title">{info.name}</span>
                 {tdxActive ? (
-                  <span className="transit-badge normal" style={{ marginLeft: '0.5rem' }}>{lang === 'zh-TW' ? '即時資料' : lang === 'en' ? 'Live Data' : lang === 'ja' ? 'リアルタイム情報' : '실시간 정보'}</span>
+                  <span className="transit-chip live">{lang === 'zh-TW' ? '即時連線' : lang === 'en' ? 'Live' : lang === 'ja' ? 'リアルタイム' : '실시간'}</span>
                 ) : (
-                  <span className="transit-badge warning" style={{ marginLeft: '0.5rem' }}>{lang === 'zh-TW' ? '靜態資料' : lang === 'en' ? 'Static Data' : lang === 'ja' ? '静的情報' : '정적 정보'}</span>
+                  <span className="transit-chip static">{lang === 'zh-TW' ? '預載靜態' : lang === 'en' ? 'Static' : lang === 'ja' ? '静的情報' : '정적'}</span>
                 )}
               </div>
-              <div className={`transit-badge${current.isNormal ? ' normal' : ' warning'}${loading ? ' loading' : ''}`}>
-                {current.status.replace(/[\uD800-\uDFFF\u2600-\u27BF🟢🔴🟡]/g, '').trim()}
+              <div className={`transit-status-pill ${current.isNormal ? 'normal' : 'warning'}${loading ? ' loading' : ''}`}>
+                <span className={`status-dot ${current.isNormal ? 'normal' : 'warning'}`} />
+                <span>{current.status.replace(/[\uD800-\uDFFF\u2600-\u27BF🟢🔴🟡]/g, '').trim()}</span>
               </div>
             </div>
-            <p className="transit-detail">{current.detail}</p>
-            {current.updatedAt && (
-              <div className="transit-updated">
-                {lang === 'zh-TW' ? '最後更新：' : lang === 'en' ? 'Last Update: ' : lang === 'ja' ? '最終更新：' : '최종 업데이트: '}{new Date(current.updatedAt).toLocaleTimeString(lang === 'zh-TW' ? 'zh-TW' : 'en-US')}
-              </div>
-            )}
-            <a href={info.url} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
-              {lang === 'zh-TW' ? '前往官方網站查看即時動態' : lang === 'en' ? 'Go to Official Website' : lang === 'ja' ? '公式サイトで詳細を確認' : '공식 웹사이트에서 확인'}
-            </a>
+
+            <div className="transit-detail-box">
+              <p className="transit-detail">{current.detail}</p>
+            </div>
+
+            <div className="transit-card-footer">
+              {current.updatedAt && (
+                <div className="transit-updated">
+                  <span>🕒</span>
+                  <span>{lang === 'zh-TW' ? '最後更新：' : lang === 'en' ? 'Last Update: ' : lang === 'ja' ? '最終更新：' : '최종 업데이트: '}{new Date(current.updatedAt).toLocaleTimeString(lang === 'zh-TW' ? 'zh-TW' : 'en-US')}</span>
+                </div>
+              )}
+              <a href={info.url} target="_blank" rel="noopener noreferrer" className="transit-link-btn">
+                <span>{lang === 'zh-TW' ? '前往官方網站查看即時動態' : lang === 'en' ? 'Go to Official Website' : lang === 'ja' ? '公式サイトで詳細を確認' : '공식 웹사이트에서 확인'}</span>
+                <span style={{ fontSize: '0.85em' }}>↗</span>
+              </a>
+            </div>
           </div>
         </div>
       )}
