@@ -435,11 +435,12 @@ async function fetchTdx<T>(path: string, retryCount = 0): Promise<T> {
   // 加入 10 秒區間的 cache buster (_t) 以繞過 Cloudflare Worker KV 快取
   const t = Math.floor(Date.now() / 10000)
   const separator = path.includes('?') ? '&' : '?'
-  const url = `${TDX_PROXY_BASE}${path}${separator}_t=${t}&$format=JSON`
+  const rawUrl = `${TDX_PROXY_BASE}${path}${separator}_t=${t}&$format=JSON`
+  const url = encodeURI(rawUrl)
 
-  // ── AbortController 超時保護（12 秒）──
+  // ── AbortController 超時保護（20 秒）──
   const controller = new AbortController()
-  const timeoutId = setTimeout(() => controller.abort(), 12000)
+  const timeoutId = setTimeout(() => controller.abort(), 20000)
 
   try {
     const response = await fetch(url, { signal: controller.signal })
@@ -1027,8 +1028,12 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
     }
   }, [])
 
-  // 保留 deps 追蹤，queryMetroData 由按鈕主動呼叫
-  useEffect(() => { }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
+  // 當切換站點或進入捷運 Tab 時自動查詢
+  useEffect(() => {
+    if (activeTab === 'metro' && selectedMetroStation && metroOperator) {
+      queryMetroData(metroOperator, selectedMetroStation)
+    }
+  }, [selectedMetroStation, metroOperator, activeTab, queryMetroData])
 
   const venueTransit = useMemo(() => {
     if (!selectedVenue) return null
@@ -1305,11 +1310,11 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
               const depMinutes = depHour * 60 + depMin
               const isDeparted = depMinutes < nowMinutes
 
-              if (isDeparted) return [] // 排除已駛離的車次
-
               let status = ''
               let isDelayed = false
-              if (delayMap[trainNo] !== undefined) {
+              if (isDeparted) {
+                status = lang === 'zh-TW' ? '已駛離' : lang === 'en' ? 'Departed' : lang === 'ja' ? '発車済み' : '출발완료'
+              } else if (delayMap[trainNo] !== undefined) {
                 const delayMin = delayMap[trainNo]
                 isDelayed = delayMin > 0
                 status = delayMin === 0
@@ -1337,7 +1342,7 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
           if (results.length === 0) {
             setTrainError(
               lang === 'zh-TW'
-                ? '今日該區間已無列車。'
+                ? '查無今日該區間之列車時刻表。'
                 : lang === 'en'
                   ? 'No train timetables for this route today.'
                   : lang === 'ja'
@@ -1414,8 +1419,6 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
           const depMinutes = Number(depTime.slice(0, 2)) * 60 + Number(depTime.slice(3, 5))
           const isDeparted = depMinutes < nowMinutes
 
-          if (isDeparted) return [] // 排除已駛離的班次，僅保留即將進站/尚未出發的班次
-
           const trainNo = item.DailyTrainInfo?.TrainNo ?? '--'
           const trainType = getHsrTrainType(trainNo)
 
@@ -1426,7 +1429,9 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
             arrTime: arrTime.slice(0, 5),
             duration: formatDuration(depTime, arrTime, lang),
             isExpress: trainType === '直達',
-            status: lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시',
+            status: isDeparted 
+              ? (lang === 'zh-TW' ? '已駛離' : lang === 'en' ? 'Departed' : lang === 'ja' ? '発車済み' : '출발완료')
+              : (lang === 'zh-TW' ? '準點' : lang === 'en' ? 'On time' : lang === 'ja' ? '定刻' : '정시'),
             isDelayed: false
           }]
         })
@@ -1439,7 +1444,7 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
       if (results.length === 0) {
         setTrainError(
           lang === 'zh-TW' 
-            ? '今日該區間已無車次資訊。' 
+            ? '查無今日該區間之車次時刻表。' 
             : lang === 'en' 
               ? 'No departures for this route today.' 
               : lang === 'ja' 
@@ -1495,7 +1500,14 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
         throw new Error('查無此路線站牌資料，請確認路線號碼與縣市是否正確')
       }
 
-      const etas = await fetchTdx<TdxBusEta[]>(`/v2/Bus/EstimatedTimeOfArrival/City/${selectedCounty}/${routeName}`)
+      // ETA 查詢若失敗或逾時，降級處理不讓整頁爆掉
+      let etas: TdxBusEta[] = []
+      try {
+        etas = await fetchTdx<TdxBusEta[]>(`/v2/Bus/EstimatedTimeOfArrival/City/${selectedCounty}/${routeName}`)
+      } catch (etaErr) {
+        console.warn('Bus ETA fetch failed or timed out:', etaErr)
+        etas = []
+      }
 
       const startTerminal = route.DepartureStopNameZh ?? stopsToRender[0]?.StopName?.Zh_tw ?? '起點'
       const endTerminal = route.DestinationStopNameZh ?? stopsToRender[stopsToRender.length - 1]?.StopName?.Zh_tw ?? '終點'
