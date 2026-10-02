@@ -829,57 +829,127 @@ export const useTranslation = () => {
 export const translateVenueName = (name: string, lang: string): string => {
   if (lang === 'zh-TW') return name
   const venueMap: Record<string, Record<string, string>> = {
+    // 基隆
+    '基隆表演藝術中心': { en: 'Keelung Performing Arts Center', ja: '基隆パフォーミングアーツセンター', ko: '지룽 공연예술센터' },
+    
+    // 台北
     '台北大巨蛋': { en: 'Taipei Dome', ja: '台北大巨蛋 (台北ドーム)', ko: '타이베이 돔' },
-    '台北小巨蛋': { en: 'Taipei Arena', ja: '台北小巨蛋 (台北アリーナ)', ko: '타이베이 아레나' },
-    '南港展覽館': { en: 'Nangang Exhibition Center', ja: '南港展覧館', ko: '난강 전람관' },
-    '台北流行音樂中心': { en: 'Taipei Music Center', ja: '台北流行音楽センター', ko: '타이베이 뮤직 센터' },
-    'Zepp New Taipei': { en: 'Zepp New Taipei', ja: 'Zepp New Taipei', ko: 'Zepp New Taipei' },
-    'Legacy Taipei': { en: 'Legacy Taipei', ja: 'Legacy Taipei', ko: 'Legacy Taipei' },
-    'The Wall Live House': { en: 'The Wall Live House', ja: 'The Wall Live House', ko: 'The Wall Live House' },
-    '桃園國際棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '桃園国際棒球場 (桃園野球場)', ko: '타오위안 국제야구장' },
-    '新竹棒球場': { en: 'Hsinchu Baseball Stadium', ja: '新竹棒球場 (新竹野球場)', ko: '신주 야구장' },
-    '天母棒球場': { en: 'Tianmu Baseball Stadium', ja: '天母棒球場 (天母野球場)', ko: '티엔무 야구장' },
-    '新莊棒球場': { en: 'Xinzhuang Baseball Stadium', ja: '新庄棒球場 (新庄野球場)', ko: '신좡 야구장' },
-    '高雄國家體育場': { en: 'Kaohsiung National Stadium', ja: '高雄国家体育場 (高雄スタジアム)', ko: '가오슝 국가체육장' },
-    '高雄巨蛋': { en: 'Kaohsiung Arena', ja: '高雄巨蛋 (高雄アリーナ)', ko: '가오슝 아레나' },
-    '高雄流行音樂中心': { en: 'Kaohsiung Music Center', ja: '高雄流行音楽センター', ko: '가오슝 뮤직 센터' },
-    '駁二 Live Warehouse': { en: 'Pier-2 LIVE WAREHOUSE', ja: '駁二 LIVE WAREHOUSE', ko: '피어-2 라이브 웨어하우스' },
-    '台中國際展覽館': { en: 'Taichung International Exhibition Center', ja: '台中国際展覧館', ko: '타이중 국제전시장' },
-    '台中國家歌劇院': { en: 'National Taichung Theater', ja: '台中国家歌劇院 (ナショナル・タイチュン・シアター)', ko: '국립타이중극장' },
-    '台中洲際棒球場': { en: 'Taichung Intercontinental Baseball Stadium', ja: '台中洲際棒球場 (台中インターコンチネンタル野球場)', ko: '타이중 인터컨티넨탈 야구장' },
-    '彰化縣立體育場': { en: 'Changhua County Stadium', ja: '彰化県立体育場', ko: '창화 현립체육장' },
-    '高雄國家體育場（世運主場館）': { en: 'Kaohsiung National Stadium (World Games Main Stadium)', ja: '高雄国家体育場 (世運主場館)', ko: '가오슝 국가체육장 (월드게임 메인 스타디움)' },
-    '斗六棒球場': { en: 'Douliu Baseball Stadium', ja: '斗六棒球場 (斗六野球場)', ko: '두류 야구장' },
-    'Legacy Taichung': { en: 'Legacy Taichung', ja: 'Legacy Taichung', ko: 'Legacy Taichung' },
-    '圓滿戶外劇場': { en: 'Fulfillment Amphitheatre', ja: '円満屋外劇場', ko: '원만 야외극장' },
-    '嘉義市棒球場': { en: 'Chiayi City Baseball Stadium', ja: '嘉義市棒球場 (嘉義野球場)', ko: '자이시 야구장' },
-    '台南市立棒球場': { en: 'Tainan Municipal Baseball Stadium', ja: '台南市立棒球場 (台南野球場)', ko: '타이남 시립야구장' },
-    '花蓮縣立體育場': { en: 'Hualien County Stadium', ja: '花蓮県立体育場', ko: '화롄 현립체육관' },
-    '後台 Backstage Live': { en: 'Backstage Live', ja: '後台 Backstage Live', ko: '백스테이지 라이브' },
-    '亞太國際棒球訓練中心成棒主球場': { en: 'Asia-Pacific International Baseball Stadium', ja: '亞太国際棒球場', ko: '아시아태평양 국제야구장' },
-    '澄清湖棒球場': { en: 'Chengqing Lake Baseball Stadium', ja: '澄清湖棒球場 (澄清湖野球場)', ko: '청칭후 야구장' },
-    '台東棒球場': { en: 'Taitung Baseball Stadium', ja: '台東棒球場 (台東野球場)', ko: '타이둥 야구장' },
-    // Renamed Venues
     '臺北大巨蛋': { en: 'Taipei Dome', ja: '臺北大巨蛋 (台北ドーム)', ko: '타이베이 돔' },
+    '台北小巨蛋': { en: 'Taipei Arena', ja: '台北小巨蛋 (台北アリーナ)', ko: '타이베이 아레나' },
     '臺北小巨蛋': { en: 'Taipei Arena', ja: '臺北小巨蛋 (台北アリーナ)', ko: '타이베이 아레나' },
+    '南港展覽館': { en: 'Nangang Exhibition Center', ja: '南港展覧館', ko: '난강 전람관' },
     '南港展覽館 1 館': { en: 'Nangang Exhibition Center Hall 1', ja: '南港展覧館1号館', ko: '난강 전람관 1관' },
-    '樂天桃園棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '楽天桃猿棒球場 (桃園野球場)', ko: '라쿠텐 타오위안 야구장' },
-    'K-ARENA 高雄巨蛋': { en: 'K-ARENA Kaohsiung Arena', ja: 'K-ARENA 高雄巨蛋 (高雄アリーナ)', ko: 'K-ARENA 가오슝 아레나' },
-    // 4.0 & 5.0 New Venues
-    'TICC 台北國際會議中心': { en: 'Taipei International Convention Center (TICC)', ja: 'TICC 台北国際會議中心', ko: '타이베이 국제회의센터 (TICC)' },
+    '南港展覽館 2 館': { en: 'Nangang Exhibition Center Hall 2', ja: '南港展覧館2号館', ko: '난강 전람관 2관' },
+    '台北流行音樂中心': { en: 'Taipei Music Center', ja: '台北流行音楽センター', ko: '타이베이 뮤직 센터' },
+    'Legacy TERA': { en: 'Legacy TERA', ja: 'Legacy TERA', ko: 'Legacy TERA' },
+    '國家兩廳院 國家音樂廳': { en: 'National Concert Hall', ja: '国家音楽庁 (ナショナル・コンサートホール)', ko: '국가음악당' },
+    'TICC 台北國際會議中心': { en: 'Taipei International Convention Center (TICC)', ja: 'TICC 台北国際会議中心', ko: '타이베이 국제회의센터 (TICC)' },
     '信義劇場 Legacy MAX': { en: 'Legacy MAX Sinyi', ja: '信義劇場 Legacy MAX', ko: '신이 극장 Legacy MAX' },
-    '台大體育館 (1樓多功能球場 / 3樓主球場)': { en: 'NTU Sports Center (1F / 3F)', ja: '台大体育館 (1F多目的アリーナ / 3Fメインアリーナ)', ko: '대만대 체육관 (1층 다목적 경기장 / 3층 메인 경기장)' },
+    'Legacy Taipei': { en: 'Legacy Taipei', ja: 'Legacy Taipei', ko: 'Legacy Taipei' },
     'Clapper Studio': { en: 'Clapper Studio', ja: 'Clapper Studio', ko: 'Clapper Studio' },
-    '新莊體育館': { en: 'Xinzhuang Gymnasium', ja: '新荘体育館', ko: '신좡 체육관' },
-    '新北市工商展覽中心': { en: 'New Taipei City Exhibition Hall', ja: '新北市工商展覧センター', ko: '신베이시 공상전람센터' },
-    '新北市政府多功能集會堂': { en: 'New Taipei City Hall Multi-purpose Assembly Hall', ja: '新北市政府多機能集会堂', ko: '신베이시청 다목적 집회장' },
-    '林口體育館': { en: 'National Taiwan Sport University Arena (Linkou Arena)', ja: '林口体育館', ko: '린커우 체육관' },
+    'Corner Max 大直展演空間': { en: 'Corner Max Live House', ja: 'Corner Max 大直展演空間', ko: 'Corner Max 공연장' },
+    '台大體育館 (1樓多功能球場 / 3樓主球場)': { en: 'NTU Sports Center (1F / 3F)', ja: '台大体育館 (1F多目的アリーナ / 3Fメインアリーナ)', ko: '대만대 체육관 (1층 다목적 경기장 / 3층 메인 경기장)' },
+    'The Wall Live House': { en: 'The Wall Live House', ja: 'The Wall Live House', ko: 'The Wall Live House' },
+    'PIPE Live Music': { en: 'PIPE Live Music', ja: 'PIPE Live Music', ko: 'PIPE Live Music' },
     '女巫店': { en: 'Witch House', ja: '女巫店 (ウィッチハウス)', ko: '마녀의 집 (Witch House)' },
+    '天母棒球場': { en: 'Tianmu Baseball Stadium', ja: '天母棒球場 (天母野球場)', ko: '티엔무 야구장' },
+
+    // 新北
+    'Zepp New Taipei': { en: 'Zepp New Taipei', ja: 'Zepp New Taipei', ko: 'Zepp New Taipei' },
+    '新莊體育館': { en: 'Xinzhuang Gymnasium', ja: '新荘体育館', ko: '신좡 체육관' },
+    '新莊棒球場': { en: 'Xinzhuang Baseball Stadium', ja: '新庄棒球場 (新庄野球場)', ko: '신좡 야구장' },
+    '板橋第一運動場': { en: 'Banqiao First Stadium', ja: '板橋第一運動場', ko: '반차오 제1운동장' },
+    '新北市政府多功能集會堂': { en: 'New Taipei City Hall Multi-purpose Assembly Hall', ja: '新北市政府多機能集会堂', ko: '신베이시청 다목적 집회장' },
+    '新北市工商展覽中心': { en: 'New Taipei City Exhibition Hall', ja: '新北市工商展覧センター', ko: '신베이시 공상전람센터' },
+    '淡水雲門劇場': { en: 'Cloud Gate Theater', ja: '淡水雲門劇場', ko: '단수이 클라우드 게이트 극장' },
+
+    // 桃園
+    '林口體育館': { en: 'National Taiwan Sport University Arena (Linkou Arena)', ja: '林口体育館', ko: '린커우 체육관' },
+    '桃園陽光劇場': { en: 'Taoyuan Sunlight Arena', ja: '桃園陽光劇場', ko: '타오위안 선라이트 아레나' },
+    '樂天桃園棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '楽天桃猿棒球場 (桃園野球場)', ko: '라쿠텐 타오위안 야구장' },
+    '桃園國際棒球場': { en: 'Rakuten Taoyuan Baseball Stadium', ja: '桃園国際棒球場 (桃園野球場)', ko: '타오위안 국제야구장' },
+    '桃園巨蛋 (桃園市立綜合體育館)': { en: 'Taoyuan Arena', ja: '桃園巨蛋 (桃園市立総合体育館)', ko: '타오위안 돔 체육관' },
+    '桃園展演中心': { en: 'Taoyuan Arts Center', ja: '桃園アーツセンター', ko: '타오위안 예술센터' },
+
+    // 新竹
+    '新竹縣立體育館 (竹北巨蛋)': { en: 'Hsinchu County Gymnasium', ja: '新竹県立体育館 (竹北ドーム)', ko: '신주 현립체육관' },
+    '新竹棒球場': { en: 'Hsinchu Baseball Stadium', ja: '新竹棒球場 (新竹野球場)', ko: '신주 야구장' },
+    '新竹市文化局演藝廳': { en: 'Hsinchu City Performing Arts Hall', ja: '新竹市文化局演芸ホール', ko: '신주시 문화국 공연장' },
+
+    // 苗栗
+    '苗栗縣文化觀光局中正堂': { en: 'Miaoli Cultural Center Zhongzheng Hall', ja: '苗栗県文化観光局中正堂', ko: '먀오리현 문화관광국 중정당' },
+
+    // 台中
+    '台中洲際棒球場': { en: 'Taichung Intercontinental Baseball Stadium', ja: '台中洲際棒球場 (台中インターコンチネンタル野球場)', ko: '타이중 인터컨티넨탈 야구장' },
+    '台中圓滿戶外劇場': { en: 'Fulfillment Amphitheatre', ja: '円満屋外劇場', ko: '원만 야외극장' },
+    '圓滿戶外劇場': { en: 'Fulfillment Amphitheatre', ja: '円満屋外劇場', ko: '원만 야외극장' },
+    '國立臺灣體育運動大學體育館': { en: 'NTUPES Gymnasium', ja: '国立台湾体育運動大学体育館', ko: '국립대만체육운동대학 체육관' },
+    '台中國家歌劇院': { en: 'National Taichung Theater', ja: '台中国家歌劇院 (ナショナル・タイチュン・シアター)', ko: '국립타이중극장' },
+    'Legacy Taichung': { en: 'Legacy Taichung', ja: 'Legacy Taichung', ko: 'Legacy Taichung' },
+    'Sound Live House 迴響音樂': { en: 'Sound Live House', ja: 'Sound Live House 迴響音楽', ko: 'Sound 라이브하우스' },
+
+    // 彰化
+    '彰化縣立體育場': { en: 'Changhua County Stadium', ja: '彰化県立体育場', ko: '창화 현립체육장' },
+    '員林演藝廳': { en: 'Yuanlin Performance Hall', ja: '員林パフォーミングアーツホール', ko: '위안린 공연예술홀' },
+
+    // 南投
+    '南投縣文化局演藝廳': { en: 'Nantou County Performing Arts Hall', ja: '南投県文化局演芸ホール', ko: '난터우현 문화국 공연장' },
+
+    // 雲林
+    '斗六棒球場': { en: 'Douliu Baseball Stadium', ja: '斗六棒球場 (斗六野球場)', ko: '두류 야구장' },
+    '雲林縣文化觀光局表演廳': { en: 'Yunlin County Performing Hall', ja: '雲林県文化観光局ホール', ko: '윈린현 문화관광국 공연홀' },
+
+    // 嘉義
+    '嘉義市棒球場': { en: 'Chiayi City Baseball Stadium', ja: '嘉義市棒球場 (嘉義野球場)', ko: '자이시 야구장' },
+    '嘉義縣表演藝術中心': { en: 'Chiayi Performing Arts Center', ja: '嘉義県パフォーミングアーツセンター', ko: '자이현 공연예술센터' },
+    '嘉義市立文化中心音樂廳': { en: 'Chiayi Municipal Cultural Center Concert Hall', ja: '嘉義市立文化センター音楽ホール', ko: '자이 시립문화센터 콘서트홀' },
+
+    // 台南
+    '大台南會展中心 ICC Tainan': { en: 'ICC Tainan (International Convention Center Tainan)', ja: '大台南会展中心 ICC Tainan', ko: 'ICC 타이난 컨벤션 센터' },
+    '台南文化中心演藝廳': { en: 'Tainan Cultural Center Performance Hall', ja: '台南文化センター演芸ホール', ko: '타이난 문화센터 공연장' },
+    '亞太國際棒球訓練中心成棒主球場': { en: 'Asia-Pacific International Baseball Stadium', ja: '亞太国際棒球場', ko: '아시아태평양 국제야구장' },
+    '台南市立棒球場': { en: 'Tainan Municipal Baseball Stadium', ja: '台南市立棒球場 (台南野球場)', ko: '타이남 시립야구장' },
     '飄丿白鷺': { en: 'Piau Piau Egret Live House', ja: '飄丿白鷺 (ライブハウス)', ko: '피아오 피아오 백로 (Livehouse)' },
     '飄丿白鷺 Live House': { en: 'Piau Piau Egret Live House', ja: '飄丿白鷺 (ライブハウス)', ko: '피아오 피아오 백로 (Livehouse)' },
-    '漂丿白鷺 Live House': { en: 'Piau Piau Egret Live House', ja: '飄丿白鷺 (ライブハウス)', ko: '피아오 피아오 백로 (Livehouse)' },
     'TCRC Livehouse': { en: 'TCRC Livehouse', ja: 'TCRC Livehouse', ko: 'TCRC 라이브하우스' },
+
+    // 高雄
+    '高雄國家體育場': { en: 'Kaohsiung National Stadium', ja: '高雄国家体育場 (高雄スタジアム)', ko: '가오슝 국가체육장' },
+    '高雄國家體育場（世運主場館）': { en: 'Kaohsiung National Stadium (World Games Main Stadium)', ja: '高雄国家体育場 (世運主場館)', ko: '가오슝 국가체육장 (월드게임 메인 스타디움)' },
+    'K-ARENA 高雄巨蛋': { en: 'K-ARENA Kaohsiung Arena', ja: 'K-ARENA 高雄巨蛋 (高雄アリーナ)', ko: 'K-ARENA 가오슝 아레나' },
+    '高雄巨蛋': { en: 'Kaohsiung Arena', ja: '高雄巨蛋 (高雄アリーナ)', ko: '가오슝 아레나' },
+    '衛武營國家藝術文化中心': { en: 'National Kaohsiung Center for the Arts (Weiwuying)', ja: '衛武営国家芸術文化センター', ko: '국립가오슝예술문화센터 (웨이우잉)' },
+    '高雄流行音樂中心': { en: 'Kaohsiung Music Center', ja: '高雄流行音楽センター', ko: '가오슝 뮤직 센터' },
+    '高雄展覽館 KEC': { en: 'Kaohsiung Exhibition Center (KEC)', ja: '高雄展覧館 KEC', ko: '가오슝 전람관 KEC' },
     '高雄 LIVE WAREHOUSE': { en: 'LIVE WAREHOUSE (Kaohsiung)', ja: '高雄 LIVE WAREHOUSE', ko: '가오슝 라이브 웨어하우스' },
+    '後台 Backstage Live': { en: 'Backstage Live', ja: '後台 Backstage Live', ko: '백스테이지 라이브' },
+    '澄清湖棒球場': { en: 'Chengqing Lake Baseball Stadium', ja: '澄清湖棒球場 (澄清湖野球場)', ko: '청칭후 야구장' },
+
+    // 屏東
+    '屏東演藝廳': { en: 'Pingtung Performing Arts Center', ja: '屏東パフォーミングアーツセンター', ko: '핑둥 공연예술센터' },
+    '屏東縣立體育館': { en: 'Pingtung County Gymnasium', ja: '屏東県立体育館', ko: '핑둥 현립체육관' },
+
+    // 宜蘭
+    '宜蘭演藝廳': { en: 'Yilan Performing Arts Center', ja: '宜蘭パフォーミングアーツセンター', ko: '이란 공연예술센터' },
+    '羅東文化工場': { en: 'Luodong Cultural Working House', ja: '羅東文化工場', ko: '뤄둥 문화공장' },
+
+    // 花蓮
+    '花蓮縣立體育場': { en: 'Hualien County Stadium', ja: '花蓮県立体育場', ko: '화롄 현립체육관' },
+    '花蓮縣文化局演藝廳': { en: 'Hualien County Performing Arts Hall', ja: '花蓮県文化局演芸ホール', ko: '화롄현 문화국 공연장' },
+
+    // 台東
+    '台東棒球場': { en: 'Taitung Baseball Stadium', ja: '台東棒球場 (台東野球場)', ko: '타이둥 야구장' },
+    '鐵花新聚落 (鐵花村)': { en: 'Tiehua Music Village', ja: '鉄花新聚落 (Tiehua Village)', ko: '티에화 뮤직 빌리지' },
+    '台東縣藝文中心演藝廳': { en: 'Taitung Arts Center Concert Hall', ja: '台東県芸文センター演芸ホール', ko: '타이둥 예술문화센터 공연장' },
+
+    // 澎湖
+    '澎湖縣演藝廳': { en: 'Penghu County Performing Arts Hall', ja: '澎湖県演芸ホール', ko: '펑후현 공연예술홀' },
+
+    // 金門
+    '金門縣文化局演藝廳': { en: 'Kinmen County Performing Arts Hall', ja: '金門県文化局演芸ホール', ko: '진먼현 문화국 공연장' },
+
+    // 連江 (馬祖)
+    '連江縣南竿介壽堂演藝廳': { en: 'Lienchiang County Jieshou Hall', ja: '連江県南竿介寿堂ホール', ko: '롄장현 남간 계수당 공연장' },
   }
   return venueMap[name]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || name
 }

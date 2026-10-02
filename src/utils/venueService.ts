@@ -4,7 +4,7 @@ import { VENUES as STATIC_VENUES } from '../constants/venues'
 import type { Venue } from '../types'
 
 const COLLECTION_NAME = 'venues'
-const CACHE_KEY = 'tw_cached_venues_v1'
+const CACHE_KEY = 'tw_cached_venues_v2'
 
 /**
  * 取得初始場館資料（優先讀取本機快取，若無則回傳靜態預設資料）
@@ -84,6 +84,20 @@ export async function fetchVenuesFromFirestore(): Promise<Venue[]> {
         longitude: typeof data.longitude === 'number' ? data.longitude : undefined,
       })
     })
+
+    // 自動巡檢：檢查是否有新的預設場館尚未寫入 Firestore，並自動同步補齊
+    const fetchedIdSet = new Set(fetchedVenues.map((v) => v.id))
+    const missingVenues = STATIC_VENUES.filter((v) => !fetchedIdSet.has(v.id))
+    if (missingVenues.length > 0) {
+      console.log(`[VenueService] Auto-syncing ${missingVenues.length} newly added venues to Firestore...`)
+      const batch = writeBatch(db)
+      missingVenues.forEach((v) => {
+        const docRef = doc(db, COLLECTION_NAME, v.id)
+        batch.set(docRef, v, { merge: true })
+        fetchedVenues.push(v)
+      })
+      batch.commit().catch((err) => console.warn('[VenueService] Auto-sync commit error:', err))
+    }
 
     // 依原始清單順序排序（若有在 STATIC_VENUES 內的保持原本順序，新加入的排在後面）
     const staticIdOrder = new Map(STATIC_VENUES.map((v, i) => [v.id, i]))
