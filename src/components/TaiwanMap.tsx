@@ -4,7 +4,7 @@ import type { Concert, Venue } from '../types'
 import { VENUES } from '../constants/venues'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
 import { useTranslation, translateVenueName, translateCityName } from '../utils/i18n.tsx'
-import { PinIcon, UserIcon } from './SvgIcon'
+import { PinIcon, UserIcon, CheckIcon, CloseIcon } from './SvgIcon'
 
 const project = (lon: number, lat: number) => {
   const x = 159.787256 * lon - 18882.141068
@@ -852,7 +852,7 @@ function TaiwanMapComponent({
                   >
                     <div className="popover-venue-name-row">
                       <span className="popover-venue-name">{translateVenueName(venue.name, lang)}</span>
-                      {hasVisits && <span className="visited-tick">✓</span>}
+                      {hasVisits && <span className="visited-tick"><CheckIcon size="0.9em" /></span>}
                     </div>
                     <div className="popover-venue-meta">
                       <span>
@@ -884,7 +884,9 @@ function TaiwanMapComponent({
         >
           <div className="overlap-popover-header">
             <span>{lang === 'zh-TW' ? '請選擇場館' : lang === 'ja' ? '会場を選択してください' : lang === 'ko' ? '공연장을 선택하세요' : 'Select Venue'}</span>
-            <button className="overlap-close-btn" type="button" onClick={() => setOverlappingVenues(null)}>✕</button>
+            <button className="overlap-close-btn" type="button" onClick={() => setOverlappingVenues(null)} aria-label="Close">
+              <CloseIcon size="0.9em" />
+            </button>
           </div>
           <div className="overlap-venue-list">
             {overlappingVenues.map((venue) => {

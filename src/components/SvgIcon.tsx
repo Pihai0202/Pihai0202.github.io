@@ -5,7 +5,7 @@ export interface IconProps extends React.SVGProps<SVGSVGElement> {
   size?: string | number;
 }
 
-// ☰ Menu Icon
+// Menu Icon
 export const MenuIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="3" y1="12" x2="21" y2="12" />
@@ -14,7 +14,7 @@ export const MenuIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// ✕ Close Icon
+// Close Icon
 export const CloseIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="18" y1="6" x2="6" y2="18" />
@@ -22,7 +22,7 @@ export const CloseIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// ☀️ Sun Icon
+// Sun Icon
 export const SunIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="12" r="4" />
@@ -37,14 +37,14 @@ export const SunIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🌙 Moon Icon
+// Moon Icon
 export const MoonIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9z" />
   </svg>
 );
 
-// 🎨 Palette Icon
+// Palette Icon
 export const PaletteIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="13.5" cy="6.5" r=".5" fill="currentColor" />
@@ -55,14 +55,14 @@ export const PaletteIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => 
   </svg>
 );
 
-// ✓ Check Icon
+// Check Icon
 export const CheckIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polyline points="20 6 9 17 4 12" />
   </svg>
 );
 
-// ✍️ Edit / Pencil Icon
+// Edit / Pencil Icon
 export const EditIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
@@ -70,7 +70,7 @@ export const EditIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// ✨ Sparkles Icon
+// Sparkles Icon
 export const SparklesIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 3v1" />
@@ -84,7 +84,7 @@ export const SparklesIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =>
   </svg>
 );
 
-// ⚾ Baseball Icon
+// Baseball Icon
 export const BaseballIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="12" r="10" />
@@ -93,7 +93,7 @@ export const BaseballIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =>
   </svg>
 );
 
-// ⚠️ Warning Icon
+// Warning Icon
 export const WarningIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
@@ -102,7 +102,7 @@ export const WarningIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => 
   </svg>
 );
 
-// 🔓 Lock Open Icon
+// Lock Open Icon
 export const LockOpenIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -110,7 +110,7 @@ export const LockOpenIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =>
   </svg>
 );
 
-// 🫵 / ⬅️ Back Arrow Icon
+// ⬅️ Back Arrow Icon
 export const ArrowLeftIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="19" y1="12" x2="5" y2="12" />
@@ -118,7 +118,7 @@ export const ArrowLeftIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =
   </svg>
 );
 
-// ➔ Arrow Right Icon
+// Arrow Right Icon
 export const ArrowRightIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="5" y1="12" x2="19" y2="12" />
@@ -126,49 +126,49 @@ export const ArrowRightIcon: React.FC<IconProps> = ({ size = '1em', ...props }) 
   </svg>
 );
 
-// ❤️ Heart Filled Icon
+// Heart Filled Icon
 export const HeartFilledIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
 
-// 🤍 Heart Outline Icon
+// Heart Outline Icon
 export const HeartOutlineIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
   </svg>
 );
 
-// 🟢 Green Dot Icon
+// Green Dot Icon
 export const GreenDotIcon: React.FC<IconProps> = ({ size = '0.7em', ...props }) => (
   <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle' }} {...props}>
     <circle cx="8" cy="8" r="6" />
   </svg>
 );
 
-// ⚪ Gray Dot Icon
+// Gray Dot Icon
 export const GrayDotIcon: React.FC<IconProps> = ({ size = '0.7em', ...props }) => (
   <svg viewBox="0 0 16 16" width={size} height={size} fill="currentColor" style={{ display: 'inline-block', verticalAlign: 'middle' }} {...props}>
     <circle cx="8" cy="8" r="6" />
   </svg>
 );
 
-// ⛅ CloudSun Icon (Weather)
+// CloudSun Icon (Weather)
 export const CloudSunIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.9 11.5A5.5 5.5 0 0 0 9.5 5.6H9a5 5 0 0 0 0 10h8.5a3.5 3.5 0 0 0 .4-6.9z" />
   </svg>
 );
 
-// ☁️ Cloud Icon (Weather)
+// Cloud Icon (Weather)
 export const CloudIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 8.58" />
   </svg>
 );
 
-// ❄️ Snowflake Icon (Weather)
+// Snowflake Icon (Weather)
 export const SnowflakeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="12" y1="2" x2="12" y2="22" />
@@ -178,7 +178,7 @@ export const SnowflakeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =
   </svg>
 );
 
-// ⛈️ Cloud Lightning Icon (Weather)
+// Cloud Lightning Icon (Weather)
 export const CloudLightningIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 8.58" />
@@ -186,14 +186,14 @@ export const CloudLightningIcon: React.FC<IconProps> = ({ size = '1em', ...props
   </svg>
 );
 
-// ☔ Umbrella / Rain Icon (Weather)
+// Umbrella / Rain Icon (Weather)
 export const UmbrellaIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M23 12a11.02 11.02 0 0 0-22 0zm-11 0v9a2 2 0 0 0 4 0" />
   </svg>
 );
 
-// 📋 Clipboard Icon
+// Clipboard Icon
 export const ClipboardIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" />
@@ -201,7 +201,7 @@ export const ClipboardIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =
   </svg>
 );
 
-// 🗺️ Map Icon
+// Map Icon
 export const MapIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
@@ -210,7 +210,7 @@ export const MapIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 📅 Calendar Icon
+// Calendar Icon
 export const CalendarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="3" y="4" width="18" height="18" rx="2" ry="2" />
@@ -220,14 +220,14 @@ export const CalendarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =>
   </svg>
 );
 
-// 💬 Message Icon
+// Message Icon
 export const MessageIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
   </svg>
 );
 
-// 👤 User Icon
+// User Icon
 export const UserIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
@@ -235,7 +235,7 @@ export const UserIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🎵 Music Icon
+// Music Icon
 export const MusicIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M9 18V5l12-2v13" />
@@ -244,7 +244,7 @@ export const MusicIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🔍 Search Icon
+// Search Icon
 export const SearchIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="11" cy="11" r="8" />
@@ -252,7 +252,7 @@ export const SearchIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 📷 Camera Icon
+// Camera Icon
 export const CameraIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -260,7 +260,7 @@ export const CameraIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 📍 Pin Icon
+// Pin Icon
 export const PinIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
@@ -268,28 +268,28 @@ export const PinIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// ▶ Play Icon
+// Play Icon
 export const PlayIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" {...props}>
     <polygon points="5 3 19 12 5 21 5 3" />
   </svg>
 );
 
-// 🎫 Ticket Icon
+// Ticket Icon
 export const TicketIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2zm7 0v6m6-6v6" />
   </svg>
 );
 
-// ⭐ Star Icon
+// Star Icon
 export const StarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="currentColor" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
   </svg>
 );
 
-// 🗑️ Trash Icon
+// Trash Icon
 export const TrashIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polyline points="3 6 5 6 21 6" />
@@ -297,7 +297,7 @@ export const TrashIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 💵 Dollar Icon
+// Dollar Icon
 export const DollarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <line x1="12" y1="1" x2="12" y2="23" />
@@ -305,21 +305,21 @@ export const DollarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🔑 Key Icon
+// Key Icon
 export const KeyIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.778-7.778zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
   </svg>
 );
 
-// 👋 Logout / Log Out Icon
+// Logout / Log Out Icon
 export const LogoutIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
   </svg>
 );
 
-// 📧 Mail / Envelope Icon
+// Mail / Envelope Icon
 export const MailIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
@@ -327,7 +327,7 @@ export const MailIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🎤 Microphone / Mic Icon
+// Microphone / Mic Icon
 export const MicIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
@@ -335,14 +335,14 @@ export const MicIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🔥 Flame / Fire Icon
+// Flame / Fire Icon
 export const FlameIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z" />
   </svg>
 );
 
-// 🏰 Building / Venue Icon
+// Building / Venue Icon
 export const BuildingIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="4" y="2" width="16" height="20" rx="2" ry="2" />
@@ -353,21 +353,21 @@ export const BuildingIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =>
   </svg>
 );
 
-// 🐾 Activity / Footprint Icon
+// Activity / Footprint Icon
 export const ActivityIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
   </svg>
 );
 
-// 📢 Megaphone Icon
+// Megaphone Icon
 export const MegaphoneIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M11 5L6 9H2v6h4l5 4V5zM19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07" />
   </svg>
 );
 
-// 🔗 Link Icon
+// Link Icon
 export const LinkIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
@@ -375,14 +375,14 @@ export const LinkIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 💾 Save / Download Icon
+// Save / Download Icon
 export const DownloadIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
   </svg>
 );
 
-// 🚇 / 🚄 Train / Metro / Rail Icon
+// Train / Metro / Rail Icon
 export const TrainIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="4" y="3" width="16" height="16" rx="2" />
@@ -390,7 +390,7 @@ export const TrainIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🚌 Bus / Transit Icon
+// Bus / Transit Icon
 export const BusIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="4" y="3" width="16" height="16" rx="2" />
@@ -398,14 +398,14 @@ export const BusIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🔄 Refresh / Rotate Icon
+// Refresh / Rotate Icon
 export const RefreshIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67" />
   </svg>
 );
 
-// 🧭 Compass / Navigation Icon
+// Compass / Navigation Icon
 export const CompassIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="12" r="10" />
@@ -413,7 +413,7 @@ export const CompassIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => 
   </svg>
 );
 
-// 🌡️ Thermometer Icon
+// Thermometer Icon
 export const ThermometerIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" />
@@ -428,7 +428,7 @@ export const PlusIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🇹🇼 Taiwan Shape Icon (Merged paths of Taiwan map)
+// Taiwan Shape Icon (Merged paths of Taiwan map)
 export const TaiwanIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg 
     viewBox="180 150 550 700" 
@@ -470,7 +470,7 @@ export const ChevronLeftIcon: React.FC<IconProps> = ({ size = '1em', ...props })
   </svg>
 );
 
-// 🖼️ Image Icon
+// Image Icon
 export const ImageIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
@@ -479,7 +479,7 @@ export const ImageIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🌐 Globe Icon
+// Globe Icon
 export const GlobeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="12" r="10" />
@@ -488,7 +488,7 @@ export const GlobeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🔇 Volume X / Mute Icon
+// Volume X / Mute Icon
 export const VolumeXIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
@@ -497,7 +497,7 @@ export const VolumeXIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => 
   </svg>
 );
 
-// 🚀 Rocket Icon
+// Rocket Icon
 export const RocketIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4.5 16.5c-1.5 1.25-2.5 3.5-2.5 3.5s2.25-1 3.5-2.5" />
@@ -507,7 +507,7 @@ export const RocketIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🎸 Guitar Icon
+// Guitar Icon
 export const GuitarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M18.8 3.2a1.8 1.8 0 0 0-2.6 0L12 7.4 16.6 12l4.2-4.2a1.8 1.8 0 0 0 0-2.6z" />
@@ -516,7 +516,7 @@ export const GuitarIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🎹 Piano Icon
+// Piano Icon
 export const PianoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <rect x="2" y="3" width="20" height="18" rx="2" ry="2" />
@@ -532,7 +532,7 @@ export const PianoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🎧 Headphones Icon
+// Headphones Icon
 export const HeadphonesIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M3 18v-6a9 9 0 0 1 18 0v6" />
@@ -540,7 +540,7 @@ export const HeadphonesIcon: React.FC<IconProps> = ({ size = '1em', ...props }) 
   </svg>
 );
 
-// 🥁 Drum Icon
+// Drum Icon
 export const DrumIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <ellipse cx="12" cy="7" rx="10" ry="3" />
@@ -553,7 +553,7 @@ export const DrumIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 💃 Dancer Icon
+// Dancer Icon
 export const DancerIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="4" r="2" />
@@ -562,7 +562,7 @@ export const DancerIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🕺 Disco Icon
+// Disco Icon
 export const DiscoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <circle cx="12" cy="5" r="2" />
@@ -572,7 +572,7 @@ export const DiscoIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🤘 Rock Icon
+// Rock Icon
 export const RockIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M18 10v6a6 6 0 0 1-12 0v-6" />
@@ -584,7 +584,7 @@ export const RockIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🏆 Trophy Icon
+// Trophy Icon
 export const TrophyIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6" />
@@ -595,14 +595,14 @@ export const TrophyIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 🛡️ Shield Icon
+// Shield Icon
 export const ShieldIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
   </svg>
 );
 
-// 🚄 HsrIcon (High Speed Rail)
+// HsrIcon (High Speed Rail)
 export const HsrIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M4 14V9a5 5 0 0 1 5-5h6a5 5 0 0 1 5 5v5" />
@@ -616,7 +616,7 @@ export const HsrIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
-// 💡 LightbulbIcon
+// LightbulbIcon
 export const LightbulbIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
     <path d="M9 18h6" />
@@ -624,3 +624,28 @@ export const LightbulbIcon: React.FC<IconProps> = ({ size = '1em', ...props }) =
     <path d="M12 2a7 7 0 0 0-7 7c0 2.38 1.19 4.47 3 5.74V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.26c1.81-1.27 3-3.36 3-5.74a7 7 0 0 0-7-7z" />
   </svg>
 );
+
+// Clock Icon
+export const ClockIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="12" cy="12" r="10" />
+    <polyline points="12 6 12 12 16 14" />
+  </svg>
+);
+
+// Water Droplet / Rain Icon
+export const DropletIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+  </svg>
+);
+
+// Bike / Bicycle Icon
+export const BikeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <circle cx="5.5" cy="17.5" r="3.5" />
+    <circle cx="18.5" cy="17.5" r="3.5" />
+    <path d="M15 6a1 1 0 1 0 0-2 1 1 0 0 0 0 2zm-3 11.5L8.5 7.5H5.5M12 17.5l3.5-7.5H18M12 17.5V10h3" />
+  </svg>
+);
+

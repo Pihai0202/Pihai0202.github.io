@@ -920,8 +920,9 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
                     alignItems: 'center',
                     gap: '0.75rem'
                   }}>
-                    <p style={{ color: 'var(--muted)', fontSize: '0.88rem', margin: 0 }}>
-                      {lang === 'zh-TW' ? '💬 登入會員後即可參與討論與發表回覆' : '💬 Log in to participate in the conversation and post replies'}
+                    <p style={{ color: 'var(--muted)', fontSize: '0.88rem', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <MessageIcon size="1.1em" />
+                      <span>{lang === 'zh-TW' ? '登入會員後即可參與討論與發表回覆' : 'Log in to participate in the conversation and post replies'}</span>
                     </p>
                     <button
                       type="button"
@@ -953,8 +954,9 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
                           type="button"
                           className="cancel-reply-to-btn"
                           onClick={() => setReplyTo(null)}
+                          aria-label="Cancel reply"
                         >
-                          ✕
+                          <CloseIcon size="0.85em" />
                         </button>
                       </div>
                     )}

@@ -27,7 +27,9 @@ import {
   CameraIcon,
   TrashIcon,
   SearchIcon,
-  LinkIcon
+  LinkIcon,
+  CloseIcon,
+  UserIcon
 } from './SvgIcon'
 
 const EMOJI_TO_AVATAR_KEY: Record<string, string> = {
@@ -452,7 +454,7 @@ export function ProfilePage({
                   </span>
                 )
               ) : (
-                (user.nickname || '👤').charAt(0).toUpperCase()
+                user.nickname ? user.nickname.charAt(0).toUpperCase() : <UserIcon size="1.2em" />
               )}
               <div className="avatar-overlay">
                 <span>{lang === 'zh-TW' ? '更換頭像' : 'Change Avatar'}</span>
@@ -660,8 +662,8 @@ export function ProfilePage({
       {isAvatarModalOpen && (
         <div className="modal-overlay active" onClick={() => setIsAvatarModalOpen(false)}>
           <div className="modal publish-modal" style={{ maxWidth: '400px' }} onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={() => setIsAvatarModalOpen(false)}>
-              ✕
+            <button className="modal-close" type="button" onClick={() => setIsAvatarModalOpen(false)} aria-label="Close">
+              <CloseIcon size="1em" />
             </button>
             <h2 style={{ fontFamily: '"Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif', fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1rem' }}>
               {lang === 'zh-TW' ? '自訂個人頭像' : 'Customize Avatar'}
@@ -725,8 +727,8 @@ export function ProfilePage({
                 <ActivityIcon size="1.1em" style={{ marginRight: '6px', verticalAlign: 'middle' }} />
                 {lang === 'zh-TW' ? '我的音樂現場足跡' : 'My Live Music Footprint'}
               </h4>
-              <button className="close-records-modal-btn" onClick={() => setShowRecordsModal(false)}>
-                &times;
+              <button className="close-records-modal-btn" onClick={() => setShowRecordsModal(false)} aria-label="Close">
+                <CloseIcon size="1em" />
               </button>
             </div>
             <div className="records-modal-body">
@@ -740,8 +742,8 @@ export function ProfilePage({
       {isSpotifyModalOpen && (
         <div className="modal-overlay active" onClick={() => setIsSpotifyModalOpen(false)}>
           <div className="modal spotify-edit-modal" style={{ maxWidth: '460px', padding: '1.8rem', borderRadius: '20px' }} onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={() => setIsSpotifyModalOpen(false)}>
-              ✕
+            <button className="modal-close" type="button" onClick={() => setIsSpotifyModalOpen(false)} aria-label="Close">
+              <CloseIcon size="1em" />
             </button>
             <h3 style={{ fontSize: '1.2rem', color: 'var(--text)', marginBottom: '0.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
               <MusicIcon style={{ color: '#1db954' }} />

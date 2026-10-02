@@ -13,6 +13,7 @@ import {
   HsrIcon,
   LightbulbIcon,
   GreenDotIcon,
+  ClockIcon,
 } from './SvgIcon'
 
 // ─── 型別定義 ────────────────────────────────────────────────────────────────
@@ -1763,7 +1764,7 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
             <div className="transit-card-footer">
               {current.updatedAt && (
                 <div className="transit-updated">
-                  <span>🕒</span>
+                  <ClockIcon size="1em" style={{ verticalAlign: 'middle', marginRight: '4px' }} />
                   <span>{lang === 'zh-TW' ? '最後更新：' : lang === 'en' ? 'Last Update: ' : lang === 'ja' ? '最終更新：' : '최종 업데이트: '}{new Date(current.updatedAt).toLocaleTimeString(lang === 'zh-TW' ? 'zh-TW' : 'en-US')}</span>
                 </div>
               )}

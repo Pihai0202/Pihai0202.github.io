@@ -2,14 +2,14 @@ import type { Concert } from '../types'
 
 export function getConcertShareText(concert: Concert): string {
   const meta = `【台灣演唱會記錄分享】\n` +
-    `🎵 藝人/團體：${concert.artist}\n` +
-    `🏟️ 演出場館：${concert.venueCity} · ${concert.venueName}\n` +
-    `📅 演出日期：${concert.date || '未定'}\n` +
-    (concert.concertName ? `🎫 演出名稱：${concert.concertName}\n` : '') +
-    (concert.seat ? `💺 座位區域：${concert.seat}\n` : '') +
+    `藝人/團體：${concert.artist}\n` +
+    `演出場館：${concert.venueCity} · ${concert.venueName}\n` +
+    `演出日期：${concert.date || '未定'}\n` +
+    (concert.concertName ? `演出名稱：${concert.concertName}\n` : '') +
+    (concert.seat ? `座位區域：${concert.seat}\n` : '') +
     `----------------------------------------\n`;
   
-  return meta + (concert.notes ? `📝 觀後感心得：\n${concert.notes}` : '（無撰寫心得）');
+  return meta + (concert.notes ? `觀後感心得：\n${concert.notes}` : '（無撰寫心得）');
 }
 
 export function exportToMarkdownFile(concert: Concert) {

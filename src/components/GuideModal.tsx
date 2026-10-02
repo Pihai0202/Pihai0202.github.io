@@ -65,7 +65,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
       details: [
         '地圖縮放功能：支援滑鼠拖拽與雙指縮放 (Pinch-to-zoom)，縮放範圍可自訂為 70% 至 500%。',
         '自適應版面：支援手機端自適應的抽屜式面版，可自由向上拖拽展開或收合。',
-        '足跡標記：您參戰過或去過的場館會在列表與地圖上呈現「已造訪 (✓)」標記。',
+        '足跡標記：您參戰過或去過的場館會在列表與地圖上呈現「已造訪」打勾標記。',
         '類別過濾：支援依「音樂會/演唱會 (Concert)」或「運動賽事 (Sport)」對場館進行篩選。'
       ]
     },
@@ -160,7 +160,7 @@ export function GuideModal({ onClose }: GuideModalProps) {
       details: [
         'Zoom controls: Supports mouse dragging and pinch-to-zoom (70% to 500%).',
         'Responsive layout: Adaptive bottom sheet drawer for mobile screens.',
-        'Concert footprints: Checkmarks (✓) for venues you have visited.',
+        'Concert footprints: Checkmarks for venues you have visited.',
         'Category filters: Filter venues by "Concerts" or "Sports Events".'
       ]
     },

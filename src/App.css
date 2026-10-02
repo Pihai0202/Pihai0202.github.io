@@ -11,7 +11,7 @@
    Color Schemes & Palettes (配色調色盤切換)
    ========================================================================== */
 
-/* 🌿 Scheme A: Sage Olive Green (預設莫蘭迪鼠尾草綠) */
+/* Scheme A: Sage Olive Green (預設莫蘭迪鼠尾草綠) */
 :root,
 :root[data-palette="sage"] {
   --bottom-offset: 0px;
@@ -91,7 +91,7 @@
   --scrollbar-thumb-hover: var(--accent);
 }
 
-/* 🌋 Scheme B: Volcanic Amber Gold & Black Orange (經典黑橘風格) */
+/* Scheme B: Volcanic Amber Gold & Black Orange (經典黑橘風格) */
 :root[data-palette="volcano"] {
   --bottom-offset: 0px;
   --bg: #0b0b0e;

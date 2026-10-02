@@ -13,7 +13,8 @@ import {
   CloseIcon,
   CalendarIcon,
   ClipboardIcon,
-  CheckIcon
+  CheckIcon,
+  DropletIcon
 } from './SvgIcon'
 
 interface VenueWeatherProps {
@@ -716,7 +717,7 @@ export function VenueWeather({ latitude, longitude, cityName, address, onClose, 
                     <span className="forecast-desc" title={info.desc}>{displayDesc}</span>
                     <span className="forecast-temp">{day.tempMin}°~{day.tempMax}°C</span>
                     {day.rain && day.rain !== '-' && (
-                      <span className="forecast-rain" title="降雨機率">💧{day.rain}%</span>
+                      <span className="forecast-rain" title="降雨機率"><DropletIcon size="0.9em" style={{ verticalAlign: 'text-bottom', marginRight: '2px' }} />{day.rain}%</span>
                     )}
                   </div>
                 )

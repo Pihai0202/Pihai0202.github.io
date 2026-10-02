@@ -2400,7 +2400,7 @@ function App() {
                                   >
                                     <span className="dot" />
                                     <span className="name">{translateVenueName(v.name, lang)}</span>
-                                    {hasVisits && <span className="visited-badge">✓</span>}
+                                    {hasVisits && <span className="visited-badge"><CheckIcon size="0.85em" /></span>}
                                   </button>
                                 )
                               })}
@@ -2541,8 +2541,9 @@ function App() {
                           setSelectedVenueId(null);
                           setMobileDrawerState('half');
                         }}
+                        aria-label="Clear selected venue"
                       >
-                        ✕
+                        <CloseIcon size="0.85em" />
                       </button>
                     </div>
                   ) : (
@@ -2749,7 +2750,7 @@ function App() {
                                           >
                                             <span className="dot" />
                                             <span className="name">{translateVenueName(v.name, lang)}</span>
-                                            {hasVisits && <span className="visited-badge">✓</span>}
+                                            {hasVisits && <span className="visited-badge"><CheckIcon size="0.85em" /></span>}
                                           </button>
                                         )
                                       })}
@@ -3765,7 +3766,7 @@ function App() {
                 onClick={() => setIsMobileSidebarOpen(false)}
                 aria-label="關閉選單"
               >
-                ✕
+                <CloseIcon size="1em" />
               </button>
             </div>
             <div className="sidebar-nav-items">
@@ -4243,7 +4244,8 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
             <div className="remote-card-name">{concert.name}</div>
             {concert.game_score && (
               <div className={`card-game-score-pill ${concert.game_score.status || 'scheduled'}`}>
-                ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}
+                <BaseballIcon size="0.95em" style={{ verticalAlign: 'middle', marginRight: '3px' }} />
+                <span>{shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}</span>
                 <span className={`game-status-pill ${concert.game_score.status || 'scheduled'}`}>
                   {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
                   {concert.game_score.status === 'live' ? (lang === 'zh-TW' ? '比賽中' : 'LIVE') : (concert.game_score.status_text || (concert.game_score.status === 'finished' ? '已完賽' : '未開打'))}
