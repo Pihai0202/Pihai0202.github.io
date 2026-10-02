@@ -9820,6 +9820,29 @@ svg#taiwan-map.dragging {
   }
 }
 
+/* Map Region & County Labels */
+.map-county-labels-layer {
+  pointer-events: none;
+  user-select: none;
+}
+
+.map-county-label {
+  fill: var(--map-label, #8a8a9e);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.25s ease, fill 0.3s ease;
+}
+
+[data-theme='light'] .map-county-label {
+  fill: var(--map-label, #555566);
+  opacity: 0.65;
+  font-weight: 700;
+}
+
 /* Shuangbei Cluster Marker & Inset Map Popover */
 .shuangbei-cluster-group {
   cursor: pointer;

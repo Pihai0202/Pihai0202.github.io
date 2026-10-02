@@ -977,6 +977,7 @@ export const translateCityName = (city: string, lang: string): string => {
     '澎湖': { en: 'Penghu', ja: '澎湖', ko: '펑후' },
     '金門': { en: 'Kinmen', ja: '金門', ko: '진먼' },
     '連江': { en: 'Lienchiang', ja: '連江', ko: '롄장' },
+    '馬祖': { en: 'Matsu', ja: '馬祖', ko: '마쭈' },
   }
   return cityMap[city]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || city
 }
