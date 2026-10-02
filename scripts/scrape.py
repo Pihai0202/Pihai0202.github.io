@@ -1967,30 +1967,39 @@ def scrape_cpbl_rebas():
         "桃園棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
         "樂天桃園棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
         "桃園國際棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
-        "台南": ("tainan", "台南棒球場", "台南市"),
-        "臺南": ("tainan", "台南棒球場", "台南市"),
-        "台南棒球場": ("tainan", "台南棒球場", "台南市"),
-        "臺南市立棒球場": ("tainan", "台南棒球場", "台南市"),
-        "澄清湖": ("chengcing-lake", "澄清湖棒球場", "高雄市"),
-        "澄清湖棒球場": ("chengcing-lake", "澄清湖棒球場", "高雄市"),
-        "高雄市立澄清湖棒球場": ("chengcing-lake", "澄清湖棒球場", "高雄市"),
-        "花蓮": ("hualien", "花蓮縣立體育場", "花蓮縣"),
-        "花蓮棒球場": ("hualien", "花蓮縣立體育場", "花蓮縣"),
-        "花蓮縣立德興棒球場": ("hualien", "花蓮縣立體育場", "花蓮縣"),
-        "台東": ("taitung", "台東棒球場", "台東縣"),
-        "臺東": ("taitung", "台東棒球場", "台東縣"),
-        "台東棒球場": ("taitung", "台東棒球場", "台東縣"),
-        "臺東縣立棒球場": ("taitung", "台東棒球場", "台東縣"),
-        "亞太": ("asia-pacific-main", "亞太國際棒球訓練中心成棒主球場", "台南市"),
-        "亞太主": ("asia-pacific-main", "亞太國際棒球訓練中心成棒主球場", "台南市"),
-        "亞太國際棒球訓練中心": ("asia-pacific-main", "亞太國際棒球訓練中心成棒主球場", "台南市"),
-        "斗六": ("douliou", "斗六棒球場", "雲林縣"),
-        "斗六棒球場": ("douliou", "斗六棒球場", "雲林縣"),
-        "雲林縣立斗六棒球場": ("douliou", "斗六棒球場", "雲林縣"),
-        "嘉義市": ("chiayi", "嘉義市棒球場", "嘉義市"),
-        "嘉義市立棒球場": ("chiayi", "嘉義市棒球場", "嘉義市"),
-        "新竹": ("hsinchu", "新竹棒球場", "新竹市"),
-        "新竹棒球場": ("hsinchu", "新竹棒球場", "新竹市")
+# ── 中華職棒 CPBL 官方賽程爬蟲 ─────────────────────────────────────────────
+
+def scrape_cpbl():
+    """
+    爬取中華職棒官方即時賽程與比分數據，
+    包含主客場球隊、球場、各局得分、勝敗投/MVP與購票連結。
+    """
+    print("→ 爬取中華職棒官方即時賽程數據...", file=sys.stderr)
+    events = []
+    current_year = datetime.now().year
+    
+    field_mapping = {
+        "大巨蛋": "taipei-dome", "臺北大巨蛋": "taipei-dome", "台北大巨蛋": "taipei-dome",
+        "新莊": "xinzhuang", "新莊棒球場": "xinzhuang",
+        "天母": "tianmu", "天母棒球場": "tianmu",
+        "洲際": "taichung-dome", "台中洲際棒球場": "taichung-dome", "臺中洲際棒球場": "taichung-dome",
+        "澄清湖": "chengcing-lake", "澄清湖棒球場": "chengcing-lake",
+        "亞太主": "asia-pacific-main", "亞太": "asia-pacific-main", "亞太國際棒球訓練中心": "asia-pacific-main",
+        "樂天桃園": "taoyuan-arena", "桃園": "taoyuan-arena", "桃園國際棒球場": "taoyuan-arena",
+        "台南": "tainan", "臺南": "tainan", "台南棒球場": "tainan",
+        "台東": "taitung", "臺東": "taitung", "台東棒球場": "taitung",
+        "花蓮": "hualien", "花蓮棒球場": "hualien", "花蓮縣立體育場": "hualien",
+        "斗六": "douliou", "斗六棒球場": "douliou",
+        "嘉義市": "chiayi", "嘉義市立棒球場": "chiayi",
+        "新竹": "hsinchu", "新竹棒球場": "hsinchu"
+    }
+    
+    venue_names = {
+        "taipei-dome": "台北大巨蛋", "xinzhuang": "新莊棒球場", "tianmu": "天母棒球場",
+        "taichung-dome": "台中洲際棒球場", "chengcing-lake": "澄清湖棒球場",
+        "asia-pacific-main": "亞太國際棒球訓練中心成棒主球場", "taoyuan-arena": "桃園國際棒球場",
+        "tainan": "台南棒球場", "taitung": "台東棒球場", "hualien": "花蓮縣立體育場",
+        "douliou": "斗六棒球場", "chiayi": "嘉義市棒球場", "hsinchu": "新竹棒球場"
     }
 
     team_tickets = {
@@ -2002,148 +2011,13 @@ def scrape_cpbl_rebas():
         "統一": {"name": "統一獅售票網", "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"}
     }
 
-    seen_game_ids = set()
-
-    for rel in releases[:2]:
-        for asset in rel.get("assets", []):
-            name = asset.get("name", "")
-            if not name.endswith(".zip"):
-                continue
-            download_url = asset.get("browser_download_url")
-            try:
-                areq = Request(download_url, headers={'User-Agent': 'Mozilla/5.0'})
-                with urlopen(areq, timeout=45) as aresp:
-                    zdata = aresp.read()
-                    with zipfile.ZipFile(io.BytesIO(zdata)) as z:
-                        for fname in z.namelist():
-                            if fname.endswith(".json") and not fname.endswith("-OpenData.json"):
-                                try:
-                                    graw = z.read(fname).decode('utf-8')
-                                    game = json.loads(graw)
-                                    if isinstance(game, dict) and "homeTeam" in game:
-                                        games_to_parse = [game]
-                                    elif isinstance(game, list):
-                                        games_to_parse = [g for g in game if isinstance(g, dict) and "homeTeam" in g]
-                                    else:
-                                        games_to_parse = []
-
-                                    for g in games_to_parse:
-                                        season = g.get("season", "中華職棒")
-                                        season_id = g.get("seasonId", "CPBL")
-                                        seq = g.get("seq", 0)
-                                        raw_date = g.get("date", "")
-                                        stadium = g.get("stadium", "")
-                                        away_team = g.get("awayTeam", "").strip()
-                                        home_team = g.get("homeTeam", "").strip()
-                                        
-                                        date_str = raw_date[:10]
-                                        current_year_str = str(datetime.now().year)
-                                        if not date_str.startswith(current_year_str):
-                                            continue
-                                        
-                                        game_uid = f"cpbl-{season_id}-{seq}-{date_str}"
-                                        if game_uid in seen_game_ids:
-                                            continue
-                                        seen_game_ids.add(game_uid)
-                                        
-                                        away_scores = g.get("awayScores", [])
-                                        home_scores = g.get("homeScores", [])
-                                        away_pitchers = g.get("awayPitcherBox", [])
-                                        home_pitchers = g.get("homePitcherBox", [])
-                                        away_batters = g.get("awayBatterBox", [])
-                                        home_batters = g.get("homeBatterBox", [])
-                                        
-                                        visiting_score = sum_rebas_scores(away_scores)
-                                        home_score = sum_rebas_scores(home_scores)
-                                        
-                                        away_hits = sum_rebas_stat(away_batters, "H")
-                                        home_hits = sum_rebas_stat(home_batters, "H")
-                                        away_errors = sum_rebas_stat(away_batters, "E")
-                                        home_errors = sum_rebas_stat(home_batters, "E")
-                                        
-                                        visiting_pitcher = away_pitchers[0].get("playerName") if away_pitchers else None
-                                        home_pitcher = home_pitchers[0].get("playerName") if home_pitchers else None
-                                        
-                                        status = "finished" if away_scores and len(away_scores) > 0 else "scheduled"
-                                        status_text = "已完賽" if status == "finished" else "即將開打"
-                                        
-                                        venue_id, venue_name, city = "other-venue", stadium, ""
-                                        for k, (vid, vname, vcity) in stadium_mapping.items():
-                                            if k in stadium:
-                                                venue_id, venue_name, city = vid, vname, vcity
-                                                break
-                                        
-                                        game_score = {
-                                            "visiting_team": away_team,
-                                            "home_team": home_team,
-                                            "visiting_score": visiting_score,
-                                            "home_score": home_score,
-                                            "visiting_scores": away_scores,
-                                            "home_scores": home_scores,
-                                            "visiting_hits": away_hits,
-                                            "home_hits": home_hits,
-                                            "visiting_errors": away_errors,
-                                            "home_errors": home_errors,
-                                            "visiting_pitcher": visiting_pitcher,
-                                            "home_pitcher": home_pitcher,
-                                            "status": status,
-                                            "status_text": status_text,
-                                            "awayPitcherBox": away_pitchers,
-                                            "homePitcherBox": home_pitchers,
-                                            "awayBatterBox": away_batters,
-                                            "homeBatterBox": home_batters
-                                        }
-                                        
-                                        ticket_links = []
-                                        for team_kw, t_info in team_tickets.items():
-                                            if team_kw in home_team:
-                                                ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
-                                                break
-                                        ticket_links.append({"platform": "manual", "name": "野球革命 Rebas 賽事數據", "url": "https://www.rebas.tw/"})
-                                        
-                                        events.append({
-                                            "id": game_uid,
-                                            "source": "中華職棒",
-                                            "name": f"{season} 第{seq}場：{away_team} vs {home_team}",
-                                            "venue_raw": stadium,
-                                            "venue_id": venue_id,
-                                            "venue_name": venue_name,
-                                            "city": city,
-                                            "date": date_str,
-                                            "image": "",
-                                            "url": "https://www.rebas.tw/",
-                                            "price": "依官方公告為準",
-                                            "category": "sport",
-                                            "game_score": game_score,
-                                            "ticket_links": ticket_links
-                                        })
-                                except Exception:
-                                    pass
-            except Exception as ae:
-                print(f"  ⚠ 下載 Rebas 資料集 {name} 失敗: {ae}", file=sys.stderr)
-
-    print(f"  ✅ 野球革命 Rebas Open Data 解析完成，取得 {len(events)} 筆賽事詳細數據", file=sys.stderr)
-    return events
-
-
-def scrape_cpbl():
-    """
-    爬取中華職棒數據：優先從野球革命 Rebas Open Data 取得完整局數比分與投打成績，
-    並輔以官方賽程補充未來賽事。
-    """
-    rebas_events = scrape_cpbl_rebas()
-    
-    # 嘗試獲取 CPBL 官方即時賽程作為輔助補充
-    official_events = []
     if HAS_CURL_CFFI:
         try:
-            impersonate_targets = ["safari15_5", "chrome120"]
             session = cffi_requests.Session()
             res = session.get("https://cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
             if res.status_code == 200:
                 tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
                 if tokens:
-                    current_year = datetime.now().year
                     post_res = session.post(
                         "https://cpbl.com.tw/schedule/getgamedatas",
                         data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": "A"},
@@ -2155,18 +2029,6 @@ def scrape_cpbl():
                         resp_json = post_res.json()
                         if resp_json.get("Success"):
                             games = json.loads(resp_json["GameDatas"])
-                            field_mapping = {
-                                "大巨蛋": "taipei-dome", "新莊": "xinzhuang", "天母": "tianmu",
-                                "洲際": "taichung-dome", "澄清湖": "chengcing-lake", "亞太主": "asia-pacific-main",
-                                "樂天桃園": "taoyuan-arena", "台東": "taitung", "花蓮": "hualien",
-                                "斗六": "douliou", "嘉義市": "chiayi"
-                            }
-                            venue_names = {
-                                "taipei-dome": "台北大巨蛋", "xinzhuang": "新莊棒球場", "tianmu": "天母棒球場",
-                                "taichung-dome": "台中洲際棒球場", "chengcing-lake": "澄清湖棒球場",
-                                "asia-pacific-main": "亞太國際棒球訓練中心成棒主球場", "taoyuan-arena": "桃園國際棒球場",
-                                "taitung": "台東棒球場", "hualien": "花蓮縣立體育場", "douliou": "斗六棒球場", "chiayi": "嘉義市棒球場"
-                            }
                             for g in games:
                                 start_dt = g.get("GameDateTimeS")
                                 if not start_dt:
@@ -2203,7 +2065,14 @@ def scrape_cpbl():
                                 else:
                                     status, status_text = "scheduled", "未開打"
 
-                                official_events.append({
+                                ticket_links = []
+                                for team_kw, t_info in team_tickets.items():
+                                    if team_kw in home:
+                                        ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
+                                        break
+                                ticket_links.append({"platform": "manual", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"})
+
+                                events.append({
                                     "id": f"cpbl-{current_year}-{game_no}-{date_str}",
                                     "source": "中華職棒",
                                     "name": f"中華職棒例行賽 G{game_no}：{visiting} vs {home}",
@@ -2230,21 +2099,13 @@ def scrape_cpbl():
                                         "losing_pitcher": lose_pitcher,
                                         "closer": closer
                                     },
-                                    "ticket_links": [{"platform": "manual", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"}]
+                                    "ticket_links": ticket_links
                                 })
         except Exception as e:
-            print(f"  ℹ 官方賽程輔助爬取略過: {e}", file=sys.stderr)
+            print(f"  ℹ 官方賽程爬取略過或失敗: {e}", file=sys.stderr)
 
-    # 合併 Rebas 與官方賽程（以 Rebas 為主，補充官方未在 Rebas 的賽事）
-    combined = list(rebas_events)
-    rebas_dates_teams = {(ev.get("date", "")[:10], ev.get("game_score", {}).get("visiting_team", ""), ev.get("game_score", {}).get("home_team", "")) for ev in rebas_events}
-    for off in official_events:
-        key = (off.get("date", "")[:10], off.get("game_score", {}).get("visiting_team", ""), off.get("game_score", {}).get("home_team", ""))
-        if key not in rebas_dates_teams:
-            combined.append(off)
-            
-    print(f"  CPBL 賽程整合完成，共 {len(combined)} 筆賽事", file=sys.stderr)
-    return combined
+    print(f"  CPBL 賽程爬取完成，共取得 {len(events)} 筆賽事", file=sys.stderr)
+    return events
 
 
 # ── 主程式 ─────────────────────────────────────────────────────────────────
