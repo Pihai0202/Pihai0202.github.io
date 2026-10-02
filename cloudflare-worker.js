@@ -150,14 +150,15 @@ async function handleCpblLiveScores() {
   }
 
   try {
-    const scheduleRes = await fetch("https://cpbl.com.tw/schedule", {
+    const scheduleRes = await fetch("https://www.cpbl.com.tw/schedule", {
       headers: {
         "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
       },
     });
     const html = await scheduleRes.text();
-    const tokenMatch = html.match(/RequestVerificationToken:\s*'([^']+)'/);
+    const tokenMatch = html.match(/url:\s*'\/schedule\/getgamedatas'[\s\S]*?RequestVerificationToken:\s*'([^']+)'/) ||
+                       html.match(/RequestVerificationToken:\s*'([^']+)'/);
     const token = tokenMatch ? tokenMatch[1] : "";
 
     const today = new Date();
@@ -180,13 +181,13 @@ async function handleCpblLiveScores() {
       "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
       "X-Requested-With": "XMLHttpRequest",
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-      "Referer": "https://cpbl.com.tw/schedule",
-      "Origin": "https://cpbl.com.tw",
+      "Referer": "https://www.cpbl.com.tw/schedule",
+      "Origin": "https://www.cpbl.com.tw",
     };
     if (cookieHeader) headers["Cookie"] = cookieHeader;
     if (token) headers["RequestVerificationToken"] = token;
 
-    const postRes = await fetch("https://cpbl.com.tw/schedule/getgamedatas", {
+    const postRes = await fetch("https://www.cpbl.com.tw/schedule/getgamedatas", {
       method: "POST",
       headers,
       body: formBody.toString(),
@@ -215,7 +216,7 @@ async function handleCpblLiveScores() {
       if (isGameStop) {
         status = "postponed";
         statusText = "延賽";
-      } else if (gameEnd || gameDuring || (winPitcher && losePitcher)) {
+      } else if (gameEnd || (winPitcher && losePitcher) || (gameDuring && gameDuring !== "" && isPlayBall !== true)) {
         status = "finished";
         statusText = "已完賽";
       } else if (isPlayBall) {

@@ -12,33 +12,35 @@ const project = (lon: number, lat: number) => {
   return { x, y }
 }
 
-const SHUANGBEI_VENUE_IDS = [
-  'taipei-dome',
-  'taipei-arena',
-  'nangang',
-  'nangang-2',
-  'taipei-music-center',
-  'legacy-tera',
-  'national-concert-hall',
-  'zepp-new-taipei',
-  'legacy-taipei',
-  'the-wall',
-  'pipe-live-music',
-  'corner-max',
-  'witch-house',
-  'tianmu',
-  'xinzhuang',
-  'xinzhuang-gym',
-  'banqiao-stadium',
-  'ticc',
-  'legacy-max',
-  'ntu-sports-center',
-  'clapper-studio',
-  'ntpc-exhibition-center',
-  'ntpc-hall',
-  'cloud-gate-theater',
-  'linkou-arena'
-]
+const getVenueTier = (venue: Venue): 1 | 2 | 3 => {
+  const cap = parseInt((venue.capacity || '').replace(/[^0-9]/g, ''), 10) || 0
+  if (cap >= 8000) return 1
+  if (cap >= 2000) return 2
+  return 3
+}
+
+const getClusterLabel = (clusterVenues: Venue[], lang: string): string => {
+  const cityCounts: Record<string, number> = {}
+  clusterVenues.forEach((v) => {
+    const c = v.city || ''
+    cityCounts[c] = (cityCounts[c] || 0) + 1
+  })
+
+  const uniqueCities = Object.keys(cityCounts)
+  const hasTaipei = uniqueCities.some((c) => c.includes('台北') || c.includes('臺北'))
+  const hasNewTaipei = uniqueCities.some((c) => c.includes('新北'))
+
+  if (hasTaipei && hasNewTaipei && uniqueCities.length <= 3) {
+    if (lang === 'zh-TW') return '雙北'
+    if (lang === 'ja') return '双北'
+    if (lang === 'ko') return '쌍북'
+    return 'Shuangbei'
+  }
+
+  uniqueCities.sort((a, b) => cityCounts[b] - cityCounts[a])
+  const mainCity = uniqueCities[0] || ''
+  return translateCityName(mainCity, lang)
+}
 
 const SPORT_VENUE_IDS = [
   'taipei-dome',
@@ -64,123 +66,6 @@ const SPORT_VENUE_IDS = [
   'pingtung-gym',
   'hualien',
   'taitung',
-]
-
-interface RegionClusterDef {
-  id: string
-  name: Record<string, string>
-  label: Record<string, string>
-  cities: string[]
-  explicitVenueIds?: string[]
-  pos: { x: number; y: number }
-  viewBox: string
-  counties: string[]
-}
-
-const REGION_CLUSTERS_BASE: RegionClusterDef[] = [
-  {
-    id: 'shuangbei',
-    name: {
-      'zh-TW': '雙北地區場館特寫',
-      ja: '双北（台北・新北）会場ズーム',
-      ko: '쌍북(타이베이·신베이) 공연장 돋보기',
-      en: 'Shuangbei Venues Detail',
-    },
-    label: {
-      'zh-TW': '雙北場館',
-      ja: '双北会場',
-      ko: '쌍북 공연장',
-      en: 'Shuangbei',
-    },
-    cities: ['台北', '臺北', '新北'],
-    explicitVenueIds: SHUANGBEI_VENUE_IDS,
-    pos: { x: 537, y: 247 },
-    viewBox: '495 205 125 115',
-    counties: ['Taipei', 'New Taipei', 'Keelung', 'Taoyuan'],
-  },
-  {
-    id: 'kaohsiung',
-    name: {
-      'zh-TW': '高雄地區場館特寫',
-      ja: '高雄会場ズーム',
-      ko: '가오슝 공연장 돋보기',
-      en: 'Kaohsiung Venues Detail',
-    },
-    label: {
-      'zh-TW': '高雄場館',
-      ja: '高雄会場',
-      ko: '가오슝 공연장',
-      en: 'Kaohsiung',
-    },
-    cities: ['高雄'],
-    explicitVenueIds: [
-      'kaohsiung-dome',
-      'kaohsiung-natl',
-      'weiwuying',
-      'kaohsiung-music-center',
-      'kaohsiung-exhibition-center',
-      'live-warehouse',
-      'backstage-live',
-      'chengcing-lake',
-    ],
-    pos: { x: 340, y: 663 },
-    viewBox: '290 610 110 100',
-    counties: ['Kaohsiung', 'Pingtung'],
-  },
-  {
-    id: 'tainan',
-    name: {
-      'zh-TW': '台南地區場館特寫',
-      ja: '台南会場ズーム',
-      ko: '타이남 공연장 돋보기',
-      en: 'Tainan Venues Detail',
-    },
-    label: {
-      'zh-TW': '台南場館',
-      ja: '台南会場',
-      ko: '타이남 공연장',
-      en: 'Tainan',
-    },
-    cities: ['台南', '臺南'],
-    explicitVenueIds: [
-      'icc-tainan',
-      'tainan-cultural-center',
-      'asia-pacific-main',
-      'tainan',
-      'tcrc-livehouse',
-      'wild-egret',
-    ],
-    pos: { x: 325, y: 600 },
-    viewBox: '275 545 110 100',
-    counties: ['Tainan', 'Chiayi'],
-  },
-  {
-    id: 'taichung',
-    name: {
-      'zh-TW': '台中地區場館特寫',
-      ja: '台中会場ズーム',
-      ko: '타이중 공연장 돋보기',
-      en: 'Taichung Venues Detail',
-    },
-    label: {
-      'zh-TW': '台中場館',
-      ja: '台中会場',
-      ko: '타이중 공연장',
-      en: 'Taichung',
-    },
-    cities: ['台中', '臺中'],
-    explicitVenueIds: [
-      'taichung-dome',
-      'taichung-fulfillment',
-      'ntupes-gym',
-      'taichung-venue',
-      'legacy-taichung',
-      'sound-livehouse',
-    ],
-    pos: { x: 395, y: 372 },
-    viewBox: '340 340 115 100',
-    counties: ['Taichung', 'Changhua'],
-  },
 ]
 
 const SPORT_SET = new Set(SPORT_VENUE_IDS)
@@ -251,7 +136,7 @@ function TaiwanMapComponent({
   const { t, lang } = useTranslation()
   const [center, setCenter] = useState({ x: 455, y: 500 })
   const [isDragging, setIsDragging] = useState(false)
-  const [activeClusterId, setActiveClusterId] = useState<string | null>(null)
+  const [hoveredCluster, setHoveredCluster] = useState<DynamicCluster | null>(null)
 
   const svgRef = useRef<SVGSVGElement | null>(null)
   const dragStartRef = useRef<{ clientX: number; clientY: number; centerX: number; centerY: number } | null>(null)
@@ -262,37 +147,14 @@ function TaiwanMapComponent({
   const pinchStartMidpointRef = useRef<{ clientX: number; clientY: number } | null>(null)
   const pinchStartMapCenterRef = useRef<{ x: number; y: number } | null>(null)
 
-  const computedClusters = useMemo(() => {
-    return REGION_CLUSTERS_BASE.map((cluster) => {
-      const clusterVenues = venues.filter((v) => {
-        if (cluster.explicitVenueIds && cluster.explicitVenueIds.includes(v.id)) return true
-        return cluster.cities.some((c) => v.city === c || (v.city && v.city.includes(c)))
-      })
-      return {
-        ...cluster,
-        venues: clusterVenues,
-        venueIds: clusterVenues.map((v) => v.id),
-      }
-    })
-  }, [venues])
-
-  const allClusteredVenueIds = useMemo(() => {
-    return new Set(computedClusters.flatMap((r) => r.venueIds))
-  }, [computedClusters])
-
-  const shuangbeiSet = useMemo(() => {
-    const sb = computedClusters.find((c) => c.id === 'shuangbei')
-    return new Set(sb ? sb.venueIds : SHUANGBEI_VENUE_IDS)
-  }, [computedClusters])
-
   const preprojectedVenues = useMemo(() => {
     return venues.map((venue) => ({
       ...venue,
       pos: project(venue.longitude || 0, venue.latitude || 0),
-      isShuangbei: shuangbeiSet.has(venue.id),
       isSport: SPORT_SET.has(venue.id),
+      tier: getVenueTier(venue),
     }))
-  }, [venues, shuangbeiSet])
+  }, [venues])
 
   const selectedVenue = useMemo(
     () => venues.find((v) => v.id === selectedVenueId),
@@ -329,6 +191,171 @@ function TaiwanMapComponent({
     centerRef.current = c
     setDisplayCenter(c)
   }
+
+  const flyTo = (targetX: number, targetY: number, targetZoom: number, duration = 450) => {
+    if (animationRef.current) {
+      cancelAnimationFrame(animationRef.current)
+      animationRef.current = null
+    }
+    isAnimatingRef.current = false
+
+    const startZoom = displayZoomRef.current || displayZoom
+    const startX = displayCenterRef.current.x
+    const startY = displayCenterRef.current.y
+
+    const startTime = performance.now()
+    isAnimatingRef.current = true
+
+    const animate = (time: number) => {
+      const elapsed = time - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const ease = 1 - Math.pow(1 - progress, 3)
+
+      const newZoom = startZoom + (targetZoom - startZoom) * ease
+      const newX = startX + (targetX - startX) * ease
+      const newY = startY + (targetY - startY) * ease
+
+      updateDisplayZoom(newZoom)
+      updateDisplayCenter({ x: newX, y: newY })
+
+      if (progress < 1) {
+        animationRef.current = requestAnimationFrame(animate)
+      } else {
+        isAnimatingRef.current = false
+        setCenter({ x: targetX, y: targetY })
+        onZoomChange(targetZoom)
+      }
+    }
+
+    animationRef.current = requestAnimationFrame(animate)
+  }
+
+  interface DynamicCluster {
+    id: string
+    isCluster: true
+    pos: { x: number; y: number }
+    venues: (typeof preprojectedVenues)[0][]
+    count: number
+    label: string
+    hasVisits: boolean
+    hasEvents: boolean
+    isCategoryInactive: boolean
+  }
+
+  interface SingleVenueItem {
+    id: string
+    isCluster: false
+    pos: { x: number; y: number }
+    venue: (typeof preprojectedVenues)[0]
+    hasVisits: boolean
+    hasEvents: boolean
+    isActive: boolean
+    isCategoryInactive: boolean
+  }
+
+  type MapDisplayItem = DynamicCluster | SingleVenueItem
+
+  // Quantize zoom bucket to stabilize clusters during continuous touch pinch/drag
+  const clusterZoomBucket = Math.round(displayZoom * 10) / 10
+
+  const dynamicDisplayItems = useMemo<MapDisplayItem[]>(() => {
+    // Adaptive radius: larger at full-island view to merge adjacent metropolitan zones, tighter when zoomed in
+    const baseRadius = clusterZoomBucket < 1.3 ? 55 : clusterZoomBucket < 2.0 ? 42 : 32
+    const radiusSvg = Math.max(6, baseRadius / clusterZoomBucket)
+    // Low zoom requires >= 3 venues to form a cluster, so 1-2 venue towns (Yilan, Hualien, Chiayi) stay as discrete dots
+    const minClusterCount = clusterZoomBucket < 1.5 ? 3 : 2
+
+    const visited = new Set<string>()
+    const items: MapDisplayItem[] = []
+
+    // Sort: Tier 1 (major stadiums) first so clusters anchor around central regional hubs
+    const sorted = [...preprojectedVenues].sort((a, b) => {
+      if (a.id === selectedVenueId) return -1
+      if (b.id === selectedVenueId) return 1
+      if (a.tier !== b.tier) return a.tier - b.tier
+      const capA = parseInt((a.capacity || '').replace(/[^0-9]/g, ''), 10) || 0
+      const capB = parseInt((b.capacity || '').replace(/[^0-9]/g, ''), 10) || 0
+      return capB - capA
+    })
+
+    for (let i = 0; i < sorted.length; i++) {
+      const v = sorted[i]
+      if (visited.has(v.id)) continue
+
+      // Explicitly keep the currently selected venue unclustered so its focus ring is directly visible
+      if (v.id === selectedVenueId) {
+        visited.add(v.id)
+        const hasVisits = visitedVenueIds.has(v.id)
+        const hasEvents = activeVenueIds ? activeVenueIds.has(v.id) : false
+        const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(v.id)
+        items.push({
+          id: v.id,
+          isCluster: false,
+          pos: v.pos,
+          venue: v,
+          hasVisits,
+          hasEvents,
+          isActive: true,
+          isCategoryInactive: !!isCategoryInactive,
+        })
+        continue
+      }
+
+      const group = [v]
+      visited.add(v.id)
+
+      for (let j = i + 1; j < sorted.length; j++) {
+        const v2 = sorted[j]
+        if (visited.has(v2.id) || v2.id === selectedVenueId) continue
+        const dist = Math.hypot(v.pos.x - v2.pos.x, v.pos.y - v2.pos.y)
+        if (dist <= radiusSvg) {
+          group.push(v2)
+          visited.add(v2.id)
+        }
+      }
+
+      if (group.length >= minClusterCount) {
+        const avgX = group.reduce((sum, g) => sum + g.pos.x, 0) / group.length
+        const avgY = group.reduce((sum, g) => sum + g.pos.y, 0) / group.length
+        const clusterHasVisits = group.some((gv) => visitedVenueIds.has(gv.id))
+        const clusterHasEvents = group.some((gv) => activeVenueIds && activeVenueIds.has(gv.id))
+        const allCategoryInactive =
+          categoryFilter !== 'all' &&
+          activeVenueIds &&
+          group.every((gv) => !activeVenueIds.has(gv.id))
+
+        items.push({
+          id: `cluster-${group[0].id}-${group.length}`,
+          isCluster: true,
+          pos: { x: avgX, y: avgY },
+          venues: group,
+          count: group.length,
+          label: getClusterLabel(group, lang),
+          hasVisits: clusterHasVisits,
+          hasEvents: !!clusterHasEvents,
+          isCategoryInactive: !!allCategoryInactive,
+        })
+      } else {
+        for (const gv of group) {
+          const hasVisits = visitedVenueIds.has(gv.id)
+          const hasEvents = activeVenueIds ? activeVenueIds.has(gv.id) : false
+          const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(gv.id)
+          items.push({
+            id: gv.id,
+            isCluster: false,
+            pos: gv.pos,
+            venue: gv,
+            hasVisits,
+            hasEvents,
+            isActive: false,
+            isCategoryInactive: !!isCategoryInactive,
+          })
+        }
+      }
+    }
+
+    return items
+  }, [preprojectedVenues, clusterZoomBucket, selectedVenueId, visitedVenueIds, activeVenueIds, categoryFilter, lang])
 
   useEffect(() => {
     centerRef.current = center
@@ -378,98 +405,18 @@ function TaiwanMapComponent({
     if (selectedVenueId === lastSelectedVenueId.current) return
     lastSelectedVenueId.current = selectedVenueId
 
-    // Cancel any active animation and reset animation flag on transition
-    if (animationRef.current) {
-      cancelAnimationFrame(animationRef.current)
-      animationRef.current = null
-    }
-    isAnimatingRef.current = false
-
     if (selectedVenue) {
       const projected = project(selectedVenue.longitude || 0, selectedVenue.latitude || 0)
       let targetZoom = 3.5
       if (selectedVenue.id === 'linkou-arena' || selectedVenue.id === 'taoyuan-arena') {
         targetZoom = 3.8
       }
-
-      // Start animating from current visual coordinates
-      const startZoom = displayZoomRef.current || displayZoom
-      const startX = displayCenterRef.current.x
-      const startY = displayCenterRef.current.y
-      const targetX = projected.x
-      const targetY = projected.y
-
-      const duration = 500
-      const startTime = performance.now()
-      isAnimatingRef.current = true
-
-      const animate = (time: number) => {
-        const elapsed = time - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const ease = 1 - Math.pow(1 - progress, 3)
-
-        const newZoom = startZoom + (targetZoom - startZoom) * ease
-        const newX = startX + (targetX - startX) * ease
-        const newY = startY + (targetY - startY) * ease
-
-        updateDisplayZoom(newZoom)
-        updateDisplayCenter({ x: newX, y: newY })
-
-        if (progress < 1) {
-          animationRef.current = requestAnimationFrame(animate)
-        } else {
-          isAnimatingRef.current = false
-          setCenter({ x: targetX, y: targetY })
-          onZoomChange(targetZoom)
-        }
-      }
-
-      animationRef.current = requestAnimationFrame(animate)
+      flyTo(projected.x, projected.y, targetZoom)
     } else {
       const defaultZoom = typeof window !== 'undefined' && window.innerWidth <= 1200 ? 0.95 : 1.1
-      // Start animating from current visual coordinates back to default zoom and center
-      const startZoom = displayZoomRef.current || displayZoom
-      const startX = displayCenterRef.current.x
-      const startY = displayCenterRef.current.y
-      const targetX = 455
-      const targetY = 500
-
-      const duration = 500
-      const startTime = performance.now()
-      isAnimatingRef.current = true
-
-      const animate = (time: number) => {
-        const elapsed = time - startTime
-        const progress = Math.min(elapsed / duration, 1)
-        const ease = 1 - Math.pow(1 - progress, 3)
-
-        const newZoom = startZoom + (defaultZoom - startZoom) * ease
-        const newX = startX + (targetX - startX) * ease
-        const newY = startY + (targetY - startY) * ease
-
-        updateDisplayZoom(newZoom)
-        updateDisplayCenter({ x: newX, y: newY })
-
-        if (progress < 1) {
-          animationRef.current = requestAnimationFrame(animate)
-        } else {
-          isAnimatingRef.current = false
-          onZoomChange(defaultZoom)
-          setCenter({ x: 455, y: 500 })
-        }
-      }
-
-      animationRef.current = requestAnimationFrame(animate)
+      flyTo(455, 500, defaultZoom)
     }
-
-    return () => {
-      if (animationRef.current) {
-        cancelAnimationFrame(animationRef.current)
-        animationRef.current = null
-      }
-      isAnimatingRef.current = false
-    }
-  }, [selectedVenueId, selectedVenue, onZoomChange])
+  }, [selectedVenueId, selectedVenue])
 
   const wheelTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -644,6 +591,33 @@ function TaiwanMapComponent({
     }
   }, [onZoomChange])
 
+  const handleClusterClick = (cluster: DynamicCluster, e: MouseEvent) => {
+    if (didDragRef.current) return
+    e.stopPropagation()
+
+    const maxSpread = Math.max(
+      ...cluster.venues.map((v) => Math.hypot(v.pos.x - cluster.pos.x, v.pos.y - cluster.pos.y))
+    )
+
+    if (displayZoom >= 3.4 || maxSpread < 6) {
+      if (svgRef.current) {
+        const container = svgRef.current.parentElement
+        if (container) {
+          const containerRect = container.getBoundingClientRect()
+          setOverlappingVenues(cluster.venues)
+          setOverlapPos({
+            x: e.clientX - containerRect.left,
+            y: e.clientY - containerRect.top,
+          })
+          return
+        }
+      }
+    }
+
+    const targetZoom = Math.min(5.5, Math.max(displayZoom * 1.85, 2.8))
+    flyTo(cluster.pos.x, cluster.pos.y, targetZoom)
+  }
+
   const width = 800 / displayZoom
   const height = 800 / displayZoom
   const minX = displayCenter.x - width / 2
@@ -690,63 +664,75 @@ function TaiwanMapComponent({
           {lang === 'zh-TW' ? '馬祖' : 'Matsu'}
         </text>
 
-        {displayZoom < 1.5 && (
-          <g className="region-clusters-layer">
-            {computedClusters.map((cluster) => {
-              const isActive = activeClusterId === cluster.id
-              const labelText = cluster.label[lang] || cluster.label['zh-TW']
+        <g className="dynamic-markers-layer">
+          {dynamicDisplayItems.map((item) => {
+            if (item.isCluster) {
+              const isLarge = item.count >= 15
+              const plateRadius = isLarge ? 13 : 11
               return (
                 <g
-                  key={cluster.id}
-                  className={`shuangbei-cluster-group${isActive ? ' active' : ''}`}
-                  transform={`translate(${cluster.pos.x},${cluster.pos.y})`}
-                  onClick={(e) => {
-                    if (didDragRef.current) return
-                    e.stopPropagation()
-                    setActiveClusterId(cluster.id)
+                  key={item.id}
+                  className={`shuangbei-cluster-group${item.hasVisits ? ' visited' : ''}${item.hasEvents ? ' has-events' : ''}${item.isCategoryInactive ? ' category-inactive' : ''}`}
+                  transform={`translate(${item.pos.x},${item.pos.y})`}
+                  onClick={(e) => handleClusterClick(item, e)}
+                  onMouseEnter={() => {
+                    if (!isDragging) setHoveredCluster(item)
                   }}
+                  onMouseMove={(e) => setTooltipPos({ x: e.clientX, y: e.clientY })}
+                  onMouseLeave={() => setHoveredCluster(null)}
                   style={{ cursor: 'pointer' }}
                 >
-                  <circle className="click-target" r="22" cx="0" cy="0" fill="transparent" />
-                  <circle className="pulse-ring-cluster" r="18" cx="0" cy="0" />
-                  <circle className="cluster-plate" cx="0" cy="0" r="14" />
-                  <text x="0" y="4" textAnchor="middle" className="cluster-text">
-                    {cluster.venues.length}
-                  </text>
-                  <text x="0" y="27" textAnchor="middle" className="cluster-label">
-                    {labelText}
-                  </text>
+                  <g transform={`scale(${1 / displayZoom})`}>
+                    <circle className="click-target" r={plateRadius + 7} cx="0" cy="0" fill="transparent" />
+                    <circle className="pulse-ring-cluster" r={plateRadius + 2.5} cx="0" cy="0" />
+                    <circle className="cluster-plate" cx="0" cy="0" r={plateRadius} />
+                    <text
+                      x="0"
+                      y={isLarge ? 4.5 : 4}
+                      textAnchor="middle"
+                      className="cluster-text"
+                      fontSize={isLarge ? 12 : 11}
+                    >
+                      {item.count}
+                    </text>
+                  </g>
                 </g>
               )
-            })}
-          </g>
-        )}
+            }
 
-        <g>
-          {preprojectedVenues.map((venue) => {
-            const hasVisits = visitedVenueIds.has(venue.id)
-            const isActive = selectedVenueId === venue.id
-            const isCategoryInactive = categoryFilter !== 'all' && activeVenueIds && !activeVenueIds.has(venue.id)
-            const shouldShowIcon = isActive || hasVisits || (activeVenueIds && activeVenueIds.has(venue.id)) || displayZoom >= 1.5 || (hoveredVenue && hoveredVenue.id === venue.id)
-            if (displayZoom < 1.5 && allClusteredVenueIds.has(venue.id)) return null
+            const { venue, hasVisits, isActive, hasEvents, isCategoryInactive } = item
+            const isHovered = hoveredVenue && hoveredVenue.id === venue.id
+
+            // LOD (Level of Detail):
+            // - Selected / hovered / visited / active events: high priority
+            // - Tier 1: stadium icon at zoom >= 1.6
+            // - Tier 2: arena/hall icon at zoom >= 2.4
+            // - Tier 3: livehouse icon at zoom >= 3.4
+            const shouldShowIcon =
+              isActive ||
+              isHovered ||
+              hasVisits ||
+              hasEvents ||
+              (venue.tier === 1 && displayZoom >= 1.6) ||
+              (venue.tier === 2 && displayZoom >= 2.4) ||
+              displayZoom >= 3.4
 
             return (
               <g
                 key={venue.id}
                 data-venue-id={venue.id}
                 className={`venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}${isCategoryInactive ? ' category-inactive' : ''} ${shouldShowIcon ? 'show-icon' : 'show-dot'}`}
-                transform={`translate(${venue.pos.x},${venue.pos.y})`}
+                transform={`translate(${item.pos.x},${item.pos.y})`}
                 onClick={(e) => {
                   if (isCategoryInactive || didDragRef.current) return
                   e.stopPropagation()
-                  
-                  let targetVenueId = venue.id
+
                   if (svgRef.current) {
                     const groups = Array.from(svgRef.current.querySelectorAll('.venue-icon-group:not(.category-inactive)'))
                     const nearby = groups
                       .filter((el) => {
                         const r = el.getBoundingClientRect()
-                        const dist = Math.sqrt(Math.pow(e.clientX - (r.left + r.width / 2), 2) + Math.pow(e.clientY - (r.top + r.height / 2), 2))
+                        const dist = Math.hypot(e.clientX - (r.left + r.width / 2), e.clientY - (r.top + r.height / 2))
                         return dist < 22
                       })
                       .map((el) => venues.find((v) => v.id === el.getAttribute('data-venue-id')))
@@ -756,18 +742,18 @@ function TaiwanMapComponent({
                       const container = svgRef.current.parentElement
                       if (container) {
                         const containerRect = container.getBoundingClientRect()
-                        const offsetX = e.clientX - containerRect.left
-                        const offsetY = e.clientY - containerRect.top
                         setOverlappingVenues(nearby)
-                        setOverlapPos({ x: offsetX, y: offsetY })
+                        setOverlapPos({
+                          x: e.clientX - containerRect.left,
+                          y: e.clientY - containerRect.top,
+                        })
                         return
                       }
                     }
                   }
 
                   setOverlappingVenues(null)
-                  onSelectVenue(targetVenueId)
-                  setActiveClusterId(null)
+                  onSelectVenue(venue.id)
                 }}
                 onMouseEnter={() => {
                   if (isCategoryInactive || isDragging) return
@@ -782,7 +768,12 @@ function TaiwanMapComponent({
               >
                 <circle className="click-target" r={22 / displayZoom} cx="0" cy="0" fill="transparent" style={{ cursor: 'pointer' }} />
                 <circle className="pulse-ring" r="12" cx="0" cy="0" />
-                <circle className="placeholder-dot" r="4" cx="0" cy="0" />
+                <circle
+                  className={`placeholder-dot tier-${venue.tier}${hasEvents ? ' has-events' : ''}`}
+                  r={venue.tier === 1 ? 4.2 : venue.tier === 2 ? 3.4 : 2.8}
+                  cx="0"
+                  cy="0"
+                />
                 <g className="venue-icon">
                   <g transform="scale(0.666667) translate(-12, -12)">
                     <circle className="icon-plate" cx="12" cy="12" r="11" />
@@ -806,92 +797,25 @@ function TaiwanMapComponent({
         </g>
       </svg>
 
-      {activeClusterId && (() => {
-        const activeCluster = computedClusters.find(c => c.id === activeClusterId) || computedClusters[0]
-        const clusterVenues = activeCluster.venues
-        const clusterTitle = activeCluster.name[lang] || activeCluster.name['zh-TW']
-
-        return (
-          <div className="shuangbei-popover">
-            <div className="popover-header">
-              <span className="popover-title">
-                <PinIcon size="1.1em" style={{ marginRight: '6px', color: '#ef5350', verticalAlign: 'middle' }} />
-                {clusterTitle}
-              </span>
-              <button className="popover-close-btn" type="button" onClick={() => setActiveClusterId(null)}>×</button>
-            </div>
-            
-            <div className="popover-map-container">
-              <svg viewBox={activeCluster.viewBox} className="shuangbei-mini-map">
-                {activeCluster.counties.map((countyName) => (
-                  <path
-                    key={countyName}
-                    d={TAIWAN_PATHS[countyName]}
-                    className="mini-map-county"
-                  />
-                ))}
-                
-                {clusterVenues.map((venue) => {
-                  const hasVisits = visitedVenueIds.has(venue.id)
-                  const isActive = selectedVenueId === venue.id
-                  const { x, y } = project(venue.longitude || 0, venue.latitude || 0)
-                  
-                  return (
-                    <g
-                      key={venue.id}
-                      className={`mini-venue-icon-group${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-                      transform={`translate(${x},${y})`}
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        onSelectVenue(venue.id)
-                        setActiveClusterId(null)
-                      }}
-                      style={{ cursor: 'pointer' }}
-                    >
-                      <circle className="mini-click-target" r="6" cx="0" cy="0" fill="transparent" />
-                      <circle className="mini-pulse-ring" r="4.5" cx="0" cy="0" />
-                      <circle className="mini-placeholder-dot" r="1.8" cx="0" cy="0" />
-                    </g>
-                  )
-                })}
-              </svg>
-            </div>
-            
-            <div className="popover-venue-list">
-              {clusterVenues.map((venue) => {
-                const hasVisits = visitedVenueIds.has(venue.id)
-                const isActive = selectedVenueId === venue.id
-                
-                return (
-                  <div
-                    key={venue.id}
-                    className={`popover-venue-item${hasVisits ? ' visited' : ''}${isActive ? ' active' : ''}`}
-                    onClick={() => {
-                      onSelectVenue(venue.id)
-                      setActiveClusterId(null)
-                    }}
-                  >
-                    <div className="popover-venue-name-row">
-                      <span className="popover-venue-name">{translateVenueName(venue.name, lang)}</span>
-                      {hasVisits && <span className="visited-tick"><CheckIcon size="0.9em" /></span>}
-                    </div>
-                    <div className="popover-venue-meta">
-                      <span>
-                        <UserIcon size="0.95em" style={{ marginRight: '4px', color: '#42a5f5', verticalAlign: 'middle' }} />
-                        {t('capacityPeople', { capacity: venue.capacity })}
-                      </span>
-                      <span>
-                        <PinIcon size="0.95em" style={{ marginRight: '4px', color: '#ef5350', verticalAlign: 'middle' }} />
-                        {translateCityName(venue.city, lang)}
-                      </span>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+      {hoveredCluster && (
+        <div
+          className="map-tooltip cluster-tooltip"
+          style={{
+            position: 'fixed',
+            left: tooltipPos.x + 15,
+            top: tooltipPos.y + 15,
+            pointerEvents: 'none',
+            zIndex: 1000,
+          }}
+        >
+          <div className="tooltip-title">
+            {hoveredCluster.label} ({hoveredCluster.count} {lang === 'zh-TW' ? '個場館' : lang === 'ja' ? '会場' : lang === 'ko' ? '곳' : 'venues'})
           </div>
-        )
-      })()}
+          <div className="tooltip-meta" style={{ fontSize: '0.8rem', opacity: 0.85, marginTop: '2px' }}>
+            {lang === 'zh-TW' ? '點擊放大探索此區域' : lang === 'ja' ? 'クリックしてズーム' : lang === 'ko' ? '클릭하여 확대' : 'Click to zoom into area'}
+          </div>
+        </div>
+      )}
 
       {overlappingVenues && overlapPos && (
         <div
@@ -923,7 +847,10 @@ function TaiwanMapComponent({
                     setOverlappingVenues(null)
                   }}
                 >
-                  <div className="overlap-venue-name">{translateVenueName(venue.name, lang)}</div>
+                  <div className="overlap-venue-name">
+                    {translateVenueName(venue.name, lang)}
+                    {hasVisits && <CheckIcon size="0.85em" style={{ marginLeft: '6px', color: 'var(--teal)' }} />}
+                  </div>
                   <div className="overlap-venue-meta">
                     <span>{translateCityName(venue.city, lang)}</span>
                     <span className="dot-divider">•</span>

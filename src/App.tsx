@@ -3360,8 +3360,8 @@ function App() {
               setMusicBarUrl(url)
               setIsMusicBarVisible(true)
             }}
-            onRefreshScore={pollCpblLiveScores}
-            isScoreRefreshing={isCpblRefreshing}
+            onRefreshScore={handleRefreshAllEventsAndScores}
+            isScoreRefreshing={isCpblRefreshing || isRemoteRefreshing}
             onLogAsPersonal={(ticket) => {
               if (!isLoggedIn || !currentUser) {
                 showToast(lang === 'zh-TW' ? '請先登入會員以收錄活動至我的記錄！' : 'Please log in to save to your personal records!', 'info')

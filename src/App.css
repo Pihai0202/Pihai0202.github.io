@@ -871,6 +871,25 @@ svg#taiwan-map.dragging {
   transform-origin: 0 0;
 }
 
+.venue-icon-group .placeholder-dot.tier-1 {
+  stroke-width: 2px;
+  filter: drop-shadow(0 0 3px rgba(187, 134, 252, 0.45));
+}
+
+.venue-icon-group .placeholder-dot.tier-2 {
+  stroke-width: 1.5px;
+}
+
+.venue-icon-group .placeholder-dot.tier-3 {
+  stroke-width: 1.2px;
+  opacity: 0.85;
+}
+
+.venue-icon-group .placeholder-dot.has-events {
+  stroke: #ffb74d;
+  filter: drop-shadow(0 0 4px rgba(255, 183, 77, 0.8));
+}
+
 .venue-icon-group.visited .placeholder-dot {
   stroke: var(--teal);
 }
@@ -9810,43 +9829,40 @@ svg#taiwan-map.dragging {
 .shuangbei-cluster-group .cluster-plate {
   fill: #1a1a24;
   stroke: var(--accent);
-  stroke-width: 2px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.45));
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .shuangbei-cluster-group .cluster-text {
   font-family: system-ui, -apple-system, sans-serif;
-  font-size: 13px;
-  font-weight: bold;
+  font-weight: 700;
   fill: var(--accent);
-  transition: all 0.3s ease;
-}
-
-.shuangbei-cluster-group .cluster-label {
-  font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 10px;
-  font-weight: bold;
-  fill: var(--map-label, #8c7869);
-  pointer-events: none;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 .shuangbei-cluster-group .pulse-ring-cluster {
   fill: none;
   stroke: var(--accent);
-  stroke-width: 1.5px;
-  opacity: 0.8;
-  animation: pulse-ring-cluster-anim 2.5s ease-out infinite;
+  stroke-width: 1.2px;
+  opacity: 0;
   pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+
+.shuangbei-cluster-group:hover .pulse-ring-cluster,
+.shuangbei-cluster-group.has-events .pulse-ring-cluster {
+  opacity: 0.7;
+  animation: pulse-ring-cluster-anim 2s ease-out infinite;
 }
 
 @keyframes pulse-ring-cluster-anim {
   0% {
-    r: 14px;
+    r: 11px;
     opacity: 0.8;
   }
   100% {
-    r: 28px;
+    r: 17px;
     opacity: 0;
   }
 }
@@ -9864,6 +9880,32 @@ svg#taiwan-map.dragging {
 .shuangbei-cluster-group:hover .cluster-label {
   fill: var(--accent);
   font-weight: bold;
+}
+
+.shuangbei-cluster-group.has-events .cluster-plate {
+  stroke: #ffb74d;
+}
+
+.shuangbei-cluster-group.has-events .pulse-ring-cluster {
+  stroke: #ffb74d;
+}
+
+.shuangbei-cluster-group.has-events .cluster-text {
+  fill: #ffb74d;
+}
+
+.shuangbei-cluster-group.visited .cluster-plate {
+  stroke: var(--teal);
+}
+
+.shuangbei-cluster-group.visited .pulse-ring-cluster {
+  stroke: var(--teal);
+}
+
+.shuangbei-cluster-group.category-inactive {
+  opacity: 0.15;
+  pointer-events: none;
+  filter: grayscale(85%);
 }
 
 
@@ -10519,11 +10561,27 @@ svg#taiwan-map.dragging {
   fill: #ffffff;
 }
 
+[data-theme='light'] .shuangbei-cluster-group.has-events .cluster-plate {
+  fill: #ff9800;
+  stroke: #ffffff;
+}
+
+[data-theme='light'] .shuangbei-cluster-group.visited .cluster-plate {
+  fill: var(--teal);
+  stroke: #ffffff;
+}
+
 [data-theme='light'] .venue-icon-group .placeholder-dot {
   fill: var(--accent);
   stroke: #ffffff;
   stroke-width: 1.5px;
   filter: drop-shadow(0 1px 4px rgba(0, 0, 0, 0.15));
+}
+
+[data-theme='light'] .venue-icon-group .placeholder-dot.has-events {
+  fill: #ff9800;
+  stroke: #ffffff;
+  filter: drop-shadow(0 1px 5px rgba(255, 152, 0, 0.4));
 }
 
 [data-theme='light'] .venue-icon-group.visited .placeholder-dot {

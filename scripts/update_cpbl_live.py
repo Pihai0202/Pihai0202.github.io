@@ -50,22 +50,47 @@ def get_player_name(name, acnt):
 
 def update_live_scores():
     session = cffi_requests.Session()
-    res = session.get("https://cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
-    tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
-    if not tokens:
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "Referer": "https://www.cpbl.com.tw/schedule",
+        "Origin": "https://www.cpbl.com.tw",
+    }
+    res = session.get("https://www.cpbl.com.tw/schedule", headers=headers, impersonate="chrome120", timeout=15)
+    
+    match = re.search(r"url:\s*'/schedule/getgamedatas'[\s\S]*?RequestVerificationToken:\s*'([^']+)'", res.text)
+    if not match:
+        tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
+        token = tokens[1] if len(tokens) > 1 else (tokens[0] if tokens else "")
+    else:
+        token = match.group(1)
+
+    if not token:
         print("No token found", file=sys.stderr)
         return False
-    token = tokens[0]
+
     current_year = datetime.now().year
     
+    post_headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+        "X-Requested-With": "XMLHttpRequest",
+        "RequestVerificationToken": token,
+        "Referer": "https://www.cpbl.com.tw/schedule",
+        "Origin": "https://www.cpbl.com.tw",
+        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+    }
+
     post_res = session.post(
-        "https://cpbl.com.tw/schedule/getgamedatas",
+        "https://www.cpbl.com.tw/schedule/getgamedatas",
         data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": "A"},
-        headers={"X-Requested-With": "XMLHttpRequest", "RequestVerificationToken": token},
-        impersonate="safari15_5",
+        headers=post_headers,
+        impersonate="chrome120",
         timeout=15
     )
     
+    if post_res.status_code != 200 or not post_res.text.startswith("{"):
+        print(f"CPBL API returned non-JSON response: {post_res.status_code}", file=sys.stderr)
+        return False
+
     data = post_res.json()
     if not data.get("Success"):
         print("Success false", file=sys.stderr)
@@ -110,7 +135,7 @@ def update_live_scores():
         if is_game_stop:
             status = "postponed"
             status_text = "延賽"
-        elif end_str or during_str or (win_p and lose_p):
+        elif end_str or (win_p and lose_p) or (during_str and during_str != "" and not is_play_ball):
             status = "finished"
             status_text = "已完賽"
         elif is_play_ball:
