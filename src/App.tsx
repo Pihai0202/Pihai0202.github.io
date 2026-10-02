@@ -1287,7 +1287,25 @@ function App() {
             // 1. 精準對齊比賽場次 Game Sno (例如 cpbl-2026-276-2026-08-20 對應 276)
             const eventSnoMatch = event.id ? event.id.match(/cpbl-\d{4}-(\d+)-/) : null
             const eventSno = eventSnoMatch ? String(Number(eventSnoMatch[1])) : ''
-            const gSno = g.game_no ? String(Number(String(g.game_no).replace(/^\d{4}(\d{1,3})\d{8}$/, '$1'))) : ''
+
+            // 解析 game_no：可能是清潔格式 "279" 或原始 GameSno "202627920261002"
+            let gSno = ''
+            if (g.game_no) {
+              const raw = String(g.game_no)
+              // 先嘗試直接解析為純數字（已經是乾淨的場次號碼）
+              if (/^\d{1,3}$/.test(raw)) {
+                gSno = String(Number(raw))
+              } else {
+                // 原始 GameSno 格式: YYYY + NNN + YYYYMMDD (4+N+8 = 13-15 位)
+                // 擷取中間的場次號碼
+                const rawMatch = raw.match(/^\d{4}(\d+)\d{8}$/)
+                if (rawMatch) {
+                  gSno = String(Number(rawMatch[1]))
+                } else {
+                  gSno = String(Number(raw)) // 最後嘗試直接轉換
+                }
+              }
+            }
 
             if (eventSno && gSno && eventSno === gSno) {
               return true

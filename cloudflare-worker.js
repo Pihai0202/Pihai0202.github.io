@@ -282,22 +282,29 @@ async function handleCpblLiveScores() {
         const dateStr = twDate.toISOString().substring(0, 10);
         const todayCpbl = (payload.events || [])
           .filter((e) => e.source === "中華職棒" && (e.date === dateStr || !e.date) && e.game_score)
-          .map((e) => ({
-            game_no: String(e.id || "").replace(/[^0-9]/g, ""),
-            date: e.date,
-            visiting_team: e.game_score.visiting_team,
-            home_team: e.game_score.home_team,
-            visiting_score: e.game_score.visiting_score,
-            home_score: e.game_score.home_score,
-            visiting_pitcher: e.game_score.visiting_pitcher,
-            home_pitcher: e.game_score.home_pitcher,
-            winning_pitcher: e.game_score.winning_pitcher,
-            losing_pitcher: e.game_score.losing_pitcher,
-            closer: e.game_score.closer,
-            mvp: e.game_score.mvp,
-            status: e.game_score.status,
-            status_text: e.game_score.status_text,
-          }));
+          .map((e) => {
+            // Extract clean game number from event ID: cpbl-2026-279-2026-10-02 → "279"
+            const idStr = String(e.id || "");
+            const snoMatch = idStr.match(/cpbl-\d{4}-(\d+)/);
+            const gameNo = snoMatch ? String(parseInt(snoMatch[1], 10)) : idStr.replace(/[^0-9]/g, "");
+
+            return {
+              game_no: gameNo,
+              date: e.date,
+              visiting_team: e.game_score.visiting_team,
+              home_team: e.game_score.home_team,
+              visiting_score: e.game_score.visiting_score,
+              home_score: e.game_score.home_score,
+              visiting_pitcher: e.game_score.visiting_pitcher,
+              home_pitcher: e.game_score.home_pitcher,
+              winning_pitcher: e.game_score.winning_pitcher,
+              losing_pitcher: e.game_score.losing_pitcher,
+              closer: e.game_score.closer,
+              mvp: e.game_score.mvp,
+              status: e.game_score.status,
+              status_text: e.game_score.status_text,
+            };
+          });
 
         return new Response(JSON.stringify({
           updated_at: new Date().toISOString(),
