@@ -74,32 +74,14 @@ const SORTED_TAIWAN_PATHS = Object.entries(TAIWAN_PATHS).sort(([a], [b]) =>
   a === 'Taipei' ? 1 : b === 'Taipei' ? -1 : 0
 )
 
-interface CountyLabelItem {
+interface OffshoreLabelItem {
   id: string
   name: string
   x: number
   y: number
-  minZoom?: number
 }
 
-const COUNTY_LABELS: CountyLabelItem[] = [
-  { id: 'Keelung', name: '基隆', x: 574, y: 234, minZoom: 1.2 },
-  { id: 'Taipei', name: '台北', x: 538, y: 242 },
-  { id: 'NewTaipei', name: '新北', x: 572, y: 270 },
-  { id: 'Taoyuan', name: '桃園', x: 486, y: 280 },
-  { id: 'Hsinchu', name: '新竹', x: 468, y: 310 },
-  { id: 'Miaoli', name: '苗栗', x: 436, y: 345 },
-  { id: 'Taichung', name: '台中', x: 432, y: 388 },
-  { id: 'Changhua', name: '彰化', x: 366, y: 434 },
-  { id: 'Nantou', name: '南投', x: 450, y: 458 },
-  { id: 'Yunlin', name: '雲林', x: 356, y: 488 },
-  { id: 'Chiayi', name: '嘉義', x: 384, y: 510 },
-  { id: 'Tainan', name: '台南', x: 344, y: 574 },
-  { id: 'Kaohsiung', name: '高雄', x: 388, y: 612 },
-  { id: 'Pingtung', name: '屏東', x: 382, y: 720 },
-  { id: 'Yilan', name: '宜蘭', x: 560, y: 325 },
-  { id: 'Hualien', name: '花蓮', x: 512, y: 475 },
-  { id: 'Taitung', name: '台東', x: 495, y: 645 },
+const OFFSHORE_LABELS: OffshoreLabelItem[] = [
   { id: 'Penghu', name: '澎湖', x: 213, y: 585 },
   { id: 'Kinmen', name: '金門', x: 25, y: 375 },
   { id: 'Lienchiang', name: '馬祖', x: 324, y: 115 },
@@ -685,23 +667,23 @@ function TaiwanMapComponent({
 
         <TaiwanMapBackground />
 
-        {/* Region & County Name Labels Layer */}
-        <g className="map-county-labels-layer" pointerEvents="none" style={{ userSelect: 'none' }}>
-          {COUNTY_LABELS.map((item) => {
-            if (displayZoom < (item.minZoom || 0.8)) return null
-            return (
-              <text
-                key={item.id}
-                x={item.x}
-                y={item.y}
-                className="map-county-label"
-                textAnchor="middle"
-                dominantBaseline="central"
-              >
-                {translateCityName(item.name, lang)}
-              </text>
-            )
-          })}
+        {/* Offshore Region Labels Layer (Penghu, Kinmen, Matsu) */}
+        <g className="map-offshore-labels-layer" pointerEvents="none" style={{ userSelect: 'none' }}>
+          {OFFSHORE_LABELS.map((item) => (
+            <text
+              key={item.id}
+              x={item.x}
+              y={item.y}
+              className="map-offshore-label"
+              fill="var(--map-label, #4a4a70)"
+              fontSize="13"
+              fontWeight="bold"
+              textAnchor="middle"
+              dominantBaseline="central"
+            >
+              {translateCityName(item.name, lang)}
+            </text>
+          ))}
         </g>
 
         <g className="dynamic-markers-layer">

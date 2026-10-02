@@ -9820,27 +9820,26 @@ svg#taiwan-map.dragging {
   }
 }
 
-/* Map Region & County Labels */
-.map-county-labels-layer {
+/* Map Offshore Labels (Penghu, Kinmen, Matsu) */
+.map-offshore-labels-layer {
   pointer-events: none;
   user-select: none;
 }
 
-.map-county-label {
+.map-offshore-label {
   fill: var(--map-label, #8a8a9e);
-  font-size: 11px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  opacity: 0.55;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
   pointer-events: none;
   user-select: none;
   transition: opacity 0.25s ease, fill 0.3s ease;
 }
 
-[data-theme='light'] .map-county-label {
-  fill: var(--map-label, #555566);
-  opacity: 0.65;
-  font-weight: 700;
+[data-theme='light'] .map-offshore-label {
+  fill: var(--map-label, #4a4a5a);
+  opacity: 0.9;
 }
 
 /* Shuangbei Cluster Marker & Inset Map Popover */
