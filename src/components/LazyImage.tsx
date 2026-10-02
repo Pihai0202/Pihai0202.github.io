@@ -1,11 +1,16 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 
 export interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   fallback?: React.ReactNode
 }
 
 export function LazyImage({ src, alt, fallback, ...props }: LazyImageProps) {
+  const [hasError, setHasError] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
+
+  useEffect(() => {
+    setHasError(false)
+  }, [src])
 
   useEffect(() => {
     return () => {
@@ -20,7 +25,7 @@ export function LazyImage({ src, alt, fallback, ...props }: LazyImageProps) {
     }
   }, [])
 
-  if (!src) {
+  if (!src || hasError) {
     return <>{fallback || null}</>
   }
 
@@ -30,6 +35,8 @@ export function LazyImage({ src, alt, fallback, ...props }: LazyImageProps) {
       src={src}
       alt={alt}
       loading="lazy"
+      referrerPolicy="no-referrer"
+      onError={() => setHasError(true)}
       {...props}
     />
   )

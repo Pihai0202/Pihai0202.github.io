@@ -14830,5 +14830,30 @@ body:has(.main-layout) {
   margin-top: 4px;
 }
 
+.card-game-score-pill.live {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.4);
+  color: #ef4444;
+}
+
+.card-game-score-pill .game-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+}
+
+.card-game-score-pill .game-status-pill.live {
+  background: rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  font-weight: 800;
+}
+
+.card-game-score-pill .game-status-pill.finished {
+  opacity: 0.8;
+}
+
 
 

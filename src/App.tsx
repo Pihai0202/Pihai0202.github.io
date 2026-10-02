@@ -4225,7 +4225,15 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
           <LazyImage
             src={concert.image}
             alt=""
-            fallback={<div className="remote-card-fallback">LIVE</div>}
+            fallback={
+              concert.source === '中華職棒' || concert.category === 'sport' ? (
+                <div className="remote-card-fallback sport-fallback" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 107, 0, 0.1)', color: '#ff6b00' }}>
+                  <BaseballIcon size="1.6em" />
+                </div>
+              ) : (
+                <div className="remote-card-fallback">LIVE</div>
+              )
+            }
           />
           <div className="remote-card-body">
             <div className="remote-card-top">
@@ -4233,10 +4241,13 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
               <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
-            {concert.game_score && concert.game_score.status === 'finished' && (
-              <div className="card-game-score-pill">
-                ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score} - {concert.game_score.home_score} {shortenCpblTeamName(concert.game_score.home_team)}
-                <span className="game-status-pill finished">已完賽</span>
+            {concert.game_score && (
+              <div className={`card-game-score-pill ${concert.game_score.status || 'scheduled'}`}>
+                ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}
+                <span className={`game-status-pill ${concert.game_score.status || 'scheduled'}`}>
+                  {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
+                  {concert.game_score.status === 'live' ? (lang === 'zh-TW' ? '比賽中' : 'LIVE') : (concert.game_score.status_text || (concert.game_score.status === 'finished' ? '已完賽' : '未開打'))}
+                </span>
               </div>
             )}
             {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
