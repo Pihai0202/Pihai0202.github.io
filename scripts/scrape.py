@@ -2036,12 +2036,10 @@ def scrape_cpbl_rebas():
                                         away_team = g.get("awayTeam", "").strip()
                                         home_team = g.get("homeTeam", "").strip()
                                         
-                                        if not away_team or not home_team or not raw_date:
-                                            continue
-                                            
                                         date_str = raw_date[:10]
-                                        time_str = raw_date[11:16] if len(raw_date) >= 16 else "18:35"
-                                        full_date = f"{date_str} {time_str}"
+                                        current_year_str = str(datetime.now().year)
+                                        if not date_str.startswith(current_year_str):
+                                            continue
                                         
                                         game_uid = f"cpbl-{season_id}-{seq}-{date_str}"
                                         if game_uid in seen_game_ids:
@@ -2111,7 +2109,7 @@ def scrape_cpbl_rebas():
                                             "venue_id": venue_id,
                                             "venue_name": venue_name,
                                             "city": city,
-                                            "date": full_date,
+                                            "date": date_str,
                                             "image": "",
                                             "url": "https://www.rebas.tw/",
                                             "price": "依官方公告為準",

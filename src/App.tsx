@@ -1078,15 +1078,9 @@ function App() {
     const dd = String(taipeiTime.getDate()).padStart(2, '0')
     const todayStr = `${yyyy}-${mm}-${dd}`
 
+    // 售票資訊（即將登場活動）清單：嚴格只顯示「今日及未來」的活動與賽事
     return [...resolvedRemoteConcerts]
-      .filter((c) => {
-        // 演唱會類別：過濾已過期活動（僅保留今日及未來）
-        // 體育賽事 / 中華職棒：保留所有賽程與賽事結果（包含已完賽），方便球迷查看各場比分與 Box Score
-        if (c.category === 'sport' || c.source === '中華職棒') {
-          return true
-        }
-        return !c.date || c.date.trim() >= todayStr
-      })
+      .filter((c) => !c.date || c.date.trim().substring(0, 10) >= todayStr)
       .sort((a, b) => {
         const dateA = a.date ? a.date.trim().substring(0, 10) : '9999'
         const dateB = b.date ? b.date.trim().substring(0, 10) : '9999'
@@ -1102,9 +1096,9 @@ function App() {
     const dd = String(taipeiTime.getDate()).padStart(2, '0')
     const todayStr = `${yyyy}-${mm}-${dd}`
 
+    const all = sortedRemoteConcerts.length
     const sport = sortedRemoteConcerts.filter((c) => c.source === '中華職棒' || c.category === 'sport').length
-    const concert = sortedRemoteConcerts.filter((c) => c.source !== '中華職棒' && c.category !== 'sport').length
-    const all = concert + sortedRemoteConcerts.filter((c) => (c.source === '中華職棒' || c.category === 'sport') && (!c.date || c.date.substring(0, 10) >= todayStr)).length
+    const concert = all - sport
     const today = sortedRemoteConcerts.filter((c) => {
       if (!c.date) return false
       const clean = c.date.trim().replace(/\//g, '-')
@@ -1131,29 +1125,6 @@ function App() {
         }
         const isSport = c.source === '中華職棒' || c.category === 'sport'
         return categoryFilter === 'sport' ? isSport : !isSport
-      })
-    } else {
-      // 在「全部」類別：顯示所有即將登場演唱會，以及近期（近 7 天內～未來）的中華職棒賽事，避免首頁過度冗長
-      const d = new Date()
-      const utc = d.getTime() + d.getTimezoneOffset() * 60000
-      const taipeiTime = new Date(utc + 3600000 * 8)
-      const yyyy = taipeiTime.getFullYear()
-      const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
-      const dd = String(taipeiTime.getDate()).padStart(2, '0')
-      const todayStr = `${yyyy}-${mm}-${dd}`
-
-      const sevenDaysAgo = new Date(taipeiTime.getTime() - 7 * 24 * 60 * 60 * 1000)
-      const prevY = sevenDaysAgo.getFullYear()
-      const prevM = String(sevenDaysAgo.getMonth() + 1).padStart(2, '0')
-      const prevD = String(sevenDaysAgo.getDate()).padStart(2, '0')
-      const recentThreshold = `${prevY}-${prevM}-${prevD}`
-
-      list = list.filter((c) => {
-        const isSport = c.source === '中華職棒' || c.category === 'sport'
-        if (isSport) {
-          return !c.date || c.date.trim().substring(0, 10) >= recentThreshold
-        }
-        return !c.date || c.date.trim().substring(0, 10) >= todayStr
       })
     }
 
