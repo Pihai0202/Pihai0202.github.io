@@ -213,18 +213,19 @@ async function handleCpblLiveScores() {
 
       let status = "scheduled";
       let statusText = "未開打";
+      const vScoreNum = Number(g.VisitingScore);
+      const hScoreNum = Number(g.HomeScore);
+      const hasScores = g.VisitingScore !== null && g.VisitingScore !== undefined && !isNaN(vScoreNum) && !isNaN(hScoreNum) && (vScoreNum > 0 || hScoreNum > 0);
+
       if (isGameStop) {
         status = "postponed";
         statusText = "延賽";
-      } else if (gameEnd || (winPitcher && losePitcher) || (gameDuring && gameDuring !== "" && isPlayBall !== true)) {
+      } else if ((gameEnd && gameEnd.length >= 10 && !isPlayBall) || (winPitcher && losePitcher && !isPlayBall) || (mvp && !isPlayBall)) {
         status = "finished";
         statusText = "已完賽";
-      } else if (isPlayBall) {
+      } else if (isPlayBall || (gameDuring && gameDuring !== "" && !gameEnd) || (hasScores && !gameEnd)) {
         status = "live";
         statusText = "比賽中";
-      } else if (winPitcher || mvp) {
-        status = "finished";
-        statusText = "已完賽";
       }
 
       const rawSno = String(g.GameSno || "").trim();

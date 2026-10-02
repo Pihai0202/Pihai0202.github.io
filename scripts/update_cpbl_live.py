@@ -135,15 +135,12 @@ def update_live_scores():
         if is_game_stop:
             status = "postponed"
             status_text = "延賽"
-        elif end_str or (win_p and lose_p) or (during_str and during_str != "" and not is_play_ball):
+        elif (end_str and len(end_str) >= 10 and not is_play_ball) or ((win_p and lose_p) and not is_play_ball) or (mvp_p and not is_play_ball):
             status = "finished"
             status_text = "已完賽"
-        elif is_play_ball:
+        elif is_play_ball or (during_str and during_str != "" and not end_str) or (v_score is not None and h_score is not None and (int(str(v_score) or "0") > 0 or int(str(h_score) or "0") > 0) and not end_str):
             status = "live"
             status_text = "比賽中"
-        elif win_p or mvp_p:
-            status = "finished"
-            status_text = "已完賽"
             
         vis_score_str = v_score if (status in ("finished", "live") and v_score is not None) else "-"
         home_score_str = h_score if (status in ("finished", "live") and h_score is not None) else "-"
