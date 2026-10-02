@@ -167,7 +167,7 @@ const translations: Record<Language, Record<string, string>> = {
     spotifyPlayerCollapse: '收起播放器',
 
     // Weather Panel
-    weatherTitle: '即時天氣預報',
+    weatherTitle: '天氣預報',
     feelsLike: '體感溫度',
     humidity: '相對濕度',
     windSpeed: '當前風速',
@@ -359,7 +359,7 @@ const translations: Record<Language, Record<string, string>> = {
     spotifyPlayerCollapse: 'Collapse Player',
 
     // Weather Panel
-    weatherTitle: 'Real-time Weather',
+    weatherTitle: 'Weather Forecast',
     feelsLike: 'Feels Like',
     humidity: 'Humidity',
     windSpeed: 'Wind Speed',
@@ -551,7 +551,7 @@ const translations: Record<Language, Record<string, string>> = {
     spotifyPlayerCollapse: 'プレーヤーを閉じる',
 
     // Weather Panel
-    weatherTitle: 'リアルタイム天気予報',
+    weatherTitle: '天気予報',
     feelsLike: '体感温度',
     humidity: '相対湿度',
     windSpeed: '現在の風速',
@@ -743,7 +743,7 @@ const translations: Record<Language, Record<string, string>> = {
     spotifyPlayerCollapse: '플레이어 닫기',
 
     // Weather Panel
-    weatherTitle: '실시간 날씨 예보',
+    weatherTitle: '날씨 예보',
     feelsLike: '체감 온도',
     humidity: '상대 습도',
     windSpeed: '현재 풍속',
