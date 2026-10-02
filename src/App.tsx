@@ -32,7 +32,7 @@ import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { isTargetEventCategory } from './utils/eventFilterHelper'
-import { shortenCpblTeamName } from './utils/cpblUtils'
+import { shortenCpblTeamName, resolveCpblPlayerName } from './utils/cpblUtils'
 import { collection, addDoc, doc, setDoc, getDoc, onSnapshot } from 'firebase/firestore'
 import { db, logCustomEvent, auth } from './firebase'
 import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
@@ -4243,7 +4243,19 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
             <div className="remote-card-name">{concert.name}</div>
             {concert.game_score && (
               <div className={`card-game-score-pill ${concert.game_score.status || 'scheduled'}`}>
-                ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}
+                <span className="game-score-teams">
+                  ⚾ {shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}
+                </span>
+                {(concert.game_score.visiting_pitcher || concert.game_score.home_pitcher) && (
+                  <span className="game-pitchers-preview">
+                    {' '}(先發: {resolveCpblPlayerName(concert.game_score.visiting_pitcher) || '待公告'} vs {resolveCpblPlayerName(concert.game_score.home_pitcher) || '待公告'})
+                  </span>
+                )}
+                {concert.game_score.status === 'finished' && (concert.game_score.winning_pitcher || concert.game_score.mvp) && (
+                  <span className="game-pitchers-preview finished">
+                    {' '}({concert.game_score.winning_pitcher ? `勝: ${resolveCpblPlayerName(concert.game_score.winning_pitcher)}` : ''}{concert.game_score.winning_pitcher && concert.game_score.mvp ? ' · ' : ''}{concert.game_score.mvp ? `MVP: ${resolveCpblPlayerName(concert.game_score.mvp)}` : ''})
+                  </span>
+                )}
                 <span className={`game-status-pill ${concert.game_score.status || 'scheduled'}`}>
                   {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
                   {concert.game_score.status === 'live' ? (lang === 'zh-TW' ? '比賽中' : 'LIVE') : (concert.game_score.status_text || (concert.game_score.status === 'finished' ? '已完賽' : '未開打'))}
