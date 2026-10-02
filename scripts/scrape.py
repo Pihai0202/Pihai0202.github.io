@@ -1912,61 +1912,6 @@ def get_cpbl_player_name(acnt):
     except Exception:
         pass
     return ""
-
-def sum_rebas_scores(scores):
-    total = 0
-    valid = False
-    for s in scores:
-        try:
-            total += int(s)
-            valid = True
-        except (ValueError, TypeError):
-            pass
-    return total if valid else "-"
-
-def sum_rebas_stat(box, key):
-    total = 0
-    for player in box:
-        try:
-            total += int(player.get(key, 0))
-        except (ValueError, TypeError):
-            pass
-    return total
-
-def scrape_cpbl_rebas():
-    """
-    從野球革命 Rebas Open Data (https://github.com/rebas-tw/rebas.tw-open-data)
-    下載並解析中華職棒賽事、每局比分 (Line Score)、投手成績表與打者成績表。
-    """
-    print("→ 爬取野球革命 Rebas Open Data 中華職棒賽事數據...", file=sys.stderr)
-    url_rel = 'https://api.github.com/repos/rebas-tw/rebas.tw-open-data/releases'
-    events = []
-    
-    try:
-        req = Request(url_rel, headers={'User-Agent': 'Mozilla/5.0'})
-        with urlopen(req, timeout=25) as resp:
-            releases = json.loads(resp.read().decode('utf-8'))
-    except Exception as e:
-        print(f"  ⚠ 讀取 Rebas GitHub Releases 失敗: {e}", file=sys.stderr)
-        return []
-
-    stadium_mapping = {
-        "大巨蛋": ("taipei-dome", "台北大巨蛋", "台北市"),
-        "臺北大巨蛋": ("taipei-dome", "台北大巨蛋", "台北市"),
-        "台北大巨蛋": ("taipei-dome", "台北大巨蛋", "台北市"),
-        "洲際": ("taichung-dome", "台中洲際棒球場", "台中市"),
-        "臺中市洲際棒球場": ("taichung-dome", "台中洲際棒球場", "台中市"),
-        "台中洲際棒球場": ("taichung-dome", "台中洲際棒球場", "台中市"),
-        "新莊": ("xinzhuang", "新莊棒球場", "新北市"),
-        "新莊棒球場": ("xinzhuang", "新莊棒球場", "新北市"),
-        "新北市立新莊棒球場": ("xinzhuang", "新莊棒球場", "新北市"),
-        "天母": ("tianmu", "天母棒球場", "台北市"),
-        "天母棒球場": ("tianmu", "天母棒球場", "台北市"),
-        "臺北市立天母棒球場": ("tianmu", "天母棒球場", "台北市"),
-        "桃園": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
-        "桃園棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
-        "樂天桃園棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
-        "桃園國際棒球場": ("taoyuan-arena", "桃園國際棒球場", "桃園市"),
 # ── 中華職棒 CPBL 官方賽程爬蟲 ─────────────────────────────────────────────
 
 def scrape_cpbl():
