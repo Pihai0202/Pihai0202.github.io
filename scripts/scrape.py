@@ -1956,6 +1956,20 @@ def scrape_cpbl():
         "統一": {"name": "統一獅售票網", "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"}
     }
 
+    team_logos = {
+        "兄弟": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
+        "中信": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
+        "統一": "https://www.cpbl.com.tw/files/atts/0L021496162893869773/logo_lions.png",
+        "味全": "https://www.cpbl.com.tw/files/atts/0L021497845061333235/logo_dragon.png",
+        "龍": "https://www.cpbl.com.tw/files/atts/0L021497845061333235/logo_dragon.png",
+        "富邦": "https://www.cpbl.com.tw/files/atts/0L021495969510091777/logo_fubon.png",
+        "悍將": "https://www.cpbl.com.tw/files/atts/0L021495969510091777/logo_fubon.png",
+        "樂天": "https://www.cpbl.com.tw/files/atts/0L015574823122453305/2024_CPBL%E6%A8%99Logo_R2_%E6%A8%82%E5%A4%A9.png",
+        "桃猿": "https://www.cpbl.com.tw/files/atts/0L015574823122453305/2024_CPBL%E6%A8%99Logo_R2_%E6%A8%82%E5%A4%A9.png",
+        "台鋼": "https://www.cpbl.com.tw/files/atts/0M259522048557486065/%E5%8F%B0%E9%8B%BC-100x100.png",
+        "雄鷹": "https://www.cpbl.com.tw/files/atts/0M259522048557486065/%E5%8F%B0%E9%8B%BC-100x100.png",
+    }
+
     if HAS_CURL_CFFI:
         try:
             session = cffi_requests.Session()
@@ -2012,8 +2026,10 @@ def scrape_cpbl():
                                 
                                 visiting_score = g.get("VisitingScore")
                                 home_score = g.get("HomeScore")
-                                is_play_ball = g.get("IsPlayBall", "N")
-                                is_game_stop = str(g.get("IsGameStop") or "0") in ("1", "true", "True")
+                                is_play_ball = (g.get("IsPlayBall") or "N").strip()
+                                is_game_stop = str(g.get("IsGameStop") or "0").strip() in ("1", "true", "True")
+                                end_time = (g.get("GameDateTimeE") or "").strip()
+                                during_time = (g.get("GameDuringTime") or "").strip()
                                 win_pitcher = (g.get("WinningPitcherName") or "").replace("\u200b", "").strip()
                                 lose_pitcher = (g.get("LoserPitcherName") or "").replace("\u200b", "").strip()
                                 closer = (g.get("CloserName") or "").replace("\u200b", "").strip()
@@ -2023,12 +2039,25 @@ def scrape_cpbl():
 
                                 if is_game_stop:
                                     status, status_text = "postponed", "延賽"
-                                elif g.get("GameDateTimeE") or g.get("GameDuringTime") or (win_pitcher and lose_pitcher):
-                                    status, status_text = "finished", "已完賽"
                                 elif is_play_ball == "Y":
                                     status, status_text = "live", "比賽中"
+                                elif (end_time and end_time != "None") or during_time or (win_pitcher and lose_pitcher):
+                                    status, status_text = "finished", "已完賽"
                                 else:
                                     status, status_text = "scheduled", "未開打"
+
+                                # Thumbnail Image determination
+                                club_img = (g.get("HomeClubSmallImgPath") or g.get("VisitingClubSmallImgPath") or "").strip()
+                                if club_img.startswith("/"):
+                                    # URL encode chinese characters in file path safely
+                                    encoded_path = quote(club_img, safe="/:")
+                                    event_img = f"https://www.cpbl.com.tw{encoded_path}"
+                                else:
+                                    event_img = ""
+                                    for kw, logo_url in team_logos.items():
+                                        if kw in home or kw in visiting:
+                                            event_img = logo_url
+                                            break
 
                                 ticket_links = []
                                 for team_kw, t_info in team_tickets.items():
@@ -2046,7 +2075,7 @@ def scrape_cpbl():
                                     "venue_name": venue_name,
                                     "city": VENUE_CITY.get(venue_id, ""),
                                     "date": date_str,
-                                    "image": "",
+                                    "image": event_img,
                                     "url": "https://www.cpbl.com.tw/schedule",
                                     "price": "依官網/主隊公告為準",
                                     "category": "sport",
