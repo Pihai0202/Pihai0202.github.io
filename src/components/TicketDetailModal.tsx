@@ -560,7 +560,7 @@ export function TicketDetailModal({
             )}
 
             {/* 先發投手資訊 (Starting Pitchers) */}
-            {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled' || ticket.game_score.status === 'live') && (
+            {(ticket.game_score.visiting_pitcher || ticket.game_score.home_pitcher || ticket.game_score.status === 'scheduled' || ticket.game_score.status === 'live' || ticket.game_score.status === 'finished') && (
               <div className="scoreboard-starting-pitchers">
                 <div className="pitcher-cell">
                   <span className="pitcher-label">
