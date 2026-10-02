@@ -1959,32 +1959,52 @@ def scrape_cpbl():
     if HAS_CURL_CFFI:
         try:
             session = cffi_requests.Session()
-            res = session.get("https://cpbl.com.tw/schedule", impersonate="safari15_5", timeout=15)
+            browser_headers = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
+                "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
+            }
+            res = session.get("https://www.cpbl.com.tw/schedule", headers=browser_headers, impersonate="chrome120", timeout=20)
             if res.status_code == 200:
-                tokens = re.findall(r"RequestVerificationToken:\s*'([^']+)'", res.text)
-                if tokens:
+                tokens = re.findall(r"RequestVerificationToken:\s*['\"]([^'\"]+)['\"]", res.text)
+                if not tokens:
+                    tokens = re.findall(r'name="__RequestVerificationToken"[^>]*value="([^"]+)"', res.text)
+                
+                token = tokens[0] if tokens else ""
+                post_headers = {
+                    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token,
+                    "Referer": "https://www.cpbl.com.tw/schedule",
+                    "Origin": "https://www.cpbl.com.tw",
+                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8",
+                }
+
+                years_to_scrape = [current_year]
+                for yr in years_to_scrape:
                     post_res = session.post(
-                        "https://cpbl.com.tw/schedule/getgamedatas",
-                        data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": "A"},
-                        headers={"X-Requested-With": "XMLHttpRequest", "RequestVerificationToken": tokens[0]},
-                        impersonate="safari15_5",
-                        timeout=15
+                        "https://www.cpbl.com.tw/schedule/getgamedatas",
+                        data={"calendar": f"{yr}/01/01", "location": "", "kindCode": "A"},
+                        headers=post_headers,
+                        impersonate="chrome120",
+                        timeout=20
                     )
                     if post_res.status_code == 200:
                         resp_json = post_res.json()
                         if resp_json.get("Success"):
-                            games = json.loads(resp_json["GameDatas"])
+                            raw_games = resp_json.get("GameDatas")
+                            games = json.loads(raw_games) if isinstance(raw_games, str) else (raw_games or [])
                             for g in games:
                                 start_dt = g.get("GameDateTimeS")
                                 if not start_dt:
                                     continue
                                 date_str = start_dt[:10]
-                                visiting = (g.get("VisitingTeamName") or "").replace("\u200b", "").strip()
-                                home = (g.get("HomeTeamName") or "").replace("\u200b", "").strip()
+                                visiting = (g.get("VisitingTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
+                                home = (g.get("HomeTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
                                 if not visiting or not home:
                                     continue
                                 game_no = g.get("GameSno", "")
-                                field_abbe = (g.get("FieldAbbe") or "").strip()
+                                field_abbe = (g.get("FieldAbbe") or "").replace("\u200b", "").strip()
                                 venue_id = field_mapping.get(field_abbe) or match_venue(field_abbe)[0]
                                 if not venue_id:
                                     continue
@@ -1994,12 +2014,12 @@ def scrape_cpbl():
                                 home_score = g.get("HomeScore")
                                 is_play_ball = g.get("IsPlayBall", "N")
                                 is_game_stop = str(g.get("IsGameStop") or "0") in ("1", "true", "True")
-                                win_pitcher = g.get("WinningPitcherName") or ""
-                                lose_pitcher = g.get("LoserPitcherName") or ""
-                                closer = g.get("CloserName") or ""
-                                mvp = g.get("MvpName") or ""
-                                v_pitcher = g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or ""
-                                h_pitcher = g.get("HomePitcherName") or g.get("HomeFirstMover") or ""
+                                win_pitcher = (g.get("WinningPitcherName") or "").replace("\u200b", "").strip()
+                                lose_pitcher = (g.get("LoserPitcherName") or "").replace("\u200b", "").strip()
+                                closer = (g.get("CloserName") or "").replace("\u200b", "").strip()
+                                mvp = (g.get("MvpName") or "").replace("\u200b", "").strip()
+                                v_pitcher = (g.get("VisitingPitcherName") or g.get("VisitingFirstMover") or "").replace("\u200b", "").strip()
+                                h_pitcher = (g.get("HomePitcherName") or g.get("HomeFirstMover") or "").replace("\u200b", "").strip()
 
                                 if is_game_stop:
                                     status, status_text = "postponed", "延賽"
@@ -2018,7 +2038,7 @@ def scrape_cpbl():
                                 ticket_links.append({"platform": "manual", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"})
 
                                 events.append({
-                                    "id": f"cpbl-{current_year}-{game_no}-{date_str}",
+                                    "id": f"cpbl-{yr}-{game_no}-{date_str}",
                                     "source": "中華職棒",
                                     "name": f"中華職棒例行賽 G{game_no}：{visiting} vs {home}",
                                     "venue_raw": field_abbe,
