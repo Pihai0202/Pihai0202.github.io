@@ -30,6 +30,9 @@ import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
 import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
+import './components/HistoricalEventPicker.css'
+import type { HistoricalEvent } from './types'
+import { searchHistoricalEvents } from './utils/historicalEventsService'
 import { useTranslation, translateVenueName, translateCityName, translateSuspensionStatus } from './utils/i18n.tsx'
 import { isTargetEventCategory } from './utils/eventFilterHelper'
 import { shortenCpblTeamName } from './utils/cpblUtils'
@@ -318,6 +321,9 @@ function App() {
   const [formVenueId, setFormVenueId] = useState<string>('')
   const [formVenueName, setFormVenueName] = useState<string>('')
   const [formVenueCity, setFormVenueCity] = useState<string>('')
+  const [historicalDropdownResults, setHistoricalDropdownResults] = useState<HistoricalEvent[]>([])
+  const [isHistoricalDropdownOpen, setIsHistoricalDropdownOpen] = useState(false)
+  const [selectedHistoricalEvent, setSelectedHistoricalEvent] = useState<HistoricalEvent | null>(null)
   const [pendingMedia, setPendingMedia] = useState<ConcertMedia[]>([])
   const [spotifyQuery, setSpotifyQuery] = useState('')
   const [spotifyResults, setSpotifyResults] = useState<SpotifyItem[]>([])
@@ -1666,6 +1672,51 @@ function App() {
 
 
 
+  const handleApplyHistoricalEvent = useCallback((event: HistoricalEvent) => {
+    if (!isLoggedIn || !currentUser) {
+      showToast(lang === 'zh-TW' ? '請先登入會員以收錄歷年活動至我的記錄！' : 'Please log in to record events!', 'info')
+      setView('login')
+      return
+    }
+
+    const artistName = event.artist || extractArtistFromTitle(event.name)
+    let matchedVenue = null
+    if (event.venue_id) {
+      matchedVenue = venues.find(v => v.id === event.venue_id) || null
+    }
+    if (!matchedVenue && event.venue_name) {
+      matchedVenue = venues.find(v => v.name.includes(event.venue_name!) || event.venue_name!.includes(v.name)) || null
+    }
+
+    setForm((prev) => ({
+      ...prev,
+      artist: artistName,
+      concertName: event.name,
+      date: event.date ? event.date.slice(0, 10) : prev.date,
+      coverUrl: event.image || prev.coverUrl || '',
+    }))
+
+    if (matchedVenue) {
+      setFormVenueId(matchedVenue.id)
+      setFormVenueName(matchedVenue.name)
+      setFormVenueCity(matchedVenue.city)
+    } else {
+      setFormVenueId('custom')
+      setFormVenueName(event.venue_name || '')
+      setFormVenueCity(event.city || '台北')
+    }
+
+    setSelectedHistoricalEvent(event)
+    setIsHistoricalDropdownOpen(false)
+    setIsAddModalOpen(true)
+    showToast(
+      lang === 'zh-TW' 
+        ? `已帶入「${event.name}」，請填寫您的座位與心得！` 
+        : `Auto-filled "${event.name}"! Please enter your seat and notes.`, 
+      'success'
+    )
+  }, [isLoggedIn, currentUser, venues, lang, showToast])
+
   const openAddModal = (date?: string, venue?: Venue | null) => {
     if (!isLoggedIn || !currentUser) {
       showToast(lang === 'zh-TW' ? '請先登入會員以新增個人演唱會記錄！' : 'Please log in to add concert logs!', 'info')
@@ -1688,6 +1739,9 @@ function App() {
     }
     setPendingMedia([])
     setEditingConcertId(null)
+    setSelectedHistoricalEvent(null)
+    setHistoricalDropdownResults([])
+    setIsHistoricalDropdownOpen(false)
     setSpotifyQuery('')
     setSpotifyResults([])
     setSpotifyStatus('')
@@ -1718,6 +1772,8 @@ function App() {
     setPendingMedia(concert.media)
     setEditingConcertId(concert.id)
 
+    setSelectedHistoricalEvent(null)
+    setIsHistoricalDropdownOpen(false)
     setSpotifyQuery('')
     setSpotifyResults([])
     setSpotifyStatus('')
@@ -1731,6 +1787,8 @@ function App() {
   const closeAddModal = () => {
     setNotesActiveTab('edit')
     setEditingConcertId(null)
+    setSelectedHistoricalEvent(null)
+    setIsHistoricalDropdownOpen(false)
     setIsAddModalOpen(false)
   }
   const closeDetailModal = () => setDetailConcertId(null)
@@ -3182,18 +3240,120 @@ function App() {
               type="text"
               value={form.artist}
               placeholder={t('artistPlaceholder')}
-              onChange={(event) => updateForm('artist', event.target.value)}
+              onChange={async (event) => {
+                const val = event.target.value
+                updateForm('artist', val)
+                if (!editingConcertId && val.trim().length >= 2 && !form.concertName) {
+                  const res = await searchHistoricalEvents({ query: val, limit: 6 })
+                  setHistoricalDropdownResults(res.events)
+                  setIsHistoricalDropdownOpen(true)
+                }
+              }}
             />
           </div>
-          <div className="form-group">
-            <label htmlFor="input-concert-name">{t('concertNameLabel')}</label>
-            <input
-              id="input-concert-name"
-              type="text"
-              value={form.concertName}
-              placeholder={t('concertNamePlaceholder')}
-              onChange={(event) => updateForm('concertName', event.target.value)}
-            />
+          <div className="form-group" style={{ position: 'relative' }}>
+            <label htmlFor="input-concert-name">
+              {t('concertNameLabel')}
+              {!editingConcertId && (
+                <span className="form-smart-hint">
+                  {lang === 'zh-TW' ? '（輸入關鍵字可選取歷史活動自動帶入）' : '(Select past event to autofill)'}
+                </span>
+              )}
+            </label>
+            <div className="input-with-autocomplete">
+              <input
+                id="input-concert-name"
+                type="text"
+                value={form.concertName}
+                placeholder={t('concertNamePlaceholder')}
+                autoComplete="off"
+                onChange={async (event) => {
+                  const val = event.target.value
+                  updateForm('concertName', val)
+                  if (!editingConcertId && val.trim().length > 0) {
+                    const res = await searchHistoricalEvents({ query: val, limit: 6 })
+                    setHistoricalDropdownResults(res.events)
+                    setIsHistoricalDropdownOpen(true)
+                  } else {
+                    setHistoricalDropdownResults([])
+                    setIsHistoricalDropdownOpen(false)
+                  }
+                }}
+                onFocus={async () => {
+                  if (!editingConcertId) {
+                    const q = form.concertName.trim() || form.artist.trim()
+                    if (q.length > 0) {
+                      const res = await searchHistoricalEvents({ query: q, limit: 6 })
+                      setHistoricalDropdownResults(res.events)
+                      setIsHistoricalDropdownOpen(true)
+                    }
+                  }
+                }}
+                onBlur={() => {
+                  // Delay closing slightly so onMouseDown on dropdown items triggers first
+                  setTimeout(() => {
+                    setIsHistoricalDropdownOpen(false)
+                  }, 250)
+                }}
+              />
+            </div>
+
+            {/* 即時智慧提示選單：直接出現在演唱會名稱輸入框下方 */}
+            {!editingConcertId && isHistoricalDropdownOpen && historicalDropdownResults.length > 0 && (
+              <div className="form-autocomplete-dropdown">
+                <div className="autocomplete-header-tip">
+                  💡 {lang === 'zh-TW' ? '點選活動即可自動帶入演出者、場地、日期與海報：' : 'Click to autofill artist, venue, date & poster:'}
+                </div>
+                {historicalDropdownResults.map((ev) => (
+                  <button
+                    key={ev.id}
+                    type="button"
+                    className="autocomplete-item"
+                    onMouseDown={(e) => {
+                      e.preventDefault()
+                      handleApplyHistoricalEvent(ev)
+                    }}
+                  >
+                    {ev.image ? (
+                      <img src={ev.image} alt="" className="autocomplete-thumb" />
+                    ) : (
+                      <div className="autocomplete-thumb-placeholder">
+                        {ev.category === 'sport' || ev.source === '中華職棒' ? '⚾' : '🎫'}
+                      </div>
+                    )}
+                    <div className="autocomplete-text">
+                      <div className="autocomplete-name">{ev.name}</div>
+                      <div className="autocomplete-details">
+                        <span className="badge-date">📅 {ev.date}</span>
+                        {ev.venue_name && (
+                          <span className="badge-venue">📍 {ev.city ? `${ev.city} · ` : ''}{ev.venue_name}</span>
+                        )}
+                        {ev.artist && (
+                          <span className="badge-artist">🎤 {ev.artist}</span>
+                        )}
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* 自動填入成功提示 */}
+            {!editingConcertId && selectedHistoricalEvent && (
+              <div className="autofill-applied-badge">
+                <span>
+                  ✨ {lang === 'zh-TW' ? '已自動填入：' : 'Auto-filled: '}
+                  <strong>{selectedHistoricalEvent.name}</strong> ({selectedHistoricalEvent.date})
+                </span>
+                <button
+                  type="button"
+                  className="clear-autofill-link"
+                  onClick={() => setSelectedHistoricalEvent(null)}
+                >
+                  {lang === 'zh-TW' ? '清除提示' : 'Dismiss'}
+                </button>
+              </div>
+            )}
           </div>
           <div className="form-group">
             <label htmlFor="input-date">{t('dateLabel')}</label>
@@ -3432,6 +3592,7 @@ function App() {
           />
         </Modal>
       )}
+
 
       {isSuspensionModalOpen && suspensionData && (
         <Modal className="suspension-modal" onClose={() => setIsSuspensionModalOpen(false)}>

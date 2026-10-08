@@ -2407,9 +2407,53 @@ def main():
                 new_game_dict[k] = old_ev
         
         cpbl_events = list(new_game_dict.values())
-        print(f"  ✅ 中華職棒賽程合併完成，共維持 {len(cpbl_events)} 筆賽事資料", file=sys.stderr)
-
     all_events.extend(cpbl_events)
+
+    # 自動封存已過期的活動至歷史資料庫 (public/historical-events.json)
+    expired_events = [ev for ev in all_events if ev.get("date", "") and ev.get("date", "") < today_str()]
+    if expired_events:
+        history_path = PROJECT_ROOT / "public" / "historical-events.json"
+        existing_hist_map = {}
+        if history_path.exists():
+            try:
+                with open(history_path, "r", encoding="utf-8") as f_hist:
+                    hist_data = json.load(f_hist)
+                    for h_ev in hist_data.get("events", []):
+                        if h_ev.get("id"):
+                            existing_hist_map[h_ev["id"]] = h_ev
+            except Exception:
+                pass
+        added_count = 0
+        for ev in expired_events:
+            ev_id = ev.get("id")
+            if ev_id and ev_id not in existing_hist_map:
+                existing_hist_map[ev_id] = {
+                    "id": ev_id,
+                    "name": ev.get("name", ""),
+                    "artist": ev.get("artist", ""),
+                    "venue_id": ev.get("venue_id"),
+                    "venue_name": ev.get("venue_name") or ev.get("venue_raw"),
+                    "city": ev.get("city", ""),
+                    "date": ev.get("date", ""),
+                    "category": ev.get("category", "music"),
+                    "image": ev.get("image", ""),
+                    "source": ev.get("source", ""),
+                    "url": ev.get("url", ""),
+                    "price": ev.get("price", ""),
+                }
+                added_count += 1
+        if added_count > 0:
+            sorted_hist = sorted(existing_hist_map.values(), key=lambda x: x.get("date", ""), reverse=True)
+            try:
+                with open(history_path, "w", encoding="utf-8") as f_hist:
+                    json.dump({
+                        "updated_at": datetime.now(timezone.utc).isoformat(),
+                        "count": len(sorted_hist),
+                        "events": sorted_hist
+                    }, f_hist, ensure_ascii=False, indent=2)
+                print(f"  🏛️ 已自動將 {added_count} 筆過期活動封存至 historical-events.json (總計 {len(sorted_hist)} 筆)", file=sys.stderr)
+            except Exception as e_hist:
+                print(f"  ⚠ 封存過期活動失敗: {e_hist}", file=sys.stderr)
 
     # 過濾過期活動 (保留今日及未來的活動，並完整保留所有中華職棒歷史與未來賽事)
     all_events = [ev for ev in all_events if ev.get("date", "") >= today_str() or ev.get("category") == "sport" or ev.get("source") == "中華職棒"]

@@ -63,5 +63,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if true;
     }
+
+    // 5. Historical / Archived Events: Allow anyone to read, allow writes for admin/seed sync.
+    match /archived_events/{eventId} {
+      allow read: if true;
+      allow write: if true;
+    }
   }
 }

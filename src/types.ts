@@ -120,6 +120,27 @@ export type RemoteConcertPayload = {
   events?: RemoteConcert[]
 }
 
+export type HistoricalEvent = {
+  id: string
+  name: string
+  artist?: string
+  venue_id?: string | null
+  venue_name?: string | null
+  city?: string
+  date: string
+  category?: string
+  image?: string
+  source?: string
+  url?: string
+  price?: string
+}
+
+export type HistoricalEventPayload = {
+  updated_at?: string
+  count?: number
+  events?: HistoricalEvent[]
+}
+
 export type ConcertForm = {
   artist: string
   concertName: string
