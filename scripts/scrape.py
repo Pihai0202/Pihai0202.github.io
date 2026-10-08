@@ -2018,15 +2018,36 @@ def scrape_cpbl():
             pass
         return clean
 
+    session = None
     if HAS_CURL_CFFI:
         try:
             session = cffi_requests.Session()
+        except Exception:
+            session = None
+
+    if session is None:
+        try:
+            import requests as std_requests
+            import urllib3
+            urllib3.disable_warnings()
+            s_obj = std_requests.Session()
+            orig_get = s_obj.get
+            orig_post = s_obj.post
+            s_obj.get = lambda *a, **kw: orig_get(*a, **{k: v for k, v in kw.items() if k != "impersonate"}, verify=False)
+            s_obj.post = lambda *a, **kw: orig_post(*a, **{k: v for k, v in kw.items() if k != "impersonate"}, verify=False)
+            session = s_obj
+        except Exception as e:
+            print(f"  ℹ 無法初始化請求 session: {e}", file=sys.stderr)
+            session = None
+
+    if session:
+        try:
             browser_headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
                 "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
                 "Accept-Language": "zh-TW,zh;q=0.9,en-US;q=0.8,en;q=0.7",
             }
-            res = session.get("https://www.cpbl.com.tw/schedule", headers=browser_headers, impersonate="chrome120", timeout=20)
+            res = session.get("https://www.cpbl.com.tw/schedule", headers=browser_headers, timeout=20)
             if res.status_code == 200:
                 tokens = re.findall(r"RequestVerificationToken:\s*['\"]([^'\"]+)['\"]", res.text)
                 if not tokens:
@@ -2043,106 +2064,159 @@ def scrape_cpbl():
                 }
 
                 years_to_scrape = [current_year]
+                kind_configs = [
+                    {"code": "A", "name": "例行賽"},
+                    {"code": "E", "name": "季後挑戰賽"},
+                    {"code": "C", "name": "總冠軍賽"},
+                ]
                 for yr in years_to_scrape:
-                    post_res = session.post(
-                        "https://www.cpbl.com.tw/schedule/getgamedatas",
-                        data={"calendar": f"{yr}/01/01", "location": "", "kindCode": "A"},
-                        headers=post_headers,
-                        impersonate="chrome120",
-                        timeout=20
-                    )
-                    if post_res.status_code == 200:
-                        resp_json = post_res.json()
-                        if resp_json.get("Success"):
-                            raw_games = resp_json.get("GameDatas")
-                            games = json.loads(raw_games) if isinstance(raw_games, str) else (raw_games or [])
-                            for g in games:
-                                start_dt = g.get("GameDateTimeS")
-                                if not start_dt:
-                                    continue
-                                date_str = start_dt[:10]
-                                visiting = (g.get("VisitingTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
-                                home = (g.get("HomeTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
-                                if not visiting or not home:
-                                    continue
-                                game_no = g.get("GameSno", "")
-                                field_abbe = (g.get("FieldAbbe") or "").replace("\u200b", "").strip()
-                                venue_id = field_mapping.get(field_abbe) or match_venue(field_abbe)[0]
-                                if not venue_id:
-                                    continue
-                                venue_name = venue_names.get(venue_id, field_abbe + "棒球場")
-                                
-                                visiting_score = g.get("VisitingScore")
-                                home_score = g.get("HomeScore")
-                                is_play_ball = (g.get("IsPlayBall") or "N").strip()
-                                is_game_stop = str(g.get("IsGameStop") or "0").strip() in ("1", "true", "True")
-                                end_time = (g.get("GameDateTimeE") or "").strip()
-                                during_time = (g.get("GameDuringTime") or "").strip()
-                                win_pitcher = resolve_p_name(g.get("WinningPitcherName"), g.get("WinningPitcherAcnt"))
-                                lose_pitcher = resolve_p_name(g.get("LoserPitcherName"), g.get("LoserPitcherAcnt"))
-                                closer = resolve_p_name(g.get("CloserName"), g.get("CloserAcnt"))
-                                mvp = resolve_p_name(g.get("MvpName"), g.get("MvpAcnt"))
-                                v_pitcher = resolve_p_name(g.get("VisitingPitcherName") or g.get("VisitingFirstMover"), g.get("VisitingPitcherAcnt"))
-                                h_pitcher = resolve_p_name(g.get("HomePitcherName") or g.get("HomeFirstMover"), g.get("HomePitcherAcnt"))
+                    for kc in kind_configs:
+                        kind_code = kc["code"]
+                        kind_name = kc["name"]
+                        try:
+                            post_res = session.post(
+                                "https://www.cpbl.com.tw/schedule/getgamedatas",
+                                data={"calendar": f"{yr}/01/01", "location": "", "kindCode": kind_code},
+                                headers=post_headers,
+                                timeout=20
+                            )
+                        except Exception as req_err:
+                            print(f"  ℹ 請求 {yr} {kind_name} 失敗: {req_err}", file=sys.stderr)
+                            continue
 
-                                if is_game_stop:
-                                    status, status_text = "postponed", "延賽"
-                                elif is_play_ball == "Y":
-                                    status, status_text = "live", "比賽中"
-                                elif (end_time and end_time != "None") or during_time or (win_pitcher and lose_pitcher):
-                                    status, status_text = "finished", "已完賽"
-                                else:
-                                    status, status_text = "scheduled", "未開打"
+                        if post_res.status_code == 200:
+                            try:
+                                resp_json = post_res.json()
+                            except Exception:
+                                continue
+                            if resp_json.get("Success"):
+                                raw_games = resp_json.get("GameDatas")
+                                games = json.loads(raw_games) if isinstance(raw_games, str) else (raw_games or [])
+                                for g in games:
+                                    start_dt = g.get("GameDateTimeS")
+                                    if not start_dt:
+                                        continue
+                                    date_str = start_dt[:10]
+                                    visiting = (g.get("VisitingTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
+                                    home = (g.get("HomeTeamName") or "").replace("\u200b", "").replace("\ufeff", "").strip()
+                                    if not visiting or not home:
+                                        continue
+                                    game_no = g.get("GameSno", "")
+                                    field_abbe = (g.get("FieldAbbe") or "").replace("\u200b", "").strip()
+                                    venue_id = field_mapping.get(field_abbe) or match_venue(field_abbe)[0]
+                                    if not venue_id:
+                                        continue
+                                    venue_name = venue_names.get(venue_id, field_abbe + "棒球場")
+                                    
+                                    visiting_score = g.get("VisitingScore")
+                                    home_score = g.get("HomeScore")
+                                    is_play_ball = (g.get("IsPlayBall") or "N").strip()
+                                    is_game_stop = str(g.get("IsGameStop") or "0").strip() in ("1", "true", "True")
+                                    end_time = (g.get("GameDateTimeE") or "").strip()
+                                    during_time = (g.get("GameDuringTime") or "").strip()
+                                    win_pitcher = resolve_p_name(g.get("WinningPitcherName"), g.get("WinningPitcherAcnt"))
+                                    lose_pitcher = resolve_p_name(g.get("LoserPitcherName"), g.get("LoserPitcherAcnt"))
+                                    closer = resolve_p_name(g.get("CloserName"), g.get("CloserAcnt"))
+                                    mvp = resolve_p_name(g.get("MvpName"), g.get("MvpAcnt"))
+                                    v_pitcher = resolve_p_name(g.get("VisitingPitcherName") or g.get("VisitingFirstMover"), g.get("VisitingPitcherAcnt"))
+                                    h_pitcher = resolve_p_name(g.get("HomePitcherName") or g.get("HomeFirstMover"), g.get("HomePitcherAcnt"))
 
-                                # Thumbnail Image determination
-                                club_img = (g.get("HomeClubSmallImgPath") or g.get("VisitingClubSmallImgPath") or "").strip()
-                                if club_img.startswith("/"):
-                                    # URL encode chinese characters in file path safely
-                                    encoded_path = quote(club_img, safe="/:")
-                                    event_img = f"https://www.cpbl.com.tw{encoded_path}"
-                                else:
-                                    event_img = ""
-                                    for kw, logo_url in team_logos.items():
-                                        if kw in home or kw in visiting:
-                                            event_img = logo_url
-                                            break
+                                    if is_game_stop:
+                                        status, status_text = "postponed", "延賽"
+                                    elif is_play_ball == "Y":
+                                        status, status_text = "live", "比賽中"
+                                    elif (end_time and end_time != "None") or during_time or (win_pitcher and lose_pitcher):
+                                        status, status_text = "finished", "已完賽"
+                                    else:
+                                        status, status_text = "scheduled", "未開打"
 
-                                ticket_links = []
-                                for team_kw, t_info in team_tickets.items():
-                                    if team_kw in home:
-                                        ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
-                                        break
-                                ticket_links.append({"platform": "manual", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"})
+                                    # Thumbnail Image determination
+                                    club_img = (g.get("HomeClubSmallImgPath") or g.get("VisitingClubSmallImgPath") or "").strip()
+                                    if club_img.startswith("/"):
+                                        encoded_path = quote(club_img, safe="/:")
+                                        event_img = f"https://www.cpbl.com.tw{encoded_path}"
+                                    else:
+                                        event_img = ""
+                                        for kw, logo_url in team_logos.items():
+                                            if kw in home or kw in visiting:
+                                                event_img = logo_url
+                                                break
 
-                                events.append({
-                                    "id": f"cpbl-{yr}-{game_no}-{date_str}",
-                                    "source": "中華職棒",
-                                    "name": f"中華職棒例行賽 G{game_no}：{visiting} vs {home}",
-                                    "venue_raw": field_abbe,
-                                    "venue_id": venue_id,
-                                    "venue_name": venue_name,
-                                    "city": VENUE_CITY.get(venue_id, ""),
-                                    "date": date_str,
-                                    "image": event_img,
-                                    "url": "https://www.cpbl.com.tw/schedule",
-                                    "price": "依官網/主隊公告為準",
-                                    "category": "sport",
-                                    "game_score": {
-                                        "visiting_team": visiting,
-                                        "home_team": home,
-                                        "visiting_score": visiting_score if status in ["finished", "live"] and visiting_score is not None else "-",
-                                        "home_score": home_score if status in ["finished", "live"] and home_score is not None else "-",
-                                        "visiting_pitcher": v_pitcher,
-                                        "home_pitcher": h_pitcher,
-                                        "status": status,
-                                        "status_text": status_text,
-                                        "mvp": mvp,
-                                        "winning_pitcher": win_pitcher,
-                                        "losing_pitcher": lose_pitcher,
-                                        "closer": closer
-                                    },
-                                    "ticket_links": ticket_links
-                                })
+                                    # Ticket links determination
+                                    ticket_links = []
+                                    if kind_code == "E" and yr == 2026:
+                                        if "兄弟" in home:
+                                            ticket_links.append({"platform": "cpbl", "name": "中信兄弟售票網", "url": "https://tix.ctbcsports.com/BROTHERS/UTK0101_"})
+                                        elif "統一" in home:
+                                            ticket_links.append({"platform": "ibon", "name": "ibon 統一獅售票", "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39697"})
+                                        else:
+                                            for team_kw, t_info in team_tickets.items():
+                                                if team_kw in home:
+                                                    ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
+                                                    break
+                                    elif kind_code == "C":
+                                        for team_kw, t_info in team_tickets.items():
+                                            if team_kw in home:
+                                                ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
+                                                break
+                                    else:
+                                        for team_kw, t_info in team_tickets.items():
+                                            if team_kw in home:
+                                                ticket_links.append({"platform": "cpbl", "name": t_info["name"], "url": t_info["url"]})
+                                                break
+                                    ticket_links.append({"platform": "manual", "name": "中華職棒官方賽程", "url": "https://www.cpbl.com.tw/schedule"})
+
+                                    # Price determination
+                                    if kind_code == "E":
+                                        if yr == 2026:
+                                            if "兄弟" in home:
+                                                price_str = "500 - 1000 元" if str(game_no) == "1" else "400 - 800 元"
+                                            elif "統一" in home:
+                                                price_str = "500 - 1350 元"
+                                            else:
+                                                price_str = "400 - 1350 元"
+                                        else:
+                                            price_str = "400 - 1350 元"
+                                    elif kind_code == "C":
+                                        price_str = "依球團公告為準"
+                                    else:
+                                        price_str = "依官網/主隊公告為準"
+
+                                    event_name = f"中華職棒{kind_name} G{game_no}：{visiting} vs {home}"
+                                    if kind_code == "A":
+                                        event_id = f"cpbl-{yr}-{game_no}-{date_str}"
+                                    else:
+                                        event_id = f"cpbl-{yr}-{kind_code.lower()}-{game_no}-{date_str}"
+
+                                    events.append({
+                                        "id": event_id,
+                                        "source": "中華職棒",
+                                        "name": event_name,
+                                        "venue_raw": field_abbe,
+                                        "venue_id": venue_id,
+                                        "venue_name": venue_name,
+                                        "city": VENUE_CITY.get(venue_id, ""),
+                                        "date": date_str,
+                                        "image": event_img,
+                                        "url": "https://www.cpbl.com.tw/schedule",
+                                        "price": price_str,
+                                        "category": "sport",
+                                        "game_score": {
+                                            "visiting_team": visiting,
+                                            "home_team": home,
+                                            "visiting_score": visiting_score if status in ["finished", "live"] and visiting_score is not None else "-",
+                                            "home_score": home_score if status in ["finished", "live"] and home_score is not None else "-",
+                                            "visiting_pitcher": v_pitcher,
+                                            "home_pitcher": h_pitcher,
+                                            "status": status,
+                                            "status_text": status_text,
+                                            "mvp": mvp,
+                                            "winning_pitcher": win_pitcher,
+                                            "losing_pitcher": lose_pitcher,
+                                            "closer": closer
+                                        },
+                                        "ticket_links": ticket_links
+                                    })
         except Exception as e:
             print(f"  ℹ 官方賽程爬取略過或失敗: {e}", file=sys.stderr)
 

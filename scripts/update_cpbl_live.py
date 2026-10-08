@@ -79,24 +79,24 @@ def update_live_scores():
         "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
     }
 
-    post_res = session.post(
-        "https://www.cpbl.com.tw/schedule/getgamedatas",
-        data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": "A"},
-        headers=post_headers,
-        impersonate="chrome120",
-        timeout=15
-    )
-    
-    if post_res.status_code != 200 or not post_res.text.startswith("{"):
-        print(f"CPBL API returned non-JSON response: {post_res.status_code}", file=sys.stderr)
-        return False
-
-    data = post_res.json()
-    if not data.get("Success"):
-        print("Success false", file=sys.stderr)
-        return False
-    
-    games = json.loads(data["GameDatas"])
+    games = []
+    for kc in ["A", "E", "C"]:
+        try:
+            post_res = session.post(
+                "https://www.cpbl.com.tw/schedule/getgamedatas",
+                data={"calendar": f"{current_year}/01/01", "location": "", "kindCode": kc},
+                headers=post_headers,
+                impersonate="chrome120",
+                timeout=15
+            )
+            if post_res.status_code == 200 and post_res.text.startswith("{"):
+                data = post_res.json()
+                if data.get("Success"):
+                    raw_g = data.get("GameDatas")
+                    parsed_g = json.loads(raw_g) if isinstance(raw_g, str) else (raw_g or [])
+                    games.extend(parsed_g)
+        except Exception as e:
+            print(f"Error fetching kindCode {kc}: {e}", file=sys.stderr)
     if not CONCERTS_PATH.exists():
         return False
     

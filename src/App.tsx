@@ -1227,11 +1227,20 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
+      let response: Response | null = null
+
+      // 本地開發環境優先讀取本地 public/concerts.json
+      if (import.meta.env.DEV) {
+        response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
+      }
+
       // 優先從 GitHub Raw 取得 GitHub Actions 最新爬取的 concerts.json，確保比分與賽事即時同步
-      let response = await fetch(
-        `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
-        { cache: 'no-store' }
-      ).catch(() => null)
+      if (!response || !response.ok) {
+        response = await fetch(
+          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
+          { cache: 'no-store' }
+        ).catch(() => null)
+      }
 
       if (!response || !response.ok) {
         response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
@@ -4241,23 +4250,27 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
             onSelectTicket(concert)
           }}
         >
-          <LazyImage
-            src={concert.image}
-            alt=""
-            fallback={
-              concert.source === '中華職棒' || concert.category === 'sport' ? (
-                <div className="remote-card-fallback sport-fallback" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255, 107, 0, 0.1)', color: '#ff6b00' }}>
-                  <BaseballIcon size="1.6em" />
-                </div>
-              ) : (
-                <div className="remote-card-fallback">LIVE</div>
-              )
-            }
-          />
+          <div className="remote-card-bg-wrap">
+            <LazyImage
+              src={concert.image}
+              alt=""
+              className="remote-card-bg-img"
+              fallback={
+                concert.source === '中華職棒' || concert.category === 'sport' ? (
+                  <div className="remote-card-fallback sport-fallback">
+                    <BaseballIcon size="2.4em" />
+                  </div>
+                ) : (
+                  <div className="remote-card-fallback">LIVE</div>
+                )
+              }
+            />
+            <div className="remote-card-overlay" />
+          </div>
           <div className="remote-card-body">
             <div className="remote-card-top">
-              <span>{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
-              <span>{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
+              <span className="remote-card-source">{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
+              <span className="remote-card-date">{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
             </div>
             <div className="remote-card-name">{concert.name}</div>
             {concert.game_score && (

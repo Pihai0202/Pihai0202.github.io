@@ -2088,99 +2088,161 @@ svg#taiwan-map.dragging {
 }
 
 .remote-card {
-  display: grid;
-  grid-template-columns: 86px 1fr;
-  gap: 0.75rem;
-  min-height: 94px;
-  background: rgba(var(--gold-rgb), 0.06);
-  border: 1px solid rgba(var(--gold-rgb), 0.18);
-  border-radius: 8px;
-  padding: 0.65rem;
-  color: var(--text);
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  padding: 0.8rem 0.95rem;
+  min-height: 100px;
+  background: #141622;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+  color: #ffffff;
   text-decoration: none;
-  margin-bottom: 0.7rem;
-  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  margin-bottom: 0.75rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+  display: block;
 }
 
 .remote-card:hover {
-  border-color: var(--gold);
-  background: rgba(var(--gold-rgb), 0.1);
-  transform: translateX(3px);
+  border-color: rgba(var(--gold-rgb), 0.45);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
 }
 
-.remote-card img,
-.remote-card-fallback {
-  width: 86px;
-  height: 82px;
-  border-radius: 6px;
-  border: 1px solid var(--border);
+.remote-card-bg-wrap {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
 }
 
-.remote-card img {
+.remote-card-bg-img,
+.remote-card-bg-wrap img {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  background: var(--surface);
+  object-position: center;
+  display: block;
+  transition: transform 0.35s ease;
 }
 
-.remote-card-fallback {
+.remote-card:hover .remote-card-bg-img,
+.remote-card:hover .remote-card-bg-wrap img {
+  transform: scale(1.04);
+}
+
+.remote-card-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(8, 10, 16, 0.74) 0%,
+    rgba(8, 10, 16, 0.58) 50%,
+    rgba(8, 10, 16, 0.76) 100%
+  );
+  backdrop-filter: blur(1px);
+  -webkit-backdrop-filter: blur(1px);
+}
+
+.remote-card-bg-wrap .remote-card-fallback {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--surface);
-  color: var(--gold);
+  background: linear-gradient(135deg, #131622 0%, #1c2030 100%);
+  color: rgba(var(--gold-rgb), 0.2);
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: 2.2rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  user-select: none;
+}
+
+.remote-card-bg-wrap .remote-card-fallback.sport-fallback {
+  background: linear-gradient(135deg, rgba(255, 107, 0, 0.15) 0%, #151824 100%);
+  color: rgba(255, 107, 0, 0.6);
 }
 
 .remote-card-body {
+  position: relative;
+  z-index: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .remote-card-top {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 0.7rem;
-  color: var(--gold);
+  color: rgba(255, 255, 255, 0.95);
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.66rem;
-  margin-bottom: 0.25rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.7);
+}
+
+.remote-card-source {
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.remote-card-date {
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
 }
 
 .remote-card-name {
-  color: var(--text);
-  font-weight: 700;
-  font-size: 0.9rem;
-  line-height: 1.35;
+  color: #ffffff;
+  font-weight: 800;
+  font-size: 0.98rem;
+  line-height: 1.38;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 8px rgba(0, 0, 0, 0.85);
+  letter-spacing: 0.01em;
 }
 
 .remote-card-meta {
-  color: var(--muted);
-  font-size: 0.72rem;
-  margin-top: 0.25rem;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  margin-top: 0.35rem;
   overflow-wrap: anywhere;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9), 0 2px 6px rgba(0, 0, 0, 0.7);
 }
 
 .ticket-links {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.35rem;
-  margin-top: 0.45rem;
+  gap: 0.4rem;
+  margin-top: 0.5rem;
 }
 
 .ticket-links span,
 .ticket-links .ticket-link-btn {
-  border: 1px solid rgba(var(--teal-rgb), 0.25);
-  border-radius: 4px;
-  color: var(--teal);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 5px;
+  color: #e2e8f0;
   font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
-  font-size: 0.62rem;
-  padding: 0.15rem 0.35rem;
+  font-size: 0.68rem;
+  padding: 0.22rem 0.55rem;
   text-decoration: none;
-  background: rgba(var(--teal-rgb), 0.03);
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
   transition: all 0.2s ease;
   display: inline-block;
 }
@@ -2190,10 +2252,11 @@ svg#taiwan-map.dragging {
 }
 
 .ticket-links .ticket-link-btn:hover {
-  background: rgba(var(--teal-rgb), 0.15);
-  border-color: var(--teal);
-  color: #fff;
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.45);
+  color: #ffffff;
   transform: translateY(-0.5px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.35);
 }
 
 .music-bar {
@@ -2639,13 +2702,7 @@ svg#taiwan-map.dragging {
   }
 
   .remote-card {
-    grid-template-columns: 76px 1fr;
-  }
-
-  .remote-card img,
-  .remote-card-fallback {
-    width: 76px;
-    height: 78px;
+    padding: 0.75rem 0.85rem;
   }
 
   .modal {
