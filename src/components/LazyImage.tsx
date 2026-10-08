@@ -5,11 +5,15 @@ export interface LazyImageProps extends React.ImgHTMLAttributes<HTMLImageElement
 }
 
 export function LazyImage({ src, alt, fallback, ...props }: LazyImageProps) {
+  const [currentSrc, setCurrentSrc] = useState(src)
   const [hasError, setHasError] = useState(false)
+  const [triedFallback, setTriedFallback] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
 
   useEffect(() => {
+    setCurrentSrc(src)
     setHasError(false)
+    setTriedFallback(false)
   }, [src])
 
   useEffect(() => {
@@ -25,18 +29,27 @@ export function LazyImage({ src, alt, fallback, ...props }: LazyImageProps) {
     }
   }, [])
 
-  if (!src || hasError) {
+  const handleError = () => {
+    if (!triedFallback && currentSrc && currentSrc.startsWith('/') && !currentSrc.startsWith('//')) {
+      setTriedFallback(true)
+      setCurrentSrc(`https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public${currentSrc}`)
+    } else {
+      setHasError(true)
+    }
+  }
+
+  if (!currentSrc || hasError) {
     return <>{fallback || null}</>
   }
 
   return (
     <img
       ref={imgRef}
-      src={src}
+      src={currentSrc}
       alt={alt}
       loading="lazy"
       referrerPolicy="no-referrer"
-      onError={() => setHasError(true)}
+      onError={handleError}
       {...props}
     />
   )

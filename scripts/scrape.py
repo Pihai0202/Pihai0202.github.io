@@ -1957,9 +1957,9 @@ def scrape_cpbl():
     }
 
     team_logos = {
-        "兄弟": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
-        "中信": "https://www.cpbl.com.tw/files/atts/0L021497108709222204/logo_brothers.png",
-        "統一": "https://www.cpbl.com.tw/files/atts/0L021496162893869773/logo_lions.png",
+        "兄弟": "/cpbl-brothers-2026.png",
+        "中信": "/cpbl-brothers-2026.png",
+        "統一": "/cpbl-unilions-2026.jpg",
         "味全": "https://www.cpbl.com.tw/files/atts/0L021497845061333235/logo_dragon.png",
         "龍": "https://www.cpbl.com.tw/files/atts/0L021497845061333235/logo_dragon.png",
         "富邦": "https://www.cpbl.com.tw/files/atts/0L021495969510091777/logo_fubon.png",
@@ -2131,16 +2131,25 @@ def scrape_cpbl():
                                         status, status_text = "scheduled", "未開打"
 
                                     # Thumbnail Image determination
-                                    club_img = (g.get("HomeClubSmallImgPath") or g.get("VisitingClubSmallImgPath") or "").strip()
-                                    if club_img.startswith("/"):
-                                        encoded_path = quote(club_img, safe="/:")
-                                        event_img = f"https://www.cpbl.com.tw{encoded_path}"
+                                    if "兄弟" in home or "中信" in home:
+                                        event_img = "/cpbl-brothers-2026.png"
+                                    elif "統一" in home or "獅" in home:
+                                        event_img = "/cpbl-unilions-2026.jpg"
+                                    elif kind_code in ("E", "C") and ("兄弟" in visiting or "中信" in visiting):
+                                        event_img = "/cpbl-brothers-2026.png"
+                                    elif kind_code in ("E", "C") and ("統一" in visiting or "獅" in visiting):
+                                        event_img = "/cpbl-unilions-2026.jpg"
                                     else:
-                                        event_img = ""
-                                        for kw, logo_url in team_logos.items():
-                                            if kw in home or kw in visiting:
-                                                event_img = logo_url
-                                                break
+                                        club_img = (g.get("HomeClubSmallImgPath") or g.get("VisitingClubSmallImgPath") or "").strip()
+                                        if club_img.startswith("/"):
+                                            encoded_path = quote(club_img, safe="/:")
+                                            event_img = f"https://www.cpbl.com.tw{encoded_path}"
+                                        else:
+                                            event_img = ""
+                                            for kw, logo_url in team_logos.items():
+                                                if kw in home or kw in visiting:
+                                                    event_img = logo_url
+                                                    break
 
                                     # Ticket links determination
                                     ticket_links = []
