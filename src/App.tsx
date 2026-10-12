@@ -1237,27 +1237,36 @@ function App() {
     setIsRemoteRefreshing(true)
 
     try {
-      let response: Response | null = null
+      const baseUrl = import.meta.env.BASE_URL || '/'
+      const localUrl = `${baseUrl}concerts.json?t=${Date.now()}`
+      const remoteUrl = `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`
 
-      // 本地開發環境優先讀取本地 public/concerts.json
-      if (import.meta.env.DEV) {
-        response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
+      // 同時取得本地部署與 GitHub Raw 資料，選取更新時間（updated_at）較新者，避免 Fastly CDN 快取過期延遲
+      const [localRes, remoteRes] = await Promise.all([
+        fetch(localUrl, { cache: 'no-store' }).catch(() => null),
+        fetch(remoteUrl, { cache: 'no-store' }).catch(() => null),
+      ])
+
+      let data: RemoteConcertPayload | null = null
+      let localData: RemoteConcertPayload | null = null
+      let remoteData: RemoteConcertPayload | null = null
+
+      if (localRes && localRes.ok) {
+        localData = await localRes.json().catch(() => null)
+      }
+      if (remoteRes && remoteRes.ok) {
+        remoteData = await remoteRes.json().catch(() => null)
       }
 
-      // 優先從 GitHub Raw 取得 GitHub Actions 最新爬取的 concerts.json，確保比分與賽事即時同步
-      if (!response || !response.ok) {
-        response = await fetch(
-          `https://raw.githubusercontent.com/Pihai0202/Pihai0202.github.io/main/public/concerts.json?t=${Date.now()}`,
-          { cache: 'no-store' }
-        ).catch(() => null)
+      if (localData && remoteData) {
+        const localTime = localData.updated_at ? new Date(localData.updated_at).getTime() : 0
+        const remoteTime = remoteData.updated_at ? new Date(remoteData.updated_at).getTime() : 0
+        data = remoteTime > localTime ? remoteData : localData
+      } else {
+        data = localData || remoteData
       }
 
-      if (!response || !response.ok) {
-        response = await fetch(`/concerts.json?t=${Date.now()}`, { cache: 'no-store' }).catch(() => null)
-      }
-      if (!response || !response.ok) throw new Error('concerts.json not found')
-
-      const data = (await response.json()) as RemoteConcertPayload
+      if (!data) throw new Error('concerts.json not found')
       const rawEvents = Array.isArray(data.events) ? data.events : []
       const events = rawEvents.filter(isTargetEventCategory)
       setRemoteConcerts(events)
