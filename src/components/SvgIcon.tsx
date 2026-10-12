@@ -649,3 +649,16 @@ export const BikeIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
   </svg>
 );
 
+// Archive / History / Museum Icon (🏛️)
+export const ArchiveIcon: React.FC<IconProps> = ({ size = '1em', ...props }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
+    <line x1="3" y1="21" x2="21" y2="21" />
+    <line x1="6" y1="18" x2="6" y2="10" />
+    <line x1="10" y1="18" x2="10" y2="10" />
+    <line x1="14" y1="18" x2="14" y2="10" />
+    <line x1="18" y1="18" x2="18" y2="10" />
+    <polygon points="12 2 20 7 4 7" />
+    <line x1="4" y1="18" x2="20" y2="18" />
+  </svg>
+);
+

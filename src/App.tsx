@@ -74,7 +74,9 @@ import {
   MegaphoneIcon,
   RocketIcon,
   TrashIcon,
-  RefreshIcon
+  RefreshIcon,
+  LightbulbIcon,
+  MicIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -323,6 +325,7 @@ function App() {
   const [formVenueCity, setFormVenueCity] = useState<string>('')
   const [historicalDropdownResults, setHistoricalDropdownResults] = useState<HistoricalEvent[]>([])
   const [isHistoricalDropdownOpen, setIsHistoricalDropdownOpen] = useState(false)
+  const [historicalDropdownTarget, setHistoricalDropdownTarget] = useState<'artist' | 'concertName'>('concertName')
   const [selectedHistoricalEvent, setSelectedHistoricalEvent] = useState<HistoricalEvent | null>(null)
   const [pendingMedia, setPendingMedia] = useState<ConcertMedia[]>([])
   const [spotifyQuery, setSpotifyQuery] = useState('')
@@ -1150,13 +1153,14 @@ function App() {
       const q = searchQuery.toLowerCase().trim()
       list = list.filter((concert) => {
         const nameMatch = concert.name && concert.name.toLowerCase().includes(q)
+        const artistMatch = concert.artist && concert.artist.toLowerCase().includes(q)
         const venueMatch = (concert.venue_name && concert.venue_name.toLowerCase().includes(q)) ||
                            (concert.venue_raw && concert.venue_raw.toLowerCase().includes(q))
         const cityMatch = concert.city && concert.city.toLowerCase().includes(q)
         const platformMatch = concert.ticket_links && concert.ticket_links.some(
           (link) => link.name.toLowerCase().includes(q) || link.platform.toLowerCase().includes(q)
         )
-        return nameMatch || venueMatch || cityMatch || platformMatch
+        return nameMatch || artistMatch || venueMatch || cityMatch || platformMatch
       })
     }
 
@@ -3233,76 +3237,13 @@ function App() {
             </div>
           )}
 
-          <div className="form-group">
-            <label htmlFor="input-artist">{t('artistLabel')}</label>
-            <input
-              id="input-artist"
-              type="text"
-              value={form.artist}
-              placeholder={t('artistPlaceholder')}
-              onChange={async (event) => {
-                const val = event.target.value
-                updateForm('artist', val)
-                if (!editingConcertId && val.trim().length >= 2 && !form.concertName) {
-                  const res = await searchHistoricalEvents({ query: val, limit: 6 })
-                  setHistoricalDropdownResults(res.events)
-                  setIsHistoricalDropdownOpen(true)
-                }
-              }}
-            />
-          </div>
-          <div className="form-group" style={{ position: 'relative' }}>
-            <label htmlFor="input-concert-name">
-              {t('concertNameLabel')}
-              {!editingConcertId && (
-                <span className="form-smart-hint">
-                  {lang === 'zh-TW' ? '（輸入關鍵字可選取歷史活動自動帶入）' : '(Select past event to autofill)'}
-                </span>
-              )}
-            </label>
-            <div className="input-with-autocomplete">
-              <input
-                id="input-concert-name"
-                type="text"
-                value={form.concertName}
-                placeholder={t('concertNamePlaceholder')}
-                autoComplete="off"
-                onChange={async (event) => {
-                  const val = event.target.value
-                  updateForm('concertName', val)
-                  if (!editingConcertId && val.trim().length > 0) {
-                    const res = await searchHistoricalEvents({ query: val, limit: 6 })
-                    setHistoricalDropdownResults(res.events)
-                    setIsHistoricalDropdownOpen(true)
-                  } else {
-                    setHistoricalDropdownResults([])
-                    setIsHistoricalDropdownOpen(false)
-                  }
-                }}
-                onFocus={async () => {
-                  if (!editingConcertId) {
-                    const q = form.concertName.trim() || form.artist.trim()
-                    if (q.length > 0) {
-                      const res = await searchHistoricalEvents({ query: q, limit: 6 })
-                      setHistoricalDropdownResults(res.events)
-                      setIsHistoricalDropdownOpen(true)
-                    }
-                  }
-                }}
-                onBlur={() => {
-                  // Delay closing slightly so onMouseDown on dropdown items triggers first
-                  setTimeout(() => {
-                    setIsHistoricalDropdownOpen(false)
-                  }, 250)
-                }}
-              />
-            </div>
-
-            {/* 即時智慧提示選單：直接出現在演唱會名稱輸入框下方 */}
-            {!editingConcertId && isHistoricalDropdownOpen && historicalDropdownResults.length > 0 && (
+          {/* 歷史活動即時下拉清單通用渲染 */}
+          {(() => {
+            const renderHistoricalDropdown = () => (
               <div className="form-autocomplete-dropdown">
                 <div className="autocomplete-header-tip">
-                  💡 {lang === 'zh-TW' ? '點選活動即可自動帶入演出者、場地、日期與海報：' : 'Click to autofill artist, venue, date & poster:'}
+                  <LightbulbIcon size={14} style={{ marginRight: 6, verticalAlign: '-2px', color: 'var(--accent-color)' }} />
+                  {lang === 'zh-TW' ? '點選活動即可自動帶入演出者、場地、日期與海報：' : 'Click to autofill artist, venue, date & poster:'}
                 </div>
                 {historicalDropdownResults.map((ev) => (
                   <button
@@ -3318,43 +3259,151 @@ function App() {
                       <img src={ev.image} alt="" className="autocomplete-thumb" />
                     ) : (
                       <div className="autocomplete-thumb-placeholder">
-                        {ev.category === 'sport' || ev.source === '中華職棒' ? '⚾' : '🎫'}
+                        {ev.category === 'sport' || ev.source === '中華職棒' ? <BaseballIcon size={18} /> : <TicketIcon size={18} />}
                       </div>
                     )}
                     <div className="autocomplete-text">
                       <div className="autocomplete-name">{ev.name}</div>
                       <div className="autocomplete-details">
-                        <span className="badge-date">📅 {ev.date}</span>
+                        <span className="badge-date">
+                          <CalendarIcon size={12} style={{ marginRight: 4, verticalAlign: '-1px' }} />
+                          {ev.date}
+                        </span>
                         {ev.venue_name && (
-                          <span className="badge-venue">📍 {ev.city ? `${ev.city} · ` : ''}{ev.venue_name}</span>
+                          <span className="badge-venue">
+                            <PinIcon size={12} style={{ marginRight: 4, verticalAlign: '-1px' }} />
+                            {ev.city ? `${ev.city} · ` : ''}{ev.venue_name}
+                          </span>
                         )}
                         {ev.artist && (
-                          <span className="badge-artist">🎤 {ev.artist}</span>
+                          <span className="badge-artist">
+                            <MicIcon size={12} style={{ marginRight: 4, verticalAlign: '-1px' }} />
+                            {ev.artist}
+                          </span>
                         )}
                       </div>
                     </div>
                   </button>
                 ))}
               </div>
-            )}
+            )
 
-            {/* 自動填入成功提示 */}
-            {!editingConcertId && selectedHistoricalEvent && (
-              <div className="autofill-applied-badge">
-                <span>
-                  ✨ {lang === 'zh-TW' ? '已自動填入：' : 'Auto-filled: '}
-                  <strong>{selectedHistoricalEvent.name}</strong> ({selectedHistoricalEvent.date})
-                </span>
-                <button
-                  type="button"
-                  className="clear-autofill-link"
-                  onClick={() => setSelectedHistoricalEvent(null)}
-                >
-                  {lang === 'zh-TW' ? '清除提示' : 'Dismiss'}
-                </button>
-              </div>
-            )}
-          </div>
+            return (
+              <>
+                <div className="form-group" style={{ position: 'relative' }}>
+                  <label htmlFor="input-artist">
+                    {t('artistLabel')}
+                    {!editingConcertId && (
+                      <span className="form-smart-hint">
+                        {lang === 'zh-TW' ? '（輸入歌手可即時推薦歷年場次）' : '(Autofills past concerts)'}
+                      </span>
+                    )}
+                  </label>
+                  <div className="input-with-autocomplete">
+                    <input
+                      id="input-artist"
+                      type="text"
+                      value={form.artist}
+                      placeholder={t('artistPlaceholder')}
+                      autoComplete="off"
+                      onChange={async (event) => {
+                        const val = event.target.value
+                        updateForm('artist', val)
+                        if (!editingConcertId && val.trim().length >= 1) {
+                          setHistoricalDropdownTarget('artist')
+                          const res = await searchHistoricalEvents({ artist: val, query: val, limit: 8 })
+                          setHistoricalDropdownResults(res.events)
+                          setIsHistoricalDropdownOpen(res.events.length > 0)
+                        } else {
+                          setHistoricalDropdownResults([])
+                          setIsHistoricalDropdownOpen(false)
+                        }
+                      }}
+                      onFocus={async () => {
+                        if (!editingConcertId && form.artist.trim().length >= 1) {
+                          setHistoricalDropdownTarget('artist')
+                          const res = await searchHistoricalEvents({ artist: form.artist, query: form.artist, limit: 8 })
+                          setHistoricalDropdownResults(res.events)
+                          setIsHistoricalDropdownOpen(res.events.length > 0)
+                        }
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setIsHistoricalDropdownOpen(false), 250)
+                      }}
+                    />
+                  </div>
+                  {!editingConcertId && isHistoricalDropdownOpen && historicalDropdownTarget === 'artist' && historicalDropdownResults.length > 0 && renderHistoricalDropdown()}
+                </div>
+
+                <div className="form-group" style={{ position: 'relative' }}>
+                  <label htmlFor="input-concert-name">
+                    {t('concertNameLabel')}
+                    {!editingConcertId && (
+                      <span className="form-smart-hint">
+                        {lang === 'zh-TW' ? '（輸入關鍵字可選取歷史活動自動帶入）' : '(Select past event to autofill)'}
+                      </span>
+                    )}
+                  </label>
+                  <div className="input-with-autocomplete">
+                    <input
+                      id="input-concert-name"
+                      type="text"
+                      value={form.concertName}
+                      placeholder={t('concertNamePlaceholder')}
+                      autoComplete="off"
+                      onChange={async (event) => {
+                        const val = event.target.value
+                        updateForm('concertName', val)
+                        if (!editingConcertId && val.trim().length > 0) {
+                          setHistoricalDropdownTarget('concertName')
+                          const res = await searchHistoricalEvents({ query: val, limit: 8 })
+                          setHistoricalDropdownResults(res.events)
+                          setIsHistoricalDropdownOpen(res.events.length > 0)
+                        } else {
+                          setHistoricalDropdownResults([])
+                          setIsHistoricalDropdownOpen(false)
+                        }
+                      }}
+                      onFocus={async () => {
+                        if (!editingConcertId) {
+                          const q = form.concertName.trim() || form.artist.trim()
+                          if (q.length > 0) {
+                            setHistoricalDropdownTarget('concertName')
+                            const res = await searchHistoricalEvents({ query: q, limit: 8 })
+                            setHistoricalDropdownResults(res.events)
+                            setIsHistoricalDropdownOpen(res.events.length > 0)
+                          }
+                        }
+                      }}
+                      onBlur={() => {
+                        setTimeout(() => setIsHistoricalDropdownOpen(false), 250)
+                      }}
+                    />
+                  </div>
+
+                  {!editingConcertId && isHistoricalDropdownOpen && historicalDropdownTarget === 'concertName' && historicalDropdownResults.length > 0 && renderHistoricalDropdown()}
+
+                  {/* 自動填入成功提示 */}
+                  {!editingConcertId && selectedHistoricalEvent && (
+                    <div className="autofill-applied-badge">
+                      <span>
+                        <SparklesIcon size={14} style={{ marginRight: 6, verticalAlign: '-2px', color: 'var(--accent-color)' }} />
+                        {lang === 'zh-TW' ? '已自動填入：' : 'Auto-filled: '}
+                        <strong>{selectedHistoricalEvent.name}</strong> ({selectedHistoricalEvent.date})
+                      </span>
+                      <button
+                        type="button"
+                        className="clear-autofill-link"
+                        onClick={() => setSelectedHistoricalEvent(null)}
+                      >
+                        {lang === 'zh-TW' ? '清除提示' : 'Dismiss'}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </>
+            )
+          })()}
           <div className="form-group">
             <label htmlFor="input-date">{t('dateLabel')}</label>
             <input

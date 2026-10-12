@@ -2409,8 +2409,15 @@ def main():
         cpbl_events = list(new_game_dict.values())
     all_events.extend(cpbl_events)
 
-    # 自動封存已過期的活動至歷史資料庫 (public/historical-events.json)
-    expired_events = [ev for ev in all_events if ev.get("date", "") and ev.get("date", "") < today_str()]
+    # 自動封存已過期的活動至歷史資料庫 (public/historical-events.json) (排除返鄉專車與接駁服務)
+    expired_events = [
+        ev for ev in all_events
+        if ev.get("date", "") and ev.get("date", "") < today_str()
+        and "專車" not in ev.get("name", "")
+        and "接駁" not in ev.get("name", "")
+        and "專車" not in (ev.get("venue_name") or ev.get("venue_raw") or "")
+        and "搭車點" not in (ev.get("venue_name") or ev.get("venue_raw") or "")
+    ]
     if expired_events:
         history_path = PROJECT_ROOT / "public" / "historical-events.json"
         existing_hist_map = {}

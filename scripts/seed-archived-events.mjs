@@ -73,6 +73,8 @@ async function seedArchivedEvents() {
         original_id: ev.id || '',
         name: ev.name || '',
         artist: ev.artist || '',
+        artist_lower: (ev.artist || '').toLowerCase(),
+        artist_keywords: ev.artist_keywords || [],
         venue_id: ev.venue_id || null,
         venue_name: ev.venue_name || null,
         city: ev.city || '',

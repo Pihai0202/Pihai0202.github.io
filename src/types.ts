@@ -108,6 +108,7 @@ export type RemoteConcert = {
   image: string
   url: string
   price: string
+  artist?: string
   category?: string
   game_score?: GameScore
   ticket_links: TicketLink[]
@@ -124,6 +125,8 @@ export type HistoricalEvent = {
   id: string
   name: string
   artist?: string
+  artist_lower?: string
+  artist_keywords?: string[]
   venue_id?: string | null
   venue_name?: string | null
   city?: string

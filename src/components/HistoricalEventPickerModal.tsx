@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import type { HistoricalEvent } from '../types'
 import { searchHistoricalEvents } from '../utils/historicalEventsService'
-import { CloseIcon, SearchIcon, CalendarIcon, PinIcon, CheckIcon, TicketIcon, BaseballIcon } from './SvgIcon'
+import { CloseIcon, SearchIcon, CalendarIcon, PinIcon, CheckIcon, TicketIcon, BaseballIcon, ArchiveIcon, MusicIcon, MicIcon } from './SvgIcon'
 import { LazyImage } from './LazyImage'
 
 interface HistoricalEventPickerModalProps {
@@ -107,7 +107,10 @@ export function HistoricalEventPickerModal({
         <div className="historical-picker-header">
           <div className="picker-header-text">
             <div className="picker-title-row">
-              <span className="picker-badge-sparkle">🏛️ 歷年活動資料庫</span>
+              <span className="picker-badge-sparkle">
+                <ArchiveIcon size={14} style={{ marginRight: 6, verticalAlign: '-1px' }} />
+                歷年活動資料庫
+              </span>
               <span className="picker-count-pill">{totalMatches.toLocaleString()} 場收錄</span>
             </div>
             <h2 id="historical-picker-title">挑選過往活動紀錄</h2>
@@ -189,9 +192,9 @@ export function HistoricalEventPickerModal({
               <span className="picker-filter-label">類別：</span>
               <div className="picker-pills-scroll">
                 {[
-                  { id: 'all', label: '全部' },
-                  { id: 'music', label: '🎵 音樂演唱' },
-                  { id: 'sport', label: '⚾ 職棒運動' },
+                  { id: 'all', label: '全部', icon: null },
+                  { id: 'music', label: '音樂演唱', icon: <MusicIcon size={13} style={{ marginRight: 4, verticalAlign: '-1px' }} /> },
+                  { id: 'sport', label: '職棒運動', icon: <BaseballIcon size={13} style={{ marginRight: 4, verticalAlign: '-1px' }} /> },
                 ].map((item) => (
                   <button
                     key={item.id}
@@ -202,6 +205,7 @@ export function HistoricalEventPickerModal({
                       setDisplayLimit(30)
                     }}
                   >
+                    {item.icon}
                     {item.label}
                   </button>
                 ))}
@@ -239,7 +243,7 @@ export function HistoricalEventPickerModal({
             </div>
           ) : events.length === 0 ? (
             <div className="picker-empty-state">
-              <span className="empty-icon">🔍</span>
+              <span className="empty-icon"><SearchIcon size={32} /></span>
               <h3>找不到符合條件的活動</h3>
               <p>嘗試更換關鍵字或重設年份與城市篩選條件</p>
               {(query || year !== 'all' || category !== 'all' || city !== 'all') && (
@@ -305,7 +309,8 @@ export function HistoricalEventPickerModal({
 
                       {ev.artist && (
                         <div className="historical-card-artist">
-                          🎤 <span>{ev.artist}</span>
+                          <MicIcon size={12} style={{ marginRight: 4, verticalAlign: '-1px' }} />
+                          <span>{ev.artist}</span>
                         </div>
                       )}
 
