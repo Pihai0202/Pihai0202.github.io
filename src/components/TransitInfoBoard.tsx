@@ -1833,14 +1833,20 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
               </div>
             </div>
             
-            <button
-              type="button"
-              className="bus-search-btn"
-              onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
-              disabled={metroQueryLoading || !selectedMetroStation}
-            >
-              {metroQueryLoading ? (lang === 'zh-TW' ? '查詢中...' : lang === 'en' ? 'Searching...' : lang === 'ja' ? '検索中...' : '검색 중...') : (lang === 'zh-TW' ? '重新整理即時資料' : lang === 'en' ? 'Refresh Live Data' : lang === 'ja' ? 'リアルタイム情報を更新' : '실시간 정보 새로고침')}
-            </button>
+            <div className="transit-auto-sync-bar">
+              <span className="transit-auto-sync-hint">
+                {lang === 'zh-TW' ? '切換車站即自動查詢' : lang === 'ja' ? '駅を選択すると自動更新されます' : lang === 'ko' ? '역 선택 시 자동 조회됩니다' : 'Auto-updates on station change'}
+              </span>
+              <button
+                type="button"
+                className="refresh-events-btn"
+                onClick={() => queryMetroData(metroOperator, selectedMetroStation)}
+                disabled={metroQueryLoading || !selectedMetroStation}
+              >
+                <RefreshIcon size="0.9em" className={metroQueryLoading ? 'spin-icon' : ''} />
+                <span>{metroQueryLoading ? (lang === 'zh-TW' ? '更新中...' : 'Updating...') : (lang === 'zh-TW' ? '重新整理' : 'Refresh')}</span>
+              </button>
+            </div>
           </div>
 
           {/* 查詢結果區塊 */}
@@ -2235,23 +2241,20 @@ export function TransitInfoBoard({ selectedVenue, onClearVenue }: TransitInfoBoa
                 </div>
               </div>
             )}
-            <button
-              type="button"
-              className="bus-search-btn"
-              onClick={handleTrainSearch}
-              disabled={isTrainSearching}
-            >
-              {isTrainSearching 
-                ? (lang === 'zh-TW' ? '查詢中...' : lang === 'en' ? 'Searching...' : lang === 'ja' ? '検索中...' : '검색 중...') 
-                : (trainMode === 'thsr' 
-                  ? (lang === 'zh-TW' ? '查詢今日班表' : lang === 'en' ? 'Search Schedule' : lang === 'ja' ? '本日の時刻表を検索' : '오늘 시간표 검색')
-                  : (traQueryMode === 'od'
-                    ? (lang === 'zh-TW' ? '查詢今日班表' : lang === 'en' ? 'Search Schedule' : lang === 'ja' ? '本日の時刻表を検索' : '오늘 시간표 검색')
-                    : (lang === 'zh-TW' ? '查詢即時看板' : lang === 'en' ? 'Search Live Board' : lang === 'ja' ? '即時運行ボードを検索' : '실시간 안내판 검색')
-                  )
-                )
-              }
-            </button>
+            <div className="transit-auto-sync-bar">
+              <span className="transit-auto-sync-hint">
+                {lang === 'zh-TW' ? '選擇車站即自動更新班表與看板' : lang === 'ja' ? '駅を選択すると自動更新されます' : lang === 'ko' ? '역 선택 시 자동 업데이트됩니다' : 'Auto-updates on station selection'}
+              </span>
+              <button
+                type="button"
+                className="refresh-events-btn"
+                onClick={handleTrainSearch}
+                disabled={isTrainSearching}
+              >
+                <RefreshIcon size="0.9em" className={isTrainSearching ? 'spin-icon' : ''} />
+                <span>{isTrainSearching ? (lang === 'zh-TW' ? '查詢中...' : 'Searching...') : (lang === 'zh-TW' ? '重新整理' : 'Refresh')}</span>
+              </button>
+            </div>
           </div>
 
           {/* 鐵路班表與看板結果 */}

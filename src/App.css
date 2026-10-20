@@ -14998,5 +14998,321 @@ body:has(.main-layout) {
   opacity: 0.8;
 }
 
+/* ==========================================================================
+   Simplified UI: Unified Settings Modal, Category Pill Bar & Auto-Sync Bar
+   ========================================================================== */
+.settings-trigger-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 38px;
+  height: 38px;
+  padding: 0 !important;
+  border-radius: 50% !important;
+}
 
+.settings-modal {
+  max-width: 420px !important;
+  width: 92vw !important;
+  padding: 1.6rem !important;
+  border-radius: 20px !important;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
 
+.settings-modal-title {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: var(--gold);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-bottom: 0.65rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.settings-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--muted);
+  letter-spacing: 0.03em;
+}
+
+.settings-segmented-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+  background: var(--surface2, rgba(255, 255, 255, 0.03));
+  padding: 0.3rem;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+}
+
+.settings-seg-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: 9px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.84rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.settings-seg-btn:hover {
+  color: var(--text);
+}
+
+.settings-seg-btn.active {
+  background: rgba(var(--accent-rgb), 0.16);
+  border-color: rgba(var(--accent-rgb), 0.45);
+  color: var(--gold);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.palette-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.palette-dot.sage-dot {
+  background: #84a98c;
+  box-shadow: 0 0 6px rgba(132, 169, 140, 0.6);
+}
+
+.palette-dot.orange-dot {
+  background: #ff9100;
+  box-shadow: 0 0 6px rgba(255, 145, 0, 0.6);
+}
+
+.settings-lang-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.45rem;
+}
+
+.settings-lang-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.85rem;
+  border-radius: 10px;
+  background: var(--surface2, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.84rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.settings-lang-btn:hover {
+  border-color: rgba(var(--accent-rgb), 0.4);
+}
+
+.settings-lang-btn.active {
+  background: rgba(var(--accent-rgb), 0.15);
+  border-color: var(--accent);
+  color: var(--gold);
+  font-weight: 700;
+}
+
+.settings-action-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.settings-action-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 0.9rem;
+  border-radius: 11px;
+  background: var(--surface2, rgba(255, 255, 255, 0.03));
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-align: left;
+}
+
+.settings-action-item:hover {
+  border-color: rgba(var(--gold-rgb), 0.4);
+  background: rgba(var(--gold-rgb), 0.06);
+}
+
+.settings-action-item.danger {
+  color: #ff6b6b;
+  border-color: rgba(255, 107, 107, 0.25);
+}
+
+.settings-action-item.danger:hover {
+  background: rgba(255, 107, 107, 0.1);
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+.settings-action-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+.settings-action-arrow {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.settings-action-badge {
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  background: rgba(var(--accent-rgb), 0.15);
+  color: var(--gold);
+}
+
+/* 1-click inline category pills replacing dropdowns */
+.category-pill-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  scrollbar-width: none;
+  padding: 2px 0;
+}
+
+.category-pill-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.category-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.38rem 0.65rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--surface2, rgba(255, 255, 255, 0.03));
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  font-family: inherit;
+  flex-shrink: 0;
+}
+
+.category-pill-btn:hover {
+  color: var(--text);
+  border-color: rgba(var(--gold-rgb), 0.35);
+}
+
+.category-pill-btn.active {
+  background: rgba(var(--gold-rgb), 0.15);
+  border-color: var(--gold);
+  color: var(--gold);
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.category-pill-count {
+  font-size: 0.68rem;
+  opacity: 0.8;
+  padding: 0.05rem 0.32rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.category-pill-btn.active .category-pill-count {
+  background: rgba(var(--gold-rgb), 0.22);
+  opacity: 1;
+}
+
+.refresh-events-btn.icon-only {
+  width: 32px;
+  height: 32px;
+  min-width: 32px;
+  padding: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* Section title row with inline All Logs button */
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin: 0.6rem 0 0.45rem;
+}
+
+.section-title-row .section-title {
+  margin: 0;
+}
+
+.view-all-logs-inline-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.26rem 0.6rem;
+  border-radius: 999px;
+  border: 1px solid rgba(var(--gold-rgb), 0.35);
+  background: rgba(var(--gold-rgb), 0.08);
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.view-all-logs-inline-btn:hover {
+  background: rgba(var(--gold-rgb), 0.18);
+  border-color: var(--gold);
+}
+
+/* Transit auto-sync status bar */
+.transit-auto-sync-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 0.2rem;
+}
+
+.transit-auto-sync-hint {
+  font-size: 0.72rem;
+  color: var(--muted);
+}

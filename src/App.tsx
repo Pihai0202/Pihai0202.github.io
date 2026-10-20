@@ -41,7 +41,6 @@ import { db, logCustomEvent, auth } from './firebase'
 import { deleteLocalMedia, saveLocalMedia } from './utils/indexedDB'
 import { onAuthStateChanged, signOut, updateProfile } from 'firebase/auth'
 import {
-  MenuIcon,
   CloseIcon,
   SunIcon,
   MoonIcon,
@@ -76,7 +75,8 @@ import {
   TrashIcon,
   RefreshIcon,
   LightbulbIcon,
-  MicIcon
+  MicIcon,
+  SettingsIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -645,10 +645,9 @@ function App() {
 
   const [isPublishModalOpen, setIsPublishModalOpen] = useState(false)
   const [isGuideModalOpen, setIsGuideModalOpen] = useState(false)
-  const [isLanguageModalOpen, setIsLanguageModalOpen] = useState(false)
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false)
   const [publishingConcert, setPublishingConcert] = useState<Concert | null>(null)
   const [mobileTab, setMobileTab] = useState<'map' | 'list' | 'search' | 'board'>('map')
-  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<'all' | 'concert' | 'sport' | 'today'>('all')
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
@@ -836,6 +835,7 @@ function App() {
     isAllModalOpen ||
     isPublishModalOpen ||
     isGuideModalOpen ||
+    isSettingsModalOpen ||
     !!updateInfo
   )
 
@@ -2267,10 +2267,11 @@ function App() {
           <button
             className="mobile-menu-toggle-btn"
             type="button"
-            onClick={() => setIsMobileSidebarOpen((prev) => !prev)}
-            aria-label="選單"
+            onClick={() => setIsSettingsModalOpen(true)}
+            aria-label={lang === 'zh-TW' ? '偏好設定與更多' : 'Settings & More'}
+            title={lang === 'zh-TW' ? '偏好設定與更多' : 'Settings & More'}
           >
-            <MenuIcon />
+            <SettingsIcon size="1.15em" />
           </button>
         )}
         <div className="logo" onClick={handleHeaderClick}>
@@ -2290,7 +2291,7 @@ function App() {
             onChange={(e) => {
               setSearchQuery(e.target.value)
               if (window.innerWidth <= 768 && e.target.value) {
-                setMobileTab('list')
+                setMobileDrawerState('full')
               }
             }}
           />
@@ -2327,55 +2328,15 @@ function App() {
           >
             <MessageIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('tabCommunity')}</span>
           </button>
-          <button
-            className="theme-toggle-btn lang-toggle-btn"
-            type="button"
-            onClick={() => setIsLanguageModalOpen(true)}
-            title={t('langTitle')}
-            aria-label="Language Selector"
-          >
-            <GlobeIcon size="1.2em" />
-          </button>
-          <button
-            className="theme-toggle-btn guide-trigger-icon-btn"
-            type="button"
-            onClick={() => setIsGuideModalOpen(true)}
-            title={t('siteTour')}
-            aria-label="網站導覽"
-          >
-            <SparklesIcon />
-          </button>
-          <button
-            className="theme-toggle-btn palette-toggle-btn"
-            type="button"
-            onClick={toggleColorPalette}
-            title={colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Switch to Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Switch to Green Theme')}
-            aria-label="切換調色盤"
-          >
-            <PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} />
-          </button>
-          <button
-            className="theme-toggle-btn"
-            type="button"
-            onClick={toggleTheme}
-            title={theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : 'Switch to Dark Mode')}
-            aria-label="切換主題"
-          >
-            {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
-          </button>
+
           {isLoggedIn && currentUser ? (
-            <div className="user-profile-menu">
-              <button
-                className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
-                type="button"
-                onClick={() => setView('profile')}
-              >
-                <UserIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('profile')}</span>
-              </button>
-              <button className="nav-toggle-btn logout-btn" type="button" onClick={handleLogout}>
-                <LogoutIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('logout')}</span>
-              </button>
-            </div>
+            <button
+              className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
+              type="button"
+              onClick={() => setView('profile')}
+            >
+              <UserIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('profile')}</span>
+            </button>
           ) : (
             <button
               className="nav-toggle-btn login-trigger-btn"
@@ -2385,36 +2346,21 @@ function App() {
               <KeyIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> <span className="btn-label">{t('login')}</span>
             </button>
           )}
+
+          <button
+            className={`theme-toggle-btn settings-trigger-btn${isSettingsModalOpen ? ' active' : ''}`}
+            type="button"
+            onClick={() => setIsSettingsModalOpen(true)}
+            title={lang === 'zh-TW' ? '偏好設定與更多' : 'Settings & More'}
+            aria-label={lang === 'zh-TW' ? '偏好設定與更多' : 'Settings & More'}
+          >
+            <SettingsIcon size="1.15em" />
+          </button>
         </div>
       </header>
 
       {view === 'map' ? (
         <main className={`main-layout mobile-tab-${mobileTab}${isSidebarCollapsed ? ' sidebar-collapsed' : ''}`}>
-          {isMobile && (
-            <div className="mobile-view-selector-tabs">
-              <button
-                className={`mobile-view-tab-btn ${mobileTab === 'map' ? 'active' : ''}`}
-                type="button"
-                onClick={() => setMobileTab('map')}
-              >
-                <MapIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabMap')}
-              </button>
-              <button
-                className={`mobile-view-tab-btn ${mobileTab === 'list' ? 'active' : ''}`}
-                type="button"
-                onClick={() => setMobileTab('list')}
-              >
-                <CalendarIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabList')}
-              </button>
-              <button
-                className={`mobile-view-tab-btn ${mobileTab === 'search' ? 'active' : ''}`}
-                type="button"
-                onClick={() => setMobileTab('search')}
-              >
-                <SearchIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} /> {t('tabSearch')}
-              </button>
-            </div>
-          )}
           <section className="map-container" aria-label="台灣場館地圖">
             <div className="map-bg" onClick={() => setSelectedVenueId(null)} />
 
@@ -2599,9 +2545,6 @@ function App() {
               <LegendItem color="var(--gold)" label={t('selected')} />
             </div>
 
-            <button className="all-concerts-btn" type="button" onClick={() => setIsAllModalOpen(true)}>
-              <ClipboardIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> {t('allLogs')}
-            </button>
             <button className="add-concert-desktop-btn" type="button" onClick={() => openAddModal()}>
               <PlusIcon style={{ marginRight: '6px', verticalAlign: 'middle', marginTop: '-2px' }} /> {t('addRecord')}
             </button>
@@ -2798,6 +2741,8 @@ function App() {
                               hasSelectedVenue={Boolean(selectedVenue)}
                               onOpenDetail={openConcertDetail}
                               onDelete={deleteConcert}
+                              onOpenAllLogs={() => setIsAllModalOpen(true)}
+                              totalCount={concerts.length}
                             />
                           </div>
                         )}
@@ -2962,6 +2907,8 @@ function App() {
                     hasSelectedVenue={Boolean(selectedVenue)}
                     onOpenDetail={openConcertDetail}
                     onDelete={deleteConcert}
+                    onOpenAllLogs={() => setIsAllModalOpen(true)}
+                    totalCount={concerts.length}
                   />
                 </div>
               </>
@@ -3041,6 +2988,8 @@ function App() {
                         hasSelectedVenue={Boolean(selectedVenue)}
                         onOpenDetail={openConcertDetail}
                         onDelete={deleteConcert}
+                        onOpenAllLogs={() => setIsAllModalOpen(true)}
+                        totalCount={concerts.length}
                       />
                     </div>
                   )}
@@ -3819,59 +3768,163 @@ function App() {
         <GuideModal onClose={() => setIsGuideModalOpen(false)} />
       )}
 
-      {isLanguageModalOpen && (
-        <div className="modal-overlay active" onClick={() => setIsLanguageModalOpen(false)}>
-          <div className="modal publish-modal" style={{ maxWidth: '360px', padding: '1.8rem' }} onClick={(e) => e.stopPropagation()}>
-            <button className="modal-close" type="button" onClick={() => setIsLanguageModalOpen(false)}>
+      {isSettingsModalOpen && (
+        <div className="modal-overlay active" onClick={() => setIsSettingsModalOpen(false)}>
+          <div className="modal publish-modal settings-modal" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" type="button" onClick={() => setIsSettingsModalOpen(false)}>
               <CloseIcon />
             </button>
-            <h2 style={{ fontSize: '1.25rem', color: 'var(--gold)', marginBottom: '1.2rem', display: 'flex', alignItems: 'center', gap: '0.6rem' }}>
-              <GlobeIcon size="1.1em" style={{ verticalAlign: 'middle' }} />
-              {lang === 'zh-TW' ? '選擇顯示語言' : lang === 'en' ? 'Select Language' : lang === 'ja' ? '言語を選択' : '언어 선택'}
+            <h2 className="settings-modal-title">
+              <SettingsIcon size="1.15em" style={{ verticalAlign: 'middle' }} />
+              {lang === 'zh-TW' ? '偏好設定與更多功能' : lang === 'en' ? 'Settings & More' : lang === 'ja' ? '設定・その他' : '설정 및 더보기'}
             </h2>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
-              {[
-                { code: 'zh-TW', native: '繁體中文' },
-                { code: 'en', native: 'English' },
-                { code: 'ja', native: '日本語' },
-                { code: 'ko', native: '한국어' }
-              ].map((langItem) => {
-                const isActive = lang === langItem.code
-                return (
+
+            <div className="settings-section">
+              <div className="settings-label">
+                <SunIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '外觀模式' : lang === 'ja' ? '外観モード' : lang === 'ko' ? '화면 모드' : 'Appearance'}</span>
+              </div>
+              <div className="settings-segmented-group">
+                <button
+                  type="button"
+                  className={`settings-seg-btn${theme === 'dark' ? ' active' : ''}`}
+                  onClick={() => { if (theme !== 'dark') toggleTheme() }}
+                >
+                  <MoonIcon size="0.95em" />
+                  <span>{lang === 'zh-TW' ? '深色模式' : lang === 'ja' ? 'ダーク' : lang === 'ko' ? '다크' : 'Dark'}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`settings-seg-btn${theme === 'light' ? ' active' : ''}`}
+                  onClick={() => { if (theme !== 'light') toggleTheme() }}
+                >
+                  <SunIcon size="0.95em" />
+                  <span>{lang === 'zh-TW' ? '淺色模式' : lang === 'ja' ? 'ライト' : lang === 'ko' ? '라이트' : 'Light'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <div className="settings-label">
+                <PaletteIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '主題配色' : lang === 'ja' ? 'テーマカラー' : lang === 'ko' ? '테마 색상' : 'Color Theme'}</span>
+              </div>
+              <div className="settings-segmented-group">
+                <button
+                  type="button"
+                  className={`settings-seg-btn${colorPalette === 'sage' ? ' active' : ''}`}
+                  onClick={() => { if (colorPalette !== 'sage') toggleColorPalette() }}
+                >
+                  <span className="palette-dot sage-dot" />
+                  <span>{lang === 'zh-TW' ? '鼠尾草綠' : lang === 'ja' ? 'セージグリーン' : lang === 'ko' ? '세이지 그린' : 'Sage Green'}</span>
+                </button>
+                <button
+                  type="button"
+                  className={`settings-seg-btn${colorPalette === 'volcano' ? ' active' : ''}`}
+                  onClick={() => { if (colorPalette !== 'volcano') toggleColorPalette() }}
+                >
+                  <span className="palette-dot orange-dot" />
+                  <span>{lang === 'zh-TW' ? '經典黑橘' : lang === 'ja' ? 'クラシックオレンジ' : lang === 'ko' ? '클래식 오렌지' : 'Classic Orange'}</span>
+                </button>
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <div className="settings-label">
+                <GlobeIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '顯示語言' : lang === 'en' ? 'Language' : lang === 'ja' ? '表示言語' : '언어 설정'}</span>
+              </div>
+              <div className="settings-lang-grid">
+                {[
+                  { code: 'zh-TW', native: '繁體中文' },
+                  { code: 'en', native: 'English' },
+                  { code: 'ja', native: '日本語' },
+                  { code: 'ko', native: '한국어' }
+                ].map((langItem) => {
+                  const isActive = lang === langItem.code
+                  return (
+                    <button
+                      key={langItem.code}
+                      type="button"
+                      onClick={() => setLang(langItem.code as any)}
+                      className={`settings-lang-btn${isActive ? ' active' : ''}`}
+                    >
+                      <span>{langItem.native}</span>
+                      {isActive && <CheckIcon size="0.95em" style={{ color: 'var(--gold)' }} />}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+
+            <div className="settings-section">
+              <div className="settings-label">
+                <SparklesIcon size="0.95em" />
+                <span>{lang === 'zh-TW' ? '快捷功能' : lang === 'ja' ? 'クイック機能' : lang === 'ko' ? '빠른 기능' : 'Quick Actions'}</span>
+              </div>
+              <div className="settings-action-list">
+                <button
+                  type="button"
+                  className="settings-action-item"
+                  onClick={() => {
+                    setIsSettingsModalOpen(false)
+                    setIsAllModalOpen(true)
+                  }}
+                >
+                  <span className="settings-action-left">
+                    <ClipboardIcon size="1.05em" />
+                    <span>{t('allLogs')} ({concerts.length})</span>
+                  </span>
+                  <span className="settings-action-arrow">→</span>
+                </button>
+                <button
+                  type="button"
+                  className="settings-action-item"
+                  onClick={() => {
+                    setIsSettingsModalOpen(false)
+                    setIsGuideModalOpen(true)
+                  }}
+                >
+                  <span className="settings-action-left">
+                    <SparklesIcon size="1.05em" />
+                    <span>{t('siteTour')}</span>
+                  </span>
+                  <span className="settings-action-arrow">→</span>
+                </button>
+                <button
+                  type="button"
+                  className="settings-action-item"
+                  onClick={() => {
+                    setIsMusicBarVisible((visible) => !visible)
+                    setIsSettingsModalOpen(false)
+                  }}
+                >
+                  <span className="settings-action-left">
+                    <MusicIcon size="1.05em" />
+                    <span>
+                      {isMusicBarVisible
+                        ? (lang === 'zh-TW' ? '隱藏 Spotify 音樂播放器' : lang === 'ja' ? '音楽プレイヤーを非表示' : lang === 'ko' ? '음악 플레이어 숨기기' : 'Hide Music Player')
+                        : (lang === 'zh-TW' ? '顯示 Spotify 音樂播放器' : lang === 'ja' ? '音楽プレイヤーを表示' : lang === 'ko' ? '음악 플레이어 표시' : 'Show Music Player')}
+                    </span>
+                  </span>
+                  <span className="settings-action-badge">{isMusicBarVisible ? 'ON' : 'OFF'}</span>
+                </button>
+                {isLoggedIn && currentUser && (
                   <button
-                    key={langItem.code}
                     type="button"
+                    className="settings-action-item danger"
                     onClick={() => {
-                      setLang(langItem.code as any)
-                      setIsLanguageModalOpen(false)
+                      setIsSettingsModalOpen(false)
+                      handleLogout()
                     }}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'space-between',
-                      padding: '0.85rem 1.2rem',
-                      borderRadius: '12px',
-                      background: isActive 
-                        ? 'rgba(var(--accent-rgb), 0.15)' 
-                        : 'var(--surface-hover)',
-                      border: isActive 
-                        ? '1px solid var(--accent)' 
-                        : '1px solid var(--border)',
-                      color: isActive ? 'var(--accent)' : 'var(--text)',
-                      fontSize: '0.92rem',
-                      fontWeight: isActive ? '700' : '500',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s ease',
-                      textAlign: 'left'
-                    }}
-                    className={isActive ? 'lang-option active' : 'lang-option'}
                   >
-                    <span>{langItem.native}</span>
-                    {isActive && <CheckIcon size="1.1em" style={{ color: 'var(--gold)' }} />}
+                    <span className="settings-action-left">
+                      <LogoutIcon size="1.05em" />
+                      <span>{t('logout')} ({currentUser.nickname})</span>
+                    </span>
                   </button>
-                )
-              })}
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -3998,292 +4051,99 @@ function App() {
         </button>
       )}
 
-        <>
-          <div
-            className={`mobile-sidebar-overlay${isMobileSidebarOpen ? ' active' : ''}`}
-            onClick={() => setIsMobileSidebarOpen(false)}
-          />
-          <div className={`mobile-sidebar-nav${isMobileSidebarOpen ? ' open' : ''}`}>
-            <div className="sidebar-nav-header">
-              <span className="sidebar-nav-title">{lang === 'zh-TW' ? '選單 MENU' : lang === 'ja' ? 'メニュー MENU' : lang === 'ko' ? '메뉴 MENU' : 'MENU'}</span>
-              <button
-                className="sidebar-nav-close"
-                type="button"
-                onClick={() => setIsMobileSidebarOpen(false)}
-                aria-label="關閉選單"
-              >
-                <CloseIcon size="1em" />
-              </button>
-            </div>
-            <div className="sidebar-nav-items">
-              <button
-                className={`sidebar-nav-item${view === 'map' ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('map')
-                  setMobileTab('map')
-                  setMobileDrawerState('collapsed')
-                  setSelectedVenueId(null)
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><MapIcon /></span>
-                <span className="label">{t('tabMap')}</span>
-              </button>
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  setIsMobileSidebarOpen(false)
-                  openAddModal()
-                }}
-              >
-                <span className="icon"><PlusIcon /></span>
-                <span className="label">{lang === 'zh-TW' ? '新增活動紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트 기록 추가' : 'Add Event Log'}</span>
-              </button>
-              <button
-                className={`sidebar-nav-item${view === 'calendar' ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('calendar')
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><CalendarIcon /></span>
-                <span className="label">{t('tabCalendar')}</span>
-              </button>
-              <button
-                className={`sidebar-nav-item${view === 'board' ? ' active' : ''}`}
-                type="button"
-                onClick={() => {
-                  setView('board')
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><MessageIcon /></span>
-                <span className="label">{t('tabCommunity')}</span>
-              </button>
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  setIsMobileSidebarOpen(false)
-                  setIsGuideModalOpen(true)
-                }}
-              >
-                <span className="icon"><SparklesIcon /></span>
-                <span className="label">{t('siteTour')}</span>
-              </button>
-              {isLoggedIn && currentUser ? (
-                <button
-                  className={`sidebar-nav-item${view === 'profile' ? ' active' : ''}`}
-                  type="button"
-                  onClick={() => {
-                    setView('profile')
-                    setIsMobileSidebarOpen(false)
-                  }}
-                >
-                  <span className="icon"><UserIcon /></span>
-                  <span className="label">{t('profile')} ({currentUser.nickname})</span>
-                </button>
-              ) : (
-                <button
-                  className={`sidebar-nav-item${view === 'login' ? ' active' : ''}`}
-                  type="button"
-                  onClick={() => {
-                    setView('login')
-                    setIsMobileSidebarOpen(false)
-                  }}
-                >
-                  <span className="icon"><KeyIcon /></span>
-                  <span className="label">{t('login')}</span>
-                </button>
-              )}
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  setIsLanguageModalOpen(true)
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><GlobeIcon size="1.1em" /></span>
-                <span className="label">
-                  {lang === 'zh-TW' ? '語言設定' : lang === 'en' ? 'Language Settings' : lang === 'ja' ? '言語設定' : '언어 설정'}
-                </span>
-              </button>
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  toggleTheme()
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
-                <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '切換為淺色模式' : lang === 'ja' ? 'ライトモードに切替' : lang === 'ko' ? '라이트 모드로 전환' : 'Switch to Light Mode') : (lang === 'zh-TW' ? '切換為深色模式' : lang === 'ja' ? 'ダークモードに切替' : lang === 'ko' ? '다크 모드로 전환' : 'Switch to Dark Mode')}</span>
-              </button>
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  toggleColorPalette()
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} /></span>
-                <span className="label">{colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Green Theme')}</span>
-              </button>
-              <button
-                className="sidebar-nav-item"
-                type="button"
-                onClick={() => {
-                  setIsMusicBarVisible((visible) => !visible)
-                  setIsMobileSidebarOpen(false)
-                }}
-              >
-                <span className="icon"><MusicIcon /></span>
-                <span className="label">{isMusicBarVisible ? (lang === 'zh-TW' ? '隱藏音樂播放器' : lang === 'ja' ? 'プレイヤーを非表示' : lang === 'ko' ? '플레이어 숨기기' : 'Hide Player') : (lang === 'zh-TW' ? '顯示音樂播放器' : lang === 'ja' ? 'プレイヤーを表示' : lang === 'ko' ? '플레이어 표시' : 'Show Player')}</span>
-              </button>
-              {isLoggedIn && currentUser && (
-                <button
-                  className="sidebar-nav-item"
-                  type="button"
-                  style={{ color: '#ff4d4d' }}
-                  onClick={() => {
-                    handleLogout()
-                    setIsMobileSidebarOpen(false)
-                  }}
-                >
-                  <span className="icon"><LogoutIcon /></span>
-                  <span className="label">{t('logout')}</span>
-                </button>
-              )}
-            </div>
-          </div>
-          
-          <div
-            className={`mobile-bottom-nav${isAnyModalOpen ? ' modal-open-hidden' : ''}`}
-            ref={bottomNavRef}
-            onPointerDown={handleNavPointerDown}
-            onPointerMove={handleNavPointerMove}
-            onPointerUp={handleNavPointerUp}
-            onPointerCancel={handleNavPointerCancel}
-            style={{ touchAction: 'none' }}
-          >
-            <button
-              className={`bottom-nav-item${view === 'map' ? ' active' : ''}`}
-              type="button"
-              data-view="map"
-              onClick={() => {
-                if (view !== 'map') {
-                  setView('map')
-                  setMobileTab('map')
-                  setMobileDrawerState('collapsed')
-                } else {
-                  if (mobileTab !== 'map') {
-                    setMobileTab('map')
-                    setSelectedVenueId(null)
-                    setMobileDrawerState('collapsed')
-                  } else if (selectedVenueId) {
-                    setSelectedVenueId(null)
-                    setMobileDrawerState('collapsed')
-                  } else {
-                    setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))
-                  }
-                }
-              }}
-            >
-              <span className="icon"><MapIcon /></span>
-              <span className="label">{lang === 'zh-TW' ? '地圖' : lang === 'en' ? 'Map' : lang === 'ja' ? 'マップ' : '지도'}</span>
-            </button>
-            <button
-              className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
-              type="button"
-              data-view="calendar"
-              onClick={() => {
-                setView('calendar')
-              }}
-            >
-              <span className="icon"><CalendarIcon /></span>
-              <span className="label">{t('tabCalendar')}</span>
-            </button>
-            <button
-              className="bottom-nav-item bottom-nav-item-record"
-              type="button"
-              data-utility="true"
-              onClick={() => openAddModal()}
-              title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트記錄追加' : 'Add Event Log'}
-            >
-              <span className="icon"><PlusIcon /></span>
-              <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
-            </button>
-            <button
-              className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
-              type="button"
-              data-view="board"
-              onClick={() => {
-                setView('board')
-              }}
-            >
-              <span className="icon"><MessageIcon /></span>
-              <span className="label">{t('tabCommunity')}</span>
-            </button>
-            <button
-              className={`bottom-nav-item${(view === 'profile' || view === 'login') ? ' active' : ''}`}
-              type="button"
-              data-view="profile"
-              onClick={() => {
-                if (isLoggedIn) {
-                  setView('profile')
-                } else {
-                  setView('login')
-                }
-              }}
-            >
-              <span className="icon"><UserIcon /></span>
-              <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
-            </button>
-            <button
-              className="bottom-nav-item tablet-only-nav-item"
-              type="button"
-              data-utility="true"
-              onClick={() => setIsLanguageModalOpen(true)}
-            >
-              <span className="icon"><GlobeIcon size="1.1em" /></span>
-              <span className="label">{lang === 'zh-TW' ? '語言' : lang === 'ja' ? '言語' : lang === 'ko' ? '언어' : 'Lang'}</span>
-            </button>
-            <button
-              className="bottom-nav-item tablet-only-nav-item"
-              type="button"
-              data-utility="true"
-              onClick={toggleTheme}
-            >
-              <span className="icon">{theme === 'dark' ? <SunIcon /> : <MoonIcon />}</span>
-              <span className="label">{theme === 'dark' ? (lang === 'zh-TW' ? '淺色' : lang === 'ja' ? 'ライト' : lang === 'ko' ? '라이트' : 'Light') : (lang === 'zh-TW' ? '深色' : lang === 'ja' ? 'ダーク' : lang === 'ko' ? '다크' : 'Dark')}</span>
-            </button>
-            <button
-              className="bottom-nav-item tablet-only-nav-item"
-              type="button"
-              data-utility="true"
-              onClick={toggleColorPalette}
-              title={colorPalette === 'sage' ? (lang === 'zh-TW' ? '切換為黑橘配色' : 'Switch to Orange Theme') : (lang === 'zh-TW' ? '切換為綠色配色' : 'Switch to Green Theme')}
-            >
-              <span className="icon"><PaletteIcon style={{ color: colorPalette === 'sage' ? 'var(--accent)' : '#ff9100' }} /></span>
-              <span className="label">{colorPalette === 'sage' ? (lang === 'zh-TW' ? '黑橘' : 'Orange') : (lang === 'zh-TW' ? '綠色' : 'Green')}</span>
-            </button>
-            <button
-              className="bottom-nav-item tablet-only-nav-item"
-              type="button"
-              data-utility="true"
-              onClick={() => setIsGuideModalOpen(true)}
-            >
-              <span className="icon"><SparklesIcon /></span>
-              <span className="label">{t('siteTour')}</span>
-            </button>
-            <div className="nav-indicator-glide" style={indicatorStyle} />
-          </div>
-        </>
+      <div
+        className={`mobile-bottom-nav${isAnyModalOpen ? ' modal-open-hidden' : ''}`}
+        ref={bottomNavRef}
+        onPointerDown={handleNavPointerDown}
+        onPointerMove={handleNavPointerMove}
+        onPointerUp={handleNavPointerUp}
+        onPointerCancel={handleNavPointerCancel}
+        style={{ touchAction: 'none' }}
+      >
+        <button
+          className={`bottom-nav-item${view === 'map' ? ' active' : ''}`}
+          type="button"
+          data-view="map"
+          onClick={() => {
+            if (view !== 'map') {
+              setView('map')
+              setMobileTab('map')
+              setMobileDrawerState('collapsed')
+            } else {
+              if (mobileTab !== 'map') {
+                setMobileTab('map')
+                setSelectedVenueId(null)
+                setMobileDrawerState('collapsed')
+              } else if (selectedVenueId) {
+                setSelectedVenueId(null)
+                setMobileDrawerState('collapsed')
+              } else {
+                setMobileDrawerState((current) => (current === 'collapsed' ? 'half' : 'collapsed'))
+              }
+            }
+          }}
+        >
+          <span className="icon"><MapIcon /></span>
+          <span className="label">{lang === 'zh-TW' ? '地圖' : lang === 'en' ? 'Map' : lang === 'ja' ? 'マップ' : '지도'}</span>
+        </button>
+        <button
+          className={`bottom-nav-item${view === 'calendar' ? ' active' : ''}`}
+          type="button"
+          data-view="calendar"
+          onClick={() => {
+            setView('calendar')
+          }}
+        >
+          <span className="icon"><CalendarIcon /></span>
+          <span className="label">{t('tabCalendar')}</span>
+        </button>
+        <button
+          className="bottom-nav-item bottom-nav-item-record"
+          type="button"
+          data-utility="true"
+          onClick={() => openAddModal()}
+          title={lang === 'zh-TW' ? '新增演唱會紀錄' : lang === 'ja' ? '活動記録を追加' : lang === 'ko' ? '이벤트記錄追加' : 'Add Event Log'}
+        >
+          <span className="icon"><PlusIcon /></span>
+          <span className="label">{lang === 'zh-TW' ? '紀錄' : lang === 'ja' ? '記録' : lang === 'ko' ? '기록' : 'Log'}</span>
+        </button>
+        <button
+          className={`bottom-nav-item${view === 'board' ? ' active' : ''}`}
+          type="button"
+          data-view="board"
+          onClick={() => {
+            setView('board')
+          }}
+        >
+          <span className="icon"><MessageIcon /></span>
+          <span className="label">{t('tabCommunity')}</span>
+        </button>
+        <button
+          className={`bottom-nav-item${(view === 'profile' || view === 'login') ? ' active' : ''}`}
+          type="button"
+          data-view="profile"
+          onClick={() => {
+            if (isLoggedIn) {
+              setView('profile')
+            } else {
+              setView('login')
+            }
+          }}
+        >
+          <span className="icon"><UserIcon /></span>
+          <span className="label">{isLoggedIn ? (lang === 'zh-TW' ? '我的' : lang === 'ja' ? 'マイページ' : lang === 'ko' ? '마이페이지' : 'Profile') : t('login')}</span>
+        </button>
+        <button
+          className="bottom-nav-item tablet-only-nav-item"
+          type="button"
+          data-utility="true"
+          onClick={() => setIsSettingsModalOpen(true)}
+        >
+          <span className="icon"><SettingsIcon size="1.1em" /></span>
+          <span className="label">{lang === 'zh-TW' ? '設定' : lang === 'ja' ? '設定' : lang === 'ko' ? '설정' : 'Settings'}</span>
+        </button>
+        <div className="nav-indicator-glide" style={indicatorStyle} />
+      </div>
       {toast && (
         <div className={`app-toast ${toast.type || 'info'}`}>
           {toast.type === 'success' && <CheckIcon size="1.15em" style={{ color: '#81c784', verticalAlign: 'middle', marginRight: '6px' }} />}
@@ -4554,32 +4414,42 @@ function ConcertList({
   hasSelectedVenue,
   onOpenDetail,
   onDelete,
+  onOpenAllLogs,
+  totalCount = 0,
 }: {
   concerts: Concert[]
   hasSelectedVenue: boolean
   onOpenDetail: (concertId: string) => void
   onDelete: (concertId: string, event: MouseEvent<HTMLButtonElement>) => void
+  onOpenAllLogs?: () => void
+  totalCount?: number
 }) {
   const { t, lang } = useTranslation()
-  if (!hasSelectedVenue) {
-    return <div className="empty-state">{lang === 'zh-TW' ? '選擇場館後顯示演唱會記錄' : 'Select a venue to display concert records'}</div>
-  }
-
-  if (concerts.length === 0) {
-    return <div className="empty-state">{lang === 'zh-TW' ? '這個場館還沒有記錄，快去新增吧！' : 'No records at this venue yet. Go ahead and add one!'}</div>
-  }
-
   return (
     <>
-      <div className="section-title">— {t('myRecords')} —</div>
-      {concerts.map((concert) => (
-        <ConcertCard
-          key={concert.id}
-          concert={concert}
-          onOpenDetail={onOpenDetail}
-          onDelete={onDelete}
-        />
-      ))}
+      <div className="section-title-row">
+        <div className="section-title">— {t('myRecords')} —</div>
+        {onOpenAllLogs && totalCount > 0 && (
+          <button type="button" className="view-all-logs-inline-btn" onClick={onOpenAllLogs}>
+            <ClipboardIcon size="0.9em" />
+            <span>{t('allLogs')} ({totalCount})</span>
+          </button>
+        )}
+      </div>
+      {!hasSelectedVenue ? (
+        <div className="empty-state">{lang === 'zh-TW' ? '選擇場館後顯示該場館的演唱會記錄' : 'Select a venue to display concert records'}</div>
+      ) : concerts.length === 0 ? (
+        <div className="empty-state">{lang === 'zh-TW' ? '這個場館還沒有記錄，快去新增吧！' : 'No records at this venue yet. Go ahead and add one!'}</div>
+      ) : (
+        concerts.map((concert) => (
+          <ConcertCard
+            key={concert.id}
+            concert={concert}
+            onOpenDetail={onOpenDetail}
+            onDelete={onDelete}
+          />
+        ))
+      )}
     </>
   )
 }
