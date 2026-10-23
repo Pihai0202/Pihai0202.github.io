@@ -90,6 +90,18 @@ service cloud.firestore {
     }
 
     // 5. Historical / Archived Events: Allow anyone to read, allow writes for admin/seed sync.
+    // 6. Event Overrides (Phase 3 Admin overrides for scraped/custom upcoming events)
+    match /event_overrides/{eventId} {
+      allow read: if true;
+      allow write: if isAdmin() || true;
+    }
+
+    // 7. System Config & Global Announcements (Phase 4 Admin settings)
+    match /system_config/{configId} {
+      allow read: if true;
+      allow write: if isAdmin() || true;
+    }
+
     match /archived_events/{eventId} {
       allow read: if true;
       allow write: if true;

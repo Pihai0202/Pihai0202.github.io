@@ -12,6 +12,8 @@ import type {
   ConcertForm,
   SpotifyItem,
   SuspensionInfo,
+  EventOverride,
+  SystemConfig,
   SuspensionItem
 } from './types'
 
@@ -316,6 +318,51 @@ function App() {
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
   const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
+  const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({})
+  const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null)
+  const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string>('')
+
+  useEffect(() => {
+    const unsubOverrides = onSnapshot(
+      collection(db, 'event_overrides'),
+      (snap) => {
+        const map: Record<string, EventOverride> = {}
+        snap.forEach((d) => {
+          map[d.id] = { ...(d.data() as EventOverride), id: d.id }
+        })
+        setEventOverrides(map)
+      },
+      () => {}
+    )
+    const unsubConfig = onSnapshot(
+      doc(db, 'system_config', 'global'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const data = docSnap.data() as SystemConfig
+          setSystemConfig(data)
+          if (Array.isArray(data.customSuspensions) && data.customSuspensions.length > 0) {
+            setSuspensionData((prev) => {
+              const baseItems = prev?.items || []
+              const customMap = new Map(data.customSuspensions!.map((i) => [i.city, i]))
+              const merged = [
+                ...data.customSuspensions!,
+                ...baseItems.filter((b) => !customMap.has(b.city))
+              ]
+              return {
+                updateTime: prev?.updateTime || new Date().toLocaleString('zh-TW'),
+                items: merged
+              }
+            })
+          }
+        }
+      },
+      () => {}
+    )
+    return () => {
+      unsubOverrides()
+      unsubConfig()
+    }
+  }, [])
   const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
   const [editingConcertId, setEditingConcertId] = useState<string | null>(null)
@@ -1084,8 +1131,47 @@ function App() {
     })
   }, [remoteConcerts, selectedVenueId, selectedVenue])
   const resolvedRemoteConcerts = useMemo(() => {
-    return resolveTixcraftUrls(remoteConcerts)
-  }, [remoteConcerts])
+    const baseIds = new Set(remoteConcerts.map((c) => c.id))
+    const customNewEvents: RemoteConcert[] = Object.values(eventOverrides)
+      .filter((ov) => ov.isCustomNew && !ov.hidden && !baseIds.has(ov.id))
+      .map((ov) => ({
+        id: ov.id,
+        source: ov.source || '官方公告',
+        name: ov.name || '未命名活動',
+        venue_raw: ov.venue_name || '',
+        venue_id: ov.venue_id || null,
+        venue_name: ov.venue_name || null,
+        city: ov.city || '台北',
+        date: ov.date || '',
+        image: ov.image || '',
+        url: ov.url || '',
+        price: ov.price || '',
+        artist: ov.artist || '',
+        category: ov.category || 'music',
+        ticket_links: ov.url ? [{ platform: 'official', name: ov.source || '售票連結', url: ov.url }] : []
+      }))
+
+    const merged = [...customNewEvents, ...remoteConcerts]
+      .filter((c) => !eventOverrides[c.id]?.hidden)
+      .map((c) => {
+        const ov = eventOverrides[c.id]
+        if (!ov) return c
+        return {
+          ...c,
+          name: ov.name ?? c.name,
+          artist: ov.artist ?? c.artist,
+          venue_id: ov.venue_id !== undefined ? ov.venue_id : c.venue_id,
+          venue_name: ov.venue_name !== undefined ? ov.venue_name : c.venue_name,
+          city: ov.city ?? c.city,
+          date: ov.date ?? c.date,
+          image: ov.image ?? c.image,
+          url: ov.url ?? c.url,
+          price: ov.price ?? c.price
+        }
+      })
+
+    return resolveTixcraftUrls(merged)
+  }, [remoteConcerts, eventOverrides])
   const sortedRemoteConcerts = useMemo(() => {
     const d = new Date()
     const utc = d.getTime() + d.getTimezoneOffset() * 60000
@@ -2270,6 +2356,73 @@ function App() {
 
   return (
     <>
+      {systemConfig?.announcementEnabled &&
+        systemConfig.announcementText &&
+        dismissedAnnouncement !== systemConfig.announcementText &&
+        view !== 'admin' && (
+          <div
+            style={{
+              position: 'fixed',
+              top: '4.1rem',
+              left: '50%',
+              transform: 'translateX(-50%)',
+              zIndex: 1150,
+              maxWidth: '92vw',
+              width: 'fit-content',
+              background:
+                systemConfig.announcementType === 'warning'
+                  ? 'rgba(245, 158, 11, 0.94)'
+                  : systemConfig.announcementType === 'celebration'
+                    ? 'rgba(217, 119, 6, 0.94)'
+                    : 'rgba(var(--surface-rgb), 0.95)',
+              color: systemConfig.announcementType === 'warning' || systemConfig.announcementType === 'celebration' ? '#fff' : 'var(--text)',
+              border: '1px solid var(--accent)',
+              borderRadius: '999px',
+              padding: '0.45rem 1rem',
+              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.32)',
+              backdropFilter: 'blur(12px)',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '0.65rem',
+              fontSize: '0.84rem',
+              fontWeight: 600
+            }}
+          >
+            <MegaphoneIcon size="1em" style={{ flexShrink: 0 }} />
+            <span>{systemConfig.announcementText}</span>
+            {systemConfig.announcementLink && (
+              <a
+                href={systemConfig.announcementLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  color: 'inherit',
+                  textDecoration: 'underline',
+                  fontWeight: 800,
+                  whiteSpace: 'nowrap'
+                }}
+              >
+                {systemConfig.announcementLinkText || (lang === 'zh-TW' ? '查看詳情 ↗' : 'Details ↗')}
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => setDismissedAnnouncement(systemConfig.announcementText || '')}
+              style={{
+                background: 'transparent',
+                border: 'none',
+                color: 'inherit',
+                cursor: 'pointer',
+                padding: '2px',
+                display: 'inline-flex',
+                alignItems: 'center'
+              }}
+              aria-label="關閉公告"
+            >
+              <CloseIcon size="0.9em" />
+            </button>
+          </div>
+        )}
       <header className={view !== 'map' || isSidebarCollapsed ? 'full-width-header' : ''}>
         {view !== 'login' && (
           <button
@@ -3019,7 +3172,7 @@ function App() {
         <main className="calendar-main-layout">
           <CalendarView
             concerts={concerts}
-            remoteConcerts={resolvedRemoteConcerts}
+            remoteConcerts={remoteConcerts}
             onAddEventClick={(date) => openAddModal(date, null)}
             onOpenConcertDetail={openConcertDetail}
             onOpenTicketDetail={(ticket) => setSelectedTicket(ticket)}
@@ -3137,7 +3290,7 @@ function App() {
             currentUser={currentUser}
             venues={venues}
             onVenuesChange={setVenues}
-            remoteConcerts={resolvedRemoteConcerts}
+            remoteConcerts={remoteConcerts}
             remoteUpdatedAt={remoteUpdatedAt}
             onBack={() => {
               if (window.location.hash === '#admin') {

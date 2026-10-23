@@ -189,3 +189,33 @@ export interface SuspensionInfo {
   items: SuspensionItem[]
 }
 
+export interface EventOverride {
+  id: string
+  name?: string
+  artist?: string
+  venue_id?: string | null
+  venue_name?: string | null
+  city?: string
+  date?: string
+  image?: string
+  url?: string
+  price?: string
+  source?: string
+  category?: string
+  hidden?: boolean
+  isCustomNew?: boolean
+  updatedAt?: string
+}
+
+export interface SystemConfig {
+  announcementEnabled?: boolean
+  announcementText?: string
+  announcementType?: 'info' | 'warning' | 'celebration'
+  announcementLink?: string
+  announcementLinkText?: string
+  customSuspensions?: SuspensionItem[]
+  updatedAt?: string
+  updatedBy?: string
+
+}
+

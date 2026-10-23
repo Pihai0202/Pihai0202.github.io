@@ -12,7 +12,16 @@ import {
   getDocs
 } from 'firebase/firestore'
 import { db } from '../firebase'
-import type { Venue, SharedNote, RemoteConcert } from '../types'
+import type {
+  Venue,
+  SharedNote,
+  RemoteConcert,
+  HistoricalEvent,
+  EventOverride,
+  SystemConfig,
+  Concert,
+  SuspensionItem
+} from '../types'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
 import { VENUES as STATIC_VENUES } from '../constants/venues'
 import { ADMIN_EMAILS } from '../constants/adminConfig'
@@ -21,6 +30,10 @@ import {
   seedDefaultVenuesToFirestore,
   fetchVenuesFromFirestore
 } from '../utils/venueService'
+import {
+  getHistoricalEvents,
+  invalidateHistoricalEventsCache
+} from '../utils/historicalEventsService'
 import {
   ArrowLeftIcon,
   ShieldIcon,
@@ -43,7 +56,15 @@ import {
   HeartFilledIcon,
   EyeIcon,
   EyeOffIcon,
-  TargetIcon
+  TargetIcon,
+  CalendarIcon,
+  ArchiveIcon,
+  SettingsIcon,
+  WarningIcon,
+  RocketIcon,
+  SparklesIcon,
+  LinkIcon,
+  ClipboardIcon
 } from './SvgIcon'
 import './AdminDashboard.css'
 
@@ -72,6 +93,14 @@ interface ReplyDoc {
   content: string
   createdAt: string
   likes?: number
+}
+
+interface UserConcertLogDoc {
+  email: string
+  nickname?: string
+  avatarUrl?: string
+  updatedAt?: string
+  concerts: Concert[]
 }
 
 // Coordinate projection helpers (synchronized with TaiwanMap.tsx)
@@ -110,6 +139,21 @@ const EMPTY_VENUE_FORM: Venue = {
   longitude: 121.5606
 }
 
+const EMPTY_HISTORICAL_FORM: HistoricalEvent = {
+  id: '',
+  name: '',
+  artist: '',
+  venue_id: 'taipei-arena',
+  venue_name: '臺北小巨蛋',
+  city: '台北',
+  date: new Date().toISOString().slice(0, 10),
+  category: 'music',
+  source: '管理員補登',
+  price: '',
+  url: '',
+  image: ''
+}
+
 export function AdminDashboard({
   currentUser,
   venues,
@@ -119,21 +163,22 @@ export function AdminDashboard({
   onBack,
   onShowToast
 }: AdminDashboardProps) {
-  const [activeTab, setActiveTab] = useState<'overview' | 'moderation' | 'venues'>('overview')
+  const [activeTab, setActiveTab] = useState<
+    'overview' | 'moderation' | 'venues' | 'events' | 'system'
+  >('overview')
 
   // ---------------- 1. Firestore Real-time Data ----------------
   const [allReviews, setAllReviews] = useState<SharedNote[]>([])
   const [ticketComments, setTicketComments] = useState<TicketCommentDoc[]>([])
-  const [userStats, setUserStats] = useState<{
-    totalUsers: number
-    totalLoggedConcerts: number
-    topArtists: { name: string; count: number }[]
-    topVenues: { name: string; count: number }[]
-  }>({
-    totalUsers: 0,
-    totalLoggedConcerts: 0,
-    topArtists: [],
-    topVenues: []
+  const [userDocs, setUserDocs] = useState<UserConcertLogDoc[]>([])
+  const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({})
+  const [systemConfig, setSystemConfig] = useState<SystemConfig>({
+    announcementEnabled: false,
+    announcementText: '',
+    announcementType: 'info',
+    announcementLink: '',
+    announcementLinkText: '',
+    customSuspensions: []
   })
 
   // Listen to ALL reviews (including hidden ones for admin moderation)
@@ -193,55 +238,107 @@ export function AdminDashboard({
     return () => unsub()
   }, [])
 
-  // Load users_concerts summary statistics
+  // Listen to event_overrides (Phase 3)
   useEffect(() => {
-    let cancelled = false
-    async function loadUserStats() {
-      try {
-        const snap = await getDocs(collection(db, 'users_concerts'))
-        if (cancelled) return
-        let totalUsers = 0
-        let totalLoggedConcerts = 0
-        const artistCounts: Record<string, number> = {}
-        const venueCounts: Record<string, number> = {}
+    const unsub = onSnapshot(
+      collection(db, 'event_overrides'),
+      (snap) => {
+        const map: Record<string, EventOverride> = {}
+        snap.forEach((d) => {
+          const data = d.data() as EventOverride
+          map[d.id] = { ...data, id: d.id }
+        })
+        setEventOverrides(map)
+      },
+      (err) => console.warn('[Admin] Failed to load event_overrides:', err)
+    )
+    return () => unsub()
+  }, [])
 
+  // Listen to system_config/global (Phase 4)
+  useEffect(() => {
+    const unsub = onSnapshot(
+      doc(db, 'system_config', 'global'),
+      (docSnap) => {
+        if (docSnap.exists()) {
+          const d = docSnap.data() as SystemConfig
+          setSystemConfig({
+            announcementEnabled: d.announcementEnabled === true,
+            announcementText: d.announcementText || '',
+            announcementType: d.announcementType || 'info',
+            announcementLink: d.announcementLink || '',
+            announcementLinkText: d.announcementLinkText || '',
+            customSuspensions: Array.isArray(d.customSuspensions) ? d.customSuspensions : [],
+            updatedAt: d.updatedAt,
+            updatedBy: d.updatedBy
+          })
+        }
+      },
+      (err) => console.warn('[Admin] Failed to load system_config:', err)
+    )
+    return () => unsub()
+  }, [])
+
+  // Listen to users_concerts (for Overview + Phase 4 User Inspector)
+  useEffect(() => {
+    const unsub = onSnapshot(
+      collection(db, 'users_concerts'),
+      (snap) => {
+        const list: UserConcertLogDoc[] = []
         snap.forEach((docSnap) => {
-          totalUsers++
-          const data = docSnap.data()
-          const concerts = Array.isArray(data.concerts) ? data.concerts : []
-          totalLoggedConcerts += concerts.length
-          concerts.forEach((c: any) => {
-            if (c?.artist) {
-              const a = String(c.artist).trim()
-              if (a) artistCounts[a] = (artistCounts[a] || 0) + 1
-            }
-            if (c?.venueName) {
-              const v = String(c.venueName).trim()
-              if (v) venueCounts[v] = (venueCounts[v] || 0) + 1
-            }
+          const d = docSnap.data()
+          list.push({
+            email: docSnap.id,
+            nickname: d.nickname || docSnap.id.split('@')[0],
+            avatarUrl: d.avatarUrl,
+            updatedAt: d.updatedAt || '',
+            concerts: Array.isArray(d.concerts) ? d.concerts : []
           })
         })
-
-        const topArtists = Object.entries(artistCounts)
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 6)
-
-        const topVenues = Object.entries(venueCounts)
-          .map(([name, count]) => ({ name, count }))
-          .sort((a, b) => b.count - a.count)
-          .slice(0, 6)
-
-        setUserStats({ totalUsers, totalLoggedConcerts, topArtists, topVenues })
-      } catch (err) {
-        console.warn('[Admin] Failed to fetch users_concerts stats:', err)
-      }
-    }
-    loadUserStats()
-    return () => {
-      cancelled = true
-    }
+        list.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''))
+        setUserDocs(list)
+      },
+      (err) => console.warn('[Admin] Failed to load users_concerts:', err)
+    )
+    return () => unsub()
   }, [])
+
+  const userStats = useMemo(() => {
+    let totalLoggedConcerts = 0
+    const artistCounts: Record<string, number> = {}
+    const venueCounts: Record<string, number> = {}
+
+    userDocs.forEach((u) => {
+      totalLoggedConcerts += u.concerts.length
+      u.concerts.forEach((c) => {
+        if (c?.artist) {
+          const a = String(c.artist).trim()
+          if (a) artistCounts[a] = (artistCounts[a] || 0) + 1
+        }
+        if (c?.venueName) {
+          const v = String(c.venueName).trim()
+          if (v) venueCounts[v] = (venueCounts[v] || 0) + 1
+        }
+      })
+    })
+
+    const topArtists = Object.entries(artistCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6)
+
+    const topVenues = Object.entries(venueCounts)
+      .map(([name, count]) => ({ name, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 6)
+
+    return {
+      totalUsers: userDocs.length,
+      totalLoggedConcerts,
+      topArtists,
+      topVenues
+    }
+  }, [userDocs])
 
   // ---------------- 2. Community Moderation State & Actions ----------------
   const [modSubTab, setModSubTab] = useState<'reviews' | 'comments'>('reviews')
@@ -485,7 +582,6 @@ export function AdminDashboard({
     })
   }
 
-  // Click on the Taiwan SVG map to pick coordinates
   const handleMapSvgClick = (e: ReactMouseEvent<SVGSVGElement>) => {
     if (didMapDragRef.current || !mapSvgRef.current) return
     const rect = mapSvgRef.current.getBoundingClientRect()
@@ -657,12 +753,411 @@ export function AdminDashboard({
     }
   }
 
+  // ---------------- 4. Phase 3: Events & Historical Manager ----------------
+  const [eventsSubTab, setEventsSubTab] = useState<'upcoming' | 'historical'>('upcoming')
+  const [eventSearch, setEventSearch] = useState('')
+  const [upcomingFilter, setUpcomingFilter] = useState<'all' | 'unmapped' | 'overridden' | 'hidden'>('all')
+  const [editingOverride, setEditingOverride] = useState<EventOverride | null>(null)
+  const [isSavingOverride, setIsSavingOverride] = useState(false)
+
+  // Historical events state
+  const [historicalList, setHistoricalList] = useState<HistoricalEvent[]>([])
+  const [historicalSearch, setHistoricalSearch] = useState('')
+  const [historicalForm, setHistoricalForm] = useState<HistoricalEvent>(EMPTY_HISTORICAL_FORM)
+  const [isCreatingHistorical, setIsCreatingHistorical] = useState(true)
+  const [isSavingHistorical, setIsSavingHistorical] = useState(false)
+
+  useEffect(() => {
+    if (activeTab === 'events' && eventsSubTab === 'historical' && historicalList.length === 0) {
+      getHistoricalEvents().then((list) => setHistoricalList(list))
+    }
+  }, [activeTab, eventsSubTab, historicalList.length])
+
+  // Merge remoteConcerts with any custom-created upcoming events in eventOverrides
+  const mergedAdminUpcomingEvents = useMemo(() => {
+    const baseIds = new Set(remoteConcerts.map((c) => c.id))
+    const customEvents: RemoteConcert[] = Object.values(eventOverrides)
+      .filter((ov) => ov.isCustomNew && !baseIds.has(ov.id))
+      .map((ov) => ({
+        id: ov.id,
+        source: ov.source || '管理員補登',
+        name: ov.name || '未命名活動',
+        venue_raw: ov.venue_name || '',
+        venue_id: ov.venue_id || null,
+        venue_name: ov.venue_name || null,
+        city: ov.city || '台北',
+        date: ov.date || '',
+        image: ov.image || '',
+        url: ov.url || '',
+        price: ov.price || '',
+        artist: ov.artist || '',
+        category: ov.category || 'music',
+        ticket_links: ov.url ? [{ platform: 'official', name: ov.source || '官方連結', url: ov.url }] : []
+      }))
+
+    return [...customEvents, ...remoteConcerts].map((ev) => {
+      const ov = eventOverrides[ev.id]
+      if (!ov) return { ...ev, isOverridden: false, isHidden: false }
+      return {
+        ...ev,
+        name: ov.name ?? ev.name,
+        artist: ov.artist ?? ev.artist,
+        venue_id: ov.venue_id !== undefined ? ov.venue_id : ev.venue_id,
+        venue_name: ov.venue_name !== undefined ? ov.venue_name : ev.venue_name,
+        city: ov.city ?? ev.city,
+        date: ov.date ?? ev.date,
+        image: ov.image ?? ev.image,
+        url: ov.url ?? ev.url,
+        price: ov.price ?? ev.price,
+        isOverridden: true,
+        isHidden: ov.hidden === true
+      }
+    })
+  }, [remoteConcerts, eventOverrides])
+
+  const unmappedEventCount = useMemo(
+    () => mergedAdminUpcomingEvents.filter((e) => !e.venue_id && !e.isHidden).length,
+    [mergedAdminUpcomingEvents]
+  )
+
+  const filteredAdminUpcoming = useMemo(() => {
+    const q = eventSearch.trim().toLowerCase()
+    return mergedAdminUpcomingEvents.filter((ev) => {
+      if (upcomingFilter === 'unmapped' && (ev.venue_id || ev.isHidden)) return false
+      if (upcomingFilter === 'overridden' && !ev.isOverridden) return false
+      if (upcomingFilter === 'hidden' && !ev.isHidden) return false
+      if (!q) return true
+      return (
+        ev.name.toLowerCase().includes(q) ||
+        (ev.artist || '').toLowerCase().includes(q) ||
+        (ev.venue_name || '').toLowerCase().includes(q) ||
+        (ev.venue_raw || '').toLowerCase().includes(q) ||
+        (ev.city || '').toLowerCase().includes(q) ||
+        ev.source.toLowerCase().includes(q)
+      )
+    })
+  }, [mergedAdminUpcomingEvents, eventSearch, upcomingFilter])
+
+  const filteredHistorical = useMemo(() => {
+    const q = historicalSearch.trim().toLowerCase()
+    const list = q
+      ? historicalList.filter(
+          (ev) =>
+            ev.name.toLowerCase().includes(q) ||
+            (ev.artist || '').toLowerCase().includes(q) ||
+            (ev.venue_name || '').toLowerCase().includes(q) ||
+            (ev.date || '').includes(q)
+        )
+      : historicalList
+    return list.slice(0, 60)
+  }, [historicalList, historicalSearch])
+
+  const handleOpenOverrideModal = (ev: RemoteConcert & { isHidden?: boolean }) => {
+    const existing = eventOverrides[ev.id]
+    setEditingOverride({
+      id: ev.id,
+      name: existing?.name ?? ev.name,
+      artist: existing?.artist ?? (ev.artist || ''),
+      venue_id: existing?.venue_id !== undefined ? existing.venue_id : ev.venue_id,
+      venue_name: existing?.venue_name !== undefined ? existing.venue_name : ev.venue_name,
+      city: existing?.city ?? ev.city,
+      date: existing?.date ?? ev.date,
+      price: existing?.price ?? ev.price,
+      url: existing?.url ?? ev.url,
+      image: existing?.image ?? ev.image,
+      source: existing?.source ?? ev.source,
+      category: existing?.category ?? (ev.category || 'music'),
+      hidden: existing?.hidden ?? false,
+      isCustomNew: existing?.isCustomNew ?? false
+    })
+  }
+
+  const handleStartNewUpcomingEvent = () => {
+    const firstVenue = venues[0]
+    setEditingOverride({
+      id: `custom-ev-${Date.now().toString(36)}`,
+      name: '',
+      artist: '',
+      venue_id: firstVenue?.id || 'taipei-dome',
+      venue_name: firstVenue?.name || '臺北大巨蛋',
+      city: firstVenue?.city || '台北',
+      date: new Date().toISOString().slice(0, 10),
+      price: '',
+      url: '',
+      image: '',
+      source: '管理員補登',
+      category: 'music',
+      hidden: false,
+      isCustomNew: true
+    })
+  }
+
+  const handleSaveEventOverride = async () => {
+    if (!editingOverride || !editingOverride.id || !editingOverride.name?.trim()) {
+      onShowToast?.('請填寫活動名稱！', 'error')
+      return
+    }
+    setIsSavingOverride(true)
+    try {
+      const matchedVenue = venues.find((v) => v.id === editingOverride.venue_id)
+      const payload: EventOverride = {
+        ...editingOverride,
+        name: editingOverride.name.trim(),
+        artist: (editingOverride.artist || '').trim(),
+        venue_id: editingOverride.venue_id || null,
+        venue_name: matchedVenue ? matchedVenue.name : editingOverride.venue_name || null,
+        city: matchedVenue ? matchedVenue.city : editingOverride.city || '台北',
+        updatedAt: new Date().toISOString()
+      }
+      await setDoc(doc(db, 'event_overrides', payload.id), payload, { merge: true })
+      setEditingOverride(null)
+      onShowToast?.('已儲存活動覆寫設定，前台地圖與清單已即時更新！', 'success')
+    } catch (err) {
+      console.error('Failed to save event override:', err)
+      onShowToast?.('儲存活動覆寫失敗', 'error')
+    } finally {
+      setIsSavingOverride(false)
+    }
+  }
+
+  const handleQuickToggleHideEvent = async (ev: RemoteConcert & { isHidden?: boolean }) => {
+    const nextHidden = !ev.isHidden
+    try {
+      await setDoc(
+        doc(db, 'event_overrides', ev.id),
+        {
+          id: ev.id,
+          name: ev.name,
+          hidden: nextHidden,
+          updatedAt: new Date().toISOString()
+        },
+        { merge: true }
+      )
+      onShowToast?.(
+        nextHidden ? `已下架隱藏「${ev.name}」` : `已恢復顯示「${ev.name}」`,
+        'success'
+      )
+    } catch (err) {
+      console.error('Failed to toggle event hide:', err)
+      onShowToast?.('切換活動顯示狀態失敗', 'error')
+    }
+  }
+
+  const handleResetEventOverride = async (eventId: string) => {
+    if (!window.confirm('確定要清除此活動的手動覆寫設定並還原為爬蟲原始資料嗎？')) return
+    try {
+      await deleteDoc(doc(db, 'event_overrides', eventId))
+      if (editingOverride?.id === eventId) setEditingOverride(null)
+      onShowToast?.('已還原為爬蟲原始資料', 'success')
+    } catch (err) {
+      console.error('Failed to delete override:', err)
+      onShowToast?.('還原失敗', 'error')
+    }
+  }
+
+  const handleSaveHistoricalEvent = async () => {
+    const cleanName = historicalForm.name.trim()
+    if (!cleanName || !historicalForm.date.trim()) {
+      onShowToast?.('請填寫歷史活動名稱與日期！', 'error')
+      return
+    }
+    setIsSavingHistorical(true)
+    try {
+      const cleanId =
+        historicalForm.id.trim() || `hist-${Date.now().toString(36)}`
+      const matchedVenue = venues.find((v) => v.id === historicalForm.venue_id)
+      const artistStr = (historicalForm.artist || '').trim()
+      const keywords = Array.from(
+        new Set(
+          [
+            artistStr.toLowerCase(),
+            ...artistStr.toLowerCase().split(/[\s/&、,]+/)
+          ].filter((k) => k.length >= 2)
+        )
+      )
+
+      const docData = {
+        id: cleanId,
+        name: cleanName,
+        artist: artistStr,
+        artist_lower: artistStr.toLowerCase(),
+        artist_keywords: keywords,
+        venue_id: historicalForm.venue_id || null,
+        venue_name: matchedVenue ? matchedVenue.name : historicalForm.venue_name || '',
+        city: matchedVenue ? matchedVenue.city : historicalForm.city || '台北',
+        date: historicalForm.date.trim(),
+        category: historicalForm.category || 'music',
+        source: historicalForm.source || '管理員補登',
+        price: (historicalForm.price || '').trim(),
+        url: (historicalForm.url || '').trim(),
+        image: (historicalForm.image || '').trim(),
+        isCustomAdmin: true,
+        updatedAt: new Date().toISOString()
+      }
+
+      await setDoc(doc(db, 'archived_events', cleanId), docData, { merge: true })
+      invalidateHistoricalEventsCache()
+      const latest = await getHistoricalEvents()
+      setHistoricalList(latest)
+      setIsCreatingHistorical(true)
+      setHistoricalForm({
+        ...EMPTY_HISTORICAL_FORM,
+        id: `hist-${Date.now().toString(36)}`
+      })
+      onShowToast?.(`已儲存歷史活動「${cleanName}」並同步至歷史搜尋器！`, 'success')
+    } catch (err) {
+      console.error('Failed to save historical event:', err)
+      onShowToast?.('儲存歷史活動失敗', 'error')
+    } finally {
+      setIsSavingHistorical(false)
+    }
+  }
+
+  // ---------------- 5. Phase 4: System Config & User Inspector ----------------
+  const [sysSubTab, setSysSubTab] = useState<'config' | 'users'>('config')
+  const [isSavingConfig, setIsSavingConfig] = useState(false)
+  const [newSuspensionCity, setNewSuspensionCity] = useState('台北')
+  const [newSuspensionStatus, setNewSuspensionStatus] = useState('今日停止上班、停止上課（演出可能延期或取消）')
+  const [ghToken, setGhToken] = useState(() => localStorage.getItem('tw_admin_gh_token') || '')
+  const [isTriggeringAction, setIsTriggeringAction] = useState(false)
+
+  // User Inspector state
+  const [userSearch, setUserSearch] = useState('')
+  const [selectedUserEmail, setSelectedUserEmail] = useState<string | null>(null)
+
+  const filteredUsers = useMemo(() => {
+    const q = userSearch.trim().toLowerCase()
+    if (!q) return userDocs
+    return userDocs.filter(
+      (u) =>
+        u.email.toLowerCase().includes(q) ||
+        (u.nickname || '').toLowerCase().includes(q) ||
+        u.concerts.some(
+          (c) =>
+            (c.artist || '').toLowerCase().includes(q) ||
+            (c.concertName || '').toLowerCase().includes(q) ||
+            (c.venueName || '').toLowerCase().includes(q)
+        )
+    )
+  }, [userDocs, userSearch])
+
+  const selectedUserDoc = useMemo(
+    () => userDocs.find((u) => u.email === selectedUserEmail) || userDocs[0] || null,
+    [userDocs, selectedUserEmail]
+  )
+
+  const handleSaveSystemConfig = async () => {
+    setIsSavingConfig(true)
+    try {
+      await setDoc(
+        doc(db, 'system_config', 'global'),
+        {
+          ...systemConfig,
+          updatedAt: new Date().toISOString(),
+          updatedBy: currentUser?.email || 'admin'
+        },
+        { merge: true }
+      )
+      onShowToast?.('已儲存全站公告與系統設定，前台已即時生效！', 'success')
+    } catch (err) {
+      console.error('Failed to save system_config:', err)
+      onShowToast?.('儲存系統設定失敗', 'error')
+    } finally {
+      setIsSavingConfig(false)
+    }
+  }
+
+  const handleAddCustomSuspension = () => {
+    if (!newSuspensionStatus.trim()) return
+    const existing = systemConfig.customSuspensions || []
+    const filtered = existing.filter((item) => item.city !== newSuspensionCity)
+    const updated: SuspensionItem[] = [
+      ...filtered,
+      { city: newSuspensionCity, status: newSuspensionStatus.trim() }
+    ]
+    setSystemConfig((prev) => ({ ...prev, customSuspensions: updated }))
+  }
+
+  const handleRemoveCustomSuspension = (city: string) => {
+    setSystemConfig((prev) => ({
+      ...prev,
+      customSuspensions: (prev.customSuspensions || []).filter((item) => item.city !== city)
+    }))
+  }
+
+  const handleTriggerGithubScraper = async () => {
+    const token = ghToken.trim()
+    if (!token) {
+      window.open('https://github.com/Pihai0202/Pihai0202.github.io/actions/workflows/scrape.yml', '_blank')
+      return
+    }
+    localStorage.setItem('tw_admin_gh_token', token)
+    setIsTriggeringAction(true)
+    try {
+      const res = await fetch(
+        'https://api.github.com/repos/Pihai0202/Pihai0202.github.io/actions/workflows/scrape.yml/dispatches',
+        {
+          method: 'POST',
+          headers: {
+            Accept: 'application/vnd.github+json',
+            Authorization: `Bearer ${token}`,
+            'X-GitHub-Api-Version': '2022-11-28'
+          },
+          body: JSON.stringify({ ref: 'main' })
+        }
+      )
+      if (res.status === 204 || res.ok) {
+        onShowToast?.('已成功發送 GitHub Actions 爬蟲排程觸發指令！', 'success')
+      } else {
+        const errText = await res.text()
+        onShowToast?.(`觸發失敗 (${res.status})：請確認 Token 具備 workflow 權限 (${errText.slice(0, 60)})`, 'error')
+      }
+    } catch (err) {
+      console.error('GitHub dispatch error:', err)
+      onShowToast?.('網路連線錯誤，無法呼叫 GitHub API', 'error')
+    } finally {
+      setIsTriggeringAction(false)
+    }
+  }
+
+  const handleExportUserJson = (u: UserConcertLogDoc) => {
+    const blob = new Blob([JSON.stringify(u, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `concert-backup-${u.email.replace(/[^a-zA-Z0-9_-]/g, '_')}.json`
+    a.click()
+    URL.revokeObjectURL(url)
+    onShowToast?.(`已匯出 ${u.email} 的備份 JSON 檔案`, 'success')
+  }
+
+  const handleDeleteUserSingleConcert = async (u: UserConcertLogDoc, concertId: string, title: string) => {
+    if (!window.confirm(`確定要從會員「${u.email}」的雲端紀錄中移除「${title}」嗎？`)) return
+    try {
+      const nextConcerts = u.concerts.filter((c) => c.id !== concertId)
+      await setDoc(
+        doc(db, 'users_concerts', u.email),
+        {
+          email: u.email,
+          concerts: nextConcerts,
+          updatedAt: new Date().toISOString()
+        },
+        { merge: true }
+      )
+      onShowToast?.('已移除該筆打卡紀錄', 'success')
+    } catch (err) {
+      console.error('Failed to update user concerts:', err)
+      onShowToast?.('移除紀錄失敗', 'error')
+    }
+  }
+
   // Computed summary metrics
   const visibleReviewCount = allReviews.filter((r) => !r.hidden).length
   const hiddenReviewCount = allReviews.filter((r) => r.hidden).length
   const pinnedReviewCount = allReviews.filter((r) => r.pinned).length
   const totalReviewLikes = allReviews.reduce((sum, r) => sum + (r.likes || 0), 0)
   const customVenueCount = venues.filter((v) => !staticVenueIds.has(v.id)).length
+  const overrideCount = Object.keys(eventOverrides).length
 
   // Map viewBox calculation for Venue Picker
   const mapViewW = 800 / mapZoom
@@ -688,7 +1183,7 @@ export function AdminDashboard({
               <ShieldIcon size="1.15em" style={{ color: 'var(--gold)' }} />
               <span>後台管理控制中心 (Admin Dashboard)</span>
             </h2>
-            <p>管理全台場館座標、審核社群心得與售票討論留言、檢視全站營運數據</p>
+            <p>管理全台場館座標、審核社群內容、覆寫/補登活動檔期、會員足跡救援與全站公告設定</p>
           </div>
         </div>
         <div className="admin-identity-badge">
@@ -697,7 +1192,7 @@ export function AdminDashboard({
         </div>
       </div>
 
-      {/* Main Navigation Tabs */}
+      {/* Main Navigation Tabs (All 5 Modules) */}
       <div className="admin-main-tabs">
         <button
           type="button"
@@ -722,8 +1217,30 @@ export function AdminDashboard({
           onClick={() => setActiveTab('venues')}
         >
           <MapIcon size="1.05em" />
-          <span>場館與地圖座標管理</span>
+          <span>場館與地圖座標</span>
           <span className="admin-tab-count">{venues.length}</span>
+        </button>
+        <button
+          type="button"
+          className={`admin-tab-btn${activeTab === 'events' ? ' active' : ''}`}
+          onClick={() => setActiveTab('events')}
+        >
+          <CalendarIcon size="1.05em" />
+          <span>活動覆寫與歷史檔期</span>
+          {unmappedEventCount > 0 && (
+            <span className="admin-tab-count" style={{ background: 'rgba(245, 158, 11, 0.35)', color: '#fbbf24' }}>
+              待配對 {unmappedEventCount}
+            </span>
+          )}
+        </button>
+        <button
+          type="button"
+          className={`admin-tab-btn${activeTab === 'system' ? ' active' : ''}`}
+          onClick={() => setActiveTab('system')}
+        >
+          <SettingsIcon size="1.05em" />
+          <span>全站公告與會員查詢</span>
+          <span className="admin-tab-count">{userDocs.length}</span>
         </button>
       </div>
 
@@ -778,9 +1295,9 @@ export function AdminDashboard({
                 <span>近期售票與職棒賽事</span>
                 <TicketIcon size="1.15em" />
               </div>
-              <div className="admin-stat-value">{remoteConcerts.length}</div>
+              <div className="admin-stat-value">{mergedAdminUpcomingEvents.length}</div>
               <div className="admin-stat-sub">
-                最後爬蟲更新：{remoteUpdatedAt || '讀取中'}
+                未配對場館 {unmappedEventCount} 筆 · 已手動覆寫 {overrideCount} 筆
               </div>
             </div>
           </div>
@@ -838,7 +1355,7 @@ export function AdminDashboard({
               <div className="admin-panel-header">
                 <h3>
                   <ShieldIcon size="1em" style={{ color: 'var(--gold)' }} />
-                  <span>授權管理員白名單 (RBAC)</span>
+                  <span>授權管理員白名單與快捷操作</span>
                 </h3>
               </div>
               <div className="admin-rank-list">
@@ -860,14 +1377,21 @@ export function AdminDashboard({
                   className="admin-action-btn primary"
                   onClick={() => setActiveTab('moderation')}
                 >
-                  前往審核社群貼文與留言 →
+                  審核社群貼文與留言 →
                 </button>
                 <button
                   type="button"
                   className="admin-action-btn"
-                  onClick={() => setActiveTab('venues')}
+                  onClick={() => setActiveTab('events')}
                 >
-                  前往管理場館與地圖座標 →
+                  配對活動場館與歷史檔期 →
+                </button>
+                <button
+                  type="button"
+                  className="admin-action-btn"
+                  onClick={() => setActiveTab('system')}
+                >
+                  發布全站公告與查詢會員 →
                 </button>
               </div>
             </div>
@@ -1001,7 +1525,9 @@ export function AdminDashboard({
                             · {review.venueName} ({review.venueCity}) · {review.date || '未填日期'}
                           </span>
                           <span style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>
-                            · 作者：<strong>{review.author}</strong> · <HeartFilledIcon size="0.88em" style={{ color: '#ef4444', verticalAlign: '-1px' }} /> {review.likes}
+                            · 作者：<strong>{review.author}</strong> ·{' '}
+                            <HeartFilledIcon size="0.88em" style={{ color: '#ef4444', verticalAlign: '-1px' }} />{' '}
+                            {review.likes}
                           </span>
                         </div>
 
@@ -1524,7 +2050,6 @@ export function AdminDashboard({
                   />
                 ))}
 
-                {/* All other venues as reference dots */}
                 {venues.map((v) => {
                   const pos =
                     v.longitude && v.latitude
@@ -1546,7 +2071,6 @@ export function AdminDashboard({
                   )
                 })}
 
-                {/* Active Editing Venue Target Pin */}
                 <g transform={`translate(${activePinPos.x}, ${activePinPos.y})`}>
                   <circle
                     r={Math.max(7, 16 / mapZoom)}
@@ -1604,8 +2128,18 @@ export function AdminDashboard({
               </div>
 
               <div className="admin-map-coord-readout">
-                <span>
-                  <TargetIcon size={15} style={{ width: '15px', height: '15px', color: 'var(--gold)', verticalAlign: '-2px', marginRight: '5px', flexShrink: 0 }} />
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '5px' }}>
+                  <TargetIcon
+                    size={15}
+                    style={{
+                      width: '15px',
+                      height: '15px',
+                      color: 'var(--gold)',
+                      verticalAlign: '-2px',
+                      marginRight: '5px',
+                      flexShrink: 0
+                    }}
+                  />
                   <strong>{venueForm.name || '未命名場館'}</strong>
                 </span>
                 <span style={{ fontFamily: 'monospace' }}>
@@ -1615,6 +2149,763 @@ export function AdminDashboard({
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* ==================== TAB 4: EVENTS & OVERRIDE MANAGER (PHASE 3) ==================== */}
+      {activeTab === 'events' && (
+        <div className="admin-panel">
+          <div className="admin-panel-header">
+            <div className="admin-filter-pills">
+              <button
+                type="button"
+                className={`admin-pill-btn${eventsSubTab === 'upcoming' ? ' active' : ''}`}
+                onClick={() => setEventsSubTab('upcoming')}
+              >
+                <TicketIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                近期售票與賽事覆寫 ({mergedAdminUpcomingEvents.length})
+              </button>
+              <button
+                type="button"
+                className={`admin-pill-btn${eventsSubTab === 'historical' ? ' active' : ''}`}
+                onClick={() => setEventsSubTab('historical')}
+              >
+                <ArchiveIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                歷史活動資料庫補登 ({historicalList.length})
+              </button>
+            </div>
+
+            {eventsSubTab === 'upcoming' && (
+              <button type="button" className="admin-action-btn primary" onClick={handleStartNewUpcomingEvent}>
+                <PlusIcon size="0.95em" /> 手動補登近期活動
+              </button>
+            )}
+          </div>
+
+          {eventsSubTab === 'upcoming' ? (
+            <>
+              <div className="admin-toolbar">
+                <div className="admin-search-box">
+                  <SearchIcon size="1em" />
+                  <input
+                    type="text"
+                    placeholder="搜尋活動名稱、歌手、原始場館字串或售票平台..."
+                    value={eventSearch}
+                    onChange={(e) => setEventSearch(e.target.value)}
+                  />
+                  {eventSearch && (
+                    <button
+                      type="button"
+                      onClick={() => setEventSearch('')}
+                      style={{ background: 'none', border: 'none', color: 'var(--muted)', cursor: 'pointer' }}
+                    >
+                      <CloseIcon size="0.9em" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="admin-filter-pills">
+                  <button
+                    type="button"
+                    className={`admin-pill-btn${upcomingFilter === 'all' ? ' active' : ''}`}
+                    onClick={() => setUpcomingFilter('all')}
+                  >
+                    全部 ({mergedAdminUpcomingEvents.length})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-pill-btn${upcomingFilter === 'unmapped' ? ' active' : ''}`}
+                    onClick={() => setUpcomingFilter('unmapped')}
+                  >
+                    未配對場館 ({unmappedEventCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-pill-btn${upcomingFilter === 'overridden' ? ' active' : ''}`}
+                    onClick={() => setUpcomingFilter('overridden')}
+                  >
+                    已手動覆寫 ({overrideCount})
+                  </button>
+                  <button
+                    type="button"
+                    className={`admin-pill-btn${upcomingFilter === 'hidden' ? ' active' : ''}`}
+                    onClick={() => setUpcomingFilter('hidden')}
+                  >
+                    已下架隱藏 ({mergedAdminUpcomingEvents.filter((e) => e.isHidden).length})
+                  </button>
+                </div>
+              </div>
+
+              {editingOverride && (
+                <div
+                  className="admin-mod-item is-pinned"
+                  style={{ marginBottom: '1.25rem', background: 'rgba(var(--surface-rgb), 0.95)' }}
+                >
+                  <div className="admin-panel-header" style={{ marginBottom: '0.75rem' }}>
+                    <h4 style={{ margin: 0, color: 'var(--gold)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <EditIcon size="1em" />
+                      <span>
+                        {editingOverride.isCustomNew ? '手動補登近期售票活動' : `覆寫活動設定：${editingOverride.name}`}
+                      </span>
+                    </h4>
+                    <button type="button" className="admin-action-btn" onClick={() => setEditingOverride(null)}>
+                      <CloseIcon size="0.9em" /> 關閉編輯器
+                    </button>
+                  </div>
+
+                  <div className="admin-venue-form-grid">
+                    <div className="admin-form-field full">
+                      <label>活動名稱 (Name)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.name || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, name: e.target.value })}
+                      />
+                    </div>
+                    <div className="admin-form-field">
+                      <label>演出者 / 歌手 (Artist)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.artist || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, artist: e.target.value })}
+                        placeholder="例如：五月天 Mayday"
+                      />
+                    </div>
+                    <div className="admin-form-field">
+                      <label>指定對應地圖場館 (解決未配對場館問題)</label>
+                      <select
+                        value={editingOverride.venue_id || ''}
+                        onChange={(e) => {
+                          const vid = e.target.value || null
+                          const matched = venues.find((v) => v.id === vid)
+                          setEditingOverride({
+                            ...editingOverride,
+                            venue_id: vid,
+                            venue_name: matched ? matched.name : editingOverride.venue_name,
+                            city: matched ? matched.city : editingOverride.city
+                          })
+                        }}
+                      >
+                        <option value="">-- 未配對場館 --</option>
+                        {venues.map((v) => (
+                          <option key={v.id} value={v.id}>
+                            {v.city} · {v.name} ({v.id})
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="admin-form-field">
+                      <label>演出日期 (YYYY-MM-DD)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.date || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, date: e.target.value })}
+                        placeholder="2026-11-15"
+                      />
+                    </div>
+                    <div className="admin-form-field">
+                      <label>票價資訊 (Price)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.price || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, price: e.target.value })}
+                        placeholder="例如：NT$ 4,880 / 3,880 / 2,880"
+                      />
+                    </div>
+                    <div className="admin-form-field">
+                      <label>售票連結 (URL)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.url || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, url: e.target.value })}
+                        placeholder="https://tixcraft.com/activity/detail/..."
+                      />
+                    </div>
+                    <div className="admin-form-field">
+                      <label>海報圖片網址 (Image URL)</label>
+                      <input
+                        type="text"
+                        value={editingOverride.image || ''}
+                        onChange={(e) => setEditingOverride({ ...editingOverride, image: e.target.value })}
+                        placeholder="https://..."
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1rem', flexWrap: 'wrap' }}>
+                    <button
+                      type="button"
+                      className="admin-action-btn primary"
+                      onClick={handleSaveEventOverride}
+                      disabled={isSavingOverride}
+                    >
+                      <CheckIcon size="0.95em" />
+                      <span>{isSavingOverride ? '儲存中...' : '儲存活動覆寫設定'}</span>
+                    </button>
+                    {eventOverrides[editingOverride.id] && (
+                      <button
+                        type="button"
+                        className="admin-action-btn danger"
+                        onClick={() => handleResetEventOverride(editingOverride.id)}
+                      >
+                        <TrashIcon size="0.9em" /> 清除覆寫並還原
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <div className="admin-mod-list">
+                {filteredAdminUpcoming.slice(0, 80).map((ev) => (
+                  <div
+                    key={ev.id}
+                    className={`admin-mod-item${ev.isHidden ? ' is-hidden' : ''}${ev.isOverridden ? ' is-pinned' : ''}`}
+                  >
+                    <div className="admin-mod-top">
+                      <div className="admin-mod-meta">
+                        <span className="admin-badge artist">{ev.source}</span>
+                        {ev.isOverridden && <span className="admin-badge pinned">已覆寫</span>}
+                        {ev.isHidden && <span className="admin-badge hidden">已隱藏</span>}
+                        {!ev.venue_id ? (
+                          <span className="admin-badge hidden">
+                            <WarningIcon size="0.85em" /> 未配對場館 ({ev.venue_raw || '無地點'})
+                          </span>
+                        ) : (
+                          <span className="admin-badge visible">
+                            <PinIcon size="0.85em" /> {ev.city} · {ev.venue_name}
+                          </span>
+                        )}
+                        <strong>{ev.name}</strong>
+                        <span style={{ color: 'var(--muted)', fontSize: '0.8rem', fontFamily: 'monospace' }}>
+                          {ev.date}
+                        </span>
+                      </div>
+
+                      <div className="admin-mod-actions">
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          onClick={() => handleOpenOverrideModal(ev)}
+                        >
+                          <EditIcon size="0.9em" />
+                          <span>配對場館 / 編輯</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="admin-action-btn"
+                          onClick={() => handleQuickToggleHideEvent(ev)}
+                        >
+                          {ev.isHidden ? <EyeIcon size="0.9em" /> : <EyeOffIcon size="0.9em" />}
+                          <span>{ev.isHidden ? '恢復顯示' : '下架隱藏'}</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : (
+            <div className="admin-venue-workspace">
+              {/* Historical Events List */}
+              <div>
+                <div className="admin-toolbar">
+                  <div className="admin-search-box">
+                    <SearchIcon size="1em" />
+                    <input
+                      type="text"
+                      placeholder="搜尋歷史活動名稱、歌手、場館或年份 (例如 2024)..."
+                      value={historicalSearch}
+                      onChange={(e) => setHistoricalSearch(e.target.value)}
+                    />
+                  </div>
+                  <button
+                    type="button"
+                    className="admin-action-btn primary"
+                    onClick={() => {
+                      setIsCreatingHistorical(true)
+                      setHistoricalForm({
+                        ...EMPTY_HISTORICAL_FORM,
+                        id: `hist-${Date.now().toString(36)}`
+                      })
+                    }}
+                  >
+                    <PlusIcon size="0.95em" /> 新增歷史檔期
+                  </button>
+                </div>
+
+                <div className="admin-venue-table-wrap" style={{ maxHeight: '520px' }}>
+                  <table className="admin-venue-table">
+                    <thead>
+                      <tr>
+                        <th>日期</th>
+                        <th>演出者</th>
+                        <th>活動名稱</th>
+                        <th>場館</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredHistorical.map((ev) => (
+                        <tr
+                          key={ev.id}
+                          className={!isCreatingHistorical && historicalForm.id === ev.id ? 'selected' : ''}
+                          onClick={() => {
+                            setIsCreatingHistorical(false)
+                            setHistoricalForm({ ...ev })
+                          }}
+                        >
+                          <td style={{ fontFamily: 'monospace', whiteSpace: 'nowrap' }}>{ev.date}</td>
+                          <td>
+                            <span className="admin-badge artist">{ev.artist || '—'}</span>
+                          </td>
+                          <td>
+                            <strong>{ev.name}</strong>
+                          </td>
+                          <td>{ev.venue_name || ev.city || '—'}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Historical Event Form */}
+              <div className="admin-map-picker-card">
+                <div className="admin-panel-header">
+                  <h3>
+                    {isCreatingHistorical ? <PlusIcon size="1em" /> : <EditIcon size="1em" />}
+                    <span>{isCreatingHistorical ? '新增歷史經典活動' : '編輯歷史活動'}</span>
+                  </h3>
+                </div>
+
+                <div className="admin-venue-form-grid">
+                  <div className="admin-form-field full">
+                    <label>活動完整名稱</label>
+                    <input
+                      type="text"
+                      value={historicalForm.name}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, name: e.target.value })}
+                      placeholder="例如：周杰倫 嘉年華世界巡迴演唱會 台北站"
+                    />
+                  </div>
+                  <div className="admin-form-field">
+                    <label>演出者 / 歌手 (Artist)</label>
+                    <input
+                      type="text"
+                      value={historicalForm.artist || ''}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, artist: e.target.value })}
+                      placeholder="例如：周杰倫"
+                    />
+                  </div>
+                  <div className="admin-form-field">
+                    <label>演出日期 (YYYY-MM-DD)</label>
+                    <input
+                      type="text"
+                      value={historicalForm.date}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, date: e.target.value })}
+                      placeholder="2024-12-05"
+                    />
+                  </div>
+                  <div className="admin-form-field full">
+                    <label>舉辦場館</label>
+                    <select
+                      value={historicalForm.venue_id || ''}
+                      onChange={(e) => {
+                        const vid = e.target.value
+                        const matched = venues.find((v) => v.id === vid)
+                        setHistoricalForm({
+                          ...historicalForm,
+                          venue_id: vid,
+                          venue_name: matched ? matched.name : historicalForm.venue_name,
+                          city: matched ? matched.city : historicalForm.city
+                        })
+                      }}
+                    >
+                      <option value="">-- 自訂場館 --</option>
+                      {venues.map((v) => (
+                        <option key={v.id} value={v.id}>
+                          {v.city} · {v.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="admin-form-field">
+                    <label>場館顯示名稱</label>
+                    <input
+                      type="text"
+                      value={historicalForm.venue_name || ''}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, venue_name: e.target.value })}
+                    />
+                  </div>
+                  <div className="admin-form-field">
+                    <label>城市</label>
+                    <input
+                      type="text"
+                      value={historicalForm.city || ''}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, city: e.target.value })}
+                    />
+                  </div>
+                  <div className="admin-form-field full">
+                    <label>活動海報圖片網址 (選填)</label>
+                    <input
+                      type="text"
+                      value={historicalForm.image || ''}
+                      onChange={(e) => setHistoricalForm({ ...historicalForm, image: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.6rem', marginTop: '1rem' }}>
+                  <button
+                    type="button"
+                    className="admin-action-btn primary"
+                    onClick={handleSaveHistoricalEvent}
+                    disabled={isSavingHistorical}
+                  >
+                    <CheckIcon size="0.95em" />
+                    <span>{isSavingHistorical ? '儲存中...' : '儲存至歷史資料庫 (Firestore)'}</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* ==================== TAB 5: SYSTEM CONFIG & USER INSPECTOR (PHASE 4) ==================== */}
+      {activeTab === 'system' && (
+        <div className="admin-panel">
+          <div className="admin-panel-header">
+            <div className="admin-filter-pills">
+              <button
+                type="button"
+                className={`admin-pill-btn${sysSubTab === 'config' ? ' active' : ''}`}
+                onClick={() => setSysSubTab('config')}
+              >
+                <MegaphoneIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                全站置頂公告與系統控制
+              </button>
+              <button
+                type="button"
+                className={`admin-pill-btn${sysSubTab === 'users' ? ' active' : ''}`}
+                onClick={() => setSysSubTab('users')}
+              >
+                <UserIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                雲端會員足跡查詢與備份 ({userDocs.length})
+              </button>
+            </div>
+          </div>
+
+          {sysSubTab === 'config' ? (
+            <div className="admin-panel-grid">
+              {/* Global Announcement Banner Config */}
+              <div className="admin-mod-item">
+                <div className="admin-panel-header">
+                  <h3>
+                    <SparklesIcon size="1em" style={{ color: 'var(--gold)' }} />
+                    <span>全站置頂跑馬燈 / 公告橫幅設定</span>
+                  </h3>
+                  <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 700 }}>
+                    <input
+                      type="checkbox"
+                      checked={systemConfig.announcementEnabled === true}
+                      onChange={(e) =>
+                        setSystemConfig({ ...systemConfig, announcementEnabled: e.target.checked })
+                      }
+                      style={{ width: '16px', height: '16px' }}
+                    />
+                    <span>{systemConfig.announcementEnabled ? '已啟用全站公告' : '目前關閉'}</span>
+                  </label>
+                </div>
+
+                <div className="admin-venue-form-grid">
+                  <div className="admin-form-field full">
+                    <label>公告內容文字</label>
+                    <input
+                      type="text"
+                      value={systemConfig.announcementText || ''}
+                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementText: e.target.value })}
+                      placeholder="例如：大巨蛋最新演唱會檔期與即時職棒比分已同步更新！"
+                    />
+                  </div>
+                  <div className="admin-form-field">
+                    <label>公告主題樣式</label>
+                    <select
+                      value={systemConfig.announcementType || 'info'}
+                      onChange={(e) =>
+                        setSystemConfig({
+                          ...systemConfig,
+                          announcementType: e.target.value as 'info' | 'warning' | 'celebration'
+                        })
+                      }
+                    >
+                      <option value="info">一般資訊 (鼠尾草綠/主題色)</option>
+                      <option value="warning">重要警示 (琥珀橘黃)</option>
+                      <option value="celebration">活動慶典 (亮金強調色)</option>
+                    </select>
+                  </div>
+                  <div className="admin-form-field">
+                    <label>按鈕文字 (選填)</label>
+                    <input
+                      type="text"
+                      value={systemConfig.announcementLinkText || ''}
+                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementLinkText: e.target.value })}
+                      placeholder="例如：查看詳情"
+                    />
+                  </div>
+                  <div className="admin-form-field full">
+                    <label>點擊導向連結 URL (選填)</label>
+                    <input
+                      type="text"
+                      value={systemConfig.announcementLink || ''}
+                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementLink: e.target.value })}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '1rem' }}>
+                  <button
+                    type="button"
+                    className="admin-action-btn primary"
+                    onClick={handleSaveSystemConfig}
+                    disabled={isSavingConfig}
+                  >
+                    <CheckIcon size="0.95em" />
+                    <span>{isSavingConfig ? '儲存中...' : '儲存並立即發布全站設定'}</span>
+                  </button>
+                </div>
+              </div>
+
+              {/* Manual Suspension Overrides & Scraper Trigger */}
+              <div className="admin-mod-item">
+                <div className="admin-panel-header">
+                  <h3>
+                    <WarningIcon size="1em" style={{ color: '#f59e0b' }} />
+                    <span>颱風停班停課 / 演出異動手動警示覆寫</span>
+                  </h3>
+                </div>
+
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '0.85rem' }}>
+                  <select
+                    value={newSuspensionCity}
+                    onChange={(e) => setNewSuspensionCity(e.target.value)}
+                    style={{
+                      background: 'var(--surface2)',
+                      color: 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '10px',
+                      padding: '0.45rem 0.7rem'
+                    }}
+                  >
+                    {TAIWAN_CITY_OPTIONS.map((c) => (
+                      <option key={c} value={c}>
+                        {c}
+                      </option>
+                    ))}
+                  </select>
+                  <input
+                    type="text"
+                    value={newSuspensionStatus}
+                    onChange={(e) => setNewSuspensionStatus(e.target.value)}
+                    style={{
+                      flex: 1,
+                      minWidth: '200px',
+                      background: 'var(--surface2)',
+                      color: 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '10px',
+                      padding: '0.45rem 0.7rem'
+                    }}
+                  />
+                  <button type="button" className="admin-action-btn" onClick={handleAddCustomSuspension}>
+                    <PlusIcon size="0.9em" /> 加入警示
+                  </button>
+                </div>
+
+                {(systemConfig.customSuspensions || []).length === 0 ? (
+                  <p style={{ fontSize: '0.82rem', color: 'var(--muted)' }}>
+                    目前無手動覆寫的縣市停班停課警示（將完全依人事行政總處自動爬蟲為準）。
+                  </p>
+                ) : (
+                  <div className="admin-rank-list" style={{ marginBottom: '0.85rem' }}>
+                    {(systemConfig.customSuspensions || []).map((item) => (
+                      <div key={item.city} className="admin-rank-row">
+                        <div>
+                          <span className="admin-badge hidden" style={{ marginRight: '8px' }}>
+                            {item.city}
+                          </span>
+                          <span>{item.status}</span>
+                        </div>
+                        <button
+                          type="button"
+                          className="admin-action-btn danger"
+                          onClick={() => handleRemoveCustomSuspension(item.city)}
+                        >
+                          <TrashIcon size="0.85em" /> 移除
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <button
+                  type="button"
+                  className="admin-action-btn primary"
+                  onClick={handleSaveSystemConfig}
+                  disabled={isSavingConfig}
+                >
+                  <CheckIcon size="0.95em" /> 儲存停班停課覆寫
+                </button>
+
+                {/* GitHub Actions Crawler Trigger */}
+                <div style={{ marginTop: '1.3rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                  <h4 style={{ margin: '0 0 0.5rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <RocketIcon size="1em" style={{ color: 'var(--gold)' }} />
+                    <span>GitHub Actions 自動爬蟲排程控制</span>
+                  </h4>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--muted)', margin: '0 0 0.75rem' }}>
+                    最後更新時間：{remoteUpdatedAt || '讀取中'}（預設每 20 分鐘自動執行一次）
+                  </p>
+                  <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                    <input
+                      type="password"
+                      placeholder="選填 GitHub PAT Token (留空則開啟 GitHub 網頁)"
+                      value={ghToken}
+                      onChange={(e) => setGhToken(e.target.value)}
+                      style={{
+                        flex: 1,
+                        minWidth: '210px',
+                        background: 'var(--surface2)',
+                        color: 'var(--text)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '10px',
+                        padding: '0.45rem 0.75rem',
+                        fontSize: '0.82rem'
+                      }}
+                    />
+                    <button
+                      type="button"
+                      className="admin-action-btn"
+                      onClick={handleTriggerGithubScraper}
+                      disabled={isTriggeringAction}
+                    >
+                      <LinkIcon size="0.9em" />
+                      <span>{isTriggeringAction ? '觸發中...' : ghToken.trim() ? 'API 立即觸發爬蟲' : '前往 GitHub Actions'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="admin-venue-workspace">
+              {/* Left: Users Table */}
+              <div>
+                <div className="admin-toolbar">
+                  <div className="admin-search-box">
+                    <SearchIcon size="1em" />
+                    <input
+                      type="text"
+                      placeholder="搜尋樂迷 Email、暱稱或曾打卡的歌手/場館..."
+                      value={userSearch}
+                      onChange={(e) => setUserSearch(e.target.value)}
+                    />
+                  </div>
+                </div>
+
+                <div className="admin-venue-table-wrap">
+                  <table className="admin-venue-table">
+                    <thead>
+                      <tr>
+                        <th>樂迷帳號 (Email)</th>
+                        <th>暱稱</th>
+                        <th>打卡場數</th>
+                        <th>最後同步時間</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {filteredUsers.map((u) => (
+                        <tr
+                          key={u.email}
+                          className={selectedUserDoc?.email === u.email ? 'selected' : ''}
+                          onClick={() => setSelectedUserEmail(u.email)}
+                        >
+                          <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{u.email}</td>
+                          <td>
+                            <strong>{u.nickname || '—'}</strong>
+                          </td>
+                          <td>
+                            <span className="admin-badge artist">{u.concerts.length} 場</span>
+                          </td>
+                          <td style={{ fontSize: '0.76rem', color: 'var(--muted)' }}>
+                            {u.updatedAt ? new Date(u.updatedAt).toLocaleString('zh-TW') : '—'}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Right: Selected User Concert Footprint Inspector */}
+              <div className="admin-map-picker-card">
+                {selectedUserDoc ? (
+                  <>
+                    <div className="admin-panel-header">
+                      <div>
+                        <h3 style={{ margin: 0 }}>{selectedUserDoc.nickname} 的現場足跡明細</h3>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--muted)', fontFamily: 'monospace', marginTop: '3px' }}>
+                          {selectedUserDoc.email} · 共 {selectedUserDoc.concerts.length} 筆紀錄
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        className="admin-action-btn primary"
+                        onClick={() => handleExportUserJson(selectedUserDoc)}
+                      >
+                        <ClipboardIcon size="0.9em" /> 匯出 JSON 備份
+                      </button>
+                    </div>
+
+                    <div className="admin-mod-list" style={{ maxHeight: '440px', overflowY: 'auto' }}>
+                      {selectedUserDoc.concerts.length === 0 ? (
+                        <p style={{ color: 'var(--muted)', fontSize: '0.85rem' }}>此會員尚無打卡紀錄</p>
+                      ) : (
+                        selectedUserDoc.concerts.map((c) => (
+                          <div key={c.id} className="admin-reply-row">
+                            <div>
+                              <span className="admin-badge artist" style={{ marginRight: '6px' }}>
+                                {c.artist}
+                              </span>
+                              <strong>{c.concertName || '未命名演出'}</strong>
+                              <div style={{ fontSize: '0.76rem', color: 'var(--muted)', marginTop: '2px' }}>
+                                {c.date || '無日期'} · {c.venueName} ({c.venueCity}) · 座位：{c.seat || '未填'}
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              className="admin-action-btn danger"
+                              onClick={() =>
+                                handleDeleteUserSingleConcert(
+                                  selectedUserDoc,
+                                  c.id,
+                                  `${c.artist} - ${c.concertName}`
+                                )
+                              }
+                            >
+                              <TrashIcon size="0.85em" />
+                            </button>
+                          </div>
+                        ))
+                      )}
+                    </div>
+                  </>
+                ) : (
+                  <p style={{ color: 'var(--muted)' }}>請從左側選擇一位樂迷檢視明細</p>
+                )}
+              </div>
+            </div>
+          )}
         </div>
       )}
     </div>

@@ -5,6 +5,11 @@ import type { HistoricalEvent, HistoricalEventPayload } from '../types'
 let inMemoryEvents: HistoricalEvent[] | null = null
 let loadPromise: Promise<HistoricalEvent[]> | null = null
 
+export function invalidateHistoricalEventsCache(): void {
+  inMemoryEvents = null
+  loadPromise = null
+}
+
 /**
  * Fetch historical events with smart fallback (local / static json)
  */
@@ -65,6 +70,34 @@ export async function getHistoricalEvents(): Promise<HistoricalEvent[]> {
       } catch {
         // Fallback silently if offline
       }
+    }
+
+    // 3. Merge custom admin-managed historical events from Firestore
+    try {
+      const customQ = firestoreQuery(
+        collection(db, 'archived_events'),
+        where('isCustomAdmin', '==', true),
+        firestoreLimit(200)
+      )
+      const customSnap = await getDocs(customQ)
+      if (!customSnap.empty) {
+        const customMap = new Map<string, HistoricalEvent>()
+        customSnap.forEach((d) => {
+          const data = d.data() as HistoricalEvent & { hidden?: boolean }
+          const id = data.id || d.id
+          if (!data.hidden) {
+            customMap.set(id, { ...data, id })
+          } else {
+            events = events.filter((ev) => ev.id !== id)
+          }
+        })
+        if (customMap.size > 0) {
+          const existingIds = new Set(customMap.keys())
+          events = [...Array.from(customMap.values()), ...events.filter((ev) => !existingIds.has(ev.id))]
+        }
+      }
+    } catch {
+      // Ignore offline errors
     }
 
     inMemoryEvents = events
