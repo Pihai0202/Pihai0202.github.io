@@ -3034,19 +3034,18 @@ export function AdminDashboard({
                     </button>
                   </div>
                 </div>
-              </div>
 
-              {/* Dynamic Admin Access Manager */}
-              <div className="admin-mod-item" style={{ gridColumn: '1 / -1' }}>
-                <div className="admin-panel-header">
-                  <h3>
-                    <ShieldIcon size="1em" style={{ color: 'var(--gold)' }} />
-                    <span>管理員帳號權限名單設定 (Admin Access List)</span>
-                  </h3>
-                  <span className="admin-badge artist">
-                    共 {ADMIN_EMAILS.length + (systemConfig.adminEmails?.length || 0)} 位管理員
-                  </span>
-                </div>
+                {/* Dynamic Admin Access Manager inside Right Column */}
+                <div style={{ marginTop: '1.3rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
+                  <div className="admin-panel-header" style={{ marginBottom: '0.45rem' }}>
+                    <h4 style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <ShieldIcon size="1em" style={{ color: 'var(--gold)' }} />
+                      <span>管理員帳號權限名單設定</span>
+                    </h4>
+                    <span className="admin-badge artist">
+                      共 {ADMIN_EMAILS.length + (systemConfig.adminEmails?.length || 0)} 位管理員
+                    </span>
+                  </div>
 
                 <p style={{ fontSize: '0.82rem', color: 'var(--muted)', margin: '0 0 0.85rem' }}>
                   輸入會員的登入 Email 即可授予完整管理後台與資料庫管理權限（儲存後前台與雲端權限立即生效）。
@@ -3115,6 +3114,7 @@ export function AdminDashboard({
                       </button>
                     </div>
                   ))}
+                </div>
                 </div>
               </div>
             </div>
