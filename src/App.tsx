@@ -421,7 +421,7 @@ function App() {
   const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
 
   const isAnnouncementActive = Boolean(
-    systemConfig?.announcementEnabled && systemConfig?.announcementText
+    systemConfig?.announcementEnabled !== false && systemConfig?.announcementText?.trim()
   )
   const isAnnouncementOpen =
     manualOpenAnnouncement ||
@@ -434,9 +434,9 @@ function App() {
   }, [hasActiveSuspension, currentSuspensionVersionKey, dismissedSuspensionKey])
 
   useEffect(() => {
-    if (isAnnouncementOpen && !isSuspensionModalOpen) {
+    if (isAnnouncementOpen) {
       setActiveAlertTab('announcement')
-    } else if (isSuspensionModalOpen && !isAnnouncementOpen) {
+    } else if (isSuspensionModalOpen) {
       setActiveAlertTab('suspension')
     }
   }, [isAnnouncementOpen, isSuspensionModalOpen])
@@ -2439,17 +2439,10 @@ function App() {
     <>
       {(isAnnouncementOpen || (isSuspensionModalOpen && suspensionData)) &&
         view !== 'admin' && (() => {
-          const canShowAnnouncement = isAnnouncementActive && !!systemConfig?.announcementText
-          const canShowSuspension = Boolean(hasActiveSuspension && suspensionData)
-          const showDualTabSwitcher = canShowAnnouncement && canShowSuspension
-          const effectiveTab: 'announcement' | 'suspension' =
-            activeAlertTab === 'announcement' && canShowAnnouncement
-              ? 'announcement'
-              : activeAlertTab === 'suspension' && canShowSuspension
-                ? 'suspension'
-                : isAnnouncementOpen && canShowAnnouncement
-                  ? 'announcement'
-                  : 'suspension'
+          const canShowAnnouncement = Boolean(systemConfig?.announcementText?.trim())
+          const canShowSuspension = Boolean(suspensionData && suspensionData.items.length > 0)
+          const showDualTabSwitcher = true
+          const effectiveTab: 'announcement' | 'suspension' = activeAlertTab
 
           const handleAcknowledgeAnnouncement = () => {
             if (currentAnnouncementVersionKey) {
@@ -2538,7 +2531,10 @@ function App() {
                   >
                     <button
                       type="button"
-                      onClick={() => setActiveAlertTab('announcement')}
+                      onClick={() => {
+                        setManualOpenAnnouncement(true)
+                        setActiveAlertTab('announcement')
+                      }}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -2574,7 +2570,10 @@ function App() {
                     </button>
                     <button
                       type="button"
-                      onClick={() => setActiveAlertTab('suspension')}
+                      onClick={() => {
+                        setIsSuspensionModalOpen(true)
+                        setActiveAlertTab('suspension')
+                      }}
                       style={{
                         display: 'inline-flex',
                         alignItems: 'center',
@@ -2613,7 +2612,7 @@ function App() {
                   </div>
                 )}
 
-                {effectiveTab === 'announcement' && systemConfig ? (
+                {effectiveTab === 'announcement' ? (
                   <>
                     <div
                       style={{
@@ -2626,32 +2625,32 @@ function App() {
                         fontWeight: 700,
                         marginBottom: '0.75rem',
                         background:
-                          systemConfig.announcementType === 'warning'
+                          systemConfig?.announcementType === 'warning'
                             ? 'rgba(245, 158, 11, 0.18)'
-                            : systemConfig.announcementType === 'celebration'
+                            : systemConfig?.announcementType === 'celebration'
                               ? 'rgba(234, 88, 12, 0.18)'
                               : 'rgba(var(--accent-rgb), 0.18)',
                         color:
-                          systemConfig.announcementType === 'warning'
+                          systemConfig?.announcementType === 'warning'
                             ? '#f59e0b'
-                            : systemConfig.announcementType === 'celebration'
+                            : systemConfig?.announcementType === 'celebration'
                               ? '#fb923c'
                               : 'var(--gold)'
                       }}
                     >
-                      {systemConfig.announcementType === 'warning' ? (
+                      {systemConfig?.announcementType === 'warning' ? (
                         <WarningIcon size="0.95em" />
-                      ) : systemConfig.announcementType === 'celebration' ? (
+                      ) : systemConfig?.announcementType === 'celebration' ? (
                         <SparklesIcon size="0.95em" />
                       ) : (
                         <MegaphoneIcon size="0.95em" />
                       )}
                       <span>
-                        {systemConfig.announcementType === 'warning'
+                        {systemConfig?.announcementType === 'warning'
                           ? lang === 'zh-TW'
                             ? '重要提醒'
                             : 'Important Alert'
-                          : systemConfig.announcementType === 'celebration'
+                          : systemConfig?.announcementType === 'celebration'
                             ? lang === 'zh-TW'
                               ? '最新活動公告'
                               : 'Special Event'
@@ -2669,7 +2668,7 @@ function App() {
                         lineHeight: 1.35
                       }}
                     >
-                      {systemConfig.announcementTitle ||
+                      {systemConfig?.announcementTitle ||
                         (lang === 'zh-TW' ? '全站重要公告' : 'Site Announcement')}
                     </h2>
 
@@ -2688,11 +2687,12 @@ function App() {
                         overflowY: 'auto'
                       }}
                     >
-                      {systemConfig.announcementText}
+                      {systemConfig?.announcementText ||
+                        (lang === 'zh-TW' ? '目前無最新全站系統公告。' : 'No active site announcement.')}
                     </div>
 
                     <div className="publish-actions" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                      {systemConfig.announcementLink && (
+                      {systemConfig?.announcementLink && (
                         <a
                           href={systemConfig.announcementLink}
                           target="_blank"
@@ -2718,7 +2718,7 @@ function App() {
                       <button
                         type="button"
                         className={
-                          systemConfig.announcementLink ? 'publish-cancel-btn' : 'publish-submit-btn'
+                          systemConfig?.announcementLink ? 'publish-cancel-btn' : 'publish-submit-btn'
                         }
                         style={{ flex: 1 }}
                         onClick={handleAcknowledgeAnnouncement}

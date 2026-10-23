@@ -1052,16 +1052,22 @@ export function AdminDashboard({
     setIsSavingConfig(true)
     try {
       const nowIso = new Date().toISOString()
+      const shouldEnable =
+        systemConfig.announcementEnabled !== undefined
+          ? systemConfig.announcementEnabled
+          : Boolean(systemConfig.announcementText?.trim())
       await setDoc(
         doc(db, 'system_config', 'global'),
         {
           ...systemConfig,
+          announcementEnabled: shouldEnable,
           announcementUpdatedAt: nowIso,
           updatedAt: nowIso,
           updatedBy: currentUser?.email || 'admin'
         },
         { merge: true }
       )
+      setSystemConfig((prev) => ({ ...prev, announcementEnabled: shouldEnable }))
       onShowToast?.('已儲存全站公告設定，前台已即時生效！', 'success')
     } catch (err) {
       console.error('Failed to save system_config:', err)
@@ -2722,6 +2728,52 @@ export function AdminDashboard({
                       boxShadow: '0 10px 28px rgba(0, 0, 0, 0.25)'
                     }}
                   >
+                    <div
+                      style={{
+                        display: 'grid',
+                        gridTemplateColumns: '1fr 1fr',
+                        gap: '6px',
+                        padding: '4px',
+                        borderRadius: '12px',
+                        background: 'rgba(var(--bg-rgb), 0.55)',
+                        border: '1px solid var(--border)',
+                        marginBottom: '0.9rem'
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '0.42rem 0.6rem',
+                          borderRadius: '9px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          background: 'rgba(var(--accent-rgb), 0.22)',
+                          color: 'var(--gold)'
+                        }}
+                      >
+                        <MegaphoneIcon size="0.95em" />
+                        <span>全站重要公告</span>
+                      </div>
+                      <div
+                        style={{
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '6px',
+                          padding: '0.42rem 0.6rem',
+                          borderRadius: '9px',
+                          fontSize: '0.78rem',
+                          fontWeight: 700,
+                          color: 'var(--muted)'
+                        }}
+                      >
+                        <WarningIcon size="0.95em" />
+                        <span>停班停課資訊</span>
+                      </div>
+                    </div>
                     <div
                       style={{
                         display: 'inline-flex',
