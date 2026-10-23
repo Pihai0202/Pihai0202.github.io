@@ -163,7 +163,7 @@ function TaiwanMapComponent({
   const preprojectedVenues = useMemo(() => {
     return venues.map((venue) => ({
       ...venue,
-      pos: project(venue.longitude || 0, venue.latitude || 0),
+      pos: venue.longitude && venue.latitude ? project(venue.longitude, venue.latitude) : { x: venue.x || 455, y: venue.y || 500 },
       isSport: SPORT_SET.has(venue.id),
       tier: getVenueTier(venue),
     }))
@@ -419,7 +419,7 @@ function TaiwanMapComponent({
     lastSelectedVenueId.current = selectedVenueId
 
     if (selectedVenue) {
-      const projected = project(selectedVenue.longitude || 0, selectedVenue.latitude || 0)
+      const projected = selectedVenue.longitude && selectedVenue.latitude ? project(selectedVenue.longitude, selectedVenue.latitude) : { x: selectedVenue.x || 455, y: selectedVenue.y || 500 }
       let targetZoom = 3.5
       if (selectedVenue.id === 'linkou-arena' || selectedVenue.id === 'taoyuan-arena') {
         targetZoom = 3.8

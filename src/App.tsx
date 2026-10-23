@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, useRef, memo } from 'react'
+import { useCallback, useEffect, useMemo, useState, useRef, memo, lazy, Suspense } from 'react'
 import type { ChangeEvent, MouseEvent, ReactNode, TouchEvent as ReactTouchEvent } from 'react'
 import { marked } from 'marked'
 import './App.css'
@@ -26,6 +26,8 @@ import { LoginPage } from './components/LoginPage'
 import { TicketDetailModal } from './components/TicketDetailModal'
 import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
+import { isAdminUser } from './constants/adminConfig'
+const AdminDashboard = lazy(() => import('./components/AdminDashboard'))
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
 import { SafeIframe } from './components/SafeIframe'
@@ -76,7 +78,8 @@ import {
   RefreshIcon,
   LightbulbIcon,
   MicIcon,
-  SettingsIcon
+  SettingsIcon,
+  ShieldIcon
 } from './components/SvgIcon'
 
 const STORAGE_KEY = 'tw-concerts'
@@ -340,7 +343,12 @@ function App() {
   const handleReloadPlayer = useCallback(() => setPlayerReloadKey((k) => k + 1), [])
   const [zoom, setZoom] = useState(() => getDefaultZoom())
   const [notesActiveTab, setNotesActiveTab] = useState<'edit' | 'preview'>('edit')
-  const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile'>('map')
+  const [view, setView] = useState<'map' | 'board' | 'calendar' | 'login' | 'profile' | 'admin'>(() => {
+    if (typeof window !== 'undefined' && (window.location.hash === '#admin' || new URLSearchParams(window.location.search).get('admin') === '1')) {
+      return 'admin'
+    }
+    return 'map'
+  })
 
   const bottomNavRef = useRef<HTMLDivElement>(null)
   const [indicatorStyle, setIndicatorStyle] = useState<React.CSSProperties>({
@@ -2329,6 +2337,15 @@ function App() {
             <MessageIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{t('tabCommunity')}</span>
           </button>
 
+          {isLoggedIn && currentUser && isAdminUser(currentUser.email) && (
+            <button
+              className={`nav-toggle-btn${view === 'admin' ? ' active' : ''}`}
+              type="button"
+              onClick={() => setView('admin')}
+            >
+              <ShieldIcon style={{ marginRight: '6px' }} /> <span className="btn-label">{lang === 'zh-TW' ? '管理後台' : 'Admin'}</span>
+            </button>
+          )}
           {isLoggedIn && currentUser ? (
             <button
               className={`nav-toggle-btn profile-trigger-btn${view === 'profile' ? ' active' : ''}`}
@@ -3112,6 +3129,27 @@ function App() {
           onLogout={handleLogout}
           onBack={() => setView('map')}
           onOpenConcertDetail={openConcertDetail}
+          onOpenAdmin={() => setView('admin')}
+        />
+      ) : view === 'admin' && isLoggedIn && currentUser && isAdminUser(currentUser.email) ? (
+        <Suspense fallback={<div style={{ padding: '6rem 2rem', textAlign: 'center', color: 'var(--muted)' }}>載入管理後台中...</div>}>
+          <AdminDashboard
+            currentUser={currentUser}
+            venues={venues}
+            onVenuesChange={setVenues}
+            remoteConcerts={resolvedRemoteConcerts}
+            remoteUpdatedAt={remoteUpdatedAt}
+            onBack={() => {
+              if (window.location.hash === '#admin') {
+                window.history.replaceState(null, '', window.location.pathname + window.location.search)
+              }
+              setView('map')
+            }}
+            onShowToast={showToast}
+          />
+        </Suspense>
+      ) : false ? (
+        <div
         />
       ) : (
         <LoginPage
@@ -3909,6 +3947,22 @@ function App() {
                   </span>
                   <span className="settings-action-badge">{isMusicBarVisible ? 'ON' : 'OFF'}</span>
                 </button>
+                {isLoggedIn && currentUser && isAdminUser(currentUser.email) && (
+                  <button
+                    type="button"
+                    className="settings-action-item"
+                    onClick={() => {
+                      setIsSettingsModalOpen(false)
+                      setView('admin')
+                    }}
+                  >
+                    <span className="settings-action-left">
+                      <ShieldIcon size="1.05em" />
+                      <span>{lang === 'zh-TW' ? '進入管理後台 (Admin)' : 'Admin Dashboard'}</span>
+                    </span>
+                    <span className="settings-action-arrow">→</span>
+                  </button>
+                )}
                 {isLoggedIn && currentUser && (
                   <button
                     type="button"

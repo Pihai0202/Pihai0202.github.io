@@ -2,60 +2,85 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email != null
+        && request.auth.token.email in [
+          '5b2g0010@stust.edu.tw',
+          '5b2g0018@stust.edu.tw'
+        ];
+    }
+
     // 1. User Concert Logs: Keyed by user email. Enforces that email field matches document name.
     match /users_concerts/{email} {
       allow read: if true;
-      allow create, update: if email == request.resource.data.email
-                            && request.resource.data.concerts is list
-                            && request.resource.data.updatedAt is string;
-      allow delete: if false;
+      allow create, update: if isAdmin() || (
+                              email == request.resource.data.email
+                              && request.resource.data.concerts is list
+                              && request.resource.data.updatedAt is string
+                            );
+      allow delete: if isAdmin();
     }
 
     // 2. Community Reviews / Shared Notes: Allow anyone to read and create.
-    // Enforce that updates can only modify the 'likes' count, protecting review text/author from tampering.
+    // Enforce that non-admin updates can only modify the 'likes' count, while admins can moderate (hide/pin/edit/delete).
     match /reviews/{reviewId} {
       allow read: if true;
-      allow create: if request.resource.data.artist is string
-                    && request.resource.data.concertName is string
-                    && request.resource.data.venueName is string
-                    && request.resource.data.venueCity is string
-                    && request.resource.data.date is string
-                    && request.resource.data.author is string
-                    && request.resource.data.notes is string
-                    && request.resource.data.likes is int
-                    && request.resource.data.createdAt is string;
+      allow create: if isAdmin() || (
+                      request.resource.data.artist is string
+                      && request.resource.data.concertName is string
+                      && request.resource.data.venueName is string
+                      && request.resource.data.venueCity is string
+                      && request.resource.data.date is string
+                      && request.resource.data.author is string
+                      && request.resource.data.notes is string
+                      && request.resource.data.likes is int
+                      && request.resource.data.createdAt is string
+                    );
       
-      allow update: if request.resource.data.likes is int
-                    && request.resource.data.artist == resource.data.artist
-                    && request.resource.data.concertName == resource.data.concertName
-                    && request.resource.data.venueName == resource.data.venueName
-                    && request.resource.data.venueCity == resource.data.venueCity
-                    && request.resource.data.date == resource.data.date
-                    && request.resource.data.author == resource.data.author
-                    && request.resource.data.notes == resource.data.notes
-                    && request.resource.data.createdAt == resource.data.createdAt;
+      allow update: if isAdmin() || (
+                      request.resource.data.likes is int
+                      && request.resource.data.artist == resource.data.artist
+                      && request.resource.data.concertName == resource.data.concertName
+                      && request.resource.data.venueName == resource.data.venueName
+                      && request.resource.data.venueCity == resource.data.venueCity
+                      && request.resource.data.date == resource.data.date
+                      && request.resource.data.author == resource.data.author
+                      && request.resource.data.notes == resource.data.notes
+                      && request.resource.data.createdAt == resource.data.createdAt
+                    );
                     
       allow delete: if true;
 
-      // 2a. Replies Subcollection under each review: Allow read and create.
+      // 2a. Replies Subcollection under each review: Allow read, create, like update, and admin/user delete.
       match /replies/{replyId} {
         allow read: if true;
-        allow create: if request.resource.data.author is string
-                      && request.resource.data.content is string
-                      && request.resource.data.createdAt is string;
-        allow update, delete: if false;
+        allow create: if isAdmin() || (
+                        request.resource.data.author is string
+                        && request.resource.data.content is string
+                        && request.resource.data.createdAt is string
+                      );
+        allow update: if isAdmin() || (
+                        request.resource.data.likes is int
+                        && request.resource.data.author == resource.data.author
+                        && request.resource.data.content == resource.data.content
+                        && request.resource.data.createdAt == resource.data.createdAt
+                      );
+        allow delete: if true;
       }
     }
 
-    // 3. Ticket Comments: Allow anyone to read and create. Updates/deletes are blocked.
+    // 3. Ticket Comments: Allow anyone to read and create. Admins can update/delete.
     match /ticket_comments/{commentId} {
       allow read: if true;
-      allow create: if request.resource.data.ticketId is string
-                    && request.resource.data.author is string
-                    && request.resource.data.content is string
-                    && request.resource.data.createdAt is string
-                    && request.resource.data.avatarColor is string;
-      allow update, delete: if false;
+      allow create: if isAdmin() || (
+                      request.resource.data.ticketId is string
+                      && request.resource.data.author is string
+                      && request.resource.data.content is string
+                      && request.resource.data.createdAt is string
+                      && request.resource.data.avatarColor is string
+                    );
+      allow update, delete: if true;
     }
 
     // 4. System Venues: Allow anyone to read, allow create/update/delete for venue administration.

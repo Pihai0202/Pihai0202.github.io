@@ -100,7 +100,8 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
           likes: data.likes || 0,
           createdAt: data.createdAt,
           hidden: data.hidden,
-          status: data.status
+          status: data.status,
+          pinned: data.pinned === true
         })
       })
 
@@ -299,7 +300,7 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
   const filteredNotes = useMemo(() => {
     const query = searchQuery.trim().toLowerCase()
     if (!query) {
-      return notes.sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      return notes.sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || Date.parse(b.createdAt) - Date.parse(a.createdAt))
     }
     return notes
       .filter((note) => {
@@ -311,7 +312,7 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
           note.author.toLowerCase().includes(query)
         )
       })
-      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt))
+      .sort((a, b) => (b.pinned ? 1 : 0) - (a.pinned ? 1 : 0) || Date.parse(b.createdAt) - Date.parse(a.createdAt))
   }, [notes, searchQuery])
 
   // Handle Like/Unlike toggle
@@ -523,7 +524,14 @@ export function ShareBoard({ isLoggedIn = false, currentUser = null, onRequireLo
             return (
               <div key={note.id} className="shared-note-card" onClick={() => setSelectedNote(note)}>
                 <div className="shared-card-header">
-                  <div className="card-artist-tag">{note.artist}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.45rem', flexWrap: 'wrap' }}>
+                    {note.pinned && (
+                      <span style={{ background: 'rgba(245, 158, 11, 0.18)', color: 'var(--gold, #f59e0b)', border: '1px solid rgba(245, 158, 11, 0.45)', borderRadius: '999px', padding: '0.15rem 0.55rem', fontSize: '0.72rem', fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                        <PinIcon size="0.85em" /> {lang === 'zh-TW' ? '精選置頂' : 'Pinned'}
+                      </span>
+                    )}
+                    <div className="card-artist-tag">{note.artist}</div>
+                  </div>
                   <div className="card-header-actions" style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
                     {myCreatedIds.includes(note.id) && (
                       <button

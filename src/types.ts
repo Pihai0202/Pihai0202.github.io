@@ -176,6 +176,7 @@ export type SharedNote = {
   createdAt: string
   hidden?: boolean
   status?: string
+  pinned?: boolean
 }
 
 export interface SuspensionItem {

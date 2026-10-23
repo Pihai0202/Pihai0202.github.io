@@ -29,7 +29,8 @@ import {
   SearchIcon,
   LinkIcon,
   CloseIcon,
-  UserIcon
+  UserIcon,
+  ShieldIcon
 } from './SvgIcon'
 
 const EMOJI_TO_AVATAR_KEY: Record<string, string> = {
@@ -81,6 +82,7 @@ import { collection, query, where, getDocs } from 'firebase/firestore'
 import type { SpotifyItem } from '../types'
 import { parseSpotifyEmbedUrl, getSpotifyToken, normalizeSpotifyResults } from '../App'
 import { SafeIframe } from './SafeIframe'
+import { isAdminUser } from '../constants/adminConfig'
 
 interface ProfilePageProps {
   user: { nickname: string; email?: string; avatarUrl?: string; spotifyUrl?: string }
@@ -92,6 +94,7 @@ interface ProfilePageProps {
   onLogout: () => void
   onBack: () => void
   onOpenConcertDetail: (id: string) => void
+  onOpenAdmin?: () => void
 }
 
 interface UserReview {
@@ -113,7 +116,8 @@ export function ProfilePage({
   onPlaySpotifyTrack,
   onLogout,
   onBack,
-  onOpenConcertDetail
+  onOpenConcertDetail,
+  onOpenAdmin
 }: ProfilePageProps) {
   const { t, lang } = useTranslation()
   const [isEditingName, setIsEditingName] = useState(false)
@@ -424,7 +428,29 @@ export function ProfilePage({
           <ArrowLeftIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
           {t('backBtn')}
         </button>
-        <button className="profile-logout-btn" type="button" onClick={onLogout}>
+        {isAdminUser(user.email) && onOpenAdmin && (
+            <button
+              type="button"
+              onClick={onOpenAdmin}
+              style={{
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '6px',
+                background: 'var(--accent)',
+                color: '#fff',
+                border: '1px solid var(--accent)',
+                borderRadius: '999px',
+                padding: '0.5rem 1.05rem',
+                fontSize: '0.88rem',
+                fontWeight: 700,
+                cursor: 'pointer'
+              }}
+            >
+              <ShieldIcon size="1em" />
+              <span>{lang === 'zh-TW' ? '進入管理後台' : 'Admin Dashboard'}</span>
+            </button>
+          )}
+          <button className="profile-logout-btn" type="button" onClick={onLogout}>
           <LogoutIcon style={{ marginRight: '6px', verticalAlign: 'middle' }} />
           {t('logout')}
         </button>
