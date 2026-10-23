@@ -5,10 +5,14 @@ service cloud.firestore {
     function isAdmin() {
       return request.auth != null
         && request.auth.token.email != null
-        && request.auth.token.email in [
+        && (
+          (exists(/databases/$(database)/documents/system_config/global)
+            && request.auth.token.email in get(/databases/$(database)/documents/system_config/global).data.get('adminEmails', []))
+          || request.auth.token.email in [
           '5b2g0010@stust.edu.tw',
           '5b2g0018@stust.edu.tw'
-        ];
+        ]);
+
     }
 
     // 1. User Concert Logs: Keyed by user email. Enforces that email field matches document name.

@@ -24,7 +24,7 @@ import type {
 } from '../types'
 import { TAIWAN_PATHS } from '../constants/taiwanPaths'
 import { VENUES as STATIC_VENUES } from '../constants/venues'
-import { ADMIN_EMAILS } from '../constants/adminConfig'
+import { ADMIN_EMAILS, isAdminUser, isSuperAdminUser, setDynamicAdminEmails } from '../constants/adminConfig'
 import {
   saveVenuesToLocalCache,
   seedDefaultVenuesToFirestore,
@@ -271,9 +271,11 @@ export function AdminDashboard({
             announcementLink: d.announcementLink || '',
             announcementLinkText: d.announcementLinkText || '',
             customSuspensions: Array.isArray(d.customSuspensions) ? d.customSuspensions : [],
+            adminEmails: Array.isArray(d.adminEmails) ? d.adminEmails : [],
             updatedAt: d.updatedAt,
             updatedBy: d.updatedBy
           })
+          setDynamicAdminEmails(d.adminEmails)
         }
       },
       (err) => console.warn('[Admin] Failed to load system_config:', err)
@@ -1022,6 +1024,72 @@ export function AdminDashboard({
   const [newSuspensionStatus, setNewSuspensionStatus] = useState('今日停止上班、停止上課（演出可能延期或取消）')
   const [ghToken, setGhToken] = useState(() => localStorage.getItem('tw_admin_gh_token') || '')
   const [isTriggeringAction, setIsTriggeringAction] = useState(false)
+  const [newAdminEmail, setNewAdminEmail] = useState('')
+
+  const handleSaveAdminEmails = async (nextEmails: string[], toastMsg: string) => {
+    setIsSavingConfig(true)
+    try {
+      const clean = Array.from(
+        new Set(
+          nextEmails
+            .map((e) => e.trim().toLowerCase())
+            .filter((e) => e.includes('@') && !isSuperAdminUser(e))
+        )
+      )
+      const nowIso = new Date().toISOString()
+      await setDoc(
+        doc(db, 'system_config', 'global'),
+        {
+          ...systemConfig,
+          adminEmails: clean,
+          updatedAt: nowIso,
+          updatedBy: currentUser?.email || 'admin'
+        },
+        { merge: true }
+      )
+      setSystemConfig((prev) => ({ ...prev, adminEmails: clean }))
+      setDynamicAdminEmails(clean)
+      onShowToast?.(toastMsg, 'success')
+    } catch (err) {
+      console.error('Failed to save adminEmails:', err)
+      onShowToast?.('更新管理員名單失敗', 'error')
+    } finally {
+      setIsSavingConfig(false)
+    }
+  }
+
+  const handleAddAdminEmail = (overrideEmail?: string) => {
+    const raw = (overrideEmail !== undefined ? overrideEmail : newAdminEmail).trim().toLowerCase()
+    if (!raw || !raw.includes('@')) {
+      onShowToast?.('請輸入有效的管理員 Email 帳號！', 'error')
+      return
+    }
+    if (isSuperAdminUser(raw)) {
+      onShowToast?.('此帳號已是系統創始最高管理員！', 'info')
+      return
+    }
+    const existing = systemConfig.adminEmails || []
+    if (existing.some((e) => e.toLowerCase() === raw)) {
+      onShowToast?.('此 Email 已經在管理員名單中！', 'info')
+      return
+    }
+    const updated = [...existing, raw]
+    if (overrideEmail === undefined) setNewAdminEmail('')
+    handleSaveAdminEmails(updated, `已新增管理員「${raw}」，權限已即時生效！`)
+  }
+
+  const handleRemoveAdminEmail = (emailToRemove: string) => {
+    const normalized = emailToRemove.trim().toLowerCase()
+    if (isSuperAdminUser(normalized)) {
+      onShowToast?.('創始最高管理員不可移除！', 'error')
+      return
+    }
+    if (!window.confirm(`確定要移除「${normalized}」的管理員權限嗎？`)) return
+    const updated = (systemConfig.adminEmails || []).filter(
+      (e) => e.toLowerCase() !== normalized
+    )
+    handleSaveAdminEmails(updated, `已移除「${normalized}」的管理員權限`)
+  }
 
   // User Inspector state
   const [userSearch, setUserSearch] = useState('')
@@ -2967,6 +3035,88 @@ export function AdminDashboard({
                   </div>
                 </div>
               </div>
+
+              {/* Dynamic Admin Access Manager */}
+              <div className="admin-mod-item" style={{ gridColumn: '1 / -1' }}>
+                <div className="admin-panel-header">
+                  <h3>
+                    <ShieldIcon size="1em" style={{ color: 'var(--gold)' }} />
+                    <span>管理員帳號權限名單設定 (Admin Access List)</span>
+                  </h3>
+                  <span className="admin-badge artist">
+                    共 {ADMIN_EMAILS.length + (systemConfig.adminEmails?.length || 0)} 位管理員
+                  </span>
+                </div>
+
+                <p style={{ fontSize: '0.82rem', color: 'var(--muted)', margin: '0 0 0.85rem' }}>
+                  輸入會員的登入 Email 即可授予完整管理後台與資料庫管理權限（儲存後前台與雲端權限立即生效）。
+                </p>
+
+                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', marginBottom: '1rem' }}>
+                  <input
+                    type="email"
+                    placeholder="輸入要新增的管理員 Email（例如：example@gmail.com）..."
+                    value={newAdminEmail}
+                    onChange={(e) => setNewAdminEmail(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault()
+                        handleAddAdminEmail()
+                      }
+                    }}
+                    style={{
+                      flex: 1,
+                      minWidth: '240px',
+                      background: 'var(--surface2)',
+                      color: 'var(--text)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '10px',
+                      padding: '0.5rem 0.85rem',
+                      fontSize: '0.86rem'
+                    }}
+                  />
+                  <button
+                    type="button"
+                    className="admin-action-btn primary"
+                    onClick={() => handleAddAdminEmail()}
+                    disabled={isSavingConfig}
+                  >
+                    <PlusIcon size="0.9em" />
+                    <span>新增管理員</span>
+                  </button>
+                </div>
+
+                <div className="admin-rank-list">
+                  {ADMIN_EMAILS.map((email) => (
+                    <div key={email} className="admin-rank-row">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <ShieldIcon size="0.95em" style={{ color: 'var(--gold)' }} />
+                        <strong style={{ fontFamily: 'monospace', fontSize: '0.86rem' }}>{email}</strong>
+                        <span className="admin-badge pinned">系統創始管理員</span>
+                      </div>
+                      <span style={{ fontSize: '0.76rem', color: 'var(--muted)' }}>永久權限（不可移除）</span>
+                    </div>
+                  ))}
+                  {(systemConfig.adminEmails || []).map((email) => (
+                    <div key={email} className="admin-rank-row">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                        <UserIcon size="0.95em" style={{ color: 'var(--teal)' }} />
+                        <strong style={{ fontFamily: 'monospace', fontSize: '0.86rem' }}>{email}</strong>
+                        <span className="admin-badge artist">新增管理員</span>
+                      </div>
+                      <button
+                        type="button"
+                        className="admin-action-btn danger"
+                        onClick={() => handleRemoveAdminEmail(email)}
+                        disabled={isSavingConfig}
+                      >
+                        <TrashIcon size="0.85em" />
+                        <span>移除權限</span>
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : (
             <div className="admin-venue-workspace">
@@ -3001,7 +3151,14 @@ export function AdminDashboard({
                           className={selectedUserDoc?.email === u.email ? 'selected' : ''}
                           onClick={() => setSelectedUserEmail(u.email)}
                         >
-                          <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>{u.email}</td>
+                          <td style={{ fontFamily: 'monospace', fontSize: '0.8rem' }}>
+                            {u.email}
+                            {isAdminUser(u.email, systemConfig.adminEmails) && (
+                              <span className="admin-badge pinned" style={{ marginLeft: '6px' }}>
+                                管理員
+                              </span>
+                            )}
+                          </td>
                           <td>
                             <strong>{u.nickname || '—'}</strong>
                           </td>
@@ -3029,13 +3186,34 @@ export function AdminDashboard({
                           {selectedUserDoc.email} · 共 {selectedUserDoc.concerts.length} 筆紀錄
                         </div>
                       </div>
-                      <button
-                        type="button"
-                        className="admin-action-btn primary"
-                        onClick={() => handleExportUserJson(selectedUserDoc)}
-                      >
-                        <ClipboardIcon size="0.9em" /> 匯出 JSON 備份
-                      </button>
+                      <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap' }}>
+                        {!isSuperAdminUser(selectedUserDoc.email) && (
+                          isAdminUser(selectedUserDoc.email, systemConfig.adminEmails) ? (
+                            <button
+                              type="button"
+                              className="admin-action-btn danger"
+                              onClick={() => handleRemoveAdminEmail(selectedUserDoc.email)}
+                            >
+                              <TrashIcon size="0.85em" /> 移除管理員
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              className="admin-action-btn"
+                              onClick={() => handleAddAdminEmail(selectedUserDoc.email)}
+                            >
+                              <ShieldIcon size="0.85em" /> 設為管理員
+                            </button>
+                          )
+                        )}
+                        <button
+                          type="button"
+                          className="admin-action-btn primary"
+                          onClick={() => handleExportUserJson(selectedUserDoc)}
+                        >
+                          <ClipboardIcon size="0.9em" /> 匯出 JSON 備份
+                        </button>
+                      </div>
                     </div>
 
                     <div className="admin-mod-list" style={{ maxHeight: '440px', overflowY: 'auto' }}>

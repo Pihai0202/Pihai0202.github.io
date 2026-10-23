@@ -28,7 +28,7 @@ import { LoginPage } from './components/LoginPage'
 import { TicketDetailModal } from './components/TicketDetailModal'
 import { CalendarView } from './components/CalendarView'
 import { ProfilePage } from './components/ProfilePage'
-import { isAdminUser } from './constants/adminConfig'
+import { isAdminUser, setDynamicAdminEmails } from './constants/adminConfig'
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'))
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
@@ -408,6 +408,7 @@ function App() {
       (docSnap) => {
         if (docSnap.exists()) {
           const data = docSnap.data() as SystemConfig
+          setDynamicAdminEmails(data.adminEmails)
           setSystemConfig(data)
         }
       },
