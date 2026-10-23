@@ -1209,7 +1209,7 @@ export function AdminDashboard({
                   disabled={isSavingVenue}
                   title="將預設 38 座場館補齊至 Firestore"
                 >
-                  <RefreshIcon size="0.95em" /> 同步預設場館
+                  <RefreshIcon size={15} style={{ width: '15px', height: '15px', flexShrink: 0 }} /> 同步預設場館
                 </button>
               </div>
             </div>
@@ -1599,13 +1599,13 @@ export function AdminDashboard({
                   }}
                   title="重設全島視角"
                 >
-                  <RefreshIcon size="0.95em" />
+                  <RefreshIcon size={15} style={{ width: '15px', height: '15px', flexShrink: 0 }} />
                 </button>
               </div>
 
               <div className="admin-map-coord-readout">
                 <span>
-                  <TargetIcon size="1em" style={{ color: 'var(--gold)', verticalAlign: '-2px', marginRight: '5px' }} />
+                  <TargetIcon size={15} style={{ width: '15px', height: '15px', color: 'var(--gold)', verticalAlign: '-2px', marginRight: '5px', flexShrink: 0 }} />
                   <strong>{venueForm.name || '未命名場館'}</strong>
                 </span>
                 <span style={{ fontFamily: 'monospace' }}>

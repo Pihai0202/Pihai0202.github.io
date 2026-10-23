@@ -526,7 +526,7 @@
   cursor: crosshair;
 }
 
-.admin-map-svg-box svg {
+.admin-map-svg-box > svg {
   width: 100%;
   height: 100%;
   display: block;
