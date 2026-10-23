@@ -38,7 +38,12 @@ import {
   UserIcon,
   MegaphoneIcon,
   BuildingIcon,
-  TicketIcon
+  TicketIcon,
+  FlameIcon,
+  HeartFilledIcon,
+  EyeIcon,
+  EyeOffIcon,
+  TargetIcon
 } from './SvgIcon'
 import './AdminDashboard.css'
 
@@ -783,7 +788,10 @@ export function AdminDashboard({
           <div className="admin-panel-grid">
             <div className="admin-panel">
               <div className="admin-panel-header">
-                <h3>🔥 樂迷最常打卡歌手 Top 6</h3>
+                <h3>
+                  <FlameIcon size="1.05em" style={{ color: 'var(--gold)' }} />
+                  <span>樂迷最常打卡歌手 Top 6</span>
+                </h3>
               </div>
               {userStats.topArtists.length === 0 ? (
                 <p style={{ color: 'var(--muted)', fontSize: '0.88rem' }}>尚無統計資料</p>
@@ -804,7 +812,10 @@ export function AdminDashboard({
 
             <div className="admin-panel">
               <div className="admin-panel-header">
-                <h3>🏟️ 最熱門打卡場館 Top 6</h3>
+                <h3>
+                  <BuildingIcon size="1.05em" style={{ color: 'var(--gold)' }} />
+                  <span>最熱門打卡場館 Top 6</span>
+                </h3>
               </div>
               {userStats.topVenues.length === 0 ? (
                 <p style={{ color: 'var(--muted)', fontSize: '0.88rem' }}>尚無統計資料</p>
@@ -874,14 +885,16 @@ export function AdminDashboard({
                 className={`admin-pill-btn${modSubTab === 'reviews' ? ' active' : ''}`}
                 onClick={() => setModSubTab('reviews')}
               >
-                📢 心得分享牆貼文 ({allReviews.length})
+                <MegaphoneIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                心得分享牆貼文 ({allReviews.length})
               </button>
               <button
                 type="button"
                 className={`admin-pill-btn${modSubTab === 'comments' ? ' active' : ''}`}
                 onClick={() => setModSubTab('comments')}
               >
-                💬 售票活動討論留言 ({ticketComments.length})
+                <MessageIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                售票活動討論留言 ({ticketComments.length})
               </button>
             </div>
 
@@ -988,7 +1001,7 @@ export function AdminDashboard({
                             · {review.venueName} ({review.venueCity}) · {review.date || '未填日期'}
                           </span>
                           <span style={{ color: 'var(--muted)', fontSize: '0.8rem' }}>
-                            · 作者：<strong>{review.author}</strong> · ❤️ {review.likes}
+                            · 作者：<strong>{review.author}</strong> · <HeartFilledIcon size="0.88em" style={{ color: '#ef4444', verticalAlign: '-1px' }} /> {review.likes}
                           </span>
                         </div>
 
@@ -1006,7 +1019,8 @@ export function AdminDashboard({
                             className="admin-action-btn"
                             onClick={() => handleToggleHideReview(review)}
                           >
-                            <span>{review.hidden ? '👁️ 恢復公開' : '🙈 隱藏貼文'}</span>
+                            {review.hidden ? <EyeIcon size="0.9em" /> : <EyeOffIcon size="0.9em" />}
+                            <span>{review.hidden ? '恢復公開' : '隱藏貼文'}</span>
                           </button>
                           <button
                             type="button"
@@ -1233,7 +1247,7 @@ export function AdminDashboard({
                 }}
               >
                 <option value="all">所有城市 ({venues.length})</option>
-                <option value="custom">✨ 爬蟲/自訂新增場館 ({customVenueCount})</option>
+                <option value="custom">爬蟲/自訂新增場館 ({customVenueCount})</option>
                 {TAIWAN_CITY_OPTIONS.map((c) => (
                   <option key={c} value={c}>
                     {c}
@@ -1298,7 +1312,15 @@ export function AdminDashboard({
             <div style={{ marginTop: '1.25rem', paddingTop: '1rem', borderTop: '1px solid var(--border)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <h4 style={{ margin: 0, fontSize: '1rem', color: 'var(--gold)' }}>
-                  {isCreatingVenue ? '➕ 新增場館資料' : `✏️ 編輯場館：${venueForm.name}`}
+                  {isCreatingVenue ? (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <PlusIcon size="1em" /> 新增場館資料
+                    </span>
+                  ) : (
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
+                      <EditIcon size="1em" /> 編輯場館：{venueForm.name}
+                    </span>
+                  )}
                 </h4>
                 <button
                   type="button"
@@ -1577,13 +1599,14 @@ export function AdminDashboard({
                   }}
                   title="重設全島視角"
                 >
-                  ⟲
+                  <RefreshIcon size="0.95em" />
                 </button>
               </div>
 
               <div className="admin-map-coord-readout">
                 <span>
-                  🎯 <strong>{venueForm.name || '未命名場館'}</strong>
+                  <TargetIcon size="1em" style={{ color: 'var(--gold)', verticalAlign: '-2px', marginRight: '5px' }} />
+                  <strong>{venueForm.name || '未命名場館'}</strong>
                 </span>
                 <span style={{ fontFamily: 'monospace' }}>
                   SVG: ({activePinPos.x}, {activePinPos.y}) · GPS: ({venueForm.latitude?.toFixed(4) ?? '—'},{' '}
