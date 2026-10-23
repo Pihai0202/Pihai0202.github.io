@@ -1463,7 +1463,46 @@ export function AdminDashboard({
                   <ShieldIcon size="1em" style={{ color: 'var(--gold)' }} />
                   <span>授權管理員白名單與快捷操作</span>
                 </h3>
+                <span className="admin-badge artist">
+                  共 {ADMIN_EMAILS.length + (systemConfig.adminEmails?.length || 0)} 位
+                </span>
               </div>
+
+              <div style={{ display: 'flex', gap: '0.45rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+                <input
+                  type="email"
+                  placeholder="輸入 Email 新增管理員..."
+                  value={newAdminEmail}
+                  onChange={(e) => setNewAdminEmail(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault()
+                      handleAddAdminEmail()
+                    }
+                  }}
+                  style={{
+                    flex: 1,
+                    minWidth: '180px',
+                    background: 'var(--surface2)',
+                    color: 'var(--text)',
+                    border: '1px solid var(--border)',
+                    borderRadius: '10px',
+                    padding: '0.42rem 0.75rem',
+                    fontSize: '0.82rem',
+                    boxSizing: 'border-box'
+                  }}
+                />
+                <button
+                  type="button"
+                  className="admin-action-btn primary"
+                  onClick={() => handleAddAdminEmail()}
+                  disabled={isSavingConfig}
+                >
+                  <PlusIcon size="0.9em" />
+                  <span>新增管理員</span>
+                </button>
+              </div>
+
               <div className="admin-rank-list">
                 {ADMIN_EMAILS.map((email, idx) => (
                   <div key={email} className="admin-rank-row">
@@ -1474,6 +1513,28 @@ export function AdminDashboard({
                     <span className="admin-badge visible">
                       <CheckIcon size="0.85em" /> 已啟用最高權限
                     </span>
+                  </div>
+                ))}
+                {(systemConfig.adminEmails || []).map((email, idx) => (
+                  <div key={email} className="admin-rank-row">
+                    <div>
+                      <span className="admin-rank-num">{ADMIN_EMAILS.length + idx + 1}</span>
+                      <span style={{ fontFamily: 'monospace' }}>{email}</span>
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span className="admin-badge visible">
+                        <CheckIcon size="0.85em" /> 已授權管理員
+                      </span>
+                      <button
+                        type="button"
+                        className="admin-action-btn danger"
+                        style={{ padding: '0.22rem 0.55rem', fontSize: '0.74rem' }}
+                        onClick={() => handleRemoveAdminEmail(email)}
+                        disabled={isSavingConfig}
+                      >
+                        <TrashIcon size="0.85em" /> 移除
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
