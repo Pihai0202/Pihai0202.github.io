@@ -2897,36 +2897,6 @@ function App() {
         </div>
 
         <div className="header-right">
-          {isAnnouncementActive && (
-            <button
-              className="nav-toggle-btn"
-              type="button"
-              onClick={() => {
-                setManualOpenAnnouncement(true)
-                setActiveAlertTab('announcement')
-              }}
-              title={lang === 'zh-TW' ? '查看全站公告' : 'View Announcement'}
-              style={{ borderColor: 'rgba(var(--accent-rgb), 0.45)', color: 'var(--gold)' }}
-            >
-              <MegaphoneIcon style={{ marginRight: '5px' }} />
-              <span className="btn-label">{lang === 'zh-TW' ? '公告' : 'Notice'}</span>
-            </button>
-          )}
-          {hasActiveSuspension && suspensionData && (
-            <button
-              className="nav-toggle-btn"
-              type="button"
-              onClick={() => {
-                setIsSuspensionModalOpen(true)
-                setActiveAlertTab('suspension')
-              }}
-              title={lang === 'zh-TW' ? '查看停班停課資訊' : 'Typhoon Alert'}
-              style={{ borderColor: 'rgba(245, 158, 11, 0.45)', color: '#f59e0b' }}
-            >
-              <WarningIcon style={{ marginRight: '5px' }} />
-              <span className="btn-label">{lang === 'zh-TW' ? '停班停課' : 'Typhoon'}</span>
-            </button>
-          )}
           <button
             className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
             type="button"
