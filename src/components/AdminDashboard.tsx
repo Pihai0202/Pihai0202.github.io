@@ -266,6 +266,7 @@ export function AdminDashboard({
             announcementEnabled: d.announcementEnabled === true,
             announcementText: d.announcementText || '',
             announcementType: d.announcementType || 'info',
+            announcementSpeed: d.announcementSpeed || 'normal',
             announcementLink: d.announcementLink || '',
             announcementLinkText: d.announcementLinkText || '',
             customSuspensions: Array.isArray(d.customSuspensions) ? d.customSuspensions : [],
@@ -2653,7 +2654,24 @@ export function AdminDashboard({
                       placeholder="例如：查看詳情"
                     />
                   </div>
-                  <div className="admin-form-field full">
+                  <div className="admin-form-field">
+                    <label>跑馬燈捲動速度</label>
+                    <select
+                      value={systemConfig.announcementSpeed || 'normal'}
+                      onChange={(e) =>
+                        setSystemConfig({
+                          ...systemConfig,
+                          announcementSpeed: e.target.value as 'slow' | 'normal' | 'fast' | 'static'
+                        })
+                      }
+                    >
+                      <option value="normal">標準跑馬燈捲動 (18秒)</option>
+                      <option value="fast">快速跑馬燈捲動 (11秒)</option>
+                      <option value="slow">慢速跑馬燈捲動 (28秒)</option>
+                      <option value="static">靜態固定顯示 (不捲動)</option>
+                    </select>
+                  </div>
+                  <div className="admin-form-field">
                     <label>點擊導向連結 URL (選填)</label>
                     <input
                       type="text"
@@ -2661,6 +2679,52 @@ export function AdminDashboard({
                       onChange={(e) => setSystemConfig({ ...systemConfig, announcementLink: e.target.value })}
                       placeholder="https://..."
                     />
+                  </div>
+                </div>
+
+                {/* Live Marquee Preview */}
+                <div style={{ marginTop: '1rem' }}>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginBottom: '0.45rem', fontWeight: 600 }}>
+                    跑馬燈前台即時動態預覽：
+                  </div>
+                  <div
+                    className={`global-marquee-bar theme-${systemConfig.announcementType || 'info'}`}
+                    style={{
+                      position: 'relative',
+                      top: 'auto',
+                      left: 'auto',
+                      transform: 'none',
+                      width: '100%',
+                      maxWidth: '100%',
+                      zIndex: 1,
+                      ['--marquee-duration' as any]:
+                        systemConfig.announcementSpeed === 'slow'
+                          ? '28s'
+                          : systemConfig.announcementSpeed === 'fast'
+                            ? '11s'
+                            : '18s'
+                    }}
+                  >
+                    <span className="global-marquee-tag">
+                      <MegaphoneIcon size="0.95em" style={{ flexShrink: 0 }} />
+                      <span>全站公告</span>
+                    </span>
+                    <div className="global-marquee-viewport">
+                      <div
+                        className={`global-marquee-track${
+                          systemConfig.announcementSpeed === 'static' ? ' is-static' : ''
+                        }`}
+                      >
+                        <span className="global-marquee-item">
+                          {systemConfig.announcementText || '（請在上方輸入公告文字以預覽跑馬燈捲動效果）'}
+                        </span>
+                        {systemConfig.announcementSpeed !== 'static' && (
+                          <span className="global-marquee-item" aria-hidden="true">
+                            {systemConfig.announcementText || '（請在上方輸入公告文字以預覽跑馬燈捲動效果）'}
+                          </span>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </div>
 

@@ -15316,3 +15316,102 @@ body:has(.main-layout) {
   font-size: 0.72rem;
   color: var(--muted);
 }
+
+
+/* ==========================================================================
+   Global Announcement Marquee Ticker (全站置頂跑馬燈橫幅)
+   ========================================================================== */
+.global-marquee-bar {
+  position: fixed;
+  top: 4.1rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1150;
+  width: min(760px, 92vw);
+  border-radius: 999px;
+  padding: 0.38rem 0.65rem 0.38rem 0.55rem;
+  box-shadow: 0 8px 26px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.84rem;
+  font-weight: 600;
+  border: 1px solid var(--accent);
+  box-sizing: border-box;
+}
+
+.global-marquee-bar.theme-info {
+  background: rgba(var(--surface-rgb), 0.95);
+  color: var(--text);
+  border-color: var(--accent);
+}
+
+.global-marquee-bar.theme-warning {
+  background: rgba(245, 158, 11, 0.94);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.global-marquee-bar.theme-celebration {
+  background: linear-gradient(90deg, rgba(217, 119, 6, 0.95), rgba(234, 88, 12, 0.95));
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+
+.global-marquee-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, 0.22);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 700;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.global-marquee-viewport {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  position: relative;
+  mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 5%, black 95%, transparent 100%);
+}
+
+.global-marquee-track {
+  display: inline-flex;
+  align-items: center;
+  gap: 3.5rem;
+  padding-left: 100%;
+  animation: globalMarqueeScroll var(--marquee-duration, 18s) linear infinite;
+  will-change: transform;
+}
+
+.global-marquee-bar:hover .global-marquee-track,
+.global-marquee-viewport:hover .global-marquee-track {
+  animation-play-state: paused;
+}
+
+.global-marquee-track.is-static {
+  padding-left: 0;
+  animation: none;
+}
+
+.global-marquee-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  white-space: nowrap;
+}
+
+@keyframes globalMarqueeScroll {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(-100%, 0, 0);
+  }
+}

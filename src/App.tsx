@@ -2361,35 +2361,36 @@ function App() {
         dismissedAnnouncement !== systemConfig.announcementText &&
         view !== 'admin' && (
           <div
+            className={`global-marquee-bar theme-${systemConfig.announcementType || 'info'}`}
             style={{
-              position: 'fixed',
-              top: '4.1rem',
-              left: '50%',
-              transform: 'translateX(-50%)',
-              zIndex: 1150,
-              maxWidth: '92vw',
-              width: 'fit-content',
-              background:
-                systemConfig.announcementType === 'warning'
-                  ? 'rgba(245, 158, 11, 0.94)'
-                  : systemConfig.announcementType === 'celebration'
-                    ? 'rgba(217, 119, 6, 0.94)'
-                    : 'rgba(var(--surface-rgb), 0.95)',
-              color: systemConfig.announcementType === 'warning' || systemConfig.announcementType === 'celebration' ? '#fff' : 'var(--text)',
-              border: '1px solid var(--accent)',
-              borderRadius: '999px',
-              padding: '0.45rem 1rem',
-              boxShadow: '0 8px 24px rgba(0, 0, 0, 0.32)',
-              backdropFilter: 'blur(12px)',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '0.65rem',
-              fontSize: '0.84rem',
-              fontWeight: 600
+              ['--marquee-duration' as any]:
+                systemConfig.announcementSpeed === 'slow'
+                  ? '28s'
+                  : systemConfig.announcementSpeed === 'fast'
+                    ? '11s'
+                    : '18s'
             }}
           >
-            <MegaphoneIcon size="1em" style={{ flexShrink: 0 }} />
-            <span>{systemConfig.announcementText}</span>
+            <span className="global-marquee-tag">
+              <MegaphoneIcon size="0.95em" style={{ flexShrink: 0 }} />
+              <span>{lang === 'zh-TW' ? '全站公告' : 'Notice'}</span>
+            </span>
+
+            <div className="global-marquee-viewport">
+              <div
+                className={`global-marquee-track${
+                  systemConfig.announcementSpeed === 'static' ? ' is-static' : ''
+                }`}
+              >
+                <span className="global-marquee-item">{systemConfig.announcementText}</span>
+                {systemConfig.announcementSpeed !== 'static' && (
+                  <span className="global-marquee-item" aria-hidden="true">
+                    {systemConfig.announcementText}
+                  </span>
+                )}
+              </div>
+            </div>
+
             {systemConfig.announcementLink && (
               <a
                 href={systemConfig.announcementLink}
@@ -2399,7 +2400,9 @@ function App() {
                   color: 'inherit',
                   textDecoration: 'underline',
                   fontWeight: 800,
-                  whiteSpace: 'nowrap'
+                  whiteSpace: 'nowrap',
+                  flexShrink: 0,
+                  fontSize: '0.8rem'
                 }}
               >
                 {systemConfig.announcementLinkText || (lang === 'zh-TW' ? '查看詳情 ↗' : 'Details ↗')}
@@ -2415,7 +2418,8 @@ function App() {
                 cursor: 'pointer',
                 padding: '2px',
                 display: 'inline-flex',
-                alignItems: 'center'
+                alignItems: 'center',
+                flexShrink: 0
               }}
               aria-label="關閉公告"
             >

@@ -211,6 +211,7 @@ export interface SystemConfig {
   announcementEnabled?: boolean
   announcementText?: string
   announcementType?: 'info' | 'warning' | 'celebration'
+  announcementSpeed?: 'slow' | 'normal' | 'fast' | 'static'
   announcementLink?: string
   announcementLinkText?: string
   customSuspensions?: SuspensionItem[]
