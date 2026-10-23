@@ -1505,10 +1505,20 @@ export function AdminDashboard({
 
               <div className="admin-rank-list">
                 {ADMIN_EMAILS.map((email, idx) => (
-                  <div key={email} className="admin-rank-row">
-                    <div>
+                  <div key={email} className="admin-rank-row" style={{ flexWrap: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
                       <span className="admin-rank-num">{idx + 1}</span>
-                      <span style={{ fontFamily: 'monospace' }}>{email}</span>
+                      <span
+                        style={{
+                          fontFamily: 'monospace',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title={email}
+                      >
+                        {email}
+                      </span>
                     </div>
                     <span className="admin-badge visible">
                       <CheckIcon size="0.85em" /> 已啟用最高權限
@@ -1516,19 +1526,29 @@ export function AdminDashboard({
                   </div>
                 ))}
                 {(systemConfig.adminEmails || []).map((email, idx) => (
-                  <div key={email} className="admin-rank-row">
-                    <div>
+                  <div key={email} className="admin-rank-row" style={{ flexWrap: 'nowrap' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', minWidth: 0, flex: 1 }}>
                       <span className="admin-rank-num">{ADMIN_EMAILS.length + idx + 1}</span>
-                      <span style={{ fontFamily: 'monospace' }}>{email}</span>
+                      <span
+                        style={{
+                          fontFamily: 'monospace',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                        title={email}
+                      >
+                        {email}
+                      </span>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
                       <span className="admin-badge visible">
-                        <CheckIcon size="0.85em" /> 已授權管理員
+                        <CheckIcon size="0.85em" /> 已授權
                       </span>
                       <button
                         type="button"
                         className="admin-action-btn danger"
-                        style={{ padding: '0.22rem 0.55rem', fontSize: '0.74rem' }}
+                        style={{ padding: '0.24rem 0.58rem', fontSize: '0.75rem' }}
                         onClick={() => handleRemoveAdminEmail(email)}
                         disabled={isSavingConfig}
                       >
@@ -3147,32 +3167,58 @@ export function AdminDashboard({
                 </div>
 
                 <div className="admin-rank-list">
-                  {ADMIN_EMAILS.map((email) => (
-                    <div key={email} className="admin-rank-row">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <ShieldIcon size="0.95em" style={{ color: 'var(--gold)' }} />
-                        <strong style={{ fontFamily: 'monospace', fontSize: '0.86rem' }}>{email}</strong>
-                        <span className="admin-badge pinned">系統創始管理員</span>
+                  {ADMIN_EMAILS.map((email, idx) => (
+                    <div key={email} className="admin-rank-row" style={{ flexWrap: 'nowrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                        <span className="admin-rank-num">{idx + 1}</span>
+                        <strong
+                          style={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.86rem',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                          title={email}
+                        >
+                          {email}
+                        </strong>
                       </div>
-                      <span style={{ fontSize: '0.76rem', color: 'var(--muted)' }}>永久權限（不可移除）</span>
+                      <span className="admin-badge pinned">創始管理員（不可移除）</span>
                     </div>
                   ))}
-                  {(systemConfig.adminEmails || []).map((email) => (
-                    <div key={email} className="admin-rank-row">
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
-                        <UserIcon size="0.95em" style={{ color: 'var(--teal)' }} />
-                        <strong style={{ fontFamily: 'monospace', fontSize: '0.86rem' }}>{email}</strong>
-                        <span className="admin-badge artist">新增管理員</span>
+                  {(systemConfig.adminEmails || []).map((email, idx) => (
+                    <div key={email} className="admin-rank-row" style={{ flexWrap: 'nowrap' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px', minWidth: 0, flex: 1 }}>
+                        <span className="admin-rank-num">{ADMIN_EMAILS.length + idx + 1}</span>
+                        <strong
+                          style={{
+                            fontFamily: 'monospace',
+                            fontSize: '0.86rem',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                          title={email}
+                        >
+                          {email}
+                        </strong>
                       </div>
-                      <button
-                        type="button"
-                        className="admin-action-btn danger"
-                        onClick={() => handleRemoveAdminEmail(email)}
-                        disabled={isSavingConfig}
-                      >
-                        <TrashIcon size="0.85em" />
-                        <span>移除權限</span>
-                      </button>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '6px', flexShrink: 0 }}>
+                        <span className="admin-badge visible">
+                          <CheckIcon size="0.85em" /> 已授權
+                        </span>
+                        <button
+                          type="button"
+                          className="admin-action-btn danger"
+                          style={{ padding: '0.24rem 0.58rem', fontSize: '0.75rem' }}
+                          onClick={() => handleRemoveAdminEmail(email)}
+                          disabled={isSavingConfig}
+                        >
+                          <TrashIcon size="0.85em" />
+                          <span>移除</span>
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
