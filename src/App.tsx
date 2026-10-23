@@ -317,12 +317,79 @@ function App() {
   const drawerHeaderRef = useRef<HTMLDivElement | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
-  const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
+  const [rawSuspensionData, setRawSuspensionData] = useState<SuspensionInfo | null>(null)
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({})
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null)
   const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string>(
     () => localStorage.getItem('tw-dismissed-announcement') || ''
   )
+  const [dismissedSuspensionKey, setDismissedSuspensionKey] = useState<string>(
+    () => localStorage.getItem('suspension-dismissed-date') || ''
+  )
+  const [manualOpenAnnouncement, setManualOpenAnnouncement] = useState(false)
+  const [activeAlertTab, setActiveAlertTab] = useState<'announcement' | 'suspension'>('announcement')
+
+  const suspensionData = useMemo<SuspensionInfo | null>(() => {
+    const customList = systemConfig?.customSuspensions || []
+    if (!rawSuspensionData && customList.length === 0) return null
+    const normalizeCity = (c: string) => c.replace(/臺/g, '台').replace(/[市縣]/g, '').trim()
+    const customMap = new Map(customList.map((i) => [normalizeCity(i.city), i]))
+    const baseItems = rawSuspensionData?.items || []
+    const mergedItems: SuspensionItem[] = []
+    const seenKeys = new Set<string>()
+
+    customList.forEach((item) => {
+      const k = normalizeCity(item.city)
+      seenKeys.add(k)
+      mergedItems.push(item)
+    })
+
+    baseItems.forEach((item) => {
+      const k = normalizeCity(item.city)
+      if (!seenKeys.has(k) && !customMap.has(k)) {
+        seenKeys.add(k)
+        mergedItems.push(item)
+      }
+    })
+
+    return {
+      updateTime: rawSuspensionData?.updateTime || new Date().toLocaleString('zh-TW'),
+      items: mergedItems
+    }
+  }, [rawSuspensionData, systemConfig?.customSuspensions])
+
+  const hasActiveSuspension = useMemo(() => {
+    if (!suspensionData || !suspensionData.items.length) return false
+    return suspensionData.items.some(
+      (item) =>
+        item.status.includes('停止') ||
+        item.status.includes('停班') ||
+        item.status.includes('停課') ||
+        !item.status.includes('照常')
+    )
+  }, [suspensionData])
+
+  const currentSuspensionVersionKey = useMemo(() => {
+    const d = new Date()
+    const utc = d.getTime() + d.getTimezoneOffset() * 60000
+    const taipeiTime = new Date(utc + 3600000 * 8)
+    const yyyy = taipeiTime.getFullYear()
+    const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
+    const dd = String(taipeiTime.getDate()).padStart(2, '0')
+    const todayStr = `${yyyy}-${mm}-${dd}`
+    const customPart =
+      systemConfig?.suspensionUpdatedAt ||
+      (systemConfig?.customSuspensions?.length ? JSON.stringify(systemConfig.customSuspensions) : '')
+    return customPart ? `${todayStr}::${customPart}` : todayStr
+  }, [systemConfig?.suspensionUpdatedAt, systemConfig?.customSuspensions])
+
+  const currentAnnouncementVersionKey = useMemo(() => {
+    if (!systemConfig?.announcementText) return ''
+    return (
+      systemConfig.announcementUpdatedAt ||
+      `${systemConfig.announcementTitle || ''}::${systemConfig.announcementText}`
+    )
+  }, [systemConfig?.announcementUpdatedAt, systemConfig?.announcementTitle, systemConfig?.announcementText])
 
   useEffect(() => {
     const unsubOverrides = onSnapshot(
@@ -342,20 +409,6 @@ function App() {
         if (docSnap.exists()) {
           const data = docSnap.data() as SystemConfig
           setSystemConfig(data)
-          if (Array.isArray(data.customSuspensions) && data.customSuspensions.length > 0) {
-            setSuspensionData((prev) => {
-              const baseItems = prev?.items || []
-              const customMap = new Map(data.customSuspensions!.map((i) => [i.city, i]))
-              const merged = [
-                ...data.customSuspensions!,
-                ...baseItems.filter((b) => !customMap.has(b.city))
-              ]
-              return {
-                updateTime: prev?.updateTime || new Date().toLocaleString('zh-TW'),
-                items: merged
-              }
-            })
-          }
         }
       },
       () => {}
@@ -366,6 +419,27 @@ function App() {
     }
   }, [])
   const [isSuspensionModalOpen, setIsSuspensionModalOpen] = useState(false)
+
+  const isAnnouncementActive = Boolean(
+    systemConfig?.announcementEnabled && systemConfig?.announcementText
+  )
+  const isAnnouncementOpen =
+    manualOpenAnnouncement ||
+    (isAnnouncementActive && dismissedAnnouncement !== currentAnnouncementVersionKey)
+
+  useEffect(() => {
+    if (hasActiveSuspension && dismissedSuspensionKey !== currentSuspensionVersionKey) {
+      setIsSuspensionModalOpen(true)
+    }
+  }, [hasActiveSuspension, currentSuspensionVersionKey, dismissedSuspensionKey])
+
+  useEffect(() => {
+    if (isAnnouncementOpen && !isSuspensionModalOpen) {
+      setActiveAlertTab('announcement')
+    } else if (isSuspensionModalOpen && !isAnnouncementOpen) {
+      setActiveAlertTab('suspension')
+    }
+  }, [isAnnouncementOpen, isSuspensionModalOpen])
   const [detailConcertId, setDetailConcertId] = useState<string | null>(null)
   const [editingConcertId, setEditingConcertId] = useState<string | null>(null)
   const [isSaving, setIsSaving] = useState(false)
@@ -1030,7 +1104,7 @@ function App() {
         )
         if (!response.ok) throw new Error('suspension.json not found')
         const data = (await response.json()) as SuspensionInfo
-        setSuspensionData(data)
+        setRawSuspensionData(data)
 
         // 檢查是否有實際停班停課資訊（包含「停止」或「停班」或「停課」，且排除單純的照常）
         const hasSuspension = data.items.some(
@@ -1911,7 +1985,12 @@ function App() {
     const mm = String(taipeiTime.getMonth() + 1).padStart(2, '0')
     const dd = String(taipeiTime.getDate()).padStart(2, '0')
     const todayStr = `${yyyy}-${mm}-${dd}`
-    localStorage.setItem('suspension-dismissed-date', todayStr)
+    void todayStr
+    localStorage.setItem('suspension-dismissed-date', currentSuspensionVersionKey)
+    setDismissedSuspensionKey(currentSuspensionVersionKey)
+    if (isAnnouncementOpen) {
+      setActiveAlertTab('announcement')
+    }
     setIsSuspensionModalOpen(false)
   }
 
@@ -2358,155 +2437,421 @@ function App() {
 
   return (
     <>
-      {systemConfig?.announcementEnabled &&
-        systemConfig.announcementText &&
-        dismissedAnnouncement !== (systemConfig.updatedAt || systemConfig.announcementText) &&
-        view !== 'admin' && (
-          <div
-            className="modal-overlay active"
-            style={{ zIndex: 2200 }}
-            onClick={() =>
-              setDismissedAnnouncement(systemConfig.updatedAt || systemConfig.announcementText || '')
+      {(isAnnouncementOpen || (isSuspensionModalOpen && suspensionData)) &&
+        view !== 'admin' && (() => {
+          const canShowAnnouncement = isAnnouncementActive && !!systemConfig?.announcementText
+          const canShowSuspension = Boolean(hasActiveSuspension && suspensionData)
+          const showDualTabSwitcher = canShowAnnouncement && canShowSuspension
+          const effectiveTab: 'announcement' | 'suspension' =
+            activeAlertTab === 'announcement' && canShowAnnouncement
+              ? 'announcement'
+              : activeAlertTab === 'suspension' && canShowSuspension
+                ? 'suspension'
+                : isAnnouncementOpen && canShowAnnouncement
+                  ? 'announcement'
+                  : 'suspension'
+
+          const handleAcknowledgeAnnouncement = () => {
+            if (currentAnnouncementVersionKey) {
+              setDismissedAnnouncement(currentAnnouncementVersionKey)
+              localStorage.setItem('tw-dismissed-announcement', currentAnnouncementVersionKey)
             }
-          >
+            setManualOpenAnnouncement(false)
+            if (isSuspensionModalOpen && canShowSuspension) {
+              setActiveAlertTab('suspension')
+            }
+          }
+
+          const handleCloseSuspension = () => {
+            setIsSuspensionModalOpen(false)
+            if (isAnnouncementOpen && canShowAnnouncement) {
+              setActiveAlertTab('announcement')
+            }
+          }
+
+          const warningCount = suspensionData
+            ? suspensionData.items.filter(
+                (item) =>
+                  item.status.includes('停止') ||
+                  item.status.includes('停班') ||
+                  item.status.includes('停課') ||
+                  !item.status.includes('照常')
+              ).length
+            : 0
+
+          return (
             <div
-              className="modal publish-modal"
-              style={{
-                maxWidth: '440px',
-                padding: '1.8rem 1.9rem',
-                borderRadius: '22px',
-                border:
-                  systemConfig.announcementType === 'warning'
-                    ? '1px solid rgba(245, 158, 11, 0.55)'
-                    : '1px solid var(--border)'
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                className="modal-close"
-                type="button"
-                onClick={() =>
-                  setDismissedAnnouncement(systemConfig.updatedAt || systemConfig.announcementText || '')
+              className="modal-overlay active"
+              style={{ zIndex: 2200 }}
+              onClick={() => {
+                if (effectiveTab === 'announcement') {
+                  handleAcknowledgeAnnouncement()
+                } else {
+                  handleCloseSuspension()
                 }
-              >
-                <CloseIcon />
-              </button>
-
+              }}
+            >
               <div
-                style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: '6px',
-                  padding: '0.25rem 0.7rem',
-                  borderRadius: '999px',
-                  fontSize: '0.76rem',
-                  fontWeight: 700,
-                  marginBottom: '0.75rem',
-                  background:
-                    systemConfig.announcementType === 'warning'
-                      ? 'rgba(245, 158, 11, 0.18)'
-                      : systemConfig.announcementType === 'celebration'
-                        ? 'rgba(234, 88, 12, 0.18)'
-                        : 'rgba(var(--accent-rgb), 0.18)',
-                  color:
-                    systemConfig.announcementType === 'warning'
-                      ? '#f59e0b'
-                      : systemConfig.announcementType === 'celebration'
-                        ? '#fb923c'
-                        : 'var(--gold)'
-                }}
+                className={`modal ${effectiveTab === 'suspension' ? 'suspension-modal' : 'publish-modal'}`}
+                style={
+                  effectiveTab === 'announcement'
+                    ? {
+                        maxWidth: '460px',
+                        padding: '1.75rem 1.85rem',
+                        borderRadius: '22px',
+                        border:
+                          systemConfig?.announcementType === 'warning'
+                            ? '1px solid rgba(245, 158, 11, 0.55)'
+                            : '1px solid var(--border)'
+                      }
+                    : undefined
+                }
+                onClick={(e) => e.stopPropagation()}
               >
-                {systemConfig.announcementType === 'warning' ? (
-                  <WarningIcon size="0.95em" />
-                ) : systemConfig.announcementType === 'celebration' ? (
-                  <SparklesIcon size="0.95em" />
-                ) : (
-                  <MegaphoneIcon size="0.95em" />
-                )}
-                <span>
-                  {systemConfig.announcementType === 'warning'
-                    ? lang === 'zh-TW'
-                      ? '重要提醒'
-                      : 'Important Alert'
-                    : systemConfig.announcementType === 'celebration'
-                      ? lang === 'zh-TW'
-                        ? '最新活動公告'
-                        : 'Special Event'
-                      : lang === 'zh-TW'
-                        ? '系統公告'
-                        : 'Announcement'}
-                </span>
-              </div>
-
-              <h2
-                style={{
-                  fontSize: '1.28rem',
-                  color: 'var(--text)',
-                  margin: '0 0 0.9rem',
-                  lineHeight: 1.35
-                }}
-              >
-                {systemConfig.announcementTitle || (lang === 'zh-TW' ? '全站重要公告' : 'Site Announcement')}
-              </h2>
-
-              <div
-                style={{
-                  background: 'rgba(var(--surface-rgb), 0.55)',
-                  border: '1px solid var(--border)',
-                  borderRadius: '14px',
-                  padding: '1rem 1.1rem',
-                  marginBottom: '1.35rem',
-                  color: 'var(--text)',
-                  fontSize: '0.92rem',
-                  lineHeight: 1.6,
-                  whiteSpace: 'pre-wrap',
-                  maxHeight: '260px',
-                  overflowY: 'auto'
-                }}
-              >
-                {systemConfig.announcementText}
-              </div>
-
-              <div className="publish-actions" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
-                {systemConfig.announcementLink && (
-                  <a
-                    href={systemConfig.announcementLink}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="publish-submit-btn"
-                    style={{
-                      flex: 1,
-                      textAlign: 'center',
-                      textDecoration: 'none',
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      gap: '6px'
-                    }}
-                  >
-                    <span>
-                      {systemConfig.announcementLinkText || (lang === 'zh-TW' ? '前往查看詳情' : 'Learn More')}
-                    </span>
-                    <RocketIcon size="0.95em" />
-                  </a>
-                )}
                 <button
+                  className="modal-close"
                   type="button"
-                  className={systemConfig.announcementLink ? 'publish-cancel-btn' : 'publish-submit-btn'}
-                  style={{ flex: 1 }}
                   onClick={() => {
-                    const key = systemConfig.updatedAt || systemConfig.announcementText || ''
-                    setDismissedAnnouncement(key)
-                    localStorage.setItem('tw-dismissed-announcement', key)
+                    if (effectiveTab === 'announcement') {
+                      handleAcknowledgeAnnouncement()
+                    } else {
+                      handleCloseSuspension()
+                    }
                   }}
                 >
-                  <CheckIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
-                  {lang === 'zh-TW' ? '我知道了' : 'Got it'}
+                  <CloseIcon />
                 </button>
+
+                {showDualTabSwitcher && (
+                  <div
+                    style={{
+                      display: 'grid',
+                      gridTemplateColumns: '1fr 1fr',
+                      gap: '6px',
+                      padding: '4px',
+                      borderRadius: '12px',
+                      background: 'rgba(var(--bg-rgb), 0.55)',
+                      border: '1px solid var(--border)',
+                      marginBottom: '1.1rem',
+                      marginRight: '1.8rem'
+                    }}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => setActiveAlertTab('announcement')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '0.48rem 0.65rem',
+                        borderRadius: '9px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        background:
+                          effectiveTab === 'announcement'
+                            ? 'rgba(var(--accent-rgb), 0.22)'
+                            : 'transparent',
+                        color: effectiveTab === 'announcement' ? 'var(--gold)' : 'var(--muted)',
+                        transition: 'all 0.18s ease'
+                      }}
+                    >
+                      <MegaphoneIcon size="0.95em" />
+                      <span>{lang === 'zh-TW' ? '全站重要公告' : 'Announcement'}</span>
+                      {isAnnouncementOpen && (
+                        <span
+                          style={{
+                            width: '7px',
+                            height: '7px',
+                            borderRadius: '50%',
+                            background: 'var(--gold)',
+                            display: 'inline-block'
+                          }}
+                        />
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setActiveAlertTab('suspension')}
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        gap: '6px',
+                        padding: '0.48rem 0.65rem',
+                        borderRadius: '9px',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontSize: '0.8rem',
+                        fontWeight: 700,
+                        background:
+                          effectiveTab === 'suspension'
+                            ? 'rgba(245, 158, 11, 0.22)'
+                            : 'transparent',
+                        color: effectiveTab === 'suspension' ? '#f59e0b' : 'var(--muted)',
+                        transition: 'all 0.18s ease'
+                      }}
+                    >
+                      <WarningIcon size="0.95em" />
+                      <span>
+                        {lang === 'zh-TW' ? `停班停課 (${warningCount})` : `Typhoon (${warningCount})`}
+                      </span>
+                      {isSuspensionModalOpen && (
+                        <span
+                          style={{
+                            width: '7px',
+                            height: '7px',
+                            borderRadius: '50%',
+                            background: '#ef4444',
+                            display: 'inline-block'
+                          }}
+                        />
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {effectiveTab === 'announcement' && systemConfig ? (
+                  <>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '0.25rem 0.7rem',
+                        borderRadius: '999px',
+                        fontSize: '0.76rem',
+                        fontWeight: 700,
+                        marginBottom: '0.75rem',
+                        background:
+                          systemConfig.announcementType === 'warning'
+                            ? 'rgba(245, 158, 11, 0.18)'
+                            : systemConfig.announcementType === 'celebration'
+                              ? 'rgba(234, 88, 12, 0.18)'
+                              : 'rgba(var(--accent-rgb), 0.18)',
+                        color:
+                          systemConfig.announcementType === 'warning'
+                            ? '#f59e0b'
+                            : systemConfig.announcementType === 'celebration'
+                              ? '#fb923c'
+                              : 'var(--gold)'
+                      }}
+                    >
+                      {systemConfig.announcementType === 'warning' ? (
+                        <WarningIcon size="0.95em" />
+                      ) : systemConfig.announcementType === 'celebration' ? (
+                        <SparklesIcon size="0.95em" />
+                      ) : (
+                        <MegaphoneIcon size="0.95em" />
+                      )}
+                      <span>
+                        {systemConfig.announcementType === 'warning'
+                          ? lang === 'zh-TW'
+                            ? '重要提醒'
+                            : 'Important Alert'
+                          : systemConfig.announcementType === 'celebration'
+                            ? lang === 'zh-TW'
+                              ? '最新活動公告'
+                              : 'Special Event'
+                            : lang === 'zh-TW'
+                              ? '系統公告'
+                              : 'Announcement'}
+                      </span>
+                    </div>
+
+                    <h2
+                      style={{
+                        fontSize: '1.28rem',
+                        color: 'var(--text)',
+                        margin: '0 0 0.9rem',
+                        lineHeight: 1.35
+                      }}
+                    >
+                      {systemConfig.announcementTitle ||
+                        (lang === 'zh-TW' ? '全站重要公告' : 'Site Announcement')}
+                    </h2>
+
+                    <div
+                      style={{
+                        background: 'rgba(var(--surface-rgb), 0.55)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '14px',
+                        padding: '1rem 1.1rem',
+                        marginBottom: '1.35rem',
+                        color: 'var(--text)',
+                        fontSize: '0.92rem',
+                        lineHeight: 1.6,
+                        whiteSpace: 'pre-wrap',
+                        maxHeight: '260px',
+                        overflowY: 'auto'
+                      }}
+                    >
+                      {systemConfig.announcementText}
+                    </div>
+
+                    <div className="publish-actions" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                      {systemConfig.announcementLink && (
+                        <a
+                          href={systemConfig.announcementLink}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="publish-submit-btn"
+                          style={{
+                            flex: 1,
+                            textAlign: 'center',
+                            textDecoration: 'none',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            gap: '6px'
+                          }}
+                        >
+                          <span>
+                            {systemConfig.announcementLinkText ||
+                              (lang === 'zh-TW' ? '前往查看詳情' : 'Learn More')}
+                          </span>
+                          <RocketIcon size="0.95em" />
+                        </a>
+                      )}
+                      <button
+                        type="button"
+                        className={
+                          systemConfig.announcementLink ? 'publish-cancel-btn' : 'publish-submit-btn'
+                        }
+                        style={{ flex: 1 }}
+                        onClick={handleAcknowledgeAnnouncement}
+                      >
+                        <CheckIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                        {isSuspensionModalOpen && canShowSuspension
+                          ? lang === 'zh-TW'
+                            ? '我知道了（繼續看停班停課）'
+                            : 'Got it (Next: Typhoon Alert)'
+                          : lang === 'zh-TW'
+                            ? '我知道了'
+                            : 'Got it'}
+                      </button>
+                    </div>
+                  </>
+                ) : suspensionData ? (
+                  <>
+                    <div className="suspension-header">
+                      <WarningIcon className="suspension-icon" style={{ color: 'var(--accent)' }} />
+                      <div>
+                        <h2 className="suspension-title">{t('suspensionTitle')}</h2>
+                        <div className="suspension-subtitle">
+                          {t('suspensionSource', { time: suspensionData.updateTime })}
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="suspension-body">
+                      {(() => {
+                        const warningItems = suspensionData.items.filter(
+                          (item) =>
+                            item.status.includes('停止') ||
+                            item.status.includes('停班') ||
+                            item.status.includes('停課') ||
+                            !item.status.includes('照常')
+                        )
+                        const normalItems = suspensionData.items.filter(
+                          (item) => !warningItems.includes(item)
+                        )
+
+                        return (
+                          <>
+                            {warningItems.length > 0 && (
+                              <div className="suspension-section warning-section">
+                                <div className="section-title">
+                                  <WarningIcon
+                                    size="1.2em"
+                                    style={{
+                                      color: '#ff4d4f',
+                                      marginRight: '6px',
+                                      verticalAlign: 'middle'
+                                    }}
+                                  />
+                                  {t('suspensionStop')}
+                                </div>
+                                <div className="warning-list">
+                                  {warningItems.map((item, idx) => (
+                                    <div key={idx} className="suspension-card warning-card">
+                                      <div className="county-name">
+                                        {lang === 'zh-TW'
+                                          ? item.city
+                                          : translateCityName(item.city.replace(/[市縣]/g, ''), lang)}
+                                      </div>
+                                      <div className="county-status">
+                                        {translateSuspensionStatus(item.status, lang)}
+                                      </div>
+                                    </div>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+
+                            {normalItems.length > 0 && (
+                              <details className="suspension-section normal-section" open>
+                                <summary className="section-title collapsible-title">
+                                  <CheckIcon
+                                    size="1.2em"
+                                    style={{
+                                      color: '#52c41a',
+                                      marginRight: '6px',
+                                      verticalAlign: 'middle'
+                                    }}
+                                  />
+                                  {t('suspensionNormal', { count: normalItems.length })}
+                                </summary>
+                                <div className="normal-list">
+                                  {normalItems.map((item, idx) => (
+                                    <div key={idx} className="suspension-card normal-card">
+                                      <span className="normal-county">
+                                        {lang === 'zh-TW'
+                                          ? item.city
+                                          : translateCityName(item.city.replace(/[市縣]/g, ''), lang)}
+                                      </span>
+                                      <span className="normal-status">
+                                        {translateSuspensionStatus(item.status, lang)}
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              </details>
+                            )}
+                          </>
+                        )
+                      })()}
+                    </div>
+
+                    <div className="suspension-actions">
+                      <button
+                        className="suspension-btn dismiss-btn"
+                        type="button"
+                        onClick={handleDismissSuspensionToday}
+                      >
+                        {t('suspensionDismiss')}
+                        <VolumeXIcon size="1.1em" style={{ marginLeft: '6px', verticalAlign: 'middle' }} />
+                      </button>
+                      <button
+                        className="suspension-btn close-btn"
+                        type="button"
+                        onClick={handleCloseSuspension}
+                      >
+                        {isAnnouncementOpen && canShowAnnouncement
+                          ? lang === 'zh-TW'
+                            ? '繼續看全站公告'
+                            : 'View Announcement'
+                          : t('suspensionClose')}
+                      </button>
+                    </div>
+                  </>
+                ) : null}
               </div>
             </div>
-          </div>
-        )}
+          )
+        })()}
       <header className={view !== 'map' || isSidebarCollapsed ? 'full-width-header' : ''}>
         {view !== 'login' && (
           <button
@@ -2552,6 +2897,36 @@ function App() {
         </div>
 
         <div className="header-right">
+          {isAnnouncementActive && (
+            <button
+              className="nav-toggle-btn"
+              type="button"
+              onClick={() => {
+                setManualOpenAnnouncement(true)
+                setActiveAlertTab('announcement')
+              }}
+              title={lang === 'zh-TW' ? '查看全站公告' : 'View Announcement'}
+              style={{ borderColor: 'rgba(var(--accent-rgb), 0.45)', color: 'var(--gold)' }}
+            >
+              <MegaphoneIcon style={{ marginRight: '5px' }} />
+              <span className="btn-label">{lang === 'zh-TW' ? '公告' : 'Notice'}</span>
+            </button>
+          )}
+          {hasActiveSuspension && suspensionData && (
+            <button
+              className="nav-toggle-btn"
+              type="button"
+              onClick={() => {
+                setIsSuspensionModalOpen(true)
+                setActiveAlertTab('suspension')
+              }}
+              title={lang === 'zh-TW' ? '查看停班停課資訊' : 'Typhoon Alert'}
+              style={{ borderColor: 'rgba(245, 158, 11, 0.45)', color: '#f59e0b' }}
+            >
+              <WarningIcon style={{ marginRight: '5px' }} />
+              <span className="btn-label">{lang === 'zh-TW' ? '停班停課' : 'Typhoon'}</span>
+            </button>
+          )}
           <button
             className={`nav-toggle-btn${view === 'map' ? ' active' : ''}`}
             type="button"
@@ -3876,7 +4251,7 @@ function App() {
       )}
 
 
-      {isSuspensionModalOpen && suspensionData && (
+      {isSuspensionModalOpen && !isSuspensionModalOpen && suspensionData && (
         <Modal className="suspension-modal" onClose={() => setIsSuspensionModalOpen(false)}>
           <div className="suspension-header">
             <WarningIcon className="suspension-icon" style={{ color: 'var(--accent)' }} />

@@ -216,6 +216,8 @@ export interface SystemConfig {
   announcementLink?: string
   announcementLinkText?: string
   customSuspensions?: SuspensionItem[]
+  announcementUpdatedAt?: string
+  suspensionUpdatedAt?: string
   updatedAt?: string
   updatedBy?: string
 

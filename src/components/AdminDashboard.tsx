@@ -1051,19 +1051,46 @@ export function AdminDashboard({
   const handleSaveSystemConfig = async () => {
     setIsSavingConfig(true)
     try {
+      const nowIso = new Date().toISOString()
       await setDoc(
         doc(db, 'system_config', 'global'),
         {
           ...systemConfig,
-          updatedAt: new Date().toISOString(),
+          announcementUpdatedAt: nowIso,
+          updatedAt: nowIso,
           updatedBy: currentUser?.email || 'admin'
         },
         { merge: true }
       )
-      onShowToast?.('已儲存全站公告與系統設定，前台已即時生效！', 'success')
+      onShowToast?.('已儲存全站公告設定，前台已即時生效！', 'success')
     } catch (err) {
       console.error('Failed to save system_config:', err)
       onShowToast?.('儲存系統設定失敗', 'error')
+    } finally {
+      setIsSavingConfig(false)
+    }
+  }
+
+  const handleSaveSuspensionConfig = async (overrideList?: SuspensionItem[]) => {
+    setIsSavingConfig(true)
+    try {
+      const nowIso = new Date().toISOString()
+      const nextList = overrideList !== undefined ? overrideList : systemConfig.customSuspensions || []
+      await setDoc(
+        doc(db, 'system_config', 'global'),
+        {
+          ...systemConfig,
+          customSuspensions: nextList,
+          suspensionUpdatedAt: nowIso,
+          updatedAt: nowIso,
+          updatedBy: currentUser?.email || 'admin'
+        },
+        { merge: true }
+      )
+      onShowToast?.('已儲存停班停課警示覆寫，前台已即時生效！', 'success')
+    } catch (err) {
+      console.error('Failed to save suspension config:', err)
+      onShowToast?.('儲存停班停課覆寫失敗', 'error')
     } finally {
       setIsSavingConfig(false)
     }
@@ -1078,13 +1105,16 @@ export function AdminDashboard({
       { city: newSuspensionCity, status: newSuspensionStatus.trim() }
     ]
     setSystemConfig((prev) => ({ ...prev, customSuspensions: updated }))
+    handleSaveSuspensionConfig(updated)
   }
 
   const handleRemoveCustomSuspension = (city: string) => {
+    const updated = (systemConfig.customSuspensions || []).filter((item) => item.city !== city)
     setSystemConfig((prev) => ({
       ...prev,
-      customSuspensions: (prev.customSuspensions || []).filter((item) => item.city !== city)
+      customSuspensions: updated
     }))
+    handleSaveSuspensionConfig(updated)
   }
 
   const handleTriggerGithubScraper = async () => {
@@ -2841,7 +2871,7 @@ export function AdminDashboard({
                 <button
                   type="button"
                   className="admin-action-btn primary"
-                  onClick={handleSaveSystemConfig}
+                  onClick={() => handleSaveSuspensionConfig()}
                   disabled={isSavingConfig}
                 >
                   <CheckIcon size="0.95em" /> 儲存停班停課覆寫
