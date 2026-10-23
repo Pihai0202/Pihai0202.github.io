@@ -209,6 +209,7 @@ export interface EventOverride {
 
 export interface SystemConfig {
   announcementEnabled?: boolean
+  announcementTitle?: string
   announcementText?: string
   announcementType?: 'info' | 'warning' | 'celebration'
   announcementSpeed?: 'slow' | 'normal' | 'fast' | 'static'

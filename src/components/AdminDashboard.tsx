@@ -264,6 +264,7 @@ export function AdminDashboard({
           const d = docSnap.data() as SystemConfig
           setSystemConfig({
             announcementEnabled: d.announcementEnabled === true,
+            announcementTitle: d.announcementTitle || '全站重要公告',
             announcementText: d.announcementText || '',
             announcementType: d.announcementType || 'info',
             announcementSpeed: d.announcementSpeed || 'normal',
@@ -2604,7 +2605,7 @@ export function AdminDashboard({
                 <div className="admin-panel-header">
                   <h3>
                     <SparklesIcon size="1em" style={{ color: 'var(--gold)' }} />
-                    <span>全站置頂跑馬燈 / 公告橫幅設定</span>
+                    <span>全站彈出式公告視窗設定 (Popup Modal)</span>
                   </h3>
                   <label style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', cursor: 'pointer', fontWeight: 700 }}>
                     <input
@@ -2615,18 +2616,18 @@ export function AdminDashboard({
                       }
                       style={{ width: '16px', height: '16px' }}
                     />
-                    <span>{systemConfig.announcementEnabled ? '已啟用全站公告' : '目前關閉'}</span>
+                    <span>{systemConfig.announcementEnabled ? '已啟用彈窗公告' : '目前關閉'}</span>
                   </label>
                 </div>
 
                 <div className="admin-venue-form-grid">
-                  <div className="admin-form-field full">
-                    <label>公告內容文字</label>
+                  <div className="admin-form-field">
+                    <label>彈窗公告標題</label>
                     <input
                       type="text"
-                      value={systemConfig.announcementText || ''}
-                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementText: e.target.value })}
-                      placeholder="例如：大巨蛋最新演唱會檔期與即時職棒比分已同步更新！"
+                      value={systemConfig.announcementTitle || ''}
+                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementTitle: e.target.value })}
+                      placeholder="例如：全站重要公告"
                     />
                   </div>
                   <div className="admin-form-field">
@@ -2640,36 +2641,28 @@ export function AdminDashboard({
                         })
                       }
                     >
-                      <option value="info">一般資訊 (鼠尾草綠/主題色)</option>
-                      <option value="warning">重要警示 (琥珀橘黃)</option>
-                      <option value="celebration">活動慶典 (亮金強調色)</option>
+                      <option value="info">系統公告 (預設主題色)</option>
+                      <option value="warning">重要提醒 (琥珀橘黃)</option>
+                      <option value="celebration">最新活動公告 (亮橘強調色)</option>
                     </select>
                   </div>
+                  <div className="admin-form-field full">
+                    <label>公告內文 (支援多行文字)</label>
+                    <textarea
+                      rows={3}
+                      value={systemConfig.announcementText || ''}
+                      onChange={(e) => setSystemConfig({ ...systemConfig, announcementText: e.target.value })}
+                      placeholder="輸入要向全站訪客彈出顯示的公告內容..."
+                    />
+                  </div>
                   <div className="admin-form-field">
-                    <label>按鈕文字 (選填)</label>
+                    <label>行動按鈕文字 (選填)</label>
                     <input
                       type="text"
                       value={systemConfig.announcementLinkText || ''}
                       onChange={(e) => setSystemConfig({ ...systemConfig, announcementLinkText: e.target.value })}
-                      placeholder="例如：查看詳情"
+                      placeholder="例如：前往查看詳情"
                     />
-                  </div>
-                  <div className="admin-form-field">
-                    <label>跑馬燈捲動速度</label>
-                    <select
-                      value={systemConfig.announcementSpeed || 'normal'}
-                      onChange={(e) =>
-                        setSystemConfig({
-                          ...systemConfig,
-                          announcementSpeed: e.target.value as 'slow' | 'normal' | 'fast' | 'static'
-                        })
-                      }
-                    >
-                      <option value="normal">標準跑馬燈捲動 (18秒)</option>
-                      <option value="fast">快速跑馬燈捲動 (11秒)</option>
-                      <option value="slow">慢速跑馬燈捲動 (28秒)</option>
-                      <option value="static">靜態固定顯示 (不捲動)</option>
-                    </select>
                   </div>
                   <div className="admin-form-field">
                     <label>點擊導向連結 URL (選填)</label>
@@ -2682,48 +2675,80 @@ export function AdminDashboard({
                   </div>
                 </div>
 
-                {/* Live Marquee Preview */}
-                <div style={{ marginTop: '1rem' }}>
-                  <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginBottom: '0.45rem', fontWeight: 600 }}>
-                    跑馬燈前台即時動態預覽：
+                {/* Live Popup Modal Preview */}
+                <div style={{ marginTop: '1.1rem' }}>
+                  <div style={{ fontSize: '0.78rem', color: 'var(--muted)', marginBottom: '0.5rem', fontWeight: 600 }}>
+                    彈出式公告視窗即時預覽：
                   </div>
                   <div
-                    className={`global-marquee-bar theme-${systemConfig.announcementType || 'info'}`}
                     style={{
-                      position: 'relative',
-                      top: 'auto',
-                      left: 'auto',
-                      transform: 'none',
-                      width: '100%',
-                      maxWidth: '100%',
-                      zIndex: 1,
-                      ['--marquee-duration' as any]:
-                        systemConfig.announcementSpeed === 'slow'
-                          ? '28s'
-                          : systemConfig.announcementSpeed === 'fast'
-                            ? '11s'
-                            : '18s'
+                      background: 'var(--surface)',
+                      border:
+                        systemConfig.announcementType === 'warning'
+                          ? '1px solid rgba(245, 158, 11, 0.55)'
+                          : '1px solid var(--border)',
+                      borderRadius: '18px',
+                      padding: '1.25rem 1.4rem',
+                      boxShadow: '0 10px 28px rgba(0, 0, 0, 0.25)'
                     }}
                   >
-                    <span className="global-marquee-tag">
-                      <MegaphoneIcon size="0.95em" style={{ flexShrink: 0 }} />
-                      <span>全站公告</span>
-                    </span>
-                    <div className="global-marquee-viewport">
-                      <div
-                        className={`global-marquee-track${
-                          systemConfig.announcementSpeed === 'static' ? ' is-static' : ''
-                        }`}
-                      >
-                        <span className="global-marquee-item">
-                          {systemConfig.announcementText || '（請在上方輸入公告文字以預覽跑馬燈捲動效果）'}
-                        </span>
-                        {systemConfig.announcementSpeed !== 'static' && (
-                          <span className="global-marquee-item" aria-hidden="true">
-                            {systemConfig.announcementText || '（請在上方輸入公告文字以預覽跑馬燈捲動效果）'}
-                          </span>
-                        )}
-                      </div>
+                    <div
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '6px',
+                        padding: '0.2rem 0.65rem',
+                        borderRadius: '999px',
+                        fontSize: '0.74rem',
+                        fontWeight: 700,
+                        marginBottom: '0.55rem',
+                        background:
+                          systemConfig.announcementType === 'warning'
+                            ? 'rgba(245, 158, 11, 0.18)'
+                            : systemConfig.announcementType === 'celebration'
+                              ? 'rgba(234, 88, 12, 0.18)'
+                              : 'rgba(var(--accent-rgb), 0.18)',
+                        color:
+                          systemConfig.announcementType === 'warning'
+                            ? '#f59e0b'
+                            : systemConfig.announcementType === 'celebration'
+                              ? '#fb923c'
+                              : 'var(--gold)'
+                      }}
+                    >
+                      {systemConfig.announcementType === 'warning' ? (
+                        <WarningIcon size="0.9em" />
+                      ) : systemConfig.announcementType === 'celebration' ? (
+                        <SparklesIcon size="0.9em" />
+                      ) : (
+                        <MegaphoneIcon size="0.9em" />
+                      )}
+                      <span>
+                        {systemConfig.announcementType === 'warning'
+                          ? '重要提醒'
+                          : systemConfig.announcementType === 'celebration'
+                            ? '最新活動公告'
+                            : '系統公告'}
+                      </span>
+                    </div>
+
+                    <div style={{ fontSize: '1.1rem', fontWeight: 800, color: 'var(--text)', marginBottom: '0.6rem' }}>
+                      {systemConfig.announcementTitle || '全站重要公告'}
+                    </div>
+
+                    <div
+                      style={{
+                        background: 'rgba(var(--bg-rgb), 0.45)',
+                        border: '1px solid var(--border)',
+                        borderRadius: '12px',
+                        padding: '0.8rem 0.95rem',
+                        fontSize: '0.86rem',
+                        lineHeight: 1.55,
+                        whiteSpace: 'pre-wrap',
+                        color: 'var(--text)'
+                      }}
+                    >
+                      {systemConfig.announcementText || '（請在上方輸入公告內文以預覽彈窗效果）'}
                     </div>
                   </div>
                 </div>

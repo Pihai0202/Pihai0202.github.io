@@ -320,7 +320,9 @@ function App() {
   const [suspensionData, setSuspensionData] = useState<SuspensionInfo | null>(null)
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({})
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null)
-  const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string>('')
+  const [dismissedAnnouncement, setDismissedAnnouncement] = useState<string>(
+    () => localStorage.getItem('tw-dismissed-announcement') || ''
+  )
 
   useEffect(() => {
     const unsubOverrides = onSnapshot(
@@ -2358,73 +2360,151 @@ function App() {
     <>
       {systemConfig?.announcementEnabled &&
         systemConfig.announcementText &&
-        dismissedAnnouncement !== systemConfig.announcementText &&
+        dismissedAnnouncement !== (systemConfig.updatedAt || systemConfig.announcementText) &&
         view !== 'admin' && (
           <div
-            className={`global-marquee-bar theme-${systemConfig.announcementType || 'info'}`}
-            style={{
-              ['--marquee-duration' as any]:
-                systemConfig.announcementSpeed === 'slow'
-                  ? '28s'
-                  : systemConfig.announcementSpeed === 'fast'
-                    ? '11s'
-                    : '18s'
-            }}
+            className="modal-overlay active"
+            style={{ zIndex: 2200 }}
+            onClick={() =>
+              setDismissedAnnouncement(systemConfig.updatedAt || systemConfig.announcementText || '')
+            }
           >
-            <span className="global-marquee-tag">
-              <MegaphoneIcon size="0.95em" style={{ flexShrink: 0 }} />
-              <span>{lang === 'zh-TW' ? '全站公告' : 'Notice'}</span>
-            </span>
-
-            <div className="global-marquee-viewport">
-              <div
-                className={`global-marquee-track${
-                  systemConfig.announcementSpeed === 'static' ? ' is-static' : ''
-                }`}
+            <div
+              className="modal publish-modal"
+              style={{
+                maxWidth: '440px',
+                padding: '1.8rem 1.9rem',
+                borderRadius: '22px',
+                border:
+                  systemConfig.announcementType === 'warning'
+                    ? '1px solid rgba(245, 158, 11, 0.55)'
+                    : '1px solid var(--border)'
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                className="modal-close"
+                type="button"
+                onClick={() =>
+                  setDismissedAnnouncement(systemConfig.updatedAt || systemConfig.announcementText || '')
+                }
               >
-                <span className="global-marquee-item">{systemConfig.announcementText}</span>
-                {systemConfig.announcementSpeed !== 'static' && (
-                  <span className="global-marquee-item" aria-hidden="true">
-                    {systemConfig.announcementText}
-                  </span>
-                )}
-              </div>
-            </div>
+                <CloseIcon />
+              </button>
 
-            {systemConfig.announcementLink && (
-              <a
-                href={systemConfig.announcementLink}
-                target="_blank"
-                rel="noopener noreferrer"
+              <div
                 style={{
-                  color: 'inherit',
-                  textDecoration: 'underline',
-                  fontWeight: 800,
-                  whiteSpace: 'nowrap',
-                  flexShrink: 0,
-                  fontSize: '0.8rem'
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '0.25rem 0.7rem',
+                  borderRadius: '999px',
+                  fontSize: '0.76rem',
+                  fontWeight: 700,
+                  marginBottom: '0.75rem',
+                  background:
+                    systemConfig.announcementType === 'warning'
+                      ? 'rgba(245, 158, 11, 0.18)'
+                      : systemConfig.announcementType === 'celebration'
+                        ? 'rgba(234, 88, 12, 0.18)'
+                        : 'rgba(var(--accent-rgb), 0.18)',
+                  color:
+                    systemConfig.announcementType === 'warning'
+                      ? '#f59e0b'
+                      : systemConfig.announcementType === 'celebration'
+                        ? '#fb923c'
+                        : 'var(--gold)'
                 }}
               >
-                {systemConfig.announcementLinkText || (lang === 'zh-TW' ? '查看詳情 ↗' : 'Details ↗')}
-              </a>
-            )}
-            <button
-              type="button"
-              onClick={() => setDismissedAnnouncement(systemConfig.announcementText || '')}
-              style={{
-                background: 'transparent',
-                border: 'none',
-                color: 'inherit',
-                cursor: 'pointer',
-                padding: '2px',
-                display: 'inline-flex',
-                alignItems: 'center',
-                flexShrink: 0
-              }}
-              aria-label="關閉公告"
-            >
-              <CloseIcon size="0.9em" />
-            </button>
+                {systemConfig.announcementType === 'warning' ? (
+                  <WarningIcon size="0.95em" />
+                ) : systemConfig.announcementType === 'celebration' ? (
+                  <SparklesIcon size="0.95em" />
+                ) : (
+                  <MegaphoneIcon size="0.95em" />
+                )}
+                <span>
+                  {systemConfig.announcementType === 'warning'
+                    ? lang === 'zh-TW'
+                      ? '重要提醒'
+                      : 'Important Alert'
+                    : systemConfig.announcementType === 'celebration'
+                      ? lang === 'zh-TW'
+                        ? '最新活動公告'
+                        : 'Special Event'
+                      : lang === 'zh-TW'
+                        ? '系統公告'
+                        : 'Announcement'}
+                </span>
+              </div>
+
+              <h2
+                style={{
+                  fontSize: '1.28rem',
+                  color: 'var(--text)',
+                  margin: '0 0 0.9rem',
+                  lineHeight: 1.35
+                }}
+              >
+                {systemConfig.announcementTitle || (lang === 'zh-TW' ? '全站重要公告' : 'Site Announcement')}
+              </h2>
+
+              <div
+                style={{
+                  background: 'rgba(var(--surface-rgb), 0.55)',
+                  border: '1px solid var(--border)',
+                  borderRadius: '14px',
+                  padding: '1rem 1.1rem',
+                  marginBottom: '1.35rem',
+                  color: 'var(--text)',
+                  fontSize: '0.92rem',
+                  lineHeight: 1.6,
+                  whiteSpace: 'pre-wrap',
+                  maxHeight: '260px',
+                  overflowY: 'auto'
+                }}
+              >
+                {systemConfig.announcementText}
+              </div>
+
+              <div className="publish-actions" style={{ display: 'flex', gap: '0.65rem', flexWrap: 'wrap' }}>
+                {systemConfig.announcementLink && (
+                  <a
+                    href={systemConfig.announcementLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="publish-submit-btn"
+                    style={{
+                      flex: 1,
+                      textAlign: 'center',
+                      textDecoration: 'none',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '6px'
+                    }}
+                  >
+                    <span>
+                      {systemConfig.announcementLinkText || (lang === 'zh-TW' ? '前往查看詳情' : 'Learn More')}
+                    </span>
+                    <RocketIcon size="0.95em" />
+                  </a>
+                )}
+                <button
+                  type="button"
+                  className={systemConfig.announcementLink ? 'publish-cancel-btn' : 'publish-submit-btn'}
+                  style={{ flex: 1 }}
+                  onClick={() => {
+                    const key = systemConfig.updatedAt || systemConfig.announcementText || ''
+                    setDismissedAnnouncement(key)
+                    localStorage.setItem('tw-dismissed-announcement', key)
+                  }}
+                >
+                  <CheckIcon size="0.95em" style={{ marginRight: '5px', verticalAlign: '-2px' }} />
+                  {lang === 'zh-TW' ? '我知道了' : 'Got it'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
       <header className={view !== 'map' || isSidebarCollapsed ? 'full-width-header' : ''}>
