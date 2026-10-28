@@ -2486,6 +2486,57 @@ def main():
     concerts_path.parent.mkdir(parents=True, exist_ok=True)
     with open(concerts_path, "w", encoding="utf-8") as f:
         json.dump(output, f, ensure_ascii=False, indent=2)
+    with open(concerts_path, "w", encoding="utf-8") as f:
+        json.dump(output, f, ensure_ascii=False, indent=2)
+    try:
+        t_str = today_str()
+        today_cards = []
+        for ev in all_events:
+            ev_date = (ev.get("date") or "").strip().replace("/", "-")
+            if not ev_date.startswith(t_str):
+                continue
+            parts = ev_date[:10].split("-")
+            ym = f"{parts[0]}.{parts[1]}" if len(parts) == 3 else "日期未定"
+            day_lbl = parts[2] if len(parts) == 3 else "--"
+            subtitle = (ev.get("artist") or "").strip() or (ev.get("source") or "售票活動")
+            venue_lbl = ev.get("venue_name") or ev.get("venue_raw") or ev.get("city") or "地點待確認"
+            if ev.get("venue_id") == "kaohsiung-natl" or venue_lbl in ("國家體育場", "高雄國家體育場"):
+                venue_lbl = "高雄世運"
+            venue_lbl = venue_lbl.replace("臺", "台")
+            cat_lbl = "sport" if (ev.get("source") == "中華職棒" or ev.get("category") == "sport") else "concert"
+            img_url = (ev.get("image") or "").strip()
+            if img_url.startswith("/"):
+                img_url = f"https://concert.pihai0202.com{img_url}"
+            today_cards.append({
+                "id": ev.get("id", ""),
+                "subtitle": subtitle,
+                "source_badge": ev.get("source", "") if ev.get("source") != subtitle else "",
+                "title": ev.get("name", ""),
+                "venue": venue_lbl,
+                "venue_id": ev.get("venue_id") or "",
+                "city": (ev.get("city") or "").replace("臺", "台"),
+                "category": cat_lbl,
+                "background_image": img_url,
+                "url": ev.get("url") or "https://concert.pihai0202.com",
+                "stub": {
+                    "badge_text": "今天",
+                    "is_today": True,
+                    "day": day_lbl,
+                    "year_month": ym,
+                },
+                "ticket_links": ev.get("ticket_links", []),
+            })
+        today_api_path = PROJECT_ROOT / "public" / "api" / "today.json"
+        today_api_path.parent.mkdir(parents=True, exist_ok=True)
+        with open(today_api_path, "w", encoding="utf-8") as f_today:
+            json.dump({
+                "date": t_str,
+                "updated_at": output["updated_at"],
+                "count": len(today_cards),
+                "cards": today_cards,
+            }, f_today, ensure_ascii=False, indent=2)
+    except Exception:
+        pass
 
     print(json.dumps(output, ensure_ascii=False, indent=2))
     print(f"\n✅ 共 {len(all_events)} 筆活動", file=sys.stderr)

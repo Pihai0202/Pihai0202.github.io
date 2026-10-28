@@ -32,6 +32,7 @@ import { isAdminUser, setDynamicAdminEmails } from './constants/adminConfig'
 const AdminDashboard = lazy(() => import('./components/AdminDashboard'))
 import { TransitInfoBoard } from './components/TransitInfoBoard'
 import { GuideModal } from './components/GuideModal'
+import { EmbedBuilderModal, CodeSvgIcon } from './components/EmbedTodayWidget'
 import { SafeIframe } from './components/SafeIframe'
 import { LazyImage } from './components/LazyImage'
 import './components/HistoricalEventPicker.css'
@@ -317,6 +318,7 @@ function App() {
   const drawerHeaderRef = useRef<HTMLDivElement | null>(null)
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
   const [isAllModalOpen, setIsAllModalOpen] = useState(false)
+  const [isEmbedModalOpen, setIsEmbedModalOpen] = useState(false)
   const [rawSuspensionData, setRawSuspensionData] = useState<SuspensionInfo | null>(null)
   const [eventOverrides, setEventOverrides] = useState<Record<string, EventOverride>>({})
   const [systemConfig, setSystemConfig] = useState<SystemConfig | null>(null)
@@ -4385,6 +4387,7 @@ function App() {
         </Modal>
       )}
 
+      <EmbedBuilderModal isOpen={isEmbedModalOpen} onClose={() => setIsEmbedModalOpen(false)} />
       {isGuideModalOpen && (
         <GuideModal onClose={() => setIsGuideModalOpen(false)} />
       )}
@@ -4484,6 +4487,20 @@ function App() {
                 <span>{lang === 'zh-TW' ? '快捷功能' : lang === 'ja' ? 'クイック機能' : lang === 'ko' ? '빠른 기능' : 'Quick Actions'}</span>
               </div>
               <div className="settings-action-list">
+                <button
+                  type="button"
+                  className="settings-action-item"
+                  onClick={() => {
+                    setIsSettingsModalOpen(false)
+                    setIsEmbedModalOpen(true)
+                  }}
+                >
+                  <span className="settings-action-left">
+                    <CodeSvgIcon size="1.05em" />
+                    <span>{lang === 'zh-TW' ? '今日演出卡片 API / 網站嵌入產生器' : 'Today Card API & Widget Builder'}</span>
+                  </span>
+                  <span className="settings-action-arrow"><ChevronRightIcon size="1em" /></span>
+                </button>
                 <button
                   type="button"
                   className="settings-action-item"
