@@ -2088,20 +2088,20 @@ svg#taiwan-map.dragging {
 }
 
 .remote-card {
-  --ticket-stub-width: 90px;
-  --ticket-notch-radius: 9.5px;
+  --ticket-stub-width: 96px;
+  --ticket-notch-radius: 7.5px;
   position: relative;
   overflow: hidden;
-  border-radius: 16px;
+  border-radius: 14px;
   padding: 0;
-  min-height: 110px;
+  min-height: 112px;
   background: #141622;
-  border: none;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.38);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
   color: #ffffff;
   text-decoration: none;
   margin-bottom: 0.8rem;
-  transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+  transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.25s ease, border-color 0.25s ease;
   display: block;
   -webkit-mask-image:
     radial-gradient(circle at calc(100% - var(--ticket-stub-width)) 0, transparent var(--ticket-notch-radius), #000 calc(var(--ticket-notch-radius) + 0.6px)),
@@ -2117,10 +2117,22 @@ svg#taiwan-map.dragging {
   mask-repeat: no-repeat;
 }
 
+.remote-card::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, var(--gold, #ffd166) 0%, var(--teal, #4ecdc4) 100%);
+  z-index: 3;
+  opacity: 0.9;
+}
+
 .remote-card:hover {
   transform: translateY(-2px);
-  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.52);
-  filter: brightness(1.05);
+  border-color: rgba(var(--gold-rgb), 0.48);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.55);
 }
 
 .remote-card-bg-wrap {
@@ -2140,7 +2152,7 @@ svg#taiwan-map.dragging {
   object-fit: cover;
   object-position: center;
   display: block;
-  transition: transform 0.35s ease;
+  transition: transform 0.4s ease;
 }
 
 .remote-card:hover .remote-card-bg-img,
@@ -2151,15 +2163,12 @@ svg#taiwan-map.dragging {
 .remote-card-overlay {
   position: absolute;
   inset: 0;
-  background-image:
-    radial-gradient(rgba(255, 255, 255, 0.08) 1.2px, transparent 1.2px),
-    linear-gradient(
-      135deg,
-      rgba(8, 10, 16, 0.56) 0%,
-      rgba(8, 10, 16, 0.36) 50%,
-      rgba(8, 10, 16, 0.58) 100%
-    );
-  background-size: 16px 16px, 100% 100%;
+  background: linear-gradient(
+    90deg,
+    rgba(10, 12, 20, 0.78) 0%,
+    rgba(10, 12, 20, 0.45) 58%,
+    rgba(10, 12, 20, 0.68) 100%
+  );
 }
 
 .remote-card-bg-wrap .remote-card-fallback {
@@ -2187,7 +2196,7 @@ svg#taiwan-map.dragging {
   z-index: 1;
   display: flex;
   align-items: stretch;
-  min-height: 110px;
+  min-height: 112px;
   width: 100%;
 }
 
@@ -2196,45 +2205,7 @@ svg#taiwan-map.dragging {
   min-width: 0;
   display: flex;
   align-items: center;
-  padding: 0.85rem 0.95rem 0.85rem 1.05rem;
-}
-
-.remote-ticket-thumb {
-  width: 82px;
-  height: 82px;
-  border-radius: 12px;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 1.5px solid rgba(255, 255, 255, 0.22);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.42);
-  background: #181b28;
-}
-
-.remote-ticket-thumb-img,
-.remote-ticket-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: center;
-  display: block;
-}
-
-.remote-ticket-thumb-fallback {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(135deg, #1a1e2e 0%, #252b40 100%);
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: 800;
-  font-size: 0.9rem;
-  letter-spacing: 0.08em;
-}
-
-.remote-ticket-thumb-fallback.sport {
-  background: linear-gradient(135deg, rgba(255, 107, 0, 0.25) 0%, #1b2030 100%);
-  color: #ff9f43;
+  padding: 0.78rem 0.9rem 0.78rem 1rem;
 }
 
 .remote-ticket-info {
@@ -2243,57 +2214,83 @@ svg#taiwan-map.dragging {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  gap: 0.16rem;
+  gap: 0.28rem;
+}
+
+.remote-card-kicker-row {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.remote-card-artist {
+  color: var(--gold, #ffd166);
+  font-weight: 800;
+  font-size: 0.76rem;
+  line-height: 1.25;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95);
+  display: inline-flex;
+  align-items: center;
+}
+
+.remote-card-source-pill {
+  flex-shrink: 0;
+  font-size: 0.64rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.85);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  padding: 0.1rem 0.42rem;
+  border-radius: 4px;
+  line-height: 1.2;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
 }
 
 .remote-card-name {
   color: #ffffff;
   font-weight: 800;
-  font-size: 0.95rem;
-  line-height: 1.28;
+  font-size: 0.96rem;
+  line-height: 1.32;
   display: -webkit-box;
   overflow: hidden;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.92), 0 2px 8px rgba(0, 0, 0, 0.75);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 10px rgba(0, 0, 0, 0.8);
   letter-spacing: 0.01em;
 }
 
-.remote-card-artist {
-  color: rgba(255, 255, 255, 0.86);
-  font-weight: 700;
-  font-size: 0.8rem;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  margin-top: 0.08rem;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+.remote-card-footer-row {
   display: flex;
   align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.08rem;
 }
 
 .remote-card-venue {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.28rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: rgba(255, 255, 255, 0.92);
   font-weight: 700;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   line-height: 1.3;
-  margin-top: 0.04rem;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.9);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.95), 0 2px 6px rgba(0, 0, 0, 0.8);
 }
 
 .ticket-pin-icon {
-  width: 13px;
-  height: 13px;
   flex-shrink: 0;
-  color: rgba(255, 255, 255, 0.92);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.8));
+  color: var(--teal, #4ecdc4);
+  filter: drop-shadow(0 1px 3px rgba(0, 0, 0, 0.85));
 }
 
 .remote-card-venue-text {
@@ -2302,113 +2299,85 @@ svg#taiwan-map.dragging {
   white-space: nowrap;
 }
 
-.remote-ticket-perf {
-  position: absolute;
-  right: var(--ticket-stub-width);
-  top: 15px;
-  bottom: 15px;
-  transform: translateX(50%);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  pointer-events: none;
-  z-index: 2;
-}
-
-.remote-ticket-perf .perf-dot {
-  width: 4.5px;
-  height: 4.5px;
-  border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 4px rgba(34, 197, 94, 0.55);
-}
-
 .remote-ticket-stub {
   width: var(--ticket-stub-width);
   flex-shrink: 0;
   position: relative;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.5rem 1.15rem 0.5rem 0.35rem;
-  box-sizing: border-box;
-}
-
-.remote-ticket-date-col {
-  display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  text-align: center;
+  padding: 0.6rem 0.5rem;
+  box-sizing: border-box;
+  background: rgba(10, 12, 20, 0.46);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border-left: 1.5px dashed rgba(255, 255, 255, 0.24);
+  gap: 0.18rem;
 }
 
-.ticket-stub-month {
-  font-size: 0.76rem;
+.ticket-stub-countdown {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  background: rgba(var(--teal-rgb, 78, 205, 196), 0.2);
+  border: 1px solid rgba(var(--teal-rgb, 78, 205, 196), 0.45);
+  color: var(--teal, #4ecdc4);
+  font-size: 0.66rem;
   font-weight: 800;
-  color: #ffffff;
   line-height: 1.1;
-  letter-spacing: 0.03em;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.88);
+  padding: 0.2rem 0.48rem;
+  border-radius: 6px;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
+  margin-bottom: 0.1rem;
+}
+
+.ticket-stub-countdown.soon {
+  background: rgba(var(--gold-rgb, 255, 209, 102), 0.22);
+  border-color: rgba(var(--gold-rgb, 255, 209, 102), 0.55);
+  color: var(--gold, #ffd166);
+}
+
+.ticket-stub-countdown.today {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.9) 0%, rgba(234, 88, 12, 0.9) 100%);
+  border-color: rgba(253, 224, 71, 0.65);
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.45);
+}
+
+.stub-live-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 0 6px #ffffff;
+}
+
+.ticket-stub-countdown.past {
+  background: rgba(30, 41, 59, 0.65);
+  border-color: rgba(148, 163, 184, 0.28);
+  color: rgba(226, 232, 240, 0.65);
 }
 
 .ticket-stub-day {
   font-size: 1.85rem;
   font-weight: 900;
   color: #ffffff;
-  line-height: 1.04;
-  letter-spacing: -0.02em;
-  margin: 0.04rem 0;
+  line-height: 1;
+  letter-spacing: -0.03em;
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.88);
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
 }
 
-.ticket-stub-divider {
-  width: 30px;
-  height: 2.5px;
-  border-radius: 99px;
-  background: rgba(255, 255, 255, 0.38);
-  margin: 0.18rem 0 0.25rem;
-}
-
-.ticket-stub-countdown {
-  background: rgba(20, 83, 45, 0.82);
-  border: 1px solid rgba(74, 222, 128, 0.3);
-  color: #4ade80;
-  font-size: 0.72rem;
-  font-weight: 800;
-  line-height: 1.1;
-  padding: 0.2rem 0.55rem;
-  border-radius: 999px;
-  white-space: nowrap;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
-}
-
-.ticket-stub-countdown.today {
-  background: rgba(22, 163, 74, 0.9);
-  border-color: rgba(134, 239, 172, 0.55);
-  color: #ffffff;
-}
-
-.ticket-stub-countdown.past {
-  background: rgba(30, 41, 59, 0.75);
-  border-color: rgba(148, 163, 184, 0.28);
-  color: rgba(226, 232, 240, 0.75);
-}
-
-.ticket-stub-year {
-  position: absolute;
-  right: -4px;
-  top: 50%;
-  transform: translateY(-50%) rotate(-90deg);
-  transform-origin: center;
-  font-size: 0.62rem;
-  font-weight: 800;
-  color: rgba(255, 255, 255, 0.65);
+.ticket-stub-ym {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.72);
   letter-spacing: 0.06em;
-  white-space: nowrap;
-  pointer-events: none;
-  user-select: none;
+  line-height: 1.1;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.85);
 }
 

@@ -4917,44 +4917,44 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
     const match = (dateStr || '').match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/)
     if (!match) {
       return {
-        yearLabel: '',
-        monthLabel: lang === 'zh-TW' ? '日期' : 'DATE',
+        yearMonthLabel: lang === 'zh-TW' ? '日期未定' : 'DATE TBA',
         dayLabel: '--',
-        countdownLabel: lang === 'zh-TW' ? '未定' : 'TBA',
+        countdownLabel: lang === 'zh-TW' ? '待公告' : 'TBA',
         isPast: false,
         isToday: false,
+        isSoon: false,
       }
     }
     const y = Number(match[1])
     const m = Number(match[2])
     const d = Number(match[3])
     const dayPadded = String(d).padStart(2, '0')
+    const monthPadded = String(m).padStart(2, '0')
 
     const [tY, tM, tD] = todayStr.split('-').map(Number)
     const todayUtc = Date.UTC(tY, tM - 1, tD)
     const targetUtc = Date.UTC(y, m - 1, d)
     const diffDays = Math.round((targetUtc - todayUtc) / (1000 * 60 * 60 * 24))
 
-    const monthNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
-    const monthLabel = lang === 'en' ? (monthNamesEn[m - 1] || `${m}M`) : lang === 'ko' ? `${m}월` : `${m}月`
-    const yearLabel = lang === 'en' ? `${y}` : lang === 'ko' ? `${y}년` : `${y}年`
+    const monthNamesEn = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC']
+    const yearMonthLabel = lang === 'en' ? `${monthNamesEn[m - 1]} ${y}` : `${y}.${monthPadded}`
 
     let countdownLabel = ''
     if (diffDays > 0) {
-      countdownLabel = lang === 'zh-TW' ? `${diffDays}天` : lang === 'ja' ? `${diffDays}日` : lang === 'ko' ? `${diffDays}일` : `${diffDays}d`
+      countdownLabel = lang === 'zh-TW' ? `${diffDays} 天` : lang === 'ja' ? `${diffDays}日` : lang === 'ko' ? `${diffDays}일` : `${diffDays}d`
     } else if (diffDays === 0) {
-      countdownLabel = lang === 'zh-TW' ? '今天' : lang === 'ja' ? '今日' : lang === 'ko' ? '오늘' : 'Today'
+      countdownLabel = lang === 'zh-TW' ? '今天' : lang === 'ja' ? '今日' : lang === 'ko' ? '오늘' : 'TODAY'
     } else {
-      countdownLabel = lang === 'zh-TW' ? '已結束' : lang === 'ja' ? '終了' : lang === 'ko' ? '종료' : 'Ended'
+      countdownLabel = lang === 'zh-TW' ? '已結束' : lang === 'ja' ? '終了' : lang === 'ko' ? '종료' : 'ENDED'
     }
 
     return {
-      yearLabel,
-      monthLabel,
+      yearMonthLabel,
       dayLabel: dayPadded,
       countdownLabel,
       isPast: diffDays < 0,
       isToday: diffDays === 0,
+      isSoon: diffDays > 0 && diffDays <= 5,
     }
   }
 
@@ -5077,18 +5077,25 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
           <div className="remote-ticket-layout">
             <div className="remote-ticket-main">
               <div className="remote-ticket-info">
+                <div className="remote-card-kicker-row">
+                  <span className="remote-card-artist" title={subtitleText}>
+                    {concert.game_score?.status === 'live' && <span className="live-pulsing-dot" style={{ marginRight: '5px' }} />}
+                    {subtitleText}
+                  </span>
+                  {concert.source && subtitleText !== translateSource(concert.source) && (
+                    <span className="remote-card-source-pill">{translateSource(concert.source)}</span>
+                  )}
+                </div>
+
                 <div className="remote-card-name" title={concert.name}>{concert.name}</div>
-                <div className="remote-card-artist" title={subtitleText}>
-                  {concert.game_score?.status === 'live' && <span className="live-pulsing-dot" style={{ marginRight: '5px' }} />}
-                  {subtitleText}
+
+                <div className="remote-card-footer-row">
+                  <div className="remote-card-venue">
+                    <PinIcon size="0.88em" className="ticket-pin-icon" />
+                    <span className="remote-card-venue-text">{venueText}</span>
+                  </div>
                 </div>
-                <div className="remote-card-venue">
-                  <svg className="ticket-pin-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <circle cx="8" cy="5.2" r="3.1" fill="currentColor" />
-                    <path d="M8 8.2V14.2" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
-                  </svg>
-                  <span className="remote-card-venue-text">{venueText}</span>
-                </div>
+
                 {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
                   <div className="typhoon-warning-badge">
                     <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
@@ -5098,27 +5105,13 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
               </div>
             </div>
 
-            <div className="remote-ticket-perf" aria-hidden="true">
-              <span className="perf-dot" />
-              <span className="perf-dot" />
-              <span className="perf-dot" />
-              <span className="perf-dot" />
-              <span className="perf-dot" />
-              <span className="perf-dot" />
-            </div>
-
             <div className="remote-ticket-stub">
-              <div className="remote-ticket-date-col">
-                <div className="ticket-stub-month">{dateInfo.monthLabel}</div>
-                <div className="ticket-stub-day">{dateInfo.dayLabel}</div>
-                <div className="ticket-stub-divider" />
-                <div className={`ticket-stub-countdown${dateInfo.isToday ? ' today' : dateInfo.isPast ? ' past' : ''}`}>
-                  {dateInfo.countdownLabel}
-                </div>
+              <div className={`ticket-stub-countdown${dateInfo.isToday ? ' today' : dateInfo.isSoon ? ' soon' : dateInfo.isPast ? ' past' : ''}`}>
+                {dateInfo.isToday && <span className="stub-live-dot" />}
+                {dateInfo.countdownLabel}
               </div>
-              {dateInfo.yearLabel && (
-                <div className="ticket-stub-year">{dateInfo.yearLabel}</div>
-              )}
+              <div className="ticket-stub-day">{dateInfo.dayLabel}</div>
+              <div className="ticket-stub-ym">{dateInfo.yearMonthLabel}</div>
             </div>
           </div>
         </div>
