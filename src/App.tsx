@@ -1043,7 +1043,7 @@ function App() {
   const [hasCheckedMigration, setHasCheckedMigration] = useState(false)
   const [toast, setToast] = useState<{ message: string; type?: 'info' | 'success' | 'error' } | null>(null)
   const showToast = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
-    setToast({ message, type })
+    if (!message) return; setToast({ message, type })
     setTimeout(() => {
       setToast(null)
     }, 3000)
@@ -1767,9 +1767,9 @@ function App() {
     if (!apiKey || concerts.length === 0 || hasCheckedMigration) return
 
     const migrateOldPhotos = async () => {
-      // Find all concerts that have old base64 images
+      const failedMap: Record<string, number> = JSON.parse(localStorage.getItem('tw-migration-failed') || '{}'); const shouldMigrate = (m: { id?: string; dataUrl: string; type: string }) => { const key = m.id || m.dataUrl; return m.type.startsWith('image/') && (m.dataUrl.startsWith('data:image/') || m.dataUrl.includes('ibb.co')) && (!failedMap[key] || Date.now() - failedMap[key] > 6 * 3600 * 1000) }
       const concertsToMigrate = concerts.filter(c =>
-        c.media && c.media.some(m => m.type.startsWith('image/') && (m.dataUrl.startsWith('data:image/') || m.dataUrl.includes('ibb.co')))
+        c.media && c.media.some(shouldMigrate)
       )
 
       if (concertsToMigrate.length === 0) {
@@ -1780,8 +1780,8 @@ function App() {
       setHasCheckedMigration(true)
       showToast(
         lang === 'zh-TW' 
-          ? '偵測到舊照片，正在背景備份至雲端空間...' 
-          : 'Old photos detected, backing up to cloud in background...', 
+          ? '' 
+          : '', 
         'info'
       )
 
@@ -1795,7 +1795,7 @@ function App() {
         let concertMediaChanged = false
         const newMedia = await Promise.all(
           concert.media.map(async (m) => {
-            if (m.type.startsWith('image/') && (m.dataUrl.startsWith('data:image/') || m.dataUrl.includes('ibb.co'))) {
+            if (shouldMigrate(m)) {
               try {
                 const blob = m.dataUrl.startsWith('data:image/') ? dataURLtoBlob(m.dataUrl) : m.dataUrl
                 const imgbbUrl = await uploadImageToImgBB(blob, m.name || 'migrated_photo.jpg')
@@ -1803,7 +1803,7 @@ function App() {
                 hasChanges = true
                 return { ...m, dataUrl: imgbbUrl }
               } catch (err) {
-                console.error(`Failed to migrate image ${m.name} in concert ${concert.id}:`, err)
+                failedMap[m.id || m.dataUrl] = Date.now(); localStorage.setItem('tw-migration-failed', JSON.stringify(failedMap)); console.error(`Failed to migrate image ${m.name} in concert ${concert.id}:`, err)
                 return m
               }
             }
