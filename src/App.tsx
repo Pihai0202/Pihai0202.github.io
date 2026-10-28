@@ -4853,24 +4853,109 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
     return srcMap[src]?.[lang === 'ja' ? 'ja' : lang === 'ko' ? 'ko' : 'en'] || src
   }
 
-  const translatePrice = (price: string): string => {
-    if (!price) return ''
-    if (price === '依官網/主辦公告為準') {
-      return lang === 'zh-TW' 
-        ? '依官網/主辦公告為準' 
-        : lang === 'ja' 
-          ? '公式サイトまたは主催者の発表に準ずる' 
-          : lang === 'ko' 
-            ? '공식 홈페이지/주최측 공지 기준' 
-            : 'Subject to official website/organizer announcement'
+  const getVenueMetaText = (c: RemoteConcert): string => {
+    const rawVal = c.venue_name || c.venue_raw || c.city
+    if (!rawVal) return lang === 'zh-TW' ? '地點待確認' : lang === 'en' ? 'Location TBA' : lang === 'ja' ? '開催地未定' : '장소 미정'
+    if (lang === 'zh-TW') {
+      if (c.venue_id === 'kaohsiung-natl' || rawVal === '國家體育場' || rawVal === '高雄國家體育場') {
+        return '高雄世運'
+      }
+      return rawVal.replace(/臺/g, '台')
     }
-    return price
+    return translateVenueName(rawVal, lang)
   }
 
-  const getVenueMetaText = (c: RemoteConcert): string => {
-    const rawVal = c.venue_raw || c.venue_name || c.city
-    if (!rawVal) return lang === 'zh-TW' ? '地點待確認' : lang === 'en' ? 'Location TBA' : lang === 'ja' ? '開催地未定' : '장소 미정'
-    return translateVenueName(rawVal, lang)
+  const getTicketSubtitle = (c: RemoteConcert): string => {
+    if (c.game_score) {
+      const vTeam = shortenCpblTeamName(c.game_score.visiting_team)
+      const hTeam = shortenCpblTeamName(c.game_score.home_team)
+      if (c.game_score.status === 'scheduled') {
+        return `${vTeam} vs ${hTeam}`
+      }
+      const statusLabel = c.game_score.status === 'live'
+        ? (lang === 'zh-TW' ? '比賽中' : 'LIVE')
+        : (c.game_score.status_text || (c.game_score.status === 'finished' ? '已完賽' : '未開打'))
+      return `${vTeam} ${c.game_score.visiting_score ?? '-'} : ${c.game_score.home_score ?? '-'} ${hTeam} · ${statusLabel}`
+    }
+    if (c.artist && c.artist.trim()) return c.artist.trim()
+
+    let s = (c.name || '').trim()
+    s = s.replace(/^\s*(?:【[^】]*】|\[[^\]]*\]|\([^)]*\)|（[^）]*）)\s*/g, '')
+    s = s.replace(/^[《「『【\s]+|[》」』】\s]+$/g, '')
+    s = s.replace(/^(?:202\d\s*年?\s*)/, '')
+
+    const tourRegex = /\s+(?:Prema\s+World\s+Tour|ASIA\s+ARENA\s+TOUR|ASIA\s+FAN\s*MEETING|ASIA\s+FAN\s*CONCERT|ASIA\s+TOUR|WORLD\s+TOUR|ARENA\s+TOUR|DOME\s+TOUR|LIVE\s+TOUR|CONCERT\s+TOUR|TOUR\s+202\d|FAN\s*MEETING|FAN\s*CONCERT|IN\s+TAIPEI|IN\s+KAOHSIUNG|IN\s+TAOYUAN)/i
+    if (tourRegex.test(s)) {
+      s = s.split(tourRegex)[0].trim()
+    } else {
+      const seps = ['《', '「', '『', '<', ' - ', ' – ', ' — ', '｜', '|', '：', ':', '★']
+      for (const sep of seps) {
+        if (s.includes(sep)) {
+          const part = s.split(sep)[0].trim()
+          if (part.length >= 2) {
+            s = part
+            break
+          }
+        }
+      }
+    }
+    s = s.replace(/\s*(?:202\d|ASIA|WORLD|LIVE|TOUR)\s*$/i, '').trim()
+    if (s && s !== c.name && s.length <= 28) {
+      return s
+    }
+    const words = s.split(/\s+/)
+    if (words.length > 1 && /^[A-Za-z0-9&'.]+$/.test(words[0])) {
+      if (words.length > 2 && /^[A-Za-z0-9&'.]+$/.test(words[1]) && !/^(tour|live|in|at|asia|world|the|concert|arena|dome)$/i.test(words[1])) {
+        return `${words[0]} ${words[1]}`
+      }
+      return words[0]
+    }
+    return c.source ? translateSource(c.source) : t('statTickets')
+  }
+
+  const parseTicketDateInfo = (dateStr?: string) => {
+    const match = (dateStr || '').match(/(\d{4})[-/.](\d{1,2})[-/.](\d{1,2})/)
+    if (!match) {
+      return {
+        yearLabel: '',
+        monthLabel: lang === 'zh-TW' ? '日期' : 'DATE',
+        dayLabel: '--',
+        countdownLabel: lang === 'zh-TW' ? '未定' : 'TBA',
+        isPast: false,
+        isToday: false,
+      }
+    }
+    const y = Number(match[1])
+    const m = Number(match[2])
+    const d = Number(match[3])
+    const dayPadded = String(d).padStart(2, '0')
+
+    const [tY, tM, tD] = todayStr.split('-').map(Number)
+    const todayUtc = Date.UTC(tY, tM - 1, tD)
+    const targetUtc = Date.UTC(y, m - 1, d)
+    const diffDays = Math.round((targetUtc - todayUtc) / (1000 * 60 * 60 * 24))
+
+    const monthNamesEn = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    const monthLabel = lang === 'en' ? (monthNamesEn[m - 1] || `${m}M`) : lang === 'ko' ? `${m}월` : `${m}月`
+    const yearLabel = lang === 'en' ? `${y}` : lang === 'ko' ? `${y}년` : `${y}年`
+
+    let countdownLabel = ''
+    if (diffDays > 0) {
+      countdownLabel = lang === 'zh-TW' ? `${diffDays}天` : lang === 'ja' ? `${diffDays}日` : lang === 'ko' ? `${diffDays}일` : `${diffDays}d`
+    } else if (diffDays === 0) {
+      countdownLabel = lang === 'zh-TW' ? '今天' : lang === 'ja' ? '今日' : lang === 'ko' ? '오늘' : 'Today'
+    } else {
+      countdownLabel = lang === 'zh-TW' ? '已結束' : lang === 'ja' ? '終了' : lang === 'ko' ? '종료' : 'Ended'
+    }
+
+    return {
+      yearLabel,
+      monthLabel,
+      dayLabel: dayPadded,
+      countdownLabel,
+      isPast: diffDays < 0,
+      isToday: diffDays === 0,
+    }
   }
 
   return (
@@ -4951,9 +5036,14 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
       )}
       {displayedConcerts.map((concert) => {
         const isToday = concert.date && concert.date.trim() === todayStr
+        const dateInfo = parseTicketDateInfo(concert.date)
+        const subtitleText = getTicketSubtitle(concert)
+        const venueText = getVenueMetaText(concert)
+        const isSport = concert.source === '中華職棒' || concert.category === 'sport'
+
         return (
         <div
-          className="remote-card"
+          className="remote-card ticket-style-card"
           style={{ cursor: 'pointer' }}
           key={concert.id}
           onClick={() => {
@@ -4972,7 +5062,7 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
               alt=""
               className="remote-card-bg-img"
               fallback={
-                concert.source === '中華職棒' || concert.category === 'sport' ? (
+                isSport ? (
                   <div className="remote-card-fallback sport-fallback">
                     <BaseballIcon size="2.4em" />
                   </div>
@@ -4983,50 +5073,53 @@ const UpcomingConcerts = memo(function UpcomingConcerts({
             />
             <div className="remote-card-overlay" />
           </div>
-          <div className="remote-card-body">
-            <div className="remote-card-top">
-              <span className="remote-card-source">{concert.source ? translateSource(concert.source) : t('statTickets')}</span>
-              <span className="remote-card-date">{concert.date || (lang === 'zh-TW' ? '日期未定' : lang === 'en' ? 'TBA' : lang === 'ja' ? '日程未定' : '날짜 미정')}</span>
+
+          <div className="remote-ticket-layout">
+            <div className="remote-ticket-main">
+              <div className="remote-ticket-info">
+                <div className="remote-card-name" title={concert.name}>{concert.name}</div>
+                <div className="remote-card-artist" title={subtitleText}>
+                  {concert.game_score?.status === 'live' && <span className="live-pulsing-dot" style={{ marginRight: '5px' }} />}
+                  {subtitleText}
+                </div>
+                <div className="remote-card-venue">
+                  <svg className="ticket-pin-icon" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <circle cx="8" cy="5.2" r="3.1" fill="currentColor" />
+                    <path d="M8 8.2V14.2" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" />
+                  </svg>
+                  <span className="remote-card-venue-text">{venueText}</span>
+                </div>
+                {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
+                  <div className="typhoon-warning-badge">
+                    <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
+                    {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
+                  </div>
+                ) : null}
+              </div>
             </div>
-            <div className="remote-card-name">{concert.name}</div>
-            {concert.game_score && (
-              <div className={`card-game-score-pill ${concert.game_score.status || 'scheduled'}`}>
-                <BaseballIcon size="0.95em" style={{ verticalAlign: 'middle', marginRight: '3px' }} />
-                <span>{shortenCpblTeamName(concert.game_score.visiting_team)} {concert.game_score.visiting_score ?? '-'} {concert.game_score.status === 'scheduled' ? 'vs' : '-'} {concert.game_score.home_score ?? '-'} {shortenCpblTeamName(concert.game_score.home_team)}</span>
-                <span className={`game-status-pill ${concert.game_score.status || 'scheduled'}`}>
-                  {concert.game_score.status === 'live' && <span className="live-pulsing-dot" />}
-                  {concert.game_score.status === 'live' ? (lang === 'zh-TW' ? '比賽中' : 'LIVE') : (concert.game_score.status_text || (concert.game_score.status === 'finished' ? '已完賽' : '未開打'))}
-                </span>
-              </div>
-            )}
-            {isToday && getCitySuspensionStatus(concert.city, suspensionItems) ? (
-              <div className="typhoon-warning-badge">
-                <WarningIcon size="0.95em" style={{ marginRight: '3px', flexShrink: 0 }} />
-                {lang === 'zh-TW' ? '因颱風停班停課，演出可能延期/取消' : 'Show may be postponed/cancelled due to typhoon.'}
-              </div>
-            ) : null}
-            <div className="remote-card-meta">
-              {getVenueMetaText(concert)}
-              {concert.price ? ` · ${translatePrice(concert.price)}` : ''}
+
+            <div className="remote-ticket-perf" aria-hidden="true">
+              <span className="perf-dot" />
+              <span className="perf-dot" />
+              <span className="perf-dot" />
+              <span className="perf-dot" />
+              <span className="perf-dot" />
+              <span className="perf-dot" />
             </div>
-            {concert.ticket_links?.length > 0 && (
-              <div className="ticket-links">
-                {concert.ticket_links.slice(0, 3).map((link) => (
-                  <a
-                    key={`${concert.id}-${link.platform}`}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="ticket-link-btn"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                    }}
-                  >
-                    {translateSource(link.name)}
-                  </a>
-                ))}
+
+            <div className="remote-ticket-stub">
+              <div className="remote-ticket-date-col">
+                <div className="ticket-stub-month">{dateInfo.monthLabel}</div>
+                <div className="ticket-stub-day">{dateInfo.dayLabel}</div>
+                <div className="ticket-stub-divider" />
+                <div className={`ticket-stub-countdown${dateInfo.isToday ? ' today' : dateInfo.isPast ? ' past' : ''}`}>
+                  {dateInfo.countdownLabel}
+                </div>
               </div>
-            )}
+              {dateInfo.yearLabel && (
+                <div className="ticket-stub-year">{dateInfo.yearLabel}</div>
+              )}
+            </div>
           </div>
         </div>
         )
