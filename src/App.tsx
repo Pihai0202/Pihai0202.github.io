@@ -1763,13 +1763,13 @@ function App() {
 
   // Background migration of old Base64 images to ImgBB
   useEffect(() => {
-    const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME; const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; const apiKey = cloudName && uploadPreset
     if (!apiKey || concerts.length === 0 || hasCheckedMigration) return
 
     const migrateOldPhotos = async () => {
       // Find all concerts that have old base64 images
       const concertsToMigrate = concerts.filter(c =>
-        c.media && c.media.some(m => m.type.startsWith('image/') && m.dataUrl.startsWith('data:image/'))
+        c.media && c.media.some(m => m.type.startsWith('image/') && (m.dataUrl.startsWith('data:image/') || m.dataUrl.includes('ibb.co')))
       )
 
       if (concertsToMigrate.length === 0) {
@@ -1795,9 +1795,9 @@ function App() {
         let concertMediaChanged = false
         const newMedia = await Promise.all(
           concert.media.map(async (m) => {
-            if (m.type.startsWith('image/') && m.dataUrl.startsWith('data:image/')) {
+            if (m.type.startsWith('image/') && (m.dataUrl.startsWith('data:image/') || m.dataUrl.includes('ibb.co'))) {
               try {
-                const blob = dataURLtoBlob(m.dataUrl)
+                const blob = m.dataUrl.startsWith('data:image/') ? dataURLtoBlob(m.dataUrl) : m.dataUrl
                 const imgbbUrl = await uploadImageToImgBB(blob, m.name || 'migrated_photo.jpg')
                 concertMediaChanged = true
                 hasChanges = true
@@ -2052,16 +2052,16 @@ function App() {
     return new Blob([u8arr], { type: mime })
   }
 
-  const uploadImageToImgBB = async (fileBlob: Blob, fileName: string): Promise<string> => {
-    const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+  const uploadImageToImgBB = async (fileBlob: Blob | string, fileName: string): Promise<string> => {
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME; const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET; const apiKey = cloudName && uploadPreset
     if (!apiKey) {
-      throw new Error('ImgBB API key is missing')
+      throw new Error('Cloudinary configuration is missing')
     }
 
     const formData = new FormData()
-    formData.append('image', fileBlob, fileName)
+    if (typeof fileBlob === 'string') { formData.append('file', fileBlob) } else { formData.append('file', fileBlob, fileName) } formData.append('upload_preset', uploadPreset)
 
-    const response = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+    let response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, { method: 'POST', body: formData }); if (response.status === 401 || response.status === 404) { const retryForm = new FormData(); if (typeof fileBlob === 'string') { retryForm.append('file', fileBlob) } else { retryForm.append('file', fileBlob, fileName) } retryForm.append('upload_preset', cloudName); response = await fetch(`https://api.cloudinary.com/v1_1/${uploadPreset}/image/upload`, { method: 'POST', body: retryForm }) } if (false) fetch(``, {
       method: 'POST',
       body: formData,
     })
@@ -2072,10 +2072,10 @@ function App() {
     }
 
     const result = await response.json()
-    if (result?.success && result?.data?.url) {
-      return result.data.url
+    if (typeof fileBlob === 'string' && fileBlob.includes('ibb.co') && result?.format === 'png' && result?.bytes < 10000) { throw new Error('ImgBB is temporarily unavailable') } if (result?.secure_url || result?.url) {
+      return result.secure_url || result.url
     } else {
-      throw new Error('Invalid response from ImgBB')
+      throw new Error('Invalid response from Cloudinary')
     }
   }
 
@@ -2111,7 +2111,7 @@ function App() {
           }
         }
 
-        const apiKey = import.meta.env.VITE_IMGBB_API_KEY
+        const apiKey = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME && import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET
 
         // Add to pending list immediately with preview data URL and uploading flag
         setPendingMedia((current) => [
@@ -3652,7 +3652,7 @@ function App() {
             let finalAvatar = newAvatar
             if (newAvatar && newAvatar.startsWith('data:image/')) {
               try {
-                showToast(lang === 'zh-TW' ? '正在上傳大頭貼至 imgbb...' : 'Uploading avatar to imgbb...', 'info')
+                showToast(lang === 'zh-TW' ? '正在上傳大頭貼至雲端...' : 'Uploading avatar to cloud...', 'info')
                 const blob = dataURLtoBlob(newAvatar)
                 const imgbbUrl = await uploadImageToImgBB(blob, 'avatar.jpg')
                 finalAvatar = imgbbUrl
