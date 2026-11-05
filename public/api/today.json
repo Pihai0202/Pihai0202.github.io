@@ -1,55 +1,155 @@
 {
-  "date": "2026-11-05",
-  "updated_at": "2026-11-05T10:12:44.277117+00:00",
-  "count": 2,
+  "date": "2026-11-06",
+  "updated_at": "2026-11-05T18:05:24.561899+00:00",
+  "count": 6,
   "cards": [
     {
-      "id": "indievox-26_iv042048c-2026-11-05",
-      "subtitle": "iNDIEVOX",
+      "id": "tixcraft-26_koccamuse-2026-11-06",
+      "subtitle": "拓元售票",
       "source_badge": "",
-      "title": "2026 The Next Big Thing 大團誕生（開發場5）",
+      "title": "KOREA SPOTLIGHT X MUSE ON in TAIPEI",
       "venue": "Legacy Taipei",
       "venue_id": "legacy-taipei",
       "city": "台北",
       "category": "concert",
-      "background_image": "https://indievox.static.tixcraft.com/images/activity/26_iv042048c_9481eadd1fccf94ec6585183b643c2b6.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv042048c",
+      "background_image": "https://static.tixcraft.com/images/activity/26_koccamuse_a5ee67501d8f23b577d04d1abe022452.png",
+      "url": "https://tixcraft.com/activity/detail/26_koccamuse",
       "stub": {
         "badge_text": "今天",
         "is_today": true,
-        "day": "05",
+        "day": "06",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_koccamuse"
+        }
+      ]
+    },
+    {
+      "id": "tixcraft-26_aftp-2026-11-06",
+      "subtitle": "拓元售票",
+      "source_badge": "",
+      "title": "凱基金控xAccusefive告五人 [在這裡 @century] 世界巡迴演唱會",
+      "venue": "台北小巨蛋",
+      "venue_id": "taipei-arena",
+      "city": "台北",
+      "category": "concert",
+      "background_image": "https://static.tixcraft.com/images/activity/26_aftp_f4bc690c47fb4c84eed073a283ba61a9.png",
+      "url": "https://tixcraft.com/activity/detail/26_aftp",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "06",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_aftp"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04282cf-2026-11-06",
+      "subtitle": "iNDIEVOX",
+      "source_badge": "",
+      "title": "11.6 (Fri.) 狀態疊加Project： Superposition Vol.4，Final.",
+      "venue": "迴響音樂藝文展演空間",
+      "venue_id": "",
+      "city": "",
+      "category": "concert",
+      "background_image": "https://indievox.static.tixcraft.com/images/activity/26_iv04282cf_91da5760c59cc0125725382c5b7ab464.jpeg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04282cf",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "06",
         "year_month": "2026.11"
       },
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv042048c"
+          "url": "https://www.indievox.com/activity/detail/26_iv04282cf"
         }
       ]
     },
     {
-      "id": "ticketplus-9691a381c6e2309ffda3310f740ca0a1-1641846ec4593b5e92f74a0355e690fd",
+      "id": "indievox-26_iv04191d6-2026-11-06",
+      "subtitle": "iNDIEVOX",
+      "source_badge": "",
+      "title": "邱淑蟬 2026《無爭》發行巡迴【高雄場】",
+      "venue": "高雄 LIVE WAREHOUSE",
+      "venue_id": "live-warehouse",
+      "city": "高雄",
+      "category": "concert",
+      "background_image": "https://indievox.static.tixcraft.com/images/activity/26_iv04191d6_a0e40003b048f561a89086cc7bdcb6b0.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04191d6",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "06",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04191d6"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-e64ab57c2eb7b0b17182fc9056871702-ae391b1f2ada14e56aa9690565301c20",
       "subtitle": "遠大售票",
       "source_badge": "",
-      "title": "四季的練習—秋之迴聲｜以捷x佳美",
+      "title": "青原FIDA《回到原點》",
       "venue": "女巫店",
       "venue_id": "witch-house",
       "city": "台北",
       "category": "concert",
-      "background_image": "https://static.ticketplus.com.tw/event/9691a381c6e2309ffda3310f740ca0a1/picBigHomeThumbnail_1791202612352.jpeg",
-      "url": "https://ticketplus.com.tw/activity/9691a381c6e2309ffda3310f740ca0a1",
+      "background_image": "https://static.ticketplus.com.tw/event/e64ab57c2eb7b0b17182fc9056871702/picBigHomeThumbnail_1788752677083.jpeg",
+      "url": "https://ticketplus.com.tw/activity/e64ab57c2eb7b0b17182fc9056871702",
       "stub": {
         "badge_text": "今天",
         "is_today": true,
-        "day": "05",
+        "day": "06",
         "year_month": "2026.11"
       },
       "ticket_links": [
         {
           "platform": "ticketplus",
           "name": "遠大售票",
-          "url": "https://ticketplus.com.tw/activity/9691a381c6e2309ffda3310f740ca0a1"
+          "url": "https://ticketplus.com.tw/activity/e64ab57c2eb7b0b17182fc9056871702"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-02810aeffec1aa8d9b9471cc684704c4-32f8f678d51f9ad1846c0a6d316671f8",
+      "subtitle": "遠大售票",
+      "source_badge": "",
+      "title": "氣象限定 Quadrant Asia Tour Live in Taipei",
+      "venue": "杰克音樂Jack Studio 台北市萬華區昆明街76號",
+      "venue_id": "",
+      "city": "",
+      "category": "concert",
+      "background_image": "https://static.ticketplus.com.tw/event/02810aeffec1aa8d9b9471cc684704c4/picBigHomeThumbnail_1789033952016.jpeg",
+      "url": "https://ticketplus.com.tw/activity/02810aeffec1aa8d9b9471cc684704c4",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "06",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/02810aeffec1aa8d9b9471cc684704c4"
         }
       ]
     }
