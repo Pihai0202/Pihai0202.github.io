@@ -1,6 +1,6 @@
 {
   "date": "2026-11-07",
-  "updated_at": "2026-11-06T23:31:45.744158+00:00",
+  "updated_at": "2026-11-07T03:11:43.793585+00:00",
   "count": 11,
   "cards": [
     {
@@ -54,7 +54,7 @@
       ]
     },
     {
-      "id": "ibon-6343857",
+      "id": "ibon-13854751",
       "subtitle": "ibon售票",
       "source_badge": "",
       "title": "Blush Blossom Fan Fest 2026 in Kaohsiung",
@@ -79,32 +79,7 @@
       ]
     },
     {
-      "id": "kham-12712630",
-      "subtitle": "寬宏售票",
-      "source_badge": "",
-      "title": "2026 小宇 宋念宇《不，完美的人》演唱會",
-      "venue": "台北流行音樂中心",
-      "venue_id": "taipei-music-center",
-      "city": "台北",
-      "category": "concert",
-      "background_image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E2_Large.JPG?v=202610231202",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#",
-      "stub": {
-        "badge_text": "今天",
-        "is_today": true,
-        "day": "07",
-        "year_month": "2026.11"
-      },
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#"
-        }
-      ]
-    },
-    {
-      "id": "kham-14597846",
+      "id": "kham-11994135",
       "subtitle": "寬宏售票",
       "source_badge": "",
       "title": "2026玖壹壹南北貳路音樂節",
@@ -125,6 +100,31 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1ENTKEA#"
+        }
+      ]
+    },
+    {
+      "id": "kham-4452944",
+      "subtitle": "寬宏售票",
+      "source_badge": "",
+      "title": "2026 小宇 宋念宇《不，完美的人》演唱會",
+      "venue": "台北流行音樂中心",
+      "venue_id": "taipei-music-center",
+      "city": "台北",
+      "category": "concert",
+      "background_image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1DF32E2_Large.JPG?v=202610231202",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "07",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1DF32E2#"
         }
       ]
     },
