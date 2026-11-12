@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-12T11:47:42.195217+00:00",
-  "count": 652,
+  "updated_at": "2026-11-12T19:19:31.272844+00:00",
+  "count": 727,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -16173,46 +16173,6 @@
       ]
     },
     {
-      "id": "tixcraft-26_ksmasters-2026-11-12",
-      "source": "拓元售票",
-      "name": "2026高雄羽球大師賽",
-      "venue_raw": "高雄巨蛋",
-      "venue_id": "kaohsiung-dome",
-      "venue_name": "K-ARENA 高雄巨蛋",
-      "city": "高雄",
-      "date": "2026-11-12",
-      "image": "https://static.tixcraft.com/images/activity/26_ksmasters_56de4acd9f3e37e7d48450499917cf40.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_ksmasters",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "tixcraft",
-          "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_ksmasters"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv0425761-2026-11-12",
-      "source": "iNDIEVOX",
-      "name": "南半球的夢幻女聲 Bridge Dog 台北演唱會",
-      "venue_raw": "野地方",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-11-12",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0425761_933e6ed00739cca6d675520a9ad97c90.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0425761",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0425761"
-        }
-      ]
-    },
-    {
       "id": "tixcraft-26_cw-2026-11-13",
       "source": "拓元售票",
       "name": "CULTURE WARS LIVE IN TAIPEI 2026",
@@ -16293,6 +16253,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv04256e8-2026-11-13",
+      "source": "iNDIEVOX",
+      "name": "菌網 MYCELIUM",
+      "venue_raw": "",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-13",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04256e8_37bc28c64de943aeb6fecf15fd7916a6.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04256e8",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04256e8"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv0424735-2026-11-13",
       "source": "iNDIEVOX",
       "name": "大範大聲（tuā-pān tuā-siann）Vol.01 SADOG X Yo Chen",
@@ -16309,26 +16289,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0424735"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv04256e8-2026-11-13",
-      "source": "iNDIEVOX",
-      "name": "菌網 MYCELIUM",
-      "venue_raw": "Revolver",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-11-13",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04256e8_37bc28c64de943aeb6fecf15fd7916a6.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04256e8",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04256e8"
         }
       ]
     },
@@ -16351,6 +16311,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/39e011c895a371c40416497f696652bd"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-2ce8b8b0f65886c1d08e9637a9276455-7061e36bf90e88e1f1ecb2b421b78c7b",
+      "source": "遠大售票",
+      "name": "「TAKUYA KIMURA Live Tour 2026 Checkpoint」 in TAIPEI（11/13場次）",
+      "venue_raw": "台北流行音樂中心表演廳 台北市南港區市民大道八段99號",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-11-13",
+      "image": "https://static.ticketplus.com.tw/event/2ce8b8b0f65886c1d08e9637a9276455/picBigHomeThumbnail_1780911248137.jpeg",
+      "url": "https://ticketplus.com.tw/activity/2ce8b8b0f65886c1d08e9637a9276455",
+      "price": "3800 - 5800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/2ce8b8b0f65886c1d08e9637a9276455"
         }
       ]
     },
@@ -16395,6 +16377,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/36b9e6cb247018d125bd165fca4dc279"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-a877fe3e6219058a637241ee9baec92f-b297f0dbebf594699aa8e9bea715aef9",
+      "source": "遠大售票",
+      "name": "哥查Kerchak《我只是個無能的胖子》",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-11-13",
+      "image": "https://static.ticketplus.com.tw/event/a877fe3e6219058a637241ee9baec92f/picBigHomeThumbnail_1791963997596.jpeg",
+      "url": "https://ticketplus.com.tw/activity/a877fe3e6219058a637241ee9baec92f",
+      "price": "250 - 500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/a877fe3e6219058a637241ee9baec92f"
         }
       ]
     },
@@ -16539,7 +16543,7 @@
       ]
     },
     {
-      "id": "kham-15228004",
+      "id": "kham-656582",
       "source": "寬宏售票",
       "name": "2026 JEONG EUNJI SOLO CONCERT‘SUMMER, I’ASIA TOUR in TAIPEI",
       "venue_raw": "TICC 台北國際會議中心",
@@ -16663,6 +16667,28 @@
       ]
     },
     {
+      "id": "ticketplus-2ce8b8b0f65886c1d08e9637a9276455-a9bc51318287034af212f97f6b257da2",
+      "source": "遠大售票",
+      "name": "「TAKUYA KIMURA Live Tour 2026 Checkpoint」 in TAIPEI（11/14場次）",
+      "venue_raw": "台北流行音樂中心表演廳 台北市南港區市民大道八段99號",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-11-14",
+      "image": "https://static.ticketplus.com.tw/event/2ce8b8b0f65886c1d08e9637a9276455/picBigHomeThumbnail_1780911248137.jpeg",
+      "url": "https://ticketplus.com.tw/activity/2ce8b8b0f65886c1d08e9637a9276455",
+      "price": "3800 - 5800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/2ce8b8b0f65886c1d08e9637a9276455"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-999a09ed2fe976ff4872705f746de36a-e0d31638e2b8f57946098cc4ec0b6d2c",
       "source": "遠大售票",
       "name": "ASCA LIVE TOUR 2026 -Remedy- 台北公演",
@@ -16703,6 +16729,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/05749091d05a5686994c5046f27137e6"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-50f84817af2eff68ab3adaf30072a842-2a7412d3e768938dfab6a4760ef41935",
+      "source": "遠大售票",
+      "name": "《朵莉 Dory｜我是可笑的人啊》Full Band Live",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-11-14",
+      "image": "https://static.ticketplus.com.tw/event/50f84817af2eff68ab3adaf30072a842/picBigHomeThumbnail_1791915916201.jpeg",
+      "url": "https://ticketplus.com.tw/activity/50f84817af2eff68ab3adaf30072a842",
+      "price": "275 - 550",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/50f84817af2eff68ab3adaf30072a842"
         }
       ]
     },
@@ -16827,6 +16875,28 @@
       ]
     },
     {
+      "id": "ticketplus-886d24fae272cef8291c42e960a8fe24-8b4e9389be8ebf7e7ccda0a5d7d17169",
+      "source": "遠大售票",
+      "name": "Vaundy ASIA ARENA TOUR 2026 “HORO” IN TAIPEI 官方周邊商品 事後線上販售",
+      "venue_raw": "預購商品",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-18",
+      "image": "https://static.ticketplus.com.tw/event/886d24fae272cef8291c42e960a8fe24/picBigHomeThumbnail_1793617835068.jpeg",
+      "url": "https://ticketplus.com.tw/activity/886d24fae272cef8291c42e960a8fe24",
+      "price": "300 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/886d24fae272cef8291c42e960a8fe24"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_btskhbus-2026-11-19",
       "source": "拓元售票",
       "name": "【歌迷返鄉專車】x BTS WORLD TOUR ’ARIRANG’ IN KAOHSIUNG",
@@ -16863,6 +16933,28 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_btskns"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-1c278c733fef653ed767831d435a7625-d5c3b98fe2ee5f747536f019b4276f3d",
+      "source": "遠大售票",
+      "name": "Double A Battery・aiko x ana 跨國共演",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-11-19",
+      "image": "https://static.ticketplus.com.tw/event/1c278c733fef653ed767831d435a7625/picBigHomeThumbnail_1791917290972.jpeg",
+      "url": "https://ticketplus.com.tw/activity/1c278c733fef653ed767831d435a7625",
+      "price": "250 - 500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/1c278c733fef653ed767831d435a7625"
         }
       ]
     },
@@ -16947,26 +17039,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv04270ea-2026-11-20",
-      "source": "iNDIEVOX",
-      "name": "【加開場】鶴 The Crane - 小小茶會 Petit Tea Party",
-      "venue_raw": "SUB",
-      "venue_id": "taipei-music-center",
-      "venue_name": "台北流行音樂中心",
-      "city": "台北",
-      "date": "2026-11-20",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04270ea_c2ab7ef83f134216febdb262fb942219.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv04270ea",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04270ea"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0425817-2026-11-20",
       "source": "iNDIEVOX",
       "name": "That’s My Shhh presents LAZY HABITS 「THE CONCRETE ISLAND」Pre-Release Party",
@@ -16983,6 +17055,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0425817"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04270ea-2026-11-20",
+      "source": "iNDIEVOX",
+      "name": "【加開場】鶴 The Crane - 小小茶會 Petit Tea Party",
+      "venue_raw": "SUB",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-11-20",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04270ea_c2ab7ef83f134216febdb262fb942219.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv04270ea",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04270ea"
         }
       ]
     },
@@ -17005,6 +17097,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/d67f82ea671d8ce0f201cb75804d8ece"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-38de5d057abe14c194971b35d4b3484e-4f28ac06ea50665e2fd05fbe8d467521",
+      "source": "遠大售票",
+      "name": "沈默紳士 × 核果人 NUTS《沈果發表會》",
+      "venue_raw": "台北三創生活園區 Clapper Studio 臺北市中正區梅花里市民大道三段2號",
+      "venue_id": "clapper-studio",
+      "venue_name": "Clapper Studio",
+      "city": "台北",
+      "date": "2026-11-20",
+      "image": "https://static.ticketplus.com.tw/event/38de5d057abe14c194971b35d4b3484e/picBigHomeThumbnail_1791876921752.jpeg",
+      "url": "https://ticketplus.com.tw/activity/38de5d057abe14c194971b35d4b3484e",
+      "price": "400 - 800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/38de5d057abe14c194971b35d4b3484e"
         }
       ]
     },
@@ -17049,7 +17163,7 @@
       ]
     },
     {
-      "id": "kham-4110279",
+      "id": "kham-3069090",
       "source": "寬宏售票",
       "name": "國泰世華銀行 彭佳慧《數著時間的日子》巡迴演唱會",
       "venue_raw": "臺北小巨蛋",
@@ -17069,7 +17183,7 @@
       ]
     },
     {
-      "id": "kham-9084900",
+      "id": "kham-3202489",
       "source": "寬宏售票",
       "name": "2026 N.Flying LIVE‘&CON5：into REM’IN KAOHSIUNG",
       "venue_raw": "高雄流行音樂中心",
@@ -17089,7 +17203,7 @@
       ]
     },
     {
-      "id": "kham-9799370",
+      "id": "kham-14430216",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -17098,13 +17212,13 @@
       "city": "台北",
       "date": "2026-11-21",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
         }
       ]
     },
@@ -17215,7 +17329,7 @@
     {
       "id": "ticketplus-75a694bf61cb28f0e24835916cfae36e-e5b0bd975472de317f809e51f64f0d4b",
       "source": "遠大售票",
-      "name": "2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI (11/21場次)",
+      "name": "2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI （11/21場次）",
       "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
       "venue_id": "taipei-arena",
       "venue_name": "臺北小巨蛋",
@@ -17235,24 +17349,24 @@
       ]
     },
     {
-      "id": "ticketplus-a41ea58d4f709fe38ebb9abae1dd2bd3-1685bda15a525afb973825d71f3bd634",
+      "id": "ticketplus-174cd8c30bcd2cf4ceadd1726c83c617-dd72501f8c39fb0c41e7c14ed570b933",
       "source": "遠大售票",
-      "name": "【永豐金證券專區】2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI（11/21場次）",
-      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
-      "venue_id": "taipei-arena",
-      "venue_name": "臺北小巨蛋",
+      "name": "《酒醒吧!新生代2.0》曾柏崴x李心凱x蝸牛蓋瑞",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
       "city": "台北",
       "date": "2026-11-21",
-      "image": "https://static.ticketplus.com.tw/event/a41ea58d4f709fe38ebb9abae1dd2bd3/picBigHomeThumbnail_1790835006359.jpeg",
-      "url": "https://ticketplus.com.tw/activity/a41ea58d4f709fe38ebb9abae1dd2bd3",
-      "price": "800 - 6780",
+      "image": "https://static.ticketplus.com.tw/event/174cd8c30bcd2cf4ceadd1726c83c617/picBigHomeThumbnail_1792219149700.jpeg",
+      "url": "https://ticketplus.com.tw/activity/174cd8c30bcd2cf4ceadd1726c83c617",
+      "price": "250 - 500",
       "artist": "",
       "category": "concert",
       "ticket_links": [
         {
           "platform": "ticketplus",
           "name": "遠大售票",
-          "url": "https://ticketplus.com.tw/activity/a41ea58d4f709fe38ebb9abae1dd2bd3"
+          "url": "https://ticketplus.com.tw/activity/174cd8c30bcd2cf4ceadd1726c83c617"
         }
       ]
     },
@@ -17383,7 +17497,7 @@
     {
       "id": "ticketplus-75a694bf61cb28f0e24835916cfae36e-cc7bebaffee949042a01105dc2eb821c",
       "source": "遠大售票",
-      "name": "2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI (11/22場次)",
+      "name": "2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI （11/22場次）",
       "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
       "venue_id": "taipei-arena",
       "venue_name": "臺北小巨蛋",
@@ -17399,28 +17513,6 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/75a694bf61cb28f0e24835916cfae36e"
-        }
-      ]
-    },
-    {
-      "id": "ticketplus-a41ea58d4f709fe38ebb9abae1dd2bd3-bc10863fae742ed2e3c2cd79459b5c0c",
-      "source": "遠大售票",
-      "name": "【永豐金證券專區】2026-27 BABYMONSTER WORLD TOUR [CHOOM]  IN TAIPEI（11/22場次）",
-      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
-      "venue_id": "taipei-arena",
-      "venue_name": "臺北小巨蛋",
-      "city": "台北",
-      "date": "2026-11-22",
-      "image": "https://static.ticketplus.com.tw/event/a41ea58d4f709fe38ebb9abae1dd2bd3/picBigHomeThumbnail_1790835006359.jpeg",
-      "url": "https://ticketplus.com.tw/activity/a41ea58d4f709fe38ebb9abae1dd2bd3",
-      "price": "800 - 6780",
-      "artist": "",
-      "category": "concert",
-      "ticket_links": [
-        {
-          "platform": "ticketplus",
-          "name": "遠大售票",
-          "url": "https://ticketplus.com.tw/activity/a41ea58d4f709fe38ebb9abae1dd2bd3"
         }
       ]
     },
@@ -17443,6 +17535,72 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/a601de31176dc59308fd38668e867636"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-bbf0c5718f2239ac9b6d492874024f8e-b721b310bcb6e98c295ccfb021bc2758",
+      "source": "遠大售票",
+      "name": "2026 ONEWE 6th Live Concert IN TAIPEI【1：1自拍】",
+      "venue_raw": "Legacy TERA 台北市南港區忠孝東路七段99號",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-11-22",
+      "image": "https://static.ticketplus.com.tw/event/bbf0c5718f2239ac9b6d492874024f8e/picBigHomeThumbnail_1792392171775.jpeg",
+      "url": "https://ticketplus.com.tw/activity/bbf0c5718f2239ac9b6d492874024f8e",
+      "price": "1980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/bbf0c5718f2239ac9b6d492874024f8e"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-964ee6764fdfd86e2e1b13f0866c8ee3-0fe84bafc28b83952fafedb97aebbd23",
+      "source": "遠大售票",
+      "name": "2026 Saturnday 三周年 FAN-CON",
+      "venue_raw": "Corner House 台北市南港區忠孝東路六段21號1樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-22",
+      "image": "https://static.ticketplus.com.tw/event/964ee6764fdfd86e2e1b13f0866c8ee3/picBigHomeThumbnail_1793073300848.jpeg",
+      "url": "https://ticketplus.com.tw/activity/964ee6764fdfd86e2e1b13f0866c8ee3",
+      "price": "1090 - 2180",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/964ee6764fdfd86e2e1b13f0866c8ee3"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-bade00a677090453364c78de2babe045-f5ad4cf95d0efa452daaf6aa2afa89f3",
+      "source": "遠大售票",
+      "name": "BACK TO LIGHT！《回來找你是真的》第二單元見面會",
+      "venue_raw": "光點華山電影館A Two廳 台北市中正區八德路一段1號",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-22",
+      "image": "https://static.ticketplus.com.tw/event/bade00a677090453364c78de2babe045/picBigHomeThumbnail_1794195145996.jpeg",
+      "url": "https://ticketplus.com.tw/activity/bade00a677090453364c78de2babe045",
+      "price": "799",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/bade00a677090453364c78de2babe045"
         }
       ]
     },
@@ -17523,6 +17681,28 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04279e7"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-13e8a6e9a85ceb49fce5063ec3293099-f89751008140c400c361e83b4dbd7284",
+      "source": "遠大售票",
+      "name": "《順流》｜Eiva 林麗謙個人民謠音樂會",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-11-26",
+      "image": "https://static.ticketplus.com.tw/event/13e8a6e9a85ceb49fce5063ec3293099/picBigHomeThumbnail_1792220213195.jpeg",
+      "url": "https://ticketplus.com.tw/activity/13e8a6e9a85ceb49fce5063ec3293099",
+      "price": "275 - 550",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/13e8a6e9a85ceb49fce5063ec3293099"
         }
       ]
     },
@@ -17609,7 +17789,7 @@
     {
       "id": "ticketplus-f7ce3001a93d7db63832a86d371af467-7f156c23deda0da7f6c25ff80b974489",
       "source": "遠大售票",
-      "name": "skipskipbenben＆ 蔡元彰《到處存在場所 到 不存在的我》",
+      "name": "skip skip ben ben＆ 蔡元彰《到處存在場所 到 不存在的我》",
       "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
       "venue_id": "witch-house",
       "venue_name": "女巫店",
@@ -17625,6 +17805,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/f7ce3001a93d7db63832a86d371af467"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-25820e1cdfdd84ef2345b210391fc2aa-f968cc949d5d5e2a73b2f29e58be7d82",
+      "source": "遠大售票",
+      "name": "鄒序 Hogan T. 無端端 2026 鄒序秋冬小巡",
+      "venue_raw": "柱 The Pillars 臺中市中區中華里篤行路13號3F",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-27",
+      "image": "https://static.ticketplus.com.tw/event/25820e1cdfdd84ef2345b210391fc2aa/picBigHomeThumbnail_1791343292842.jpeg",
+      "url": "https://ticketplus.com.tw/activity/25820e1cdfdd84ef2345b210391fc2aa",
+      "price": "325 - 650",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/25820e1cdfdd84ef2345b210391fc2aa"
         }
       ]
     },
@@ -17729,7 +17931,7 @@
       ]
     },
     {
-      "id": "kham-9080450",
+      "id": "kham-6838679",
       "source": "寬宏售票",
       "name": "2026 Kep1er FAN-CON TOUR [RSVP:Respond our code] in TAIPEI",
       "venue_raw": "台北流行音樂中心",
@@ -17749,7 +17951,7 @@
       ]
     },
     {
-      "id": "kham-11185631",
+      "id": "kham-4323754",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -17758,18 +17960,18 @@
       "city": "台北",
       "date": "2026-11-28",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
         }
       ]
     },
     {
-      "id": "kham-8319298",
+      "id": "kham-2701638",
       "source": "寬宏售票",
       "name": "KPOP PLANET in TAIPEI",
       "venue_raw": "林口體育館",
@@ -17778,13 +17980,33 @@
       "city": "新北",
       "date": "2026-11-28",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1GSEUSW_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1GSEUSW",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1GSEUSW#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1GSEUSW"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1GSEUSW#"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0431404-2026-11-28",
+      "source": "iNDIEVOX",
+      "name": "11.28(六) 漁光倒 YuguangFall 2026 首次專場",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-28",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0431404_58703454af5b6b989be7b1139e8e268b.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0431404",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0431404"
         }
       ]
     },
@@ -17851,6 +18073,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/2c50382df8ffe142e2ce48139b4126b6"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-f760e63b6591d6ff734eaf89859d23bb-7a525714fe5633dfad23dbc85a52b4b7",
+      "source": "遠大售票",
+      "name": "LISANI！TAIPEI 2026 官方周邊商品線上預購",
+      "venue_raw": "預購商品",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-11-28",
+      "image": "https://static.ticketplus.com.tw/event/f760e63b6591d6ff734eaf89859d23bb/picBigHomeThumbnail_1794379273255.jpeg",
+      "url": "https://ticketplus.com.tw/activity/f760e63b6591d6ff734eaf89859d23bb",
+      "price": "300 - 1000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/f760e63b6591d6ff734eaf89859d23bb"
         }
       ]
     },
@@ -17999,6 +18243,72 @@
       ]
     },
     {
+      "id": "ticketplus-081c43eaa7a5308fa119b6a010e6967f-1326035f02cd656d70eb9e651c502008",
+      "source": "遠大售票",
+      "name": "2026 TEEN TOP WE GONNA ROCK IT DROP IT TOP IT HEY DON’T STOP IT POP IT LIVE",
+      "venue_raw": "Zepp New Taipei 新北市新莊區新北大道四段3號8樓",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-11-29",
+      "image": "https://static.ticketplus.com.tw/event/081c43eaa7a5308fa119b6a010e6967f/picBigHomeThumbnail_1791796211683.jpeg",
+      "url": "https://ticketplus.com.tw/activity/081c43eaa7a5308fa119b6a010e6967f",
+      "price": "2980 - 5980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/081c43eaa7a5308fa119b6a010e6967f"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-f79e13ad9885c42f0f8103d9716e9b15-da5766a2789bf98c0d28b0366cd6908e",
+      "source": "遠大售票",
+      "name": "2026 K-WONDER < TRIANGLE > IN KAOHSIUNG",
+      "venue_raw": "K-ARENA 高雄巨蛋 高雄市左營區博愛二路757號",
+      "venue_id": "kaohsiung-dome",
+      "venue_name": "K-ARENA 高雄巨蛋",
+      "city": "高雄",
+      "date": "2026-11-29",
+      "image": "https://static.ticketplus.com.tw/event/f79e13ad9885c42f0f8103d9716e9b15/picBigHomeThumbnail_1793957564041.jpeg",
+      "url": "https://ticketplus.com.tw/activity/f79e13ad9885c42f0f8103d9716e9b15",
+      "price": "1940 - 7280",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/f79e13ad9885c42f0f8103d9716e9b15"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-5ba47993fc034119b6d067afe1790991-ee8c27f45685f8b779cc736ea4b5579c",
+      "source": "遠大售票",
+      "name": "TEEN TOP IN TAIPEI  LIVE  1：1自拍票券",
+      "venue_raw": "Zepp New Taipei 新北市新莊區新北大道四段3號8樓",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-11-29",
+      "image": "https://static.ticketplus.com.tw/event/5ba47993fc034119b6d067afe1790991/picBigHomeThumbnail_1793252793791.jpeg",
+      "url": "https://ticketplus.com.tw/activity/5ba47993fc034119b6d067afe1790991",
+      "price": "1980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/5ba47993fc034119b6d067afe1790991"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv04278ed-2026-12-02",
       "source": "iNDIEVOX",
       "name": "午夜乒乓 丘高氣爽 Chill ＆ High Tour 台北站",
@@ -18015,6 +18325,28 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04278ed"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-c396233c5b4469b9ec7e611857e6cc1f-a3bf6f34bde031a38d94bae675a8e52d",
+      "source": "遠大售票",
+      "name": "春之子：雷擎 女巫店專場演出",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-03",
+      "image": "https://static.ticketplus.com.tw/event/c396233c5b4469b9ec7e611857e6cc1f/picBigHomeThumbnail_1793086642042.jpeg",
+      "url": "https://ticketplus.com.tw/activity/c396233c5b4469b9ec7e611857e6cc1f",
+      "price": "375 - 750",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/c396233c5b4469b9ec7e611857e6cc1f"
         }
       ]
     },
@@ -18039,7 +18371,7 @@
       ]
     },
     {
-      "id": "kham-14400860",
+      "id": "kham-11338789",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -18048,13 +18380,13 @@
       "city": "台北",
       "date": "2026-12-04",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
         }
       ]
     },
@@ -18221,26 +18553,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv04241ad-2026-12-05",
-      "source": "iNDIEVOX",
-      "name": "2026 虎山音樂祭 Tiger Mountain Ramble",
-      "venue_raw": "微遠虎山Tiger Mountain",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04241ad_b17123c527390d00f83ba8b229024820.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04241ad",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04241ad"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0430611-2026-12-05",
       "source": "iNDIEVOX",
       "name": "台南午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
@@ -18257,26 +18569,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0430611"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv04307bc-2026-12-05",
-      "source": "iNDIEVOX",
-      "name": "台南晚場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
-      "venue_raw": "全美戲院A廳",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04307bc_233bdc6f831d115e871ce6490db9fc65.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04307bc",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04307bc"
         }
       ]
     },
@@ -18301,22 +18593,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0429373-2026-12-05",
+      "id": "indievox-26_iv04307bc-2026-12-05",
       "source": "iNDIEVOX",
-      "name": "修齊首張個人專輯 《朋友、戀人與最糟糕的事》 發行專場",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
+      "name": "台南晚場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
+      "venue_raw": "全美戲院A廳",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0429373_06ef8c1f3749a3bdd000c276c7b2823e.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0429373",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04307bc_233bdc6f831d115e871ce6490db9fc65.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04307bc",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0429373"
+          "url": "https://www.indievox.com/activity/detail/26_iv04307bc"
         }
       ]
     },
@@ -18341,6 +18633,68 @@
       ]
     },
     {
+      "id": "indievox-26_iv0429373-2026-12-05",
+      "source": "iNDIEVOX",
+      "name": "修齊首張個人專輯 《朋友、戀人與最糟糕的事》 發行專場",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-05",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0429373_06ef8c1f3749a3bdd000c276c7b2823e.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0429373",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0429373"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04241ad-2026-12-05",
+      "source": "iNDIEVOX",
+      "name": "2026 虎山音樂祭 Tiger Mountain Ramble",
+      "venue_raw": "微遠虎山Tiger Mountain",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-05",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04241ad_b17123c527390d00f83ba8b229024820.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04241ad",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04241ad"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-f48ffe293f97e29747fe9f9d384efbf6-75dc7359c8dc281b92441c806bcadb3f",
+      "source": "遠大售票",
+      "name": "誰說我不在乎　高明駿2026演唱會-台北站",
+      "venue_raw": "新莊宏匯廣場 Zepp New Taipei 新北市新莊區新北大道四段3號8樓",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-12-05",
+      "image": "https://static.ticketplus.com.tw/event/f48ffe293f97e29747fe9f9d384efbf6/picBigHomeThumbnail_1793241379936.jpeg",
+      "url": "https://ticketplus.com.tw/activity/f48ffe293f97e29747fe9f9d384efbf6",
+      "price": "1490 - 4880",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/f48ffe293f97e29747fe9f9d384efbf6"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-b56ed831d1337d59c4467fce8400085b-628ed6f6aec1f2a36bb130f2480cf7fa",
       "source": "遠大售票",
       "name": "紙博 in 台北 vol.2（12/5場次）",
@@ -18359,6 +18713,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/b56ed831d1337d59c4467fce8400085b"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-c6c89b1fe766a452efb402ce4964e84d-b8ebf94d9f70fec1ba92d6ad55b18ba0",
+      "source": "遠大售票",
+      "name": "TAIPEI & TOKYO 日京江羽人 X Mao Nakatsu  Vol.2 Taipei Edition",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-05",
+      "image": "https://static.ticketplus.com.tw/event/c6c89b1fe766a452efb402ce4964e84d/picBigHomeThumbnail_1791966271540.jpeg",
+      "url": "https://ticketplus.com.tw/activity/c6c89b1fe766a452efb402ce4964e84d",
+      "price": "300 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/c6c89b1fe766a452efb402ce4964e84d"
         }
       ]
     },
@@ -18485,6 +18861,50 @@
       ]
     },
     {
+      "id": "ticketplus-340b41684621fe4486efead77166cc6f-ce67eb15b1b1023325555e4516436c6d",
+      "source": "遠大售票",
+      "name": "angela Live 2026 ~All About StarChild?!~ in Taipei",
+      "venue_raw": "Zepp New Taipei 新北市新莊區中原里新北大道四段3號8樓",
+      "venue_id": "zepp-new-taipei",
+      "venue_name": "Zepp New Taipei",
+      "city": "新北",
+      "date": "2026-12-06",
+      "image": "https://static.ticketplus.com.tw/event/340b41684621fe4486efead77166cc6f/picBigHomeThumbnail_1792143337498.jpeg",
+      "url": "https://ticketplus.com.tw/activity/340b41684621fe4486efead77166cc6f",
+      "price": "1300 - 3000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/340b41684621fe4486efead77166cc6f"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-7f9c57d1f3e5c15d97c51408f26ca085-e62c67b361cf7a3fae77c0d1f3bd434d",
+      "source": "遠大售票",
+      "name": "LOOKMHEE SONYA “EVERAFTER: ALWAYS” IN TAIPEI CITY",
+      "venue_raw": "西門 WESTAR 台北市萬華區漢中街 116 號 8 樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-06",
+      "image": "https://static.ticketplus.com.tw/event/7f9c57d1f3e5c15d97c51408f26ca085/picBigHomeThumbnail_1792031712262.jpeg",
+      "url": "https://ticketplus.com.tw/activity/7f9c57d1f3e5c15d97c51408f26ca085",
+      "price": "2000 - 8900",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/7f9c57d1f3e5c15d97c51408f26ca085"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_khalid-2026-12-07",
       "source": "拓元售票",
       "name": "Khalid： It’s Always Summer Somewhere Tour in Taipei",
@@ -18585,6 +19005,28 @@
       ]
     },
     {
+      "id": "ticketplus-e4617ca616bc0bd1179bcf87d5ab5c8b-8b9e526c1bc028a3f7a8b21fcb43fc19",
+      "source": "遠大售票",
+      "name": "眼下 Under Eyes x 軟床 gentlebadbad《朋友的房間 tomodachi no heya》",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-10",
+      "image": "https://static.ticketplus.com.tw/event/e4617ca616bc0bd1179bcf87d5ab5c8b/picBigHomeThumbnail_1793931384454.jpeg",
+      "url": "https://ticketplus.com.tw/activity/e4617ca616bc0bd1179bcf87d5ab5c8b",
+      "price": "250 - 500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/e4617ca616bc0bd1179bcf87d5ab5c8b"
+        }
+      ]
+    },
+    {
       "id": "kktix-org-e1220e1e2-2026-12-11",
       "source": "KKTIX",
       "name": "【12/11 18:30 一般票】日本「63 ANGEL」15周年特別公演",
@@ -18605,7 +19047,7 @@
       ]
     },
     {
-      "id": "kham-8783109",
+      "id": "kham-1289410",
       "source": "寬宏售票",
       "name": "三個不老擊敗之人生跑馬燈 LIVE SHOW",
       "venue_raw": "Legacy Taichung",
@@ -18614,13 +19056,13 @@
       "city": "台中",
       "date": "2026-12-11",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1G67G3R_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R#"
         }
       ]
     },
@@ -18635,7 +19077,7 @@
       "date": "2026-12-11",
       "image": "https://static.ticketplus.com.tw/event/8c547569ec0844087f59d05b38e802bc/picBigHomeThumbnail_1790747955199.jpeg",
       "url": "https://ticketplus.com.tw/activity/8c547569ec0844087f59d05b38e802bc",
-      "price": "3880 - 4880",
+      "price": "3800 - 4880",
       "artist": "",
       "category": "concert",
       "ticket_links": [
@@ -18643,6 +19085,50 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/8c547569ec0844087f59d05b38e802bc"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-524b687dccea5032cae258f54a241239-507e7a3920623b368fbb914696627cf5",
+      "source": "遠大售票",
+      "name": "2026 Roving Nation Festival 漂遊者森林音樂祭（三日票）",
+      "venue_raw": "麗寶東區落羽松草原 臺中市后里區福容路8號",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-11",
+      "image": "https://static.ticketplus.com.tw/event/524b687dccea5032cae258f54a241239/picBigHomeThumbnail_1792075094224.jpeg",
+      "url": "https://ticketplus.com.tw/activity/524b687dccea5032cae258f54a241239",
+      "price": "800 - 2980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/524b687dccea5032cae258f54a241239"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-d745d9d95f3d50b581cbbffd677a90ec-2cb654b75a40993339f586b63d241f93",
+      "source": "遠大售票",
+      "name": "雪莉曾SHAriTseng｜花式狀態SAVOR：f（23）",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-11",
+      "image": "https://static.ticketplus.com.tw/event/d745d9d95f3d50b581cbbffd677a90ec/picBigHomeThumbnail_1793790791624.jpeg",
+      "url": "https://ticketplus.com.tw/activity/d745d9d95f3d50b581cbbffd677a90ec",
+      "price": "250 - 500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/d745d9d95f3d50b581cbbffd677a90ec"
         }
       ]
     },
@@ -18747,26 +19233,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0426486-2026-12-12",
-      "source": "iNDIEVOX",
-      "name": "《永遠是生誕祭有多好》鬼灯翠2026生誕祭",
-      "venue_raw": "LIVE WAREHOUSE",
-      "venue_id": "live-warehouse",
-      "venue_name": "高雄 LIVE WAREHOUSE",
-      "city": "高雄",
-      "date": "2026-12-12",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0426486_68e0de3e64904ddcb7d358384217c926.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0426486",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0426486"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0424581-2026-12-12",
       "source": "iNDIEVOX",
       "name": "2026 魏品勻 David Wei 《還好我們都被生出來了》 Full Band 發片專場",
@@ -18803,6 +19269,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04196b4"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0426486-2026-12-12",
+      "source": "iNDIEVOX",
+      "name": "《永遠是生誕祭有多好》鬼灯翠2026生誕祭",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2026-12-12",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0426486_68e0de3e64904ddcb7d358384217c926.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0426486",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0426486"
         }
       ]
     },
@@ -18851,7 +19337,7 @@
     {
       "id": "ticketplus-3b2c627140861eaaca5e6cde9e86c8b8-6c27cb7d4b07a7a16f760de95b299915",
       "source": "遠大售票",
-      "name": "May'n All Requests Live Tour 2026「平假名 夯果醬」(高雄場)",
+      "name": "May’n All Requests Live Tour 2026「平假名 夯果醬」(高雄場)",
       "venue_raw": "LIVE WAREHOUSE 高雄市鹽埕區大義街2之5號 /駁二藝術特區大義C10倉庫",
       "venue_id": "live-warehouse",
       "venue_name": "高雄 LIVE WAREHOUSE",
@@ -18889,6 +19375,50 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/afaf206f48c75998345655952851c853"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-524b687dccea5032cae258f54a241239-d7bf253235eb8863c52ef404d6577ef6",
+      "source": "遠大售票",
+      "name": "2026 Roving Nation Festival 漂遊者森林音樂祭（雙日票）",
+      "venue_raw": "麗寶東區落羽松草原 臺中市后里區福容路8號",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-12",
+      "image": "https://static.ticketplus.com.tw/event/524b687dccea5032cae258f54a241239/picBigHomeThumbnail_1792075094224.jpeg",
+      "url": "https://ticketplus.com.tw/activity/524b687dccea5032cae258f54a241239",
+      "price": "800 - 2980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/524b687dccea5032cae258f54a241239"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-00629fd861e0c70a6762db1c2a9b2858-7d9d9ef6c29abf488859d323863c05c2",
+      "source": "遠大售票",
+      "name": "古川麦 × 王雁盟《聆聽貝殼裡的宇宙 Listening to the Universe in a Shell》（Special Guest 橋本翼）",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-12",
+      "image": "https://static.ticketplus.com.tw/event/00629fd861e0c70a6762db1c2a9b2858/picBigHomeThumbnail_1794199621768.jpeg",
+      "url": "https://ticketplus.com.tw/activity/00629fd861e0c70a6762db1c2a9b2858",
+      "price": "250 - 500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/00629fd861e0c70a6762db1c2a9b2858"
         }
       ]
     },
@@ -18953,26 +19483,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0420125-2026-12-13",
-      "source": "iNDIEVOX",
-      "name": "honeydip 2026 ”Before Sunrise” 台北公演",
-      "venue_raw": "SUB",
-      "venue_id": "taipei-music-center",
-      "venue_name": "台北流行音樂中心",
-      "city": "台北",
-      "date": "2026-12-13",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0420125_45736b672d1cee368d713fafb3c010f0.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0420125",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0420125"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0423082-2026-12-13",
       "source": "iNDIEVOX",
       "name": "周治平「有一首歌」演唱會 台北場",
@@ -18993,9 +19503,29 @@
       ]
     },
     {
+      "id": "indievox-26_iv0420125-2026-12-13",
+      "source": "iNDIEVOX",
+      "name": "honeydip 2026 ”Before Sunrise” 台北公演",
+      "venue_raw": "SUB",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-12-13",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0420125_45736b672d1cee368d713fafb3c010f0.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0420125",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0420125"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-3b2c627140861eaaca5e6cde9e86c8b8-c0cdd01368b8ae261a3bfc9a04e5bac9",
       "source": "遠大售票",
-      "name": "May'n All Requests Live Tour 2026「平假名 夯果醬」(台北午場)",
+      "name": "May’n All Requests Live Tour 2026「平假名 夯果醬」(台北午場)",
       "venue_raw": "三創生活園區 CLAPPER STUDIO 台北市中正區市民大道三段2號5樓",
       "venue_id": null,
       "venue_name": null,
@@ -19033,6 +19563,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/afaf206f48c75998345655952851c853"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-1514ab3dc6de9d16fd775316c8cc60d0-631eed9d6cfe0e8d2fe18ae6c5d52ab0",
+      "source": "遠大售票",
+      "name": "Sweetnotes Asia Tour Live in Kaohsiung",
+      "venue_raw": "後台 Backstage Live 802高雄市苓雅區苓東里海邊路15-3號",
+      "venue_id": "backstage-live",
+      "venue_name": "後台 Backstage Live",
+      "city": "高雄",
+      "date": "2026-12-13",
+      "image": "https://static.ticketplus.com.tw/event/1514ab3dc6de9d16fd775316c8cc60d0/picBigHomeThumbnail_1793679333359.jpeg",
+      "url": "https://ticketplus.com.tw/activity/1514ab3dc6de9d16fd775316c8cc60d0",
+      "price": "1200 - 2500",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/1514ab3dc6de9d16fd775316c8cc60d0"
         }
       ]
     },
@@ -19181,6 +19733,50 @@
       ]
     },
     {
+      "id": "ticketplus-992fec3ca0f45ac8e1c2c530496e1769-1fe8f259f1bb43f34ea4dec362d7609b",
+      "source": "遠大售票",
+      "name": "《桑心男孩俱樂部 SONNIE BOYZ CLUB》2026 發片專場（台北場）",
+      "venue_raw": "CLAPPER STUDIO 臺北市中正區正守里市民大道三段2號5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-18",
+      "image": "https://static.ticketplus.com.tw/event/992fec3ca0f45ac8e1c2c530496e1769/picBigHomeThumbnail_1791867419377.jpeg",
+      "url": "https://ticketplus.com.tw/activity/992fec3ca0f45ac8e1c2c530496e1769",
+      "price": "750 - 800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/992fec3ca0f45ac8e1c2c530496e1769"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-cfa5e99fb7e8617ebe24630b094e6ca3-b45bef2436a215fe0bd00f3add608055",
+      "source": "遠大售票",
+      "name": "NOIWAY in TAIPEI - Meenoi concert",
+      "venue_raw": "NUZONE 台北市大安區市民大道三段198號2樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-18",
+      "image": "https://static.ticketplus.com.tw/event/cfa5e99fb7e8617ebe24630b094e6ca3/picBigHomeThumbnail_1794286311343.jpeg",
+      "url": "https://ticketplus.com.tw/activity/cfa5e99fb7e8617ebe24630b094e6ca3",
+      "price": "900 - 3600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/cfa5e99fb7e8617ebe24630b094e6ca3"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_topkh-2026-12-19",
       "source": "拓元售票",
       "name": "T.O.P PRE-STUDIO 2026 in KAOHSIUNG",
@@ -19281,6 +19877,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv041871d-2026-12-19",
+      "source": "iNDIEVOX",
+      "name": "12.19 (Sat.)《 核子風暴NUCLEAR TEMPEST 》-輻射馬卡龍 中北巡迴 台中場",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-19",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv041871d_9554c3918762f919e2f5f7e743de5214.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv041871d",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv041871d"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv042892b-2026-12-19",
       "source": "iNDIEVOX",
       "name": "《射後不理＃ 爽就好了》Live Podcast 【Six and the Cities】 高雄場",
@@ -19317,26 +19933,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0423232"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv041871d-2026-12-19",
-      "source": "iNDIEVOX",
-      "name": "12.19 (Sat.)《 核子風暴NUCLEAR TEMPEST 》-輻射馬卡龍 中北巡迴 台中場",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-19",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv041871d_9554c3918762f919e2f5f7e743de5214.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv041871d",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv041871d"
         }
       ]
     },
@@ -19547,26 +20143,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv042149b-2026-12-20",
-      "source": "iNDIEVOX",
-      "name": "薄暮EVENFALL 2026年度專場《暮已成舟》",
-      "venue_raw": "SUB",
-      "venue_id": "taipei-music-center",
-      "venue_name": "台北流行音樂中心",
-      "city": "台北",
-      "date": "2026-12-20",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv042149b_5665f674589ff3b65bf4b04240806c49.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv042149b",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv042149b"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04142fd-2026-12-20",
       "source": "iNDIEVOX",
       "name": "《尋愛未明》✦ 琉璃花𝐑𝐔𝐑𝐈𝐊𝐀 2026主催ライブ",
@@ -19583,6 +20159,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04142fd"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv042149b-2026-12-20",
+      "source": "iNDIEVOX",
+      "name": "薄暮EVENFALL 2026年度專場《暮已成舟》",
+      "venue_raw": "SUB",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-12-20",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv042149b_5665f674589ff3b65bf4b04240806c49.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv042149b",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv042149b"
         }
       ]
     },
@@ -19669,6 +20265,28 @@
       ]
     },
     {
+      "id": "ticketplus-2f2ae5c039c77f430d3de0b4ac7b4701-13f84783b71b435a63a15e4d7218e26b",
+      "source": "遠大售票",
+      "name": "《聖誕》─ 王欣茹 X 吳思岑 X 林哲安 X 謝博安（12/24）",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-24",
+      "image": "https://static.ticketplus.com.tw/event/2f2ae5c039c77f430d3de0b4ac7b4701/picBigHomeThumbnail_1793934724815.jpeg",
+      "url": "https://ticketplus.com.tw/activity/2f2ae5c039c77f430d3de0b4ac7b4701",
+      "price": "300 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/2f2ae5c039c77f430d3de0b4ac7b4701"
+        }
+      ]
+    },
+    {
       "id": "kktix-org-ef5s9gh-2026-12-25",
       "source": "KKTIX",
       "name": "2026 YESUNG 10TH ANNIVERSARY TOUR – ABOUT THE THINGS WE CALLED ORDINARY IN TAIPEI",
@@ -19705,6 +20323,72 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv043029a"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-9d53a5c4a08674c0d9117bfe64ed78ca-3fff17b6aa8303fae24ef0d5aead1953",
+      "source": "遠大售票",
+      "name": "甜約翰 Sweet John 十週年演唱會 《Yours Truly — Dear Decade》加場",
+      "venue_raw": "Legacy Taipei 100台北市中正區八德路一段一號 華山1914創意文化園區/中5A館",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-25",
+      "image": "https://static.ticketplus.com.tw/event/9d53a5c4a08674c0d9117bfe64ed78ca/picBigHomeThumbnail_1793936174422.jpeg",
+      "url": "https://ticketplus.com.tw/activity/9d53a5c4a08674c0d9117bfe64ed78ca",
+      "price": "650 - 1300",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/9d53a5c4a08674c0d9117bfe64ed78ca"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-90e38a4ec114145802d43a5acaff7e8a-4299b9eb746b60e833465987163c4452",
+      "source": "遠大售票",
+      "name": "諏訪ななか Fan Meeting & Mini Live in Taipei(第1部VIP席)",
+      "venue_raw": "MOONDOG 台北市松山區復興南路一段39號9F",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-25",
+      "image": "https://static.ticketplus.com.tw/event/90e38a4ec114145802d43a5acaff7e8a/picBigHomeThumbnail_1793682743621.jpeg",
+      "url": "https://ticketplus.com.tw/activity/90e38a4ec114145802d43a5acaff7e8a",
+      "price": "1200 - 3800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/90e38a4ec114145802d43a5acaff7e8a"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-2f2ae5c039c77f430d3de0b4ac7b4701-2636548b8d0d4207860e1a6768ed2776",
+      "source": "遠大售票",
+      "name": "《聖誕》─ 王欣茹 X 吳思岑 X 林哲安 X 謝博安（12/25）",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-25",
+      "image": "https://static.ticketplus.com.tw/event/2f2ae5c039c77f430d3de0b4ac7b4701/picBigHomeThumbnail_1793934724815.jpeg",
+      "url": "https://ticketplus.com.tw/activity/2f2ae5c039c77f430d3de0b4ac7b4701",
+      "price": "300 - 600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/2f2ae5c039c77f430d3de0b4ac7b4701"
         }
       ]
     },
@@ -19749,7 +20433,7 @@
       ]
     },
     {
-      "id": "kham-12162536",
+      "id": "kham-14116228",
       "source": "寬宏售票",
       "name": "三個不老擊敗之人生跑馬燈 LIVE SHOW",
       "venue_raw": "Legacy Taichung",
@@ -19758,13 +20442,13 @@
       "city": "台中",
       "date": "2026-12-26",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1G67G3R_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R#",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R#"
         }
       ]
     },
@@ -19829,26 +20513,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0421171-2026-12-26",
-      "source": "iNDIEVOX",
-      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
-      "venue_raw": "台北市大佳河濱公園",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-26",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0427142-2026-12-26",
       "source": "iNDIEVOX",
       "name": "淺堤《沈默的鉅作》空間敘事三部曲 Part 2. 劇作｜音樂廳巡迴 — 臺北場",
@@ -19869,10 +20533,30 @@
       ]
     },
     {
+      "id": "indievox-26_iv0421171-2026-12-26",
+      "source": "iNDIEVOX",
+      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
+      "venue_raw": "台北市大佳河濱公園",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-26",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-f4185f9df5d5b1830829db91f3d73ba4-f0e1116cf2cfc9e2374546c5684470bd",
       "source": "遠大售票",
       "name": "Mr.Children Tour 2026 “Saturday in the park” 登記抽選（12/26場次）",
-      "venue_raw": "台北小巨蛋 台北市南京東路四段二號",
+      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段二號",
       "venue_id": "taipei-arena",
       "venue_name": "臺北小巨蛋",
       "city": "台北",
@@ -19887,6 +20571,94 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/f4185f9df5d5b1830829db91f3d73ba4"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-b198888767747ce4f4fa722f8c183e11-17659f7c3854bb2ed312b6720280be63",
+      "source": "遠大售票",
+      "name": "KENSHI YONEZU 2026-2027 WORLD TOUR / GHOST 登記抽選（12/26場次）",
+      "venue_raw": "臺北大巨蛋 臺北市信義區忠孝東路四段515號",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-12-26",
+      "image": "https://static.ticketplus.com.tw/event/b198888767747ce4f4fa722f8c183e11/picBigHomeThumbnail_1791951654112.jpeg",
+      "url": "https://ticketplus.com.tw/activity/b198888767747ce4f4fa722f8c183e11",
+      "price": "0",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/b198888767747ce4f4fa722f8c183e11"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-90723a46b63520d4adb41017e9b7a21e-b8be80f12714fafcc02519ef586bf319",
+      "source": "遠大售票",
+      "name": "PARK JINYOUNG 1ST CONCERT TOUR [CODE#] in TAIPEI",
+      "venue_raw": "TICC台北國際會議中心 台北市信義區信義路五段1號",
+      "venue_id": "ticc",
+      "venue_name": "TICC 台北國際會議中心",
+      "city": "台北",
+      "date": "2026-12-26",
+      "image": "https://static.ticketplus.com.tw/event/90723a46b63520d4adb41017e9b7a21e/picBigHomeThumbnail_1792077507429.jpeg",
+      "url": "https://ticketplus.com.tw/activity/90723a46b63520d4adb41017e9b7a21e",
+      "price": "2900 - 5800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/90723a46b63520d4adb41017e9b7a21e"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-9d53a5c4a08674c0d9117bfe64ed78ca-974ed37b6e7407457367dfa9f66ac599",
+      "source": "遠大售票",
+      "name": "甜約翰 Sweet John 十週年演唱會 《Yours Truly — Dear Decade》",
+      "venue_raw": "Legacy Taipei 100台北市中正區八德路一段一號 華山1914創意文化園區/中5A館",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-26",
+      "image": "https://static.ticketplus.com.tw/event/9d53a5c4a08674c0d9117bfe64ed78ca/picBigHomeThumbnail_1793936174422.jpeg",
+      "url": "https://ticketplus.com.tw/activity/9d53a5c4a08674c0d9117bfe64ed78ca",
+      "price": "650 - 1300",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/9d53a5c4a08674c0d9117bfe64ed78ca"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-11e03a06e7f3f59019f2c214123e4aaf-0c083fbe9c5b03bb55b1cd0e921a0ba9",
+      "source": "遠大售票",
+      "name": "找朋友一起卡",
+      "venue_raw": "女巫店 台北市新生南路三段56巷7號1樓",
+      "venue_id": "witch-house",
+      "venue_name": "女巫店",
+      "city": "台北",
+      "date": "2026-12-26",
+      "image": "https://static.ticketplus.com.tw/event/11e03a06e7f3f59019f2c214123e4aaf/picBigHomeThumbnail_1794201059083.jpeg",
+      "url": "https://ticketplus.com.tw/activity/11e03a06e7f3f59019f2c214123e4aaf",
+      "price": "325 - 650",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/11e03a06e7f3f59019f2c214123e4aaf"
         }
       ]
     },
@@ -19911,26 +20683,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0421171-2026-12-27",
-      "source": "iNDIEVOX",
-      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
-      "venue_raw": "台北市大佳河濱公園",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-27",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0427142-2026-12-27",
       "source": "iNDIEVOX",
       "name": "淺堤《沈默的鉅作》空間敘事三部曲 Part 2. 劇作｜音樂廳巡迴 — 臺北場",
@@ -19947,6 +20699,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0427142"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0421171-2026-12-27",
+      "source": "iNDIEVOX",
+      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
+      "venue_raw": "台北市大佳河濱公園",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-27",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
         }
       ]
     },
@@ -19994,7 +20766,7 @@
       "id": "ticketplus-f4185f9df5d5b1830829db91f3d73ba4-bdaf7b754926876bfa91fdda5c116b4d",
       "source": "遠大售票",
       "name": "Mr.Children Tour 2026 “Saturday in the park” 登記抽選（12/27場次）",
-      "venue_raw": "台北小巨蛋 台北市南京東路四段二號",
+      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段二號",
       "venue_id": "taipei-arena",
       "venue_name": "臺北小巨蛋",
       "city": "台北",
@@ -20009,6 +20781,116 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/f4185f9df5d5b1830829db91f3d73ba4"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-b198888767747ce4f4fa722f8c183e11-52803f20f23398268734ae0fdd8ef551",
+      "source": "遠大售票",
+      "name": "KENSHI YONEZU 2026-2027 WORLD TOUR / GHOST 登記抽選（12/27場次）",
+      "venue_raw": "臺北大巨蛋 臺北市信義區忠孝東路四段515號",
+      "venue_id": "taipei-dome",
+      "venue_name": "臺北大巨蛋",
+      "city": "台北",
+      "date": "2026-12-27",
+      "image": "https://static.ticketplus.com.tw/event/b198888767747ce4f4fa722f8c183e11/picBigHomeThumbnail_1791951654112.jpeg",
+      "url": "https://ticketplus.com.tw/activity/b198888767747ce4f4fa722f8c183e11",
+      "price": "0",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/b198888767747ce4f4fa722f8c183e11"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-146cbb24e0128239e2c80db2c63fa417-96ade0466c1de7089e9885150784824a",
+      "source": "遠大售票",
+      "name": "2026 VERA 四周年演唱會《NEXTERA》",
+      "venue_raw": "Clapper Studio 臺北市中正區正守里市民大道三段2號5樓",
+      "venue_id": "clapper-studio",
+      "venue_name": "Clapper Studio",
+      "city": "台北",
+      "date": "2026-12-27",
+      "image": "https://static.ticketplus.com.tw/event/146cbb24e0128239e2c80db2c63fa417/picBigHomeThumbnail_1793783431844.jpeg",
+      "url": "https://ticketplus.com.tw/activity/146cbb24e0128239e2c80db2c63fa417",
+      "price": "1240 - 3080",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/146cbb24e0128239e2c80db2c63fa417"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-255bd437d619ab3facb771b7689bec4c-9917ab9abc81f5285805317eb9f82a2f",
+      "source": "遠大售票",
+      "name": "PENTAGON 10th Anniversary Tour <101010> in TAIPEI",
+      "venue_raw": "LEGACY TERA 台北市南港區市民大道八段99號",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-27",
+      "image": "https://static.ticketplus.com.tw/event/255bd437d619ab3facb771b7689bec4c/picBigHomeThumbnail_1793677798935.jpeg",
+      "url": "https://ticketplus.com.tw/activity/255bd437d619ab3facb771b7689bec4c",
+      "price": "2400 - 5800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/255bd437d619ab3facb771b7689bec4c"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-d269e0f5b10b35a2c56aaeb43f46d992-a2fb39de4266a939ae6cbaadcc07dec5",
+      "source": "遠大售票",
+      "name": "2026 K-WONDER BAND STAGE IN TAIPEI",
+      "venue_raw": "NTSU ARENA（林口體育館） 桃園市龜山區文化一路250號",
+      "venue_id": "linkou-arena",
+      "venue_name": "林口體育館",
+      "city": "新北",
+      "date": "2026-12-27",
+      "image": "https://static.ticketplus.com.tw/event/d269e0f5b10b35a2c56aaeb43f46d992/picBigHomeThumbnail_1794394395400.jpeg",
+      "url": "https://ticketplus.com.tw/activity/d269e0f5b10b35a2c56aaeb43f46d992",
+      "price": "6880",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/d269e0f5b10b35a2c56aaeb43f46d992"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-93f0294bb30cb257a989740daa6be6b0-6da5e889b887e11f81d6ded76847cde8",
+      "source": "遠大售票",
+      "name": "上山 - 如夢石 發片專場",
+      "venue_raw": "Legacy Taipei 臺北市中正區八德路一段1號 華山1914創意文化園區中5A館",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-27",
+      "image": "https://static.ticketplus.com.tw/event/93f0294bb30cb257a989740daa6be6b0/picBigHomeThumbnail_1793860211761.jpeg",
+      "url": "https://ticketplus.com.tw/activity/93f0294bb30cb257a989740daa6be6b0",
+      "price": "550 - 1100",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/93f0294bb30cb257a989740daa6be6b0"
         }
       ]
     },
@@ -20033,6 +20915,26 @@
       ]
     },
     {
+      "id": "indievox-27_iv0419844-2027-01-02",
+      "source": "iNDIEVOX",
+      "name": "Makav真愛《真的愛了》首次專場演唱會",
+      "venue_raw": "SUB",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2027-01-02",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0419844_debacf59ecd610cff5719abdcf739053.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0419844",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0419844"
+        }
+      ]
+    },
+    {
       "id": "indievox-27_iv0426586-2027-01-02",
       "source": "iNDIEVOX",
       "name": "阿克沃 Awkward《裂縫之間》專輯發片場－高雄站",
@@ -20053,22 +20955,88 @@
       ]
     },
     {
-      "id": "indievox-27_iv0419844-2027-01-02",
-      "source": "iNDIEVOX",
-      "name": "Makav真愛《真的愛了》首次專場演唱會",
-      "venue_raw": "SUB",
+      "id": "ticketplus-6176f2e7ff09269e51eb55044ce516e1-0352546c1835f36d8f4f8a5213a02b42",
+      "source": "遠大售票",
+      "name": "MINHO CONCERT <MEAN : of feral> in TAIPEI",
+      "venue_raw": "國立臺灣大學綜合體育館 台北市大安區羅斯福路四段1號",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-02",
+      "image": "https://static.ticketplus.com.tw/event/6176f2e7ff09269e51eb55044ce516e1/picBigHomeThumbnail_1793357827477.jpeg",
+      "url": "https://ticketplus.com.tw/activity/6176f2e7ff09269e51eb55044ce516e1",
+      "price": "2900 - 6200",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/6176f2e7ff09269e51eb55044ce516e1"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-24558710db4ddb08fbb56ee8281d99f6",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北1/2-1/3)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-02",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-132e75d175ce49bb2a96068e980642a0-e4a3b57f8bc047d789811a2e494206f9",
+      "source": "遠大售票",
+      "name": "hue《RGB》新專輯演唱會 SPLASH",
+      "venue_raw": "Legacy TERA 臺北市南港區市民大道八段99號",
       "venue_id": "taipei-music-center",
       "venue_name": "台北流行音樂中心",
       "city": "台北",
       "date": "2027-01-02",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0419844_debacf59ecd610cff5719abdcf739053.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0419844",
+      "image": "https://static.ticketplus.com.tw/event/132e75d175ce49bb2a96068e980642a0/picBigHomeThumbnail_1793674880017.jpeg",
+      "url": "https://ticketplus.com.tw/activity/132e75d175ce49bb2a96068e980642a0",
+      "price": "650 - 1300",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/132e75d175ce49bb2a96068e980642a0"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv043129f-2027-01-03",
+      "source": "iNDIEVOX",
+      "name": "Soft Reboot",
+      "venue_raw": "SUB",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2027-01-03",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv043129f_7efb5ea87dd3c04ca12bd5c56dd62a70.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv043129f",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0419844"
+          "url": "https://www.indievox.com/activity/detail/27_iv043129f"
         }
       ]
     },
@@ -20193,6 +21161,26 @@
       ]
     },
     {
+      "id": "indievox-27_iv0429205-2027-01-09",
+      "source": "iNDIEVOX",
+      "name": "音速突擊 SONIC OFFENSIVE",
+      "venue_raw": "PIPE LIVEHOUSE",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-09",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429205_7fb01ceb642900158142837915dccfec.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0429205",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0429205"
+        }
+      ]
+    },
+    {
       "id": "indievox-27_iv04283e7-2027-01-09",
       "source": "iNDIEVOX",
       "name": "Legacy Presents【2026都市女聲】：戴曉君 Sauljaljui《尋∞走》VAIVAIK-台北場",
@@ -20233,26 +21221,6 @@
       ]
     },
     {
-      "id": "indievox-27_iv0429205-2027-01-09",
-      "source": "iNDIEVOX",
-      "name": "音速突擊 SONIC OFFENSIVE",
-      "venue_raw": "PIPE LIVEHOUSE",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2027-01-09",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429205_7fb01ceb642900158142837915dccfec.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0429205",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0429205"
-        }
-      ]
-    },
-    {
       "id": "ticketplus-c3dc337da337c035c92bb65268f10986-65958c4579118ea187082e582e1b63f6",
       "source": "遠大售票",
       "name": "YOASOBI ASIA 10-CITY DOME & STADIUM TOUR 2026-2027 超惑星“SUPER PLANET” IN TAIPEI 登記抽選（01/09場次）",
@@ -20271,6 +21239,50 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/c3dc337da337c035c92bb65268f10986"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-992fec3ca0f45ac8e1c2c530496e1769-2688be5aaa253785dd1cb10d98a45786",
+      "source": "遠大售票",
+      "name": "《桑心男孩俱樂部 SONNIE BOYZ CLUB》2026 發片專場（高雄場）",
+      "venue_raw": "LIVE WAREHOUSE 小庫 高雄市鹽埕區南端里大義街2-5號C10",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2027-01-09",
+      "image": "https://static.ticketplus.com.tw/event/992fec3ca0f45ac8e1c2c530496e1769/picBigHomeThumbnail_1791867419377.jpeg",
+      "url": "https://ticketplus.com.tw/activity/992fec3ca0f45ac8e1c2c530496e1769",
+      "price": "750 - 800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/992fec3ca0f45ac8e1c2c530496e1769"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-c28f10dad8b2acf1de5e6aff4051a269-a9be66a064670178cbd79eaae7bcaccb",
+      "source": "遠大售票",
+      "name": "JEONGHAN X JOSHUA JOURNEY INTO [DREAMING] - TAIPEI（1/9場次）",
+      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
+      "venue_id": "taipei-arena",
+      "venue_name": "臺北小巨蛋",
+      "city": "台北",
+      "date": "2027-01-09",
+      "image": "https://static.ticketplus.com.tw/event/c28f10dad8b2acf1de5e6aff4051a269/picBigHomeThumbnail_1794043351882.jpeg",
+      "url": "https://ticketplus.com.tw/activity/c28f10dad8b2acf1de5e6aff4051a269",
+      "price": "800 - 6880",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/c28f10dad8b2acf1de5e6aff4051a269"
         }
       ]
     },
@@ -20355,26 +21367,6 @@
       ]
     },
     {
-      "id": "indievox-27_iv0431080-2027-01-10",
-      "source": "iNDIEVOX",
-      "name": "台北午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
-      "venue_raw": "小上海音樂餐廳",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2027-01-10",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0431080_973af9940d76ae557194a2ead94f372a.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0431080",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0431080"
-        }
-      ]
-    },
-    {
       "id": "indievox-27_iv04311bf-2027-01-10",
       "source": "iNDIEVOX",
       "name": "台北晚場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
@@ -20391,6 +21383,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/27_iv04311bf"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv0431080-2027-01-10",
+      "source": "iNDIEVOX",
+      "name": "台北午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
+      "venue_raw": "小上海音樂餐廳",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-10",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0431080_973af9940d76ae557194a2ead94f372a.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0431080",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0431080"
         }
       ]
     },
@@ -20477,6 +21489,28 @@
       ]
     },
     {
+      "id": "ticketplus-c28f10dad8b2acf1de5e6aff4051a269-3d51cb3342ce05fcc0278867bcb37e19",
+      "source": "遠大售票",
+      "name": "JEONGHAN X JOSHUA JOURNEY INTO [DREAMING] - TAIPEI（1/10場次）",
+      "venue_raw": "台北小巨蛋 台北市松山區南京東路四段2號",
+      "venue_id": "taipei-arena",
+      "venue_name": "臺北小巨蛋",
+      "city": "台北",
+      "date": "2027-01-10",
+      "image": "https://static.ticketplus.com.tw/event/c28f10dad8b2acf1de5e6aff4051a269/picBigHomeThumbnail_1794043351882.jpeg",
+      "url": "https://ticketplus.com.tw/activity/c28f10dad8b2acf1de5e6aff4051a269",
+      "price": "800 - 6880",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/c28f10dad8b2acf1de5e6aff4051a269"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-27_atc-2027-01-15",
       "source": "拓元售票",
       "name": "AGAINST THE CURRENT：TILL DEATH＆BACK TOUR IN TAIPEI",
@@ -20517,6 +21551,26 @@
       ]
     },
     {
+      "id": "indievox-27_iv0429930-2027-01-16",
+      "source": "iNDIEVOX",
+      "name": "魚條《變形》——高雄場",
+      "venue_raw": "LIVE WAREHOUSE小庫",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2027-01-16",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429930_83b6227a060e6a0c353398573c830690.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0429930",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0429930"
+        }
+      ]
+    },
+    {
       "id": "indievox-27_iv0425977-2027-01-16",
       "source": "iNDIEVOX",
       "name": "yureruwayurei (揺れるは幽霊) w/ Spit lulu’s 2027年台灣初次巡迴",
@@ -20537,22 +21591,24 @@
       ]
     },
     {
-      "id": "indievox-27_iv0429930-2027-01-16",
-      "source": "iNDIEVOX",
-      "name": "魚條《變形》——高雄場",
-      "venue_raw": "LIVE WAREHOUSE小庫",
-      "venue_id": "live-warehouse",
-      "venue_name": "高雄 LIVE WAREHOUSE",
-      "city": "高雄",
+      "id": "ticketplus-6beaf3aaa97e2413c75978b4c424a0e4-4ca416498f3fd97fd8c368161b992a85",
+      "source": "遠大售票",
+      "name": "小鹿なおFanMeeting in Taipei 2027",
+      "venue_raw": "CLAPPER STUDIO 台北市中正區市民大道三段2號5F",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2027-01-16",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429930_83b6227a060e6a0c353398573c830690.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0429930",
-      "price": "",
+      "image": "https://static.ticketplus.com.tw/event/6beaf3aaa97e2413c75978b4c424a0e4/picBigHomeThumbnail_1788336586921.jpeg",
+      "url": "https://ticketplus.com.tw/activity/6beaf3aaa97e2413c75978b4c424a0e4",
+      "price": "1000 - 3000",
+      "artist": "",
+      "category": "concert",
       "ticket_links": [
         {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0429930"
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/6beaf3aaa97e2413c75978b4c424a0e4"
         }
       ]
     },
@@ -20575,6 +21631,50 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/aed80ffbe5435bbb1a98898fb288e6c8"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-9de6b98aa09a42209d45ab15b4cbd097-97de314c4110559c12bfb442bdf98192",
+      "source": "遠大售票",
+      "name": "2027 CHOSEN FESTIVAL 邱聲",
+      "venue_raw": "北流戶外表演空間、SUB LIVE 臺北市南港區市民大道八段 99 號",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2027-01-16",
+      "image": "https://static.ticketplus.com.tw/event/9de6b98aa09a42209d45ab15b4cbd097/picBigHomeThumbnail_1792753124052.jpeg",
+      "url": "https://ticketplus.com.tw/activity/9de6b98aa09a42209d45ab15b4cbd097",
+      "price": "800 - 1555",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/9de6b98aa09a42209d45ab15b4cbd097"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-84c463d9886c8c0ecf48ecc2d5ad5edd",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台中1/16-1/17)",
+      "venue_raw": "台中 台中市北屯區文心路四段936號2樓、3樓、4樓、5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-16",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
         }
       ]
     },
@@ -20657,6 +21757,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/e4cd0cf639ebe6488c75528d97694602"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-826e5ddd96cf997311b5bce1ccb7be80-50cc9c99c84d703e478a0dd80e565b36",
+      "source": "遠大售票",
+      "name": "小泉萌香 2027 台北⾒⾯會（午場）",
+      "venue_raw": "Clapper Studio 台北市中正區市民大道三段2號5樓",
+      "venue_id": "clapper-studio",
+      "venue_name": "Clapper Studio",
+      "city": "台北",
+      "date": "2027-01-17",
+      "image": "https://static.ticketplus.com.tw/event/826e5ddd96cf997311b5bce1ccb7be80/picBigHomeThumbnail_1793071565805.jpeg",
+      "url": "https://ticketplus.com.tw/activity/826e5ddd96cf997311b5bce1ccb7be80",
+      "price": "1380 - 3680",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/826e5ddd96cf997311b5bce1ccb7be80"
         }
       ]
     },
@@ -20781,6 +21903,50 @@
       ]
     },
     {
+      "id": "ticketplus-03627ec8454b37cf8fc712b763261a47-bcb6b3bdb9714c7032828af1a9e6d8b5",
+      "source": "遠大售票",
+      "name": "MYTH & ROID Tour 2026-2027 “I know your fire” 台北場",
+      "venue_raw": "CLAPPER STUDIO 臺北市中正區正守里市民大道三段2號5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-23",
+      "image": "https://static.ticketplus.com.tw/event/03627ec8454b37cf8fc712b763261a47/picBigHomeThumbnail_1793271486150.jpeg",
+      "url": "https://ticketplus.com.tw/activity/03627ec8454b37cf8fc712b763261a47",
+      "price": "1400 - 2800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/03627ec8454b37cf8fc712b763261a47"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-84439cff315cc6fbab3ca80fdb145c22-9e993c3f7574055cca10f6ab91ecebc9",
+      "source": "遠大售票",
+      "name": "2026 OH MY GIRL FANMEETING [CODE NAME: OMG] IN TAIPEI（第1場次）",
+      "venue_raw": "WESTAR 臺北市萬華區漢中街116號8樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-23",
+      "image": "https://static.ticketplus.com.tw/event/84439cff315cc6fbab3ca80fdb145c22/picBigHomeThumbnail_1793787284689.jpeg",
+      "url": "https://ticketplus.com.tw/activity/84439cff315cc6fbab3ca80fdb145c22",
+      "price": "2400 - 4800",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/84439cff315cc6fbab3ca80fdb145c22"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-27_maroon5-2027-01-24",
       "source": "拓元售票",
       "name": "Maroon 5 Asia 2027 in Kaohsiung",
@@ -20817,6 +21983,26 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/40015"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv04315d3-2027-01-24",
+      "source": "iNDIEVOX",
+      "name": "The Salitus presents 「THE NEXT CHAPTER」 — The Salitus 3rd Anniversary Special Show —",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-24",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv04315d3_89d04122a80c4002b66cee08cb4fabec.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv04315d3",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv04315d3"
         }
       ]
     },
@@ -20903,6 +22089,50 @@
       ]
     },
     {
+      "id": "ticketplus-fb229e70b66f4431f4f1cd44ae431530-5b3917b99dd1cd39391fe4d054bcc8b0",
+      "source": "遠大售票",
+      "name": "2027 KIM SO WON FANMEETING [WISHMATE] IN TAIPEI（第1場次）",
+      "venue_raw": "CLAPPER STUDIO 台北市中正區市民大道三段2號5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-30",
+      "image": "https://static.ticketplus.com.tw/event/fb229e70b66f4431f4f1cd44ae431530/picBigHomeThumbnail_1792499509904.jpeg",
+      "url": "https://ticketplus.com.tw/activity/fb229e70b66f4431f4f1cd44ae431530",
+      "price": "4380 - 4980",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/fb229e70b66f4431f4f1cd44ae431530"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-e029638fd4f828e6faf160f62d08ae6b-fdb38a72acf686b21996350c15e9e5de",
+      "source": "遠大售票",
+      "name": "Jeff Bernat - Luv Language Tour - Taipei",
+      "venue_raw": "Moondog 台北市松山區復興南路一段 39 號 9 樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-02-16",
+      "image": "https://static.ticketplus.com.tw/event/e029638fd4f828e6faf160f62d08ae6b/picBigHomeThumbnail_1793350415289.jpeg",
+      "url": "https://ticketplus.com.tw/activity/e029638fd4f828e6faf160f62d08ae6b",
+      "price": "1000 - 2400",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/e029638fd4f828e6faf160f62d08ae6b"
+        }
+      ]
+    },
+    {
       "id": "ibon-5572578",
       "source": "ibon售票",
       "name": "NieR：Orchestra Concert 12026［YoRHa］",
@@ -20919,6 +22149,28 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/39974"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-cb50cc3f8bed7869c50494c78b420a1c",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南2/20-2/21)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-02-20",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
         }
       ]
     },
@@ -20963,7 +22215,7 @@
       ]
     },
     {
-      "id": "kham-4590292",
+      "id": "kham-8035358",
       "source": "寬宏售票",
       "name": "2027 好想好好愛周蕙 高雄巨蛋 演唱會",
       "venue_raw": "K-ARENA 高雄巨蛋",
@@ -20972,18 +22224,18 @@
       "city": "高雄",
       "date": "2027-02-27",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1HHC9R0_Large.JPG?v=202611111547",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HHC9R0#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HHC9R0",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HHC9R0#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HHC9R0"
         }
       ]
     },
     {
-      "id": "kham-13092595",
+      "id": "kham-5560447",
       "source": "寬宏售票",
       "name": "【2/27場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
       "venue_raw": "高雄國家體育場",
@@ -21003,7 +22255,7 @@
       ]
     },
     {
-      "id": "kham-8133901",
+      "id": "kham-3451342",
       "source": "寬宏售票",
       "name": "【2/28場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
       "venue_raw": "高雄國家體育場",
@@ -21019,6 +22271,50 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1EVUYWG"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-c4b50da5e5f92c20f8be36a626fc3646",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(新竹3/13-3/14)",
+      "venue_raw": "新竹 新竹市東區關東里光復路一段270號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-03-13",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-427165df32e22b97075198104bbe0e7e-8eb307c301d701f3181d8f2f918094a9",
+      "source": "遠大售票",
+      "name": "王謙Goatak【memories】專輯演唱會",
+      "venue_raw": "Legacy TERA 115臺北市南港區東明里市民大道八段99號",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2027-03-13",
+      "image": "https://static.ticketplus.com.tw/event/427165df32e22b97075198104bbe0e7e/picBigHomeThumbnail_1793953857310.jpeg",
+      "url": "https://ticketplus.com.tw/activity/427165df32e22b97075198104bbe0e7e",
+      "price": "500 - 1600",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/427165df32e22b97075198104bbe0e7e"
         }
       ]
     },
@@ -21067,6 +22363,28 @@
       ]
     },
     {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-8a4500ff08633c9c76035c795443f033",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北3/27-3/28)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-03-27",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
       "id": "ticketplus-a22262dab0ab7f83a1f8e9a918bd9eb6-9f2ad37da5bd95116e3072515f6c0229",
       "source": "遠大售票",
       "name": "MAHIRU ONE-MAN LIVE 2027 in Zepp New Taipei 登記抽選(3/28場次)",
@@ -21107,6 +22425,28 @@
           "platform": "ticketplus",
           "name": "遠大售票",
           "url": "https://ticketplus.com.tw/activity/69bc76ae2f280748cd8cd8f7d7444008"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-adb7c5d306ce11b320581709bcdb3d14",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南4/10-4/11)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-04-10",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
         }
       ]
     },
@@ -21171,6 +22511,28 @@
       ]
     },
     {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-8a2e520d5a46e0427a8f56a1cd8d7ea4",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台中5/8-5/9)",
+      "venue_raw": "台中 台中市北屯區文心路四段936號2樓、3樓、4樓、5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-05-08",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
       "id": "tixcraft-26_lioneers_p-2027-05-09",
       "source": "拓元售票",
       "name": "2026-27 TPBL新竹御嵿攻城獅主場賽事【季票專區】",
@@ -21187,6 +22549,94 @@
           "platform": "tixcraft",
           "name": "拓元售票",
           "url": "https://tixcraft.com/activity/detail/26_lioneers_p"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-a0e7e0118b0de289f85c7ebbebb57ab0",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北5/15-5/16)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-05-15",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-6eeaa1747c28d4a056e44efad4317f33",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南6/19-6/20)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-06-19",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-91a8cbeca3ae8f88bd0280f9c4050f1a",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(新竹6/26-6/27)",
+      "venue_raw": "新竹 新竹市東區關東里光復路一段270號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-06-26",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-fb7447645d7efcaad928f1659c1a8d67",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北7/10-7/11)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-07-10",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
         }
       ]
     },
@@ -21211,7 +22661,95 @@
       ]
     },
     {
-      "id": "kham-234468",
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-5a637a29a3f0c4b74a185dc944e5a5db",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台中7/24-7/25)",
+      "venue_raw": "台中 台中市北屯區文心路四段936號2樓、3樓、4樓、5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-07-24",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-baa628a36c8c65ab653857f78851593e",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南8/14-8/15)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-08-14",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-c2388b23de4bac6456ee2343cd713e44",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北9/11-9/12)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-09-11",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-4cbe85f5d2c3b7622190990069e86ab7",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北10/9-10/10)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-10-09",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "kham-4817571",
       "source": "寬宏售票",
       "name": "AiNA THE END 巡迴演唱會-台北站 AiNA THE END LIVE TOUR 2027 in TAIPEI",
       "venue_raw": "TICC 台北國際會議中心",
@@ -21220,13 +22758,123 @@
       "city": "台北",
       "date": "2027-10-16",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1HVN53S_Large.JPG?v=202611121310",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HVN53S#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HVN53S",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HVN53S#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HVN53S"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-09dd6f27ba88b09bda75ece546ead670",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(新竹10/16-10/17)",
+      "venue_raw": "新竹 新竹市東區關東里光復路一段270號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-10-16",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-012a16ec10f645aa9ece36c4e6aa4db6",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南10/23-10/24)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-10-23",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-a1b5b988cb9a33dcc66b0517a22dfb7f",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台中11/20-11/21)",
+      "venue_raw": "台中 台中市北屯區文心路四段936號2樓、3樓、4樓、5樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-11-20",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-09fe2aab7126e6190cff755edd4e172b",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台南12/11-12/12)",
+      "venue_raw": "台南 台南市永康區成功里中華路144-1號B1",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-12-11",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-42d9f66ae7f509122ba00a1b45548346-fbdafcfb6cbcfb1ce2bdbea9e8b6bd00",
+      "source": "遠大售票",
+      "name": "Feedback Fascial Tools 筋膜刀專業技術課程(台北12/25-12/26)",
+      "venue_raw": "台北 台北市大同區長安西路29號7樓",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-12-25",
+      "image": "https://static.ticketplus.com.tw/event/42d9f66ae7f509122ba00a1b45548346/picBigHomeThumbnail_1793594318210.jpeg",
+      "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346",
+      "price": "16000 - 21000",
+      "artist": "",
+      "category": "concert",
+      "ticket_links": [
+        {
+          "platform": "ticketplus",
+          "name": "遠大售票",
+          "url": "https://ticketplus.com.tw/activity/42d9f66ae7f509122ba00a1b45548346"
         }
       ]
     }
