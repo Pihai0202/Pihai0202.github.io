@@ -1,6 +1,6 @@
 {
-  "updated_at": "2026-11-16T09:49:51.244446+00:00",
-  "count": 703,
+  "updated_at": "2026-11-16T19:58:44.027078+00:00",
+  "count": 704,
   "sources": [
     "KKTIX",
     "拓元售票",
@@ -16481,7 +16481,27 @@
       ]
     },
     {
-      "id": "kham-14006042",
+      "id": "kham-7932191",
+      "source": "寬宏售票",
+      "name": "2026 N.Flying LIVE‘&CON5：into REM’IN KAOHSIUNG",
+      "venue_raw": "高雄流行音樂中心",
+      "venue_id": "kaohsiung-music-center",
+      "venue_name": "高雄流行音樂中心",
+      "city": "高雄",
+      "date": "2026-11-21",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F24HRG_Large.JPG?v=202611131337",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F24HRG#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F24HRG#"
+        }
+      ]
+    },
+    {
+      "id": "kham-15484539",
       "source": "寬宏售票",
       "name": "國泰世華銀行 彭佳慧《數著時間的日子》巡迴演唱會",
       "venue_raw": "臺北小巨蛋",
@@ -16501,7 +16521,7 @@
       ]
     },
     {
-      "id": "kham-2854269",
+      "id": "kham-48827",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -16510,33 +16530,13 @@
       "city": "台北",
       "date": "2026-11-21",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
-        }
-      ]
-    },
-    {
-      "id": "kham-15449315",
-      "source": "寬宏售票",
-      "name": "2026 N.Flying LIVE‘&CON5：into REM’IN KAOHSIUNG",
-      "venue_raw": "高雄流行音樂中心",
-      "venue_id": "kaohsiung-music-center",
-      "venue_name": "高雄流行音樂中心",
-      "city": "高雄",
-      "date": "2026-11-21",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F24HRG_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F24HRG",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F24HRG"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
         }
       ]
     },
@@ -17229,7 +17229,7 @@
       ]
     },
     {
-      "id": "ibon-13996588",
+      "id": "ibon-4711180",
       "source": "ibon售票",
       "name": "HEEJAE 1st FANMEETING [Beyond: YOU] in TAIPEI",
       "venue_raw": "NUZONE",
@@ -17249,27 +17249,7 @@
       ]
     },
     {
-      "id": "kham-11526149",
-      "source": "寬宏售票",
-      "name": "2026 Kep1er FAN-CON TOUR [RSVP:Respond our code] in TAIPEI",
-      "venue_raw": "台北流行音樂中心",
-      "venue_id": "taipei-music-center",
-      "venue_name": "台北流行音樂中心",
-      "city": "台北",
-      "date": "2026-11-28",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1HF3HRY_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HF3HRY#",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HF3HRY#"
-        }
-      ]
-    },
-    {
-      "id": "kham-10115068",
+      "id": "kham-12209116",
       "source": "寬宏售票",
       "name": "KPOP PLANET in TAIPEI",
       "venue_raw": "林口體育館",
@@ -17289,7 +17269,27 @@
       ]
     },
     {
-      "id": "kham-744254",
+      "id": "kham-1965133",
+      "source": "寬宏售票",
+      "name": "2026 Kep1er FAN-CON TOUR [RSVP:Respond our code] in TAIPEI",
+      "venue_raw": "台北流行音樂中心",
+      "venue_id": "taipei-music-center",
+      "venue_name": "台北流行音樂中心",
+      "city": "台北",
+      "date": "2026-11-28",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1HF3HRY_Large.JPG?v=202611131337",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HF3HRY#",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1HF3HRY#"
+        }
+      ]
+    },
+    {
+      "id": "kham-3109017",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -17298,13 +17298,13 @@
       "city": "台北",
       "date": "2026-11-28",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
         }
       ]
     },
@@ -17689,7 +17689,7 @@
       ]
     },
     {
-      "id": "kham-3642621",
+      "id": "kham-8703557",
       "source": "寬宏售票",
       "name": "2026 SHOW MUSICAL《WILD WILD》",
       "venue_raw": "信義劇場 Legacy MAX",
@@ -17698,13 +17698,13 @@
       "city": "台北",
       "date": "2026-12-04",
       "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1F4200H_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H",
       "price": "",
       "ticket_links": [
         {
           "platform": "kham",
           "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H#"
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1F4200H"
         }
       ]
     },
@@ -17871,22 +17871,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv04241ad-2026-12-05",
+      "id": "indievox-26_iv04280c7-2026-12-05",
       "source": "iNDIEVOX",
-      "name": "2026 虎山音樂祭 Tiger Mountain Ramble",
-      "venue_raw": "微遠虎山Tiger Mountain",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
+      "name": "【美秀集團《等無》巡迴 2026】",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
       "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04241ad_b17123c527390d00f83ba8b229024820.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04241ad",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04280c7_4d4994a9dbc311cd9a9c2a32a3c8dcc9.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04280c7",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04241ad"
+          "url": "https://www.indievox.com/activity/detail/26_iv04280c7"
         }
       ]
     },
@@ -17931,30 +17931,10 @@
       ]
     },
     {
-      "id": "indievox-26_iv0430611-2026-12-05",
-      "source": "iNDIEVOX",
-      "name": "台南午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
-      "venue_raw": "全美戲院A廳",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0430611_218372d9eb20daf61222b9950a7a05ff.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0430611",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0430611"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04307bc-2026-12-05",
       "source": "iNDIEVOX",
       "name": "台南晚場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
-      "venue_raw": "全美戲院A廳",
+      "venue_raw": "",
       "venue_id": null,
       "venue_name": null,
       "city": "",
@@ -17971,22 +17951,42 @@
       ]
     },
     {
-      "id": "indievox-26_iv04280c7-2026-12-05",
+      "id": "indievox-26_iv04241ad-2026-12-05",
       "source": "iNDIEVOX",
-      "name": "【美秀集團《等無》巡迴 2026】",
-      "venue_raw": "LIVE WAREHOUSE",
-      "venue_id": "live-warehouse",
-      "venue_name": "高雄 LIVE WAREHOUSE",
-      "city": "高雄",
+      "name": "2026 虎山音樂祭 Tiger Mountain Ramble",
+      "venue_raw": "微遠虎山Tiger Mountain",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-12-05",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04280c7_4d4994a9dbc311cd9a9c2a32a3c8dcc9.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04280c7",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04241ad_b17123c527390d00f83ba8b229024820.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04241ad",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04280c7"
+          "url": "https://www.indievox.com/activity/detail/26_iv04241ad"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0430611-2026-12-05",
+      "source": "iNDIEVOX",
+      "name": "台南午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 映画場",
+      "venue_raw": "",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-05",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0430611_218372d9eb20daf61222b9950a7a05ff.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0430611",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0430611"
         }
       ]
     },
@@ -18117,26 +18117,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv0414174-2026-12-06",
-      "source": "iNDIEVOX",
-      "name": "格式塔少女 Gestalt Girl 「働くこと、休むこと。」專輯發片巡迴 - 台北場",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-12-06",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0414174_3311fc4c3710560a33f8c69dbe1b8800.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0414174",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0414174"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv04219b4-2026-12-06",
       "source": "iNDIEVOX",
       "name": "蔡旻佑 Evan Yo《快樂有時有》演唱會 20週年 台北站",
@@ -18153,6 +18133,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv04219b4"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0414174-2026-12-06",
+      "source": "iNDIEVOX",
+      "name": "格式塔少女 Gestalt Girl 「働くこと、休むこと。」專輯發片巡迴 - 台北場",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-06",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0414174_3311fc4c3710560a33f8c69dbe1b8800.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0414174",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0414174"
         }
       ]
     },
@@ -18365,7 +18365,7 @@
       ]
     },
     {
-      "id": "kham-11233054",
+      "id": "kham-16577744",
       "source": "寬宏售票",
       "name": "三個不老擊敗之人生跑馬燈 LIVE SHOW",
       "venue_raw": "Legacy Taichung",
@@ -18551,6 +18551,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv04196b4-2026-12-12",
+      "source": "iNDIEVOX",
+      "name": "Legacy Presents【2026都市女聲】：小球（莊鵑瑛）《Reset：Roots》－台北場",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2026-12-12",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04196b4_cfeb4c3d5606f7398264dadfda66f6a2.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04196b4",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04196b4"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv0426486-2026-12-12",
       "source": "iNDIEVOX",
       "name": "《永遠是生誕祭有多好》鬼灯翠2026生誕祭",
@@ -18607,26 +18627,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv042231e"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv04196b4-2026-12-12",
-      "source": "iNDIEVOX",
-      "name": "Legacy Presents【2026都市女聲】：小球（莊鵑瑛）《Reset：Roots》－台北場",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2026-12-12",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04196b4_cfeb4c3d5606f7398264dadfda66f6a2.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04196b4",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04196b4"
         }
       ]
     },
@@ -18989,26 +18989,6 @@
       ]
     },
     {
-      "id": "indievox-26_iv04304c2-2026-12-18",
-      "source": "iNDIEVOX",
-      "name": "G蛋布丁《布丁的房間》演唱會",
-      "venue_raw": "Legacy mini ＠ amba",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-18",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04304c2_44b6da62523a29c84ae03e4ae57e1086.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04304c2",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04304c2"
-        }
-      ]
-    },
-    {
       "id": "indievox-26_iv0428894-2026-12-18",
       "source": "iNDIEVOX",
       "name": "『air in hurt』 Hammer Head Shark 2nd EP “air” Release Tour in Taipei w/ SuU",
@@ -19045,6 +19025,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv042611a"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04304c2-2026-12-18",
+      "source": "iNDIEVOX",
+      "name": "G蛋布丁《布丁的房間》演唱會",
+      "venue_raw": "Legacy mini ＠ amba",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-18",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04304c2_44b6da62523a29c84ae03e4ae57e1086.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04304c2",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04304c2"
         }
       ]
     },
@@ -19135,7 +19135,7 @@
       ]
     },
     {
-      "id": "ibon-3150743",
+      "id": "ibon-7092445",
       "source": "ibon售票",
       "name": "2026－2027 DOH KYUNG SOO CONCERT TOUR ［DAY OFF］ IN KAOHSIUNG",
       "venue_raw": "高雄流行音樂中心 海音館",
@@ -19155,7 +19155,7 @@
       ]
     },
     {
-      "id": "ibon-83917",
+      "id": "ibon-265274",
       "source": "ibon售票",
       "name": "RUNIDRE 1st OneMan Tour「Let’s Live Like RUNIDRE！ IN TAIPEI」",
       "venue_raw": "MOONDOG",
@@ -19215,22 +19215,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0431351-2026-12-19",
+      "id": "indievox-26_iv041871d-2026-12-19",
       "source": "iNDIEVOX",
-      "name": "老吾老以及人之老-台中站：88balaz、胖虎、來者何人",
-      "venue_raw": "Legacy Taichung",
-      "venue_id": "legacy-taichung",
-      "venue_name": "Legacy Taichung",
-      "city": "台中",
+      "name": "12.19 (Sat.)《 核子風暴NUCLEAR TEMPEST 》-輻射馬卡龍 中北巡迴 台中場",
+      "venue_raw": "迴響音樂藝文展演空間",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-12-19",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0431351_ec7955052f4711e7da7f83f4ee022143.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0431351",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv041871d_9554c3918762f919e2f5f7e743de5214.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv041871d",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0431351"
+          "url": "https://www.indievox.com/activity/detail/26_iv041871d"
         }
       ]
     },
@@ -19275,6 +19275,26 @@
       ]
     },
     {
+      "id": "indievox-26_iv0431351-2026-12-19",
+      "source": "iNDIEVOX",
+      "name": "老吾老以及人之老-台中站：88balaz、胖虎、來者何人",
+      "venue_raw": "Legacy Taichung",
+      "venue_id": "legacy-taichung",
+      "venue_name": "Legacy Taichung",
+      "city": "台中",
+      "date": "2026-12-19",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0431351_ec7955052f4711e7da7f83f4ee022143.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0431351",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0431351"
+        }
+      ]
+    },
+    {
       "id": "indievox-26_iv0428143-2026-12-19",
       "source": "iNDIEVOX",
       "name": "阿克沃 Awkward《裂縫之間》專輯發片場－台北站",
@@ -19311,26 +19331,6 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/26_iv0427650"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv041871d-2026-12-19",
-      "source": "iNDIEVOX",
-      "name": "12.19 (Sat.)《 核子風暴NUCLEAR TEMPEST 》-輻射馬卡龍 中北巡迴 台中場",
-      "venue_raw": "迴響音樂藝文展演空間",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2026-12-19",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv041871d_9554c3918762f919e2f5f7e743de5214.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv041871d",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv041871d"
         }
       ]
     },
@@ -19423,7 +19423,7 @@
       ]
     },
     {
-      "id": "ibon-13117414",
+      "id": "ibon-15781120",
       "source": "ibon售票",
       "name": "2026－2027 DOH KYUNG SOO CONCERT TOUR ［DAY OFF］ IN KAOHSIUNG",
       "venue_raw": "高雄流行音樂中心 海音館",
@@ -19443,7 +19443,7 @@
       ]
     },
     {
-      "id": "ibon-14892599",
+      "id": "ibon-3830732",
       "source": "ibon售票",
       "name": "2026－2027 臉紅的思春期 BOL4 CONCERT TOUR〔Red Square〕in TAIPEI",
       "venue_raw": "台大綜合體育館 1F",
@@ -19813,7 +19813,7 @@
       ]
     },
     {
-      "id": "kham-11921537",
+      "id": "kham-759792",
       "source": "寬宏售票",
       "name": "三個不老擊敗之人生跑馬燈 LIVE SHOW",
       "venue_raw": "Legacy Taichung",
@@ -19829,26 +19829,6 @@
           "platform": "kham",
           "name": "寬宏售票",
           "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1G67G3R"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv0429409-2026-12-26",
-      "source": "iNDIEVOX",
-      "name": "AFTER IMAGE",
-      "venue_raw": "PIPE Live Music",
-      "venue_id": "pipe-live-music",
-      "venue_name": "PIPE Live Music",
-      "city": "台北",
-      "date": "2026-12-26",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0429409_3330dae38623d76c33b56f5f62f6a4b3.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0429409",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0429409"
         }
       ]
     },
@@ -19873,22 +19853,42 @@
       ]
     },
     {
-      "id": "indievox-26_iv0421171-2026-12-26",
+      "id": "indievox-26_iv0429409-2026-12-26",
       "source": "iNDIEVOX",
-      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
-      "venue_raw": "台北市大佳河濱公園",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
+      "name": "AFTER IMAGE",
+      "venue_raw": "PIPE Live Music",
+      "venue_id": "pipe-live-music",
+      "venue_name": "PIPE Live Music",
+      "city": "台北",
       "date": "2026-12-26",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
-      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0429409_3330dae38623d76c33b56f5f62f6a4b3.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0429409",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
+          "url": "https://www.indievox.com/activity/detail/26_iv0429409"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0422821-2026-12-26",
+      "source": "iNDIEVOX",
+      "name": "【超級邊Super Band 演唱會】",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
+      "date": "2026-12-26",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0422821_3f573b33effba277db07b8afd693ec7c.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0422821",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0422821"
         }
       ]
     },
@@ -19913,22 +19913,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0422821-2026-12-26",
+      "id": "indievox-26_iv0421171-2026-12-26",
       "source": "iNDIEVOX",
-      "name": "【超級邊Super Band 演唱會】",
-      "venue_raw": "LIVE WAREHOUSE",
-      "venue_id": "live-warehouse",
-      "venue_name": "高雄 LIVE WAREHOUSE",
-      "city": "高雄",
+      "name": "國語作業簿 🎄台北歡樂耶誕城 2026",
+      "venue_raw": "台北市大佳河濱公園",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
       "date": "2026-12-26",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0422821_3f573b33effba277db07b8afd693ec7c.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0422821",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0421171_c675698e5023fcf94ff42d8bb1d1b89f.png",
+      "url": "https://www.indievox.com/activity/detail/26_iv0421171",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0422821"
+          "url": "https://www.indievox.com/activity/detail/26_iv0421171"
         }
       ]
     },
@@ -20063,7 +20063,7 @@
       ]
     },
     {
-      "id": "ibon-15435569",
+      "id": "ibon-791846",
       "source": "ibon售票",
       "name": "D＆W 2026 健．康演唱會 IN KAOHSIUNG",
       "venue_raw": "高雄流行音樂中心 海音館",
@@ -20079,6 +20079,26 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/40037"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv0427142-2026-12-27",
+      "source": "iNDIEVOX",
+      "name": "淺堤《沈默的鉅作》空間敘事三部曲 Part 2. 劇作｜音樂廳巡迴 — 臺北場",
+      "venue_raw": "臺北表演藝術中心 球劇場",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2026-12-27",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0427142_ecf4240a8823271d5dfcba2816ec6569.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0427142",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv0427142"
         }
       ]
     },
@@ -20103,22 +20123,22 @@
       ]
     },
     {
-      "id": "indievox-26_iv0427142-2026-12-27",
+      "id": "indievox-26_iv0431862-2026-12-27",
       "source": "iNDIEVOX",
-      "name": "淺堤《沈默的鉅作》空間敘事三部曲 Part 2. 劇作｜音樂廳巡迴 — 臺北場",
-      "venue_raw": "臺北表演藝術中心 球劇場",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
+      "name": "BUTTER RIOT presents：Right here， RIOT now Vol.2",
+      "venue_raw": "LIVE WAREHOUSE",
+      "venue_id": "live-warehouse",
+      "venue_name": "高雄 LIVE WAREHOUSE",
+      "city": "高雄",
       "date": "2026-12-27",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0427142_ecf4240a8823271d5dfcba2816ec6569.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv0427142",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv0431862_9986918ab0b27dcb0a01cd4c39cdf83c.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv0431862",
       "price": "",
       "ticket_links": [
         {
           "platform": "indievox",
           "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv0427142"
+          "url": "https://www.indievox.com/activity/detail/26_iv0431862"
         }
       ]
     },
@@ -20295,7 +20315,7 @@
       ]
     },
     {
-      "id": "ibon-11847560",
+      "id": "ibon-12221916",
       "source": "ibon售票",
       "name": "2026抽籤演唱會",
       "venue_raw": "高雄流行音樂中心 海音館",
@@ -20583,7 +20603,7 @@
       ]
     },
     {
-      "id": "ibon-6440079",
+      "id": "ibon-12972999",
       "source": "ibon售票",
       "name": "2026－27 FLARE U FANCON TOUR：Where U’RE in TAIPEI",
       "venue_raw": "新北市工商展覽中心",
@@ -20599,26 +20619,6 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/40030"
-        }
-      ]
-    },
-    {
-      "id": "indievox-27_iv0429205-2027-01-09",
-      "source": "iNDIEVOX",
-      "name": "音速突擊 SONIC OFFENSIVE",
-      "venue_raw": "PIPE LIVEHOUSE",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2027-01-09",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429205_7fb01ceb642900158142837915dccfec.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0429205",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0429205"
         }
       ]
     },
@@ -20659,6 +20659,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/27_iv04272a6"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv0429205-2027-01-09",
+      "source": "iNDIEVOX",
+      "name": "音速突擊 SONIC OFFENSIVE",
+      "venue_raw": "PIPE LIVEHOUSE",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-09",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0429205_7fb01ceb642900158142837915dccfec.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0429205",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0429205"
         }
       ]
     },
@@ -20809,30 +20829,10 @@
       ]
     },
     {
-      "id": "indievox-27_iv0431080-2027-01-10",
-      "source": "iNDIEVOX",
-      "name": "台北午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
-      "venue_raw": "小上海音樂餐廳",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2027-01-10",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0431080_973af9940d76ae557194a2ead94f372a.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv0431080",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv0431080"
-        }
-      ]
-    },
-    {
       "id": "indievox-27_iv04311bf-2027-01-10",
       "source": "iNDIEVOX",
       "name": "台北晚場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
-      "venue_raw": "小上海音樂餐廳",
+      "venue_raw": "",
       "venue_id": null,
       "venue_name": null,
       "city": "",
@@ -20845,6 +20845,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/27_iv04311bf"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv0431080-2027-01-10",
+      "source": "iNDIEVOX",
+      "name": "台北午場 ✦ 庸俗救星｜歲末聯歡演唱會 ✦ 尾牙場",
+      "venue_raw": "",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-10",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv0431080_973af9940d76ae557194a2ead94f372a.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv0431080",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv0431080"
         }
       ]
     },
@@ -20869,26 +20889,6 @@
       ]
     },
     {
-      "id": "indievox-27_iv04287a9-2027-01-10",
-      "source": "iNDIEVOX",
-      "name": "東京夢幻瞪鞋樂團 Beachside Talks 台北演唱會",
-      "venue_raw": "杰克文創",
-      "venue_id": null,
-      "venue_name": null,
-      "city": "",
-      "date": "2027-01-10",
-      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv04287a9_a6fd487e01d9873dc56fde04722cac36.jpg",
-      "url": "https://www.indievox.com/activity/detail/27_iv04287a9",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/27_iv04287a9"
-        }
-      ]
-    },
-    {
       "id": "indievox-27_iv04297db-2027-01-10",
       "source": "iNDIEVOX",
       "name": "魚條《變形》——台中場",
@@ -20905,6 +20905,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/27_iv04297db"
+        }
+      ]
+    },
+    {
+      "id": "indievox-27_iv04287a9-2027-01-10",
+      "source": "iNDIEVOX",
+      "name": "東京夢幻瞪鞋樂團 Beachside Talks 台北演唱會",
+      "venue_raw": "杰克文創",
+      "venue_id": null,
+      "venue_name": null,
+      "city": "",
+      "date": "2027-01-10",
+      "image": "https://indievox.static.tixcraft.com/images/activity/27_iv04287a9_a6fd487e01d9873dc56fde04722cac36.jpg",
+      "url": "https://www.indievox.com/activity/detail/27_iv04287a9",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/27_iv04287a9"
         }
       ]
     },
@@ -20993,7 +21013,7 @@
       ]
     },
     {
-      "id": "ibon-6137556",
+      "id": "ibon-856039",
       "source": "ibon售票",
       "name": "2027 FTISLAND CONCERT ‘FTSODE’ IN TAIPEI",
       "venue_raw": "TICC 臺北國際會議中心",
@@ -21265,7 +21285,7 @@
       ]
     },
     {
-      "id": "kham-6252440",
+      "id": "kham-13420911",
       "source": "寬宏售票",
       "name": "2027 吳申梅「BE WiTH YOU」Legacy演唱會",
       "venue_raw": "全台場館",
@@ -21285,7 +21305,7 @@
       ]
     },
     {
-      "id": "ibon-15431438",
+      "id": "ibon-12178498",
       "source": "ibon售票",
       "name": "MAX CHANGMIN LIVE SESSION：RESONANCE in TAIPEI",
       "venue_raw": "Legacy TERA",
@@ -21305,7 +21325,7 @@
       ]
     },
     {
-      "id": "ibon-6727937",
+      "id": "ibon-15769891",
       "source": "ibon售票",
       "name": "TungpangJessie 1st Taipei Fan Meeting",
       "venue_raw": "NUZONE 2F 展演空間",
@@ -21325,7 +21345,7 @@
       ]
     },
     {
-      "id": "ibon-4570665",
+      "id": "ibon-13738623",
       "source": "ibon售票",
       "name": "NCT WISH 2nd CONCERT TOUR ‘INTO THE WISH：Face Our WISH’ IN KAOHSIUNG",
       "venue_raw": "高雄巨蛋 KAOHSIUNG ARENA",
@@ -21469,7 +21489,7 @@
       ]
     },
     {
-      "id": "ibon-1830576",
+      "id": "ibon-4200145",
       "source": "ibon售票",
       "name": "樋口幸平 Fan meeting in 台北",
       "venue_raw": "HANASPACE（花漾展演空間）",
@@ -21485,26 +21505,6 @@
           "platform": "ibon",
           "name": "ibon售票",
           "url": "https://ticket.ibon.com.tw/ActivityInfo/Details/40015"
-        }
-      ]
-    },
-    {
-      "id": "indievox-26_iv04194bf-2027-01-24",
-      "source": "iNDIEVOX",
-      "name": "Legacy Presents【2026都市女聲】：小球（莊鵑瑛）《Reset：Me》－台北場",
-      "venue_raw": "Legacy Taipei",
-      "venue_id": "legacy-taipei",
-      "venue_name": "Legacy Taipei",
-      "city": "台北",
-      "date": "2027-01-24",
-      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04194bf_cb0db5a813822b5a5c0d7098c7c93472.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv04194bf",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv04194bf"
         }
       ]
     },
@@ -21525,6 +21525,26 @@
           "platform": "indievox",
           "name": "iNDIEVOX",
           "url": "https://www.indievox.com/activity/detail/27_iv04315d3"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04194bf-2027-01-24",
+      "source": "iNDIEVOX",
+      "name": "Legacy Presents【2026都市女聲】：小球（莊鵑瑛）《Reset：Me》－台北場",
+      "venue_raw": "Legacy Taipei",
+      "venue_id": "legacy-taipei",
+      "venue_name": "Legacy Taipei",
+      "city": "台北",
+      "date": "2027-01-24",
+      "image": "https://indievox.static.tixcraft.com/images/activity/26_iv04194bf_cb0db5a813822b5a5c0d7098c7c93472.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04194bf",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04194bf"
         }
       ]
     },
@@ -21635,7 +21655,7 @@
       ]
     },
     {
-      "id": "ibon-14383627",
+      "id": "ibon-11379844",
       "source": "ibon售票",
       "name": "NieR：Orchestra Concert 12026［YoRHa］",
       "venue_raw": "台北國際會議中心 大會堂（TICC）",
@@ -21677,7 +21697,7 @@
       ]
     },
     {
-      "id": "ibon-223374",
+      "id": "ibon-14327082",
       "source": "ibon售票",
       "name": "NieR：Orchestra Concert 12026［YoRHa］",
       "venue_raw": "台北國際會議中心 大會堂（TICC）",
@@ -21717,27 +21737,7 @@
       ]
     },
     {
-      "id": "kham-14814372",
-      "source": "寬宏售票",
-      "name": "【2/27場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
-      "venue_raw": "高雄國家體育場",
-      "venue_id": "kaohsiung-natl",
-      "venue_name": "高雄國家體育場",
-      "city": "高雄",
-      "date": "2027-02-27",
-      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1EMCIC6_Large.JPG?v=202611131337",
-      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1EMCIC6",
-      "price": "",
-      "ticket_links": [
-        {
-          "platform": "kham",
-          "name": "寬宏售票",
-          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1EMCIC6"
-        }
-      ]
-    },
-    {
-      "id": "kham-5900812",
+      "id": "kham-7740146",
       "source": "寬宏售票",
       "name": "2027 好想好好愛周蕙 高雄巨蛋 演唱會",
       "venue_raw": "K-ARENA 高雄巨蛋",
@@ -21757,7 +21757,27 @@
       ]
     },
     {
-      "id": "kham-10977006",
+      "id": "kham-8914925",
+      "source": "寬宏售票",
+      "name": "【2/27場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
+      "venue_raw": "高雄國家體育場",
+      "venue_id": "kaohsiung-natl",
+      "venue_name": "高雄國家體育場",
+      "city": "高雄",
+      "date": "2027-02-27",
+      "image": "https://imgs2.utiki.com.tw/Data/KHAM/Images/UTK2401/P1EMCIC6_Large.JPG?v=202611131337",
+      "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1EMCIC6",
+      "price": "",
+      "ticket_links": [
+        {
+          "platform": "kham",
+          "name": "寬宏售票",
+          "url": "https://kham.com.tw/application/UTK02/UTK0201_.aspx?PRODUCT_ID=P1EMCIC6"
+        }
+      ]
+    },
+    {
+      "id": "kham-10124033",
       "source": "寬宏售票",
       "name": "【2/28場次】BIGBANG 2026-2027 WORLD TOUR〈 XX：COSMOS 〉IN KAOHSIUNG",
       "venue_raw": "高雄國家體育場",
@@ -22251,7 +22271,7 @@
       ]
     },
     {
-      "id": "kham-14853471",
+      "id": "kham-11968023",
       "source": "寬宏售票",
       "name": "AiNA THE END 巡迴演唱會-台北站 AiNA THE END LIVE TOUR 2027 in TAIPEI",
       "venue_raw": "TICC 台北國際會議中心",
