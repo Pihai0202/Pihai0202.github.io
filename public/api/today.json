@@ -1,55 +1,80 @@
 {
-  "date": "2026-11-18",
-  "updated_at": "2026-11-18T09:35:55.839301+00:00",
-  "count": 2,
+  "date": "2026-11-19",
+  "updated_at": "2026-11-18T18:23:37.518373+00:00",
+  "count": 3,
   "cards": [
     {
-      "id": "indievox-26_iv042698b-2026-11-18",
-      "subtitle": "iNDIEVOX",
+      "id": "tixcraft-26_btskhbus-2026-11-19",
+      "subtitle": "拓元售票",
       "source_badge": "",
-      "title": "Wah SUB！017 人類的讚歌；P!SCO X 眠氣 Hypersomnia",
-      "venue": "台北流行音樂中心",
-      "venue_id": "taipei-music-center",
-      "city": "台北",
+      "title": "【歌迷返鄉專車】x BTS WORLD TOUR ’ARIRANG’ IN KAOHSIUNG",
+      "venue": "【返鄉專車】指定搭車點",
+      "venue_id": "",
+      "city": "",
       "category": "concert",
-      "background_image": "https://indievox.static.tixcraft.com/images/activity/26_iv042698b_adc6b502a281cb13eb10e690369b64f5.jpg",
-      "url": "https://www.indievox.com/activity/detail/26_iv042698b",
+      "background_image": "https://static.tixcraft.com/images/activity/26_btskhbus_49c8db69d1f64b5c3ca33cd9a4128b97.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_btskhbus",
       "stub": {
         "badge_text": "今天",
         "is_today": true,
-        "day": "18",
+        "day": "19",
         "year_month": "2026.11"
       },
       "ticket_links": [
         {
-          "platform": "indievox",
-          "name": "iNDIEVOX",
-          "url": "https://www.indievox.com/activity/detail/26_iv042698b"
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_btskhbus"
         }
       ]
     },
     {
-      "id": "ticketplus-886d24fae272cef8291c42e960a8fe24-8b4e9389be8ebf7e7ccda0a5d7d17169",
-      "subtitle": "遠大售票",
+      "id": "tixcraft-26_btskns-2026-11-19",
+      "subtitle": "拓元售票",
       "source_badge": "",
-      "title": "Vaundy ASIA ARENA TOUR 2026 “HORO” IN TAIPEI 官方周邊商品 事後線上販售",
-      "venue": "預購商品",
-      "venue_id": "",
-      "city": "",
+      "title": "BTS WORLD TOUR ’ARIRANG’ IN KAOHSIUNG",
+      "venue": "高雄世運",
+      "venue_id": "kaohsiung-natl",
+      "city": "高雄",
       "category": "concert",
-      "background_image": "https://static.ticketplus.com.tw/event/886d24fae272cef8291c42e960a8fe24/picBigHomeThumbnail_1793617835068.jpeg",
-      "url": "https://ticketplus.com.tw/activity/886d24fae272cef8291c42e960a8fe24",
+      "background_image": "https://static.tixcraft.com/images/activity/26_btskns_f8248940d42d5609a1c3822c06ddf973.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_btskns",
       "stub": {
         "badge_text": "今天",
         "is_today": true,
-        "day": "18",
+        "day": "19",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "tixcraft",
+          "name": "拓元售票",
+          "url": "https://tixcraft.com/activity/detail/26_btskns"
+        }
+      ]
+    },
+    {
+      "id": "ticketplus-1c278c733fef653ed767831d435a7625-d5c3b98fe2ee5f747536f019b4276f3d",
+      "subtitle": "遠大售票",
+      "source_badge": "",
+      "title": "Double A Battery・aiko x ana 跨國共演",
+      "venue": "女巫店",
+      "venue_id": "witch-house",
+      "city": "台北",
+      "category": "concert",
+      "background_image": "https://static.ticketplus.com.tw/event/1c278c733fef653ed767831d435a7625/picBigHomeThumbnail_1791917290972.jpeg",
+      "url": "https://ticketplus.com.tw/activity/1c278c733fef653ed767831d435a7625",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "19",
         "year_month": "2026.11"
       },
       "ticket_links": [
         {
           "platform": "ticketplus",
           "name": "遠大售票",
-          "url": "https://ticketplus.com.tw/activity/886d24fae272cef8291c42e960a8fe24"
+          "url": "https://ticketplus.com.tw/activity/1c278c733fef653ed767831d435a7625"
         }
       ]
     }
