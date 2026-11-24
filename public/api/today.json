@@ -1,30 +1,55 @@
 {
-  "date": "2026-11-24",
-  "updated_at": "2026-11-24T06:37:07.788400+00:00",
-  "count": 1,
+  "date": "2026-11-25",
+  "updated_at": "2026-11-24T18:15:13.783729+00:00",
+  "count": 2,
   "cards": [
     {
-      "id": "tixcraft-26_wte_v-2026-11-24",
+      "id": "tixcraft-26_5sos_v-2026-11-25",
       "subtitle": "拓元售票",
       "source_badge": "",
-      "title": "【VIP Upgrade/升級VIP】wave to earth - the pieces tour",
-      "venue": "TICC 台北國際會議中心",
-      "venue_id": "ticc",
+      "title": "【VIP Upgrade/升級VIP】5 SECONDS OF SUMMER：EVERYONE’S A STAR! WORLD TOUR",
+      "venue": "台北流行音樂中心",
+      "venue_id": "taipei-music-center",
       "city": "台北",
       "category": "concert",
-      "background_image": "https://static.tixcraft.com/images/activity/26_wte_v_aa4bd6db8b92a50fa7c9245a12536cd9.jpg",
-      "url": "https://tixcraft.com/activity/detail/26_wte_v",
+      "background_image": "https://static.tixcraft.com/images/activity/26_5sos_v_bdffd856b16fc199928bd4735029cca4.jpg",
+      "url": "https://tixcraft.com/activity/detail/26_5sos_v",
       "stub": {
         "badge_text": "今天",
         "is_today": true,
-        "day": "24",
+        "day": "25",
         "year_month": "2026.11"
       },
       "ticket_links": [
         {
           "platform": "tixcraft",
           "name": "拓元售票",
-          "url": "https://tixcraft.com/activity/detail/26_wte_v"
+          "url": "https://tixcraft.com/activity/detail/26_5sos_v"
+        }
+      ]
+    },
+    {
+      "id": "indievox-26_iv04279e7-2026-11-25",
+      "subtitle": "iNDIEVOX",
+      "source_badge": "",
+      "title": "FOREVER YOUNG —— 唱一晚奇妙的歌",
+      "venue": "台北流行音樂中心",
+      "venue_id": "taipei-music-center",
+      "city": "台北",
+      "category": "concert",
+      "background_image": "https://indievox.static.tixcraft.com/images/activity/26_iv04279e7_54f6e95d6be231c90ff6e5d37d591b95.jpg",
+      "url": "https://www.indievox.com/activity/detail/26_iv04279e7",
+      "stub": {
+        "badge_text": "今天",
+        "is_today": true,
+        "day": "25",
+        "year_month": "2026.11"
+      },
+      "ticket_links": [
+        {
+          "platform": "indievox",
+          "name": "iNDIEVOX",
+          "url": "https://www.indievox.com/activity/detail/26_iv04279e7"
         }
       ]
     }
